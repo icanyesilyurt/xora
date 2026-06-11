@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X Mirror — XORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">XO<span>RA</span></a>
+  <nav class="topnav">
+    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">10</b></a>
+    <a href="profile.html" class="pill" data-i18n="nav_profile">Profil</a>
+    <button type="button" class="pill lang-btn" id="langBtn">EN</button>
+  </nav>
+</header>
+
+<main class="page">
+
+  <!-- 1) GİRİŞ -->
+  <section id="step-input">
+    <span class="mode-emoji">🪞</span>
+    <h1 data-i18n="mirror_h1">X Mirror</h1>
+    <p class="sub" data-i18n="mirror_sub">Hesabını bağla, XORA son paylaşımlarına baksın. Kendi kartın her zaman ücretsiz.</p>
+
+    <div class="handle-form">
+      <input type="text" id="handleInput" class="handle-input"
+             data-i18n-ph="mirror_ph" placeholder="@kullaniciadin"
+             maxlength="30" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn" id="goBtn" data-i18n="mirror_btn">Aynaya Bak</button>
+      <p class="cost-note" id="mirrorLoginNote" data-i18n="mirror_login_note">Mirror için X hesabını bağlaman gerekir.</p>
+    </div>
+  </section>
+
+  <!-- 2) XORA DÜŞÜNÜYOR -->
+  <section id="step-think" hidden>
+    <div class="thinking">
+      <div class="xora-face" aria-hidden="true">
+        <span class="xora-eye"></span><span class="xora-eye"></span>
+      </div>
+      <p class="think-msg" id="thinkMsg"></p>
+      <div class="think-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+  </section>
+
+  <!-- 3) KİMLİK KARTI -->
+  <section id="step-result" hidden>
+    <div id="cardHolder"></div>
+
+    <div class="result-actions">
+      <button type="button" class="btn btn-orange" id="dlBtn" data-i18n="btn_download">Kartı İndir</button>
+      <button type="button" class="btn" id="shareBtn" data-i18n="btn_share">X'te Paylaş</button>
+    </div>
+
+    <p class="upsell">
+      <span data-i18n="upsell_mirror">Peki ya o kişi? 👀</span>
+      <a href="stalk.html" data-i18n="upsell_mirror_btn">X Stalk ile bak</a>
+    </p>
+  </section>
+
+</main>
+
+<footer class="foot">XORA V1</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="xora.js"></script>
+<script src="card.js"></script>
+<script>
+(function () {
+  var lastResult = null;
+
+  var stepInput  = document.getElementById("step-input");
+  var stepThink  = document.getElementById("step-think");
+  var stepResult = document.getElementById("step-result");
+  var input      = document.getElementById("handleInput");
+  var goBtn      = document.getElementById("goBtn");
+  var note       = document.getElementById("mirrorLoginNote");
+
+  function renderAuthState() {
+    var user = getUser();
+    if (user) {
+      input.hidden = false;
+      input.disabled = true;
+      input.value = "@" + user;
+      goBtn.setAttribute("data-i18n", "mirror_btn");
+      goBtn.textContent = t("mirror_btn");
+      note.hidden = true;
+    } else {
+      input.hidden = true;
+      input.disabled = true;
+      input.value = "";
+      goBtn.setAttribute("data-i18n", "auth_x_btn");
+      goBtn.textContent = t("auth_x_btn");
+      note.hidden = false;
+    }
+  }
+  renderAuthState();
+
+  function showResult() {
+    document.getElementById("cardHolder").innerHTML = buildIdentityCard(lastResult);
+    stepThink.hidden = true;
+    stepResult.hidden = false;
+    applyI18n();
+  }
+
+  function start() {
+    if (!isLoggedIn()) {
+      signInWithX();
+      return;
+    }
+    var handle = normHandle(input.value);
+    if (!handle) { toast(t("toast_handle")); input.focus(); return; }
+
+    lastResult = analyzeHandle(handle);
+    addHistory({ type: "mirror", handles: [handle] });
+
+    stepInput.hidden = true;
+    stepThink.hidden = false;
+    playThinking(document.getElementById("thinkMsg"), "mirror", showResult);
+  }
+
+  document.getElementById("goBtn").addEventListener("click", start);
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") start();
+  });
+  document.addEventListener("xora:session", renderAuthState);
+
+  document.getElementById("dlBtn").addEventListener("click", function () {
+    if (lastResult) downloadCanvas(renderIdentityPNG(lastResult), "xora-mirror-" + lastResult.handle + ".png");
+  });
+  document.getElementById("shareBtn").addEventListener("click", function () {
+    if (lastResult) shareOnX(shareIdentityText(lastResult));
+  });
+
+  // dil değişince kartı yeniden çiz
+  document.addEventListener("xora:lang", function () {
+    renderAuthState();
+    if (lastResult && !stepResult.hidden) showResult();
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil — XORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">XO<span>RA</span></a>
+  <nav class="topnav">
+    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">10</b></a>
+    <a href="profile.html" class="pill" data-i18n="nav_profile">Profil</a>
+    <button type="button" class="pill lang-btn" id="langBtn">EN</button>
+  </nav>
+</header>
+
+<main class="page">
+  <h1 data-i18n="profile_h1">Profil</h1>
+  <p class="sub"></p>
+
+  <!-- bağlı kullanıcı yoksa -->
+  <section id="noUser" hidden>
+    <div class="empty-box">
+      <p data-i18n="profile_nouser">Henüz hesabını bağlamadın.</p>
+      <button type="button" class="btn" id="profileLoginBtn" data-i18n="profile_gomirror">X ile Giriş Yap</button>
+    </div>
+  </section>
+
+  <!-- bağlı kullanıcı varsa -->
+  <section id="hasUser" hidden>
+
+    <div class="panel">
+      <div class="profile-row">
+        <div class="profile-user">
+          <img id="pAvatar" class="profile-avatar" alt="">
+          <div>
+          <p class="profile-name" id="pName">@kullanici</p>
+          <p class="history-date" id="pHandle">@kullanici</p>
+          <p class="history-date" data-i18n="profile_balance">Merak Kredisi</p>
+          </div>
+        </div>
+        <p class="balance-big"><span id="pCredits">0</span> <small>⚡</small></p>
+      </div>
+    </div>
+
+    <div class="panel" id="lastCardPanel" hidden>
+      <h2 data-i18n="profile_last">Son Kartın</h2>
+      <div id="lastCardHolder" style="text-align:center"></div>
+    </div>
+
+    <div class="panel">
+      <h2 data-i18n="profile_history">Geçmiş Analizler</h2>
+      <div id="historyBox"></div>
+    </div>
+
+    <button type="button" class="btn btn-ghost" id="logoutBtn" data-i18n="profile_logout">Çıkış Yap</button>
+  </section>
+
+</main>
+
+<footer class="foot">XORA V1</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="xora.js"></script>
+<script src="card.js"></script>
+<script>
+(function () {
+
+  function typeLabel(type) {
+    if (type === "mirror") return '<span class="history-type">🪞 Mirror</span>';
+    if (type === "stalk")  return '<span class="history-type h-stalk">👀 Stalk</span>';
+    return '<span class="history-type h-match">💞 Match</span>';
+  }
+
+  function fmtDate(ts) {
+    var d = new Date(ts);
+    var today = new Date();
+    if (d.toDateString() === today.toDateString()) return t("date_today");
+    return d.toLocaleDateString(getLang() === "tr" ? "tr-TR" : "en-US",
+                                { day: "numeric", month: "short" });
+  }
+
+  var remoteAnalyses = [];
+
+  function normalizeRemoteAnalysis(a) {
+    return {
+      type: a.type,
+      handles: a.target_username_2 ? [a.target_username, a.target_username_2] : [a.target_username],
+      ts: a.created_at,
+      resultTitle: a.result_title,
+      resultSubtitle: a.result_subtitle,
+      resultQuote: a.result_quote,
+      metrics: a.metrics || {},
+      rawResult: a.raw_result || {}
+    };
+  }
+
+  function renderHistoryList(hist) {
+    var box = document.getElementById("historyBox");
+    if (hist.length === 0) {
+      box.innerHTML = '<div class="empty-box">' +
+                        "<p>" + esc(t("profile_empty")) + "</p>" +
+                        '<a href="mirror.html" class="btn btn-sm">X Mirror</a>' +
+                      "</div>";
+      return;
+    }
+
+    var html = "";
+    for (var i = 0; i < hist.length; i++) {
+      var hh = hist[i];
+      var main;
+      if (hh.resultTitle) {
+        var target = hh.handles[0] ? "@" + esc(hh.handles[0]) : "";
+        var second = hh.handles[1] ? " × @" + esc(hh.handles[1]) : "";
+        main = target + second + " — " + esc(hh.resultTitle);
+      } else if (hh.type === "match") {
+        var m = matchHandles(hh.handles[0], hh.handles[1]);
+        main = "@" + esc(hh.handles[0]) + " × @" + esc(hh.handles[1]) + " — %" + m.overall;
+      } else {
+        var r = analyzeHandle(hh.handles[0]);
+        main = "@" + esc(hh.handles[0]) + " — " + esc(r.archetype.name[getLang()]);
+      }
+      html += '<div class="history-item">' +
+                typeLabel(hh.type) +
+                '<span class="history-main">' + main + "</span>" +
+                '<span class="history-date">' + fmtDate(hh.ts) + "</span>" +
+              "</div>";
+    }
+    box.innerHTML = html;
+  }
+
+  function render() {
+    var profile = getCurrentUser();
+    var user = getUser();
+    document.getElementById("noUser").hidden = !!profile;
+    document.getElementById("hasUser").hidden = !profile;
+    if (!profile) { applyI18n(); return; }
+
+    document.getElementById("pName").textContent = (profile && profile.display_name) || ("@" + user);
+    document.getElementById("pHandle").textContent = "@" + user;
+    document.getElementById("pCredits").textContent = profile && profile.credit_balance != null ? profile.credit_balance : getCredits();
+    var avatar = document.getElementById("pAvatar");
+    avatar.hidden = !(profile && profile.avatar_url);
+    if (profile && profile.avatar_url) avatar.src = profile.avatar_url;
+
+    var hist = remoteAnalyses.length > 0 ? remoteAnalyses.map(normalizeRemoteAnalysis) : getHistory();
+
+    // son kart: geçmişteki ilk kayıttan deterministik olarak yeniden üretilir
+    var lastPanel = document.getElementById("lastCardPanel");
+    var holder = document.getElementById("lastCardHolder");
+    if (hist.length > 0) {
+      lastPanel.hidden = false;
+      var last = hist[0];
+      if (last.type === "match") {
+        holder.innerHTML = buildMatchCard(matchHandles(last.handles[0], last.handles[1]));
+      } else {
+        holder.innerHTML = buildIdentityCard(analyzeHandle(last.handles[0]));
+      }
+    } else {
+      lastPanel.hidden = true;
+    }
+
+    renderHistoryList(hist);
+
+    applyI18n();
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", async function () {
+    if (confirm(t("logout_confirm"))) {
+      await clearSession();
+      toast(t("logout_done"));
+      setTimeout(function () { window.location.href = "index.html"; }, 900);
+    }
+  });
+  document.getElementById("profileLoginBtn").addEventListener("click", signInWithX);
+
+  async function loadRemoteAnalyses() {
+    remoteAnalyses = await getRemoteAnalyses(30);
+    render();
+  }
+
+  document.addEventListener("xora:lang", render);
+  document.addEventListener("xora:session", loadRemoteAnalyses);
+  document.addEventListener("DOMContentLoaded", loadRemoteAnalyses);
+  render();
+})();
+</script>
+
+</body>
+</html>

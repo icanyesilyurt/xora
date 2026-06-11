@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merak Kredisi — XORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">XO<span>RA</span></a>
+  <nav class="topnav">
+    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">10</b></a>
+    <a href="profile.html" class="pill" data-i18n="nav_profile">Profil</a>
+    <button type="button" class="pill lang-btn" id="langBtn">EN</button>
+  </nav>
+</header>
+
+<main class="page">
+  <span class="mode-emoji">⚡</span>
+  <h1 data-i18n="credits_h1">Merak Kredisi</h1>
+  <p class="sub" data-i18n="credits_sub">Kendi kartın hep ücretsiz. Başkalarını merak etmek kredi ister.</p>
+
+  <div class="panel">
+    <div class="profile-row">
+      <p style="font-weight:800" data-i18n="credits_balance">Bakiyen</p>
+      <p class="balance-big"><span id="balanceVal">0</span> <small>⚡</small></p>
+    </div>
+  </div>
+
+  <div class="packs">
+    <div class="pack">
+      <p class="pack-amount">25 <small>⚡</small></p>
+      <p class="pack-name" data-i18n="pkg1_n">Çaylak Paketi</p>
+      <p class="pack-price">₺49</p>
+      <button type="button" class="btn btn-sm" data-amount="25" data-i18n="credits_buy">Yükle</button>
+    </div>
+
+    <div class="pack hot">
+      <p class="pack-amount">60 <small>⚡</small></p>
+      <p class="pack-name" data-i18n="pkg2_n">Meraklı Paketi</p>
+      <p class="pack-price">₺99</p>
+      <button type="button" class="btn btn-sm btn-orange" data-amount="60" data-i18n="credits_buy">Yükle</button>
+    </div>
+
+    <div class="pack">
+      <p class="pack-amount">150 <small>⚡</small></p>
+      <p class="pack-name" data-i18n="pkg3_n">Dedektif Paketi</p>
+      <p class="pack-price">₺199</p>
+      <button type="button" class="btn btn-sm" data-amount="150" data-i18n="credits_buy">Yükle</button>
+    </div>
+  </div>
+
+  <p class="demo-note" data-i18n="credits_note">V1 demo: ödeme alınmaz, krediler anında yüklenir.</p>
+</main>
+
+<footer class="foot">XORA V1</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  function renderBalance() {
+    document.getElementById("balanceVal").textContent = getCredits();
+  }
+
+  var btns = document.querySelectorAll("[data-amount]");
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener("click", function () {
+      var n = parseInt(this.getAttribute("data-amount"), 10);
+      addCredits(n);              // V1: mock yükleme, ödeme yok
+      renderBalance();
+      toast("+" + n + " " + t("toast_loaded"));
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", renderBalance);
+  renderBalance();
+})();
+</script>
+
+</body>
+</html>

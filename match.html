@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X Match — XORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">XO<span>RA</span></a>
+  <nav class="topnav">
+    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">10</b></a>
+    <a href="profile.html" class="pill" data-i18n="nav_profile">Profil</a>
+    <button type="button" class="pill lang-btn" id="langBtn">EN</button>
+  </nav>
+</header>
+
+<main class="page">
+
+  <!-- 1) GİRİŞ -->
+  <section id="step-input">
+    <span class="mode-emoji">💞</span>
+    <h1 data-i18n="match_h1">X Match</h1>
+    <p class="sub" data-i18n="match_sub">İki hesabı yan yana koy. XORA uyumu söylesin, kavgayı sen çıkar.</p>
+
+    <div class="handle-form">
+      <input type="text" id="handleA" class="handle-input"
+             data-i18n-ph="match_ph1" placeholder="@birinci"
+             maxlength="30" autocomplete="off" spellcheck="false">
+      <input type="text" id="handleB" class="handle-input"
+             data-i18n-ph="match_ph2" placeholder="@ikinci"
+             maxlength="30" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn btn-orange" id="goBtn" data-i18n="match_btn">Uyumu Hesapla</button>
+      <p class="cost-note">⚡ <span data-i18n="match_note">Bu karşılaştırma 10 Merak Kredisi kullanır.</span></p>
+    </div>
+  </section>
+
+  <!-- 2) XORA DÜŞÜNÜYOR -->
+  <section id="step-think" hidden>
+    <div class="thinking">
+      <div class="xora-face" aria-hidden="true">
+        <span class="xora-eye"></span><span class="xora-eye"></span>
+      </div>
+      <p class="think-msg" id="thinkMsg"></p>
+      <div class="think-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+  </section>
+
+  <!-- 3) UYUM KARTI -->
+  <section id="step-result" hidden>
+    <div id="cardHolder"></div>
+
+    <div class="result-actions">
+      <button type="button" class="btn btn-orange" id="dlBtn" data-i18n="btn_download">Kartı İndir</button>
+      <button type="button" class="btn" id="shareBtn" data-i18n="btn_share">X'te Paylaş</button>
+      <a href="match.html" class="btn btn-ghost" data-i18n="btn_again">Tekrar Dene</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">XORA V1</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="xora.js"></script>
+<script src="card.js"></script>
+<script>
+(function () {
+  var lastMatch = null;
+
+  var stepInput  = document.getElementById("step-input");
+  var stepThink  = document.getElementById("step-think");
+  var stepResult = document.getElementById("step-result");
+  var inA = document.getElementById("handleA");
+  var inB = document.getElementById("handleB");
+
+  // ilk kutuyu kullanıcının kendi hesabıyla doldur (varsa)
+  if (getUser()) inA.value = "@" + getUser();
+  document.addEventListener("xora:session", function () {
+    if (getUser() && !inA.value) inA.value = "@" + getUser();
+  });
+
+  function showResult() {
+    document.getElementById("cardHolder").innerHTML = buildMatchCard(lastMatch);
+    stepThink.hidden = true;
+    stepResult.hidden = false;
+    applyI18n();
+  }
+
+  function start() {
+    var a = normHandle(inA.value);
+    var b = normHandle(inB.value);
+    if (!a || !b) { toast(t("toast_two")); (!a ? inA : inB).focus(); return; }
+    if (a === b)  { toast(t("toast_same")); inB.focus(); return; }
+
+    if (!spendCredits(COSTS.match)) {
+      toast(t("toast_nocredit"));
+      setTimeout(function () { window.location.href = "credits.html"; }, 1200);
+      return;
+    }
+
+    lastMatch = matchHandles(a, b);
+    addHistory({ type: "match", handles: [a, b] });
+
+    stepInput.hidden = true;
+    stepThink.hidden = false;
+    playThinking(document.getElementById("thinkMsg"), "match", showResult);
+  }
+
+  document.getElementById("goBtn").addEventListener("click", start);
+  inB.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") start();
+  });
+
+  document.getElementById("dlBtn").addEventListener("click", function () {
+    if (lastMatch) downloadCanvas(renderMatchPNG(lastMatch), "xora-match-" + lastMatch.a + "-" + lastMatch.b + ".png");
+  });
+  document.getElementById("shareBtn").addEventListener("click", function () {
+    if (lastMatch) shareOnX(shareMatchText(lastMatch));
+  });
+
+  document.addEventListener("xora:lang", function () {
+    if (lastMatch && !stepResult.hidden) showResult();
+  });
+})();
+</script>
+
+</body>
+</html>
