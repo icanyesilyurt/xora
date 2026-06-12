@@ -129,7 +129,7 @@ function normalizeXProfile(authUser) {
   ]);
   username = String(username).replace(/^@+/, "");
   if (!username && authUser.email) username = authUser.email.split("@")[0];
-  if (!username) username = String(authUser.id || "").slice(0, 8);
+  if (!username) username = "x_user_" + String(authUser.id || "").slice(0, 8);
 
   var displayName = firstValue(["name", "full_name", "display_name"]) || username;
   var avatarUrl = firstValue(["avatar_url", "picture", "profile_image_url", "profile_image_url_https"]);
@@ -138,6 +138,7 @@ function normalizeXProfile(authUser) {
                    authUser.id;
 
   authDebug("user metadata", {
+    authUserId: authUser.id,
     provider: identity && identity.provider,
     metadata: meta,
     identityData: data,
@@ -168,16 +169,27 @@ async function upsertSupabaseUser(profile) {
     last_login_at: new Date().toISOString()
   };
 
-  var result = await sb
-    .from("users")
-    .upsert(row, { onConflict: "id" })
-    .select("id,x_user_id,username,display_name,avatar_url,lang,credit_balance")
-    .single();
+  var result;
+  try {
+    result = await sb
+      .from("users")
+      .upsert(row, { onConflict: "id" })
+      .select("id,x_user_id,username,display_name,avatar_url,lang,credit_balance")
+      .single();
+  } catch (err) {
+    authDebug("users upsert exception", err);
+    console.warn("XORA users upsert exception:", err);
+    return profile;
+  }
 
-  authDebug("users upsert result", { data: result.data, error: result.error });
+  authDebug("users upsert result", {
+    payload: row,
+    data: result.data,
+    error: result.error
+  });
 
   if (result.error) {
-    console.warn("XORA users upsert failed:", result.error.message);
+    console.warn("XORA users upsert failed:", result.error.message, result.error);
     return profile;
   }
 
@@ -218,14 +230,20 @@ function cleanOAuthUrl() {
 }
 
 async function hydrateAuthUser(authUser, source) {
-  authDebug("hydrate user", { source: source, hasUser: !!authUser });
+  authDebug("hydrate user", { source: source, hasUser: !!authUser, authUserId: authUser && authUser.id });
   var profile = normalizeXProfile(authUser);
-  var saved = await upsertSupabaseUser(profile);
-  storeAuthUser(saved);
+
+  authDebug("derived profile payload", profile);
+  storeAuthUser(profile);
   xoraSessionReady = true;
   refreshAuthUi();
-  document.dispatchEvent(new CustomEvent("xora:session", { detail: saved }));
-  return saved;
+  document.dispatchEvent(new CustomEvent("xora:session", { detail: profile }));
+
+  var saved = await upsertSupabaseUser(profile);
+  storeAuthUser(saved || profile);
+  refreshAuthUi();
+  document.dispatchEvent(new CustomEvent("xora:session", { detail: saved || profile }));
+  return saved || profile;
 }
 
 async function syncSession() {
@@ -629,6 +647,10 @@ function ensureAuthModal() {
 
 function refreshAuthUi() {
   var loggedIn = isLoggedIn();
+  authDebug("current auth state", {
+    loggedIn: loggedIn,
+    user: getStoredAuthUser()
+  });
   var links = document.querySelectorAll('[data-i18n="nav_profile"]');
   for (var i = 0; i < links.length; i++) {
     links[i].textContent = loggedIn ? t("nav_profile") : t("nav_login");
