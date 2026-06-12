@@ -204,6 +204,7 @@ async function ensurePublicUser(session) {
     last_login_at: new Date().toISOString()
   };
 
+  console.log("[XORA db] upsert called at", new Date().toISOString());
   console.log("[XORA db] users upsert payload", payload);
 
   var result;
@@ -211,15 +212,16 @@ async function ensurePublicUser(session) {
     result = await sb
       .from("users")
       .upsert(payload, { onConflict: "id" })
-      .select()
-      .single();
+      .select();
   } catch (err) {
     console.error("[XORA db] users upsert failed", err);
+    console.error("[XORA db] users upsert failed full", JSON.stringify(err, null, 2));
     return null;
   }
 
   if (result.error) {
     console.error("[XORA db] users upsert failed", result.error);
+    console.error("[XORA db] users upsert failed full", JSON.stringify(result.error, null, 2));
     return null;
   }
 
