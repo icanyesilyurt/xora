@@ -33,7 +33,27 @@
     </div>
   </section>
 
-  <!-- 2) XORA DÜŞÜNÜYOR -->
+  <!-- 2) PROFİL TAMAMLAMA -->
+  <section id="step-profile" hidden>
+    <span class="mode-emoji">🪞</span>
+    <h1 data-i18n="mirror_profile_h">Profilini Tamamla</h1>
+    <p class="sub" data-i18n="mirror_profile_sub">Kartını oluşturmadan önce bilgilerini gözden geçir.</p>
+
+    <div class="handle-form">
+      <input type="text" id="displayNameInput" class="handle-input" data-i18n-ph="mirror_display_name" placeholder="Görünen ad" autocomplete="name">
+      <input type="text" id="countryInput" class="handle-input" data-i18n-ph="mirror_country" placeholder="Ülke" autocomplete="country-name">
+      <input type="text" id="cityInput" class="handle-input" data-i18n-ph="mirror_city" placeholder="Şehir" autocomplete="address-level2">
+      <input type="text" id="bioInput" class="handle-input" data-i18n-ph="mirror_bio" placeholder="Kısa bio" maxlength="140">
+      <input type="url" id="websiteInput" class="handle-input" data-i18n-ph="mirror_website" placeholder="Web sitesi" autocomplete="url">
+      <input type="url" id="avatarUrlInput" class="handle-input" data-i18n-ph="mirror_avatar_url" placeholder="Profil fotoğrafı URL">
+      <div class="result-actions">
+        <button type="button" class="btn" id="saveProfileBtn" data-i18n="mirror_save">Kaydet</button>
+        <button type="button" class="btn btn-ghost" id="skipProfileBtn" data-i18n="mirror_skip">Şimdilik geç</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3) XORA DÜŞÜNÜYOR -->
   <section id="step-think" hidden>
     <div class="thinking">
       <div class="xora-face" aria-hidden="true">
@@ -44,7 +64,7 @@
     </div>
   </section>
 
-  <!-- 3) KİMLİK KARTI -->
+  <!-- 4) KİMLİK KARTI -->
   <section id="step-result" hidden>
     <div id="cardHolder"></div>
 
@@ -73,12 +93,20 @@
   var lastResult = null;
   var mirrorStarted = false;
   var mirrorSession = null;
+  var mirrorProfileShown = false;
 
   var stepInput  = document.getElementById("step-input");
+  var stepProfile = document.getElementById("step-profile");
   var stepThink  = document.getElementById("step-think");
   var stepResult = document.getElementById("step-result");
   var goBtn      = document.getElementById("goBtn");
   var note       = document.getElementById("mirrorLoginNote");
+  var displayNameInput = document.getElementById("displayNameInput");
+  var countryInput = document.getElementById("countryInput");
+  var cityInput = document.getElementById("cityInput");
+  var bioInput = document.getElementById("bioInput");
+  var websiteInput = document.getElementById("websiteInput");
+  var avatarUrlInput = document.getElementById("avatarUrlInput");
 
   function mirrorLog(label, data) {
     if (window.console) console.log("[XORA mirror]", label, data || "");
@@ -121,18 +149,36 @@
       await clearSession();
       mirrorSession = null;
       mirrorStarted = false;
+      mirrorProfileShown = false;
       renderLogin(false);
     };
   }
 
   function renderLogin(showNote) {
     stepInput.hidden = false;
+    stepProfile.hidden = true;
     stepThink.hidden = true;
     stepResult.hidden = true;
     goBtn.setAttribute("data-i18n", "mirror_login_cta");
     goBtn.textContent = t("mirror_login_cta");
     note.hidden = !showNote;
     renderMirrorHeader(false);
+  }
+
+  function renderProfileForm(profile) {
+    stepInput.hidden = true;
+    stepProfile.hidden = false;
+    stepThink.hidden = true;
+    stepResult.hidden = true;
+
+    displayNameInput.value = profile.display_name || profile.username || "";
+    countryInput.value = "";
+    cityInput.value = "";
+    bioInput.value = "";
+    websiteInput.value = "";
+    avatarUrlInput.value = profile.avatar_url || "";
+    applyI18n();
+    renderMirrorHeader(true);
   }
 
   function showResult() {
@@ -149,7 +195,6 @@
     mirrorStarted = true;
     mirrorSession = session;
 
-    ensurePublicUser(session);
     var profile = profileFromUser(session.user);
     storeAuthUser(profile);
     refreshAuthUi();
@@ -163,6 +208,43 @@
     stepInput.hidden = true;
     stepThink.hidden = false;
     playThinking(document.getElementById("thinkMsg"), "mirror", showResult);
+  }
+
+  async function saveProfileCompletion() {
+    if (!mirrorSession || !mirrorSession.user) return;
+
+    var extra = {
+      display_name: displayNameInput.value.trim(),
+      country: countryInput.value.trim(),
+      city: cityInput.value.trim(),
+      bio: bioInput.value.trim(),
+      website: websiteInput.value.trim(),
+      avatar_url: avatarUrlInput.value.trim()
+    };
+    localStorage.setItem("xora_profile_extra", JSON.stringify(extra));
+
+    var sb = getSupabaseClient();
+    if (sb) {
+      var payload = {
+        display_name: extra.display_name || profileFromUser(mirrorSession.user).display_name,
+        avatar_url: extra.avatar_url || profileFromUser(mirrorSession.user).avatar_url || null,
+        last_login_at: new Date().toISOString()
+      };
+      console.log("[XORA db] profile completion update payload", payload);
+      var result = await sb.from("users").update(payload).eq("id", mirrorSession.user.id).select();
+      if (result.error) {
+        console.error("[XORA db] profile completion update failed", result.error);
+        console.error("[XORA db] profile completion update failed full", JSON.stringify(result.error, null, 2));
+      } else {
+        console.log("[XORA db] profile completion update result", result.data);
+      }
+    }
+
+    startMirror(mirrorSession);
+  }
+
+  function skipProfileCompletion() {
+    startMirror(mirrorSession);
   }
 
   async function waitForMirrorSession(sb) {
@@ -197,6 +279,16 @@
     if (result.error) toast(result.error.message);
   }
 
+  async function handleSessionReady(session) {
+    if (!session || !session.user || mirrorStarted || mirrorProfileShown) return;
+    mirrorSession = session;
+    mirrorProfileShown = true;
+    renderMirrorHeader(true);
+    cleanMirrorUrl();
+    await ensurePublicUser(session);
+    renderProfileForm(profileFromUser(session.user));
+  }
+
   async function initMirror() {
     mirrorLog("init", { url: window.location.href });
     renderLogin(false);
@@ -213,19 +305,21 @@
         hasSession: !!session,
         authUserId: session && session.user && session.user.id
       });
-      if (session) startMirror(session);
+      if (session) handleSessionReady(session);
     });
 
     var session = await waitForMirrorSession(sb);
     if (session) {
       mirrorLog("session ready", { authUserId: session.user && session.user.id });
-      startMirror(session);
+      handleSessionReady(session);
     } else {
       renderLogin(true);
     }
   }
 
   document.getElementById("goBtn").addEventListener("click", startLogin);
+  document.getElementById("saveProfileBtn").addEventListener("click", saveProfileCompletion);
+  document.getElementById("skipProfileBtn").addEventListener("click", skipProfileCompletion);
 
   document.getElementById("dlBtn").addEventListener("click", function () {
     if (lastResult) downloadCanvas(renderIdentityPNG(lastResult), "xora-mirror-" + lastResult.handle + ".png");
@@ -238,6 +332,7 @@
   document.addEventListener("xora:lang", function () {
     renderMirrorHeader(!!mirrorSession);
     if (!mirrorSession) renderLogin(!note.hidden);
+    if (mirrorSession && mirrorProfileShown && !mirrorStarted) renderProfileForm(profileFromUser(mirrorSession.user));
     if (lastResult && !stepResult.hidden) showResult();
   });
 

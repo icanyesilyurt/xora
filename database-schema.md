@@ -98,6 +98,9 @@ alter table public.users enable row level security;
 alter table public.analyses enable row level security;
 alter table public.credit_transactions enable row level security;
 
+grant usage on schema public to authenticated;
+grant select, insert, update on public.users to authenticated;
+
 drop policy if exists "Users can read own profile" on public.users;
 create policy "Users can read own profile"
 on public.users for select
@@ -113,6 +116,19 @@ create policy "Users can update own profile"
 on public.users for update
 using (auth.uid() = id)
 with check (auth.uid() = id);
+
+-- If the browser logs `permission denied for table users`, run the GRANT
+-- statements above together with these RLS policies. The users payload used by
+-- XORA matches this column structure:
+-- id uuid primary key
+-- x_user_id text
+-- username varchar/text
+-- display_name varchar/text
+-- avatar_url text
+-- lang char/enum
+-- credit_balance integer
+-- created_at timestamptz
+-- last_login_at timestamptz
 
 drop policy if exists "Users can read own analyses" on public.analyses;
 create policy "Users can read own analyses"
