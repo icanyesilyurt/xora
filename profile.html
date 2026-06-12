@@ -74,13 +74,15 @@
 
 <footer class="foot">XORA V1</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
 <script src="app.js"></script>
 <script src="xora.js"></script>
 <script src="card.js"></script>
 <script>
 (function () {
+  if (!isLoggedIn()) {
+    window.location.href = "auth.html";
+    return;
+  }
 
   function typeLabel(type) {
     if (type === "mirror") return '<span class="history-type">🪞 Mirror</span>';
@@ -99,6 +101,15 @@
   var remoteAnalyses = [];
 
   function normalizeRemoteAnalysis(a) {
+    if (a.handles || a.result) {
+      return {
+        type: a.type,
+        handles: a.handles || [],
+        ts: a.createdAt,
+        resultTitle: a.title,
+        rawResult: a.result || {}
+      };
+    }
     return {
       type: a.type,
       handles: a.target_username_2 ? [a.target_username, a.target_username_2] : [a.target_username],
@@ -159,7 +170,7 @@
     avatar.hidden = !(profile && profile.avatar_url);
     if (profile && profile.avatar_url) avatar.src = profile.avatar_url;
 
-    var hist = remoteAnalyses.length > 0 ? remoteAnalyses.map(normalizeRemoteAnalysis) : getHistory();
+    var hist = remoteAnalyses.length > 0 ? remoteAnalyses.map(normalizeRemoteAnalysis) : getHistory().map(normalizeRemoteAnalysis);
 
     // son kart: kayıt varsa geçmişteki ilk kayıttan gösterilir, yoksa boş durum kalır
     var lastPanel = document.getElementById("lastCardPanel");
