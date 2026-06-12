@@ -22,7 +22,7 @@
 <main class="page">
 
   <!-- 1) GİRİŞ -->
-  <section id="step-input">
+  <section id="loggedOutView">
     <span class="mode-emoji">🪞</span>
     <h1 data-i18n="mirror_h1">X Mirror</h1>
     <p class="sub" data-i18n="mirror_sub">Hesabını bağla, XORA son paylaşımlarına baksın. Kendi kartın her zaman ücretsiz.</p>
@@ -34,7 +34,7 @@
   </section>
 
   <!-- 2) PROFİL TAMAMLAMA -->
-  <section id="step-profile" hidden>
+  <section id="profileSetupView" hidden>
     <span class="mode-emoji">🪞</span>
     <h1 data-i18n="mirror_profile_h">Profilini Tamamla</h1>
     <p class="sub" data-i18n="mirror_profile_sub">Kartını oluşturmadan önce bilgilerini gözden geçir.</p>
@@ -54,7 +54,7 @@
   </section>
 
   <!-- 3) XORA DÜŞÜNÜYOR -->
-  <section id="step-think" hidden>
+  <section id="analyzingView" hidden>
     <div class="thinking">
       <div class="xora-face" aria-hidden="true">
         <span class="xora-eye"></span><span class="xora-eye"></span>
@@ -65,7 +65,7 @@
   </section>
 
   <!-- 4) KİMLİK KARTI -->
-  <section id="step-result" hidden>
+  <section id="resultView" hidden>
     <div id="cardHolder"></div>
 
     <div class="result-actions">
@@ -94,11 +94,12 @@
   var mirrorStarted = false;
   var mirrorSession = null;
   var mirrorProfileShown = false;
+  var mirrorState = "logged_out";
 
-  var stepInput  = document.getElementById("step-input");
-  var stepProfile = document.getElementById("step-profile");
-  var stepThink  = document.getElementById("step-think");
-  var stepResult = document.getElementById("step-result");
+  var loggedOutView  = document.getElementById("loggedOutView");
+  var profileSetupView = document.getElementById("profileSetupView");
+  var analyzingView  = document.getElementById("analyzingView");
+  var resultView = document.getElementById("resultView");
   var goBtn      = document.getElementById("goBtn");
   var note       = document.getElementById("mirrorLoginNote");
   var displayNameInput = document.getElementById("displayNameInput");
@@ -110,6 +111,28 @@
 
   function mirrorLog(label, data) {
     if (window.console) console.log("[XORA mirror]", label, data || "");
+  }
+
+  function setMirrorState(state) {
+    mirrorState = state;
+    [
+      loggedOutView,
+      profileSetupView,
+      analyzingView,
+      resultView
+    ].forEach(function (view) {
+      if (view) view.hidden = true;
+    });
+
+    var selected = {
+      logged_out: loggedOutView,
+      profile_setup: profileSetupView,
+      analyzing: analyzingView,
+      result: resultView
+    }[state];
+
+    if (selected) selected.hidden = false;
+    mirrorLog("state", state);
   }
 
   function cleanMirrorUrl() {
@@ -142,34 +165,21 @@
       return;
     }
 
-    nav.textContent = t("profile_logout");
-    nav.href = "#logout";
-    nav.onclick = async function (e) {
-      e.preventDefault();
-      await clearSession();
-      mirrorSession = null;
-      mirrorStarted = false;
-      mirrorProfileShown = false;
-      renderLogin(false);
-    };
+      nav.textContent = t("nav_profile");
+      nav.href = "profile.html";
+      nav.onclick = null;
   }
 
   function renderLogin(showNote) {
-    stepInput.hidden = false;
-    stepProfile.hidden = true;
-    stepThink.hidden = true;
-    stepResult.hidden = true;
+    setMirrorState("logged_out");
     goBtn.setAttribute("data-i18n", "mirror_login_cta");
     goBtn.textContent = t("mirror_login_cta");
-    note.hidden = !showNote;
+    note.hidden = true;
     renderMirrorHeader(false);
   }
 
   function renderProfileForm(profile) {
-    stepInput.hidden = true;
-    stepProfile.hidden = false;
-    stepThink.hidden = true;
-    stepResult.hidden = true;
+    setMirrorState("profile_setup");
 
     displayNameInput.value = profile.display_name || profile.username || "";
     countryInput.value = "";
@@ -183,8 +193,7 @@
 
   function showResult() {
     document.getElementById("cardHolder").innerHTML = buildIdentityCard(lastResult);
-    stepThink.hidden = true;
-    stepResult.hidden = false;
+    setMirrorState("result");
     applyI18n();
     renderMirrorHeader(true);
     mirrorLog("render card", { handle: lastResult && lastResult.handle });
@@ -205,8 +214,7 @@
     lastResult = analyzeHandle(handle);
     addHistory({ type: "mirror", handles: [handle] });
 
-    stepInput.hidden = true;
-    stepThink.hidden = false;
+    setMirrorState("analyzing");
     playThinking(document.getElementById("thinkMsg"), "mirror", showResult);
   }
 
@@ -280,7 +288,7 @@
   }
 
   async function handleSessionReady(session) {
-    if (!session || !session.user || mirrorStarted || mirrorProfileShown) return;
+    if (!session || !session.user || mirrorStarted || mirrorProfileShown || mirrorState !== "logged_out") return;
     mirrorSession = session;
     mirrorProfileShown = true;
     renderMirrorHeader(true);
@@ -331,9 +339,9 @@
   // dil değişince kartı yeniden çiz
   document.addEventListener("xora:lang", function () {
     renderMirrorHeader(!!mirrorSession);
-    if (!mirrorSession) renderLogin(!note.hidden);
+    if (!mirrorSession && mirrorState === "logged_out") renderLogin(false);
     if (mirrorSession && mirrorProfileShown && !mirrorStarted) renderProfileForm(profileFromUser(mirrorSession.user));
-    if (lastResult && !stepResult.hidden) showResult();
+    if (lastResult && mirrorState === "result") showResult();
   });
 
   initMirror();
