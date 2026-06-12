@@ -69,6 +69,11 @@
 <script src="card.js"></script>
 <script>
 (function () {
+  if (!isLoggedIn()) {
+    window.location.href = "auth.html";
+    return;
+  }
+
   var lastResult = null;
 
   var stepInput  = document.getElementById("step-input");
@@ -95,6 +100,7 @@
 
     lastResult = analyzeHandle(handle);
     addHistory({ type: "stalk", handles: [handle] });
+    saveAnalysisRecord("stalk", [handle], lastResult);
 
     stepInput.hidden = true;
     stepThink.hidden = false;

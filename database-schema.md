@@ -2,7 +2,7 @@
 
 Project reference: `jafrxhkppvvchyjbkldd`
 
-Bu dosya XORA'nın mevcut OAuth + profil + analiz geçmişi altyapısı için gereken
+Bu dosya XORA'nın email/şifre üyelik + profil + analiz geçmişi altyapısı için gereken
 üretim şemasını içerir. OpenAI, X API tweet çekme, ödeme ve kredi harcama
 mantığı bu aşamada eklenmez.
 
@@ -54,6 +54,15 @@ create table if not exists public.users (
 create index if not exists users_username_idx on public.users (username);
 create index if not exists users_x_user_id_idx on public.users (x_user_id);
 
+create table if not exists public.profiles (
+  id uuid primary key references public.users(id) on delete cascade,
+  country text,
+  city text,
+  bio text,
+  website text,
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.analyses (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.users(id) on delete cascade,
@@ -95,11 +104,15 @@ create index if not exists credit_transactions_user_created_idx
 on public.credit_transactions (user_id, created_at desc);
 
 alter table public.users enable row level security;
+alter table public.profiles enable row level security;
 alter table public.analyses enable row level security;
 alter table public.credit_transactions enable row level security;
 
 grant usage on schema public to authenticated;
 grant select, insert, update on public.users to authenticated;
+grant select, insert, update on public.profiles to authenticated;
+grant select, insert on public.analyses to authenticated;
+grant select, insert on public.credit_transactions to authenticated;
 
 drop policy if exists "Users can read own profile" on public.users;
 create policy "Users can read own profile"
@@ -129,6 +142,22 @@ with check (auth.uid() = id);
 -- credit_balance integer
 -- created_at timestamptz
 -- last_login_at timestamptz
+
+drop policy if exists "Users can read own extended profile" on public.profiles;
+create policy "Users can read own extended profile"
+on public.profiles for select
+using (auth.uid() = id);
+
+drop policy if exists "Users can insert own extended profile" on public.profiles;
+create policy "Users can insert own extended profile"
+on public.profiles for insert
+with check (auth.uid() = id);
+
+drop policy if exists "Users can update own extended profile" on public.profiles;
+create policy "Users can update own extended profile"
+on public.profiles for update
+using (auth.uid() = id)
+with check (auth.uid() = id);
 
 drop policy if exists "Users can read own analyses" on public.analyses;
 create policy "Users can read own analyses"
@@ -219,6 +248,7 @@ from public, anon, authenticated;
 ## RLS Özeti
 
 - `users`: kullanıcı yalnızca kendi satırını okuyabilir, oluşturabilir ve güncelleyebilir.
+- `profiles`: kullanıcı yalnızca kendi genişletilmiş profilini okuyabilir, oluşturabilir ve güncelleyebilir.
 - `analyses`: kullanıcı yalnızca kendi analiz kayıtlarını okuyabilir ve oluşturabilir.
 - `credit_transactions`: kullanıcı yalnızca kendi kredi hareketlerini okuyabilir ve oluşturabilir.
 - `credit_transactions.related_analysis_id` doluysa ilgili analiz de aynı kullanıcıya ait olmalıdır.

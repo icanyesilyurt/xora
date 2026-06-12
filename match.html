@@ -72,6 +72,11 @@
 <script src="card.js"></script>
 <script>
 (function () {
+  if (!isLoggedIn()) {
+    window.location.href = "auth.html";
+    return;
+  }
+
   var lastMatch = null;
 
   var stepInput  = document.getElementById("step-input");
@@ -107,6 +112,7 @@
 
     lastMatch = matchHandles(a, b);
     addHistory({ type: "match", handles: [a, b] });
+    saveAnalysisRecord("match", [a, b], lastMatch);
 
     stepInput.hidden = true;
     stepThink.hidden = false;

@@ -26,8 +26,8 @@
   <!-- bağlı kullanıcı yoksa -->
   <section id="noUser" hidden>
     <div class="empty-box">
-      <p data-i18n="profile_nouser">Henüz hesabını bağlamadın.</p>
-      <button type="button" class="btn" id="profileLoginBtn" data-i18n="profile_gomirror">X ile Giriş Yap</button>
+      <p data-i18n="profile_nouser">Devam etmek için giriş yapmalısın.</p>
+      <a href="auth.html" class="btn" id="profileLoginBtn" data-i18n="profile_gomirror">Giriş Yap</a>
     </div>
   </section>
 
@@ -48,9 +48,18 @@
       </div>
     </div>
 
-    <div class="panel" id="lastCardPanel" hidden>
+    <div class="panel" id="lastCardPanel">
       <h2 data-i18n="profile_last">Son Kartın</h2>
       <div id="lastCardHolder" style="text-align:center"></div>
+    </div>
+
+    <div class="panel">
+      <h2 data-i18n="profile_actions">Analiz Başlat</h2>
+      <div class="result-actions">
+        <a href="mirror.html" class="btn btn-sm">X Mirror</a>
+        <a href="stalk.html" class="btn btn-sm btn-orange">X Stalk</a>
+        <a href="match.html" class="btn btn-sm btn-ghost">X Match</a>
+      </div>
     </div>
 
     <div class="panel">
@@ -107,7 +116,7 @@
     if (hist.length === 0) {
       box.innerHTML = '<div class="empty-box">' +
                         "<p>" + esc(t("profile_empty")) + "</p>" +
-                        '<a href="mirror.html" class="btn btn-sm">X Mirror</a>' +
+                        "<p>" + esc(t("profile_empty_sub")) + "</p>" +
                       "</div>";
       return;
     }
@@ -152,19 +161,25 @@
 
     var hist = remoteAnalyses.length > 0 ? remoteAnalyses.map(normalizeRemoteAnalysis) : getHistory();
 
-    // son kart: geçmişteki ilk kayıttan deterministik olarak yeniden üretilir
+    // son kart: kayıt varsa geçmişteki ilk kayıttan gösterilir, yoksa boş durum kalır
     var lastPanel = document.getElementById("lastCardPanel");
     var holder = document.getElementById("lastCardHolder");
     if (hist.length > 0) {
-      lastPanel.hidden = false;
       var last = hist[0];
-      if (last.type === "match") {
+      if (last.rawResult && last.type === "match") {
+        holder.innerHTML = buildMatchCard(last.rawResult);
+      } else if (last.rawResult) {
+        holder.innerHTML = buildIdentityCard(last.rawResult);
+      } else if (last.type === "match") {
         holder.innerHTML = buildMatchCard(matchHandles(last.handles[0], last.handles[1]));
       } else {
         holder.innerHTML = buildIdentityCard(analyzeHandle(last.handles[0]));
       }
     } else {
-      lastPanel.hidden = true;
+      holder.innerHTML = '<div class="empty-box">' +
+                           "<p>" + esc(t("profile_empty")) + "</p>" +
+                           "<p>" + esc(t("profile_empty_sub")) + "</p>" +
+                         "</div>";
     }
 
     renderHistoryList(hist);
@@ -176,10 +191,11 @@
     if (confirm(t("logout_confirm"))) {
       await clearSession();
       toast(t("logout_done"));
-      setTimeout(function () { window.location.href = "index.html"; }, 900);
+      setTimeout(function () { window.location.href = "auth.html"; }, 900);
     }
   });
-  document.getElementById("profileLoginBtn").addEventListener("click", signInWithX);
+  var loginBtn = document.getElementById("profileLoginBtn");
+  if (loginBtn) loginBtn.href = "auth.html";
 
   async function loadRemoteAnalyses() {
     remoteAnalyses = await getRemoteAnalyses(30);

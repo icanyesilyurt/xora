@@ -126,8 +126,8 @@ function normalizeXProfile(authUser) {
   }
 
   var username = firstValue([
-    "user_name",
     "username",
+    "user_name",
     "preferred_username",
     "screen_name",
     "nickname"
@@ -226,6 +226,73 @@ async function ensurePublicUser(session) {
   }
 
   console.log("[XORA db] users upsert result", result.data);
+  return result.data;
+}
+
+async function ensurePublicProfile(session) {
+  if (!session || !session.user) return null;
+  var sb = getSupabaseClient();
+  if (!sb) return null;
+
+  var payload = {
+    id: session.user.id,
+    updated_at: new Date().toISOString()
+  };
+
+  var result = await sb.from("profiles").upsert(payload, { onConflict: "id" }).select();
+  if (result.error) {
+    console.error("[XORA db] profiles upsert failed", result.error);
+    console.error("[XORA db] profiles upsert failed full", JSON.stringify(result.error, null, 2));
+    return null;
+  }
+  console.log("[XORA db] profiles upsert result", result.data);
+  return result.data;
+}
+
+async function signUpWithEmail(email, username, password) {
+  var sb = getSupabaseClient();
+  if (!sb) throw new Error(t("auth_config_missing"));
+
+  username = String(username || "").replace(/^@+/, "").trim();
+  var result = await sb.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: {
+        username: username,
+        display_name: username,
+        avatar_url: null,
+        lang: getLang()
+      }
+    }
+  });
+
+  if (result.error) throw result.error;
+  if (result.data && result.data.session) {
+    await ensurePublicUser(result.data.session);
+    await ensurePublicProfile(result.data.session);
+    await hydrateAuthUser(result.data.session.user, "email-signup");
+  } else {
+    await signInWithEmail(email, password);
+  }
+  return result.data;
+}
+
+async function signInWithEmail(email, password) {
+  var sb = getSupabaseClient();
+  if (!sb) throw new Error(t("auth_config_missing"));
+
+  var result = await sb.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (result.error) throw result.error;
+  if (result.data && result.data.session) {
+    await ensurePublicUser(result.data.session);
+    await ensurePublicProfile(result.data.session);
+    await hydrateAuthUser(result.data.session.user, "email-signin");
+  }
   return result.data;
 }
 
@@ -382,6 +449,7 @@ async function syncSession() {
   }
 
   await ensurePublicUser(session);
+  await ensurePublicProfile(session);
   return hydrateAuthUser(session.user, "get-session");
 }
 
@@ -392,7 +460,10 @@ function initSession() {
     sb.auth.onAuthStateChange(function (event, session) {
       authDebug("auth event", { event: event, hasSession: !!session, authUserId: session && session.user && session.user.id });
       if (session && session.user) {
-        if (event === "SIGNED_IN") ensurePublicUser(session);
+        if (event === "SIGNED_IN") {
+          ensurePublicUser(session);
+          ensurePublicProfile(session);
+        }
         xoraSessionPromise = hydrateAuthUser(session.user, "auth-event:" + event);
       } else if (event === "SIGNED_OUT") {
         xoraAuthCallbackPending = false;
@@ -406,31 +477,6 @@ function initSession() {
     xoraSessionPromise = syncSession();
   }
   return xoraSessionPromise;
-}
-
-function getRedirectUrl() {
-  var cfg = window.XORA_CONFIG || {};
-  if (cfg.AUTH_REDIRECT_URL) return cfg.AUTH_REDIRECT_URL;
-  if (window.location.hostname === "icanyesilyurt.github.io") {
-    return "https://icanyesilyurt.github.io/xora/mirror.html";
-  }
-  return window.location.href;
-}
-
-async function signInWithX() {
-  var sb = getSupabaseClient();
-  if (!sb) {
-    toast(t("auth_config_missing"));
-    return;
-  }
-  var redirectTo = getRedirectUrl();
-  authDebug("sign in redirect", { redirectTo: redirectTo });
-  var result = await sb.auth.signInWithOAuth({
-    provider: "x",
-    options: { redirectTo: redirectTo }
-  });
-  authDebug("signInWithOAuth result", { data: result.data, error: result.error });
-  if (result.error) toast(result.error.message);
 }
 
 async function clearSession() {
@@ -497,6 +543,37 @@ async function getRemoteAnalyses(limit) {
   return result.data || [];
 }
 
+async function saveAnalysisRecord(type, handles, result) {
+  var sb = getSupabaseClient();
+  var profile = getCurrentUser();
+  if (!sb || !profile || !result) return null;
+
+  var row = {
+    user_id: profile.id,
+    type: type,
+    target_username: handles && handles[0] ? handles[0] : null,
+    target_username_2: handles && handles[1] ? handles[1] : null,
+    result_title: result.archetype && result.archetype.name ? result.archetype.name[getLang()] : (result.title || null),
+    result_subtitle: result.archetype && result.archetype.desc ? result.archetype.desc[getLang()] : (result.subtitle || null),
+    result_quote: result.quote || null,
+    avatar_emoji: result.archetype ? result.archetype.emoji : null,
+    metrics: result.scores || result.metrics || {},
+    raw_result: result,
+    language: getLang(),
+    cache_key: type + ":" + (handles || []).join(":") + ":" + Date.now()
+  };
+
+  var response = await sb.from("analyses").insert(row).select();
+  if (response.error) {
+    console.error("[XORA db] analyses insert failed", response.error);
+    console.error("[XORA db] analyses insert failed full", JSON.stringify(response.error, null, 2));
+    return null;
+  }
+  console.log("[XORA db] analyses insert result", response.data);
+  document.dispatchEvent(new CustomEvent("xora:analysis-saved", { detail: response.data }));
+  return response.data;
+}
+
 /* ---------------- dil (TR varsayılan) ---------------- */
 
 var I18N = {
@@ -520,7 +597,7 @@ var I18N = {
     mirror_sub: "Hesabını bağla, XORA son paylaşımlarına baksın. Kendi kartın her zaman ücretsiz.",
     mirror_ph: "@kullaniciadin",
     mirror_btn: "Aynaya Bak",
-    mirror_login_cta: "X ile giriş yap ve kartımı çıkar",
+    mirror_connect_cta: "X hesabını bağla ve analiz et",
     mirror_login_note: "Mirror için X hesabını bağlaman gerekir.",
     mirror_profile_h: "Profilini Tamamla",
     mirror_profile_sub: "Kartını oluşturmadan önce bilgilerini gözden geçir.",
@@ -533,8 +610,17 @@ var I18N = {
     mirror_save: "Kaydet",
     mirror_skip: "Şimdilik geç",
     auth_title: "XORA’ya Giriş Yap",
-    auth_sub: "Kendi X kartını oluşturmak için hesabını bağla.",
-    auth_x_btn: "X ile Giriş Yap",
+    auth_sub: "Analizlerini kaydetmek için XORA hesabına giriş yap.",
+    auth_login_tab: "Giriş Yap",
+    auth_signup_tab: "Üye Ol",
+    auth_email: "E-posta",
+    auth_username: "Kullanıcı adı",
+    auth_password: "Şifre",
+    auth_login_btn: "Giriş Yap",
+    auth_signup_btn: "Üye Ol",
+    auth_have_account: "Hesabın varsa giriş yap.",
+    auth_need_account: "Hesabın yoksa üye ol.",
+    auth_success: "Giriş başarılı",
     auth_config_missing: "Supabase ayarları eksik. config.js dosyasını doldur.",
     /* stalk */
     stalk_h1: "X Stalk",
@@ -570,9 +656,11 @@ var I18N = {
     profile_last: "Son Kartın",
     profile_history: "Geçmiş Analizler",
     profile_logout: "Çıkış Yap",
-    profile_nouser: "Henüz hesabını bağlamadın.",
-    profile_gomirror: "X ile Giriş Yap",
-    profile_empty: "Henüz analiz yapmadın. İlk kartını çıkar!",
+    profile_nouser: "Devam etmek için giriş yapmalısın.",
+    profile_gomirror: "Giriş Yap",
+    profile_empty: "Henüz X kimlik kartın yok.",
+    profile_empty_sub: "İlk analizini başlat.",
+    profile_actions: "Analiz Başlat",
     logout_confirm: "Çıkış yapılsın mı? Geçmiş analizler silinir, kredilerin durur.",
     logout_done: "Çıkış yapıldı",
     /* krediler */
@@ -612,7 +700,7 @@ var I18N = {
     mirror_sub: "Connect your account and let XORA read your recent posts. Your own card is always free.",
     mirror_ph: "@yourhandle",
     mirror_btn: "Look in the Mirror",
-    mirror_login_cta: "Sign in with X and create my card",
+    mirror_connect_cta: "Connect X account and analyze",
     mirror_login_note: "Mirror requires connecting your X account.",
     mirror_profile_h: "Complete Your Profile",
     mirror_profile_sub: "Review your details before creating your card.",
@@ -625,8 +713,17 @@ var I18N = {
     mirror_save: "Save",
     mirror_skip: "Skip for now",
     auth_title: "Sign in to XORA",
-    auth_sub: "Connect your X account to create your own card.",
-    auth_x_btn: "Sign in with X",
+    auth_sub: "Sign in to your XORA account to save your analyses.",
+    auth_login_tab: "Sign In",
+    auth_signup_tab: "Sign Up",
+    auth_email: "Email",
+    auth_username: "Username",
+    auth_password: "Password",
+    auth_login_btn: "Sign In",
+    auth_signup_btn: "Sign Up",
+    auth_have_account: "Already have an account? Sign in.",
+    auth_need_account: "Need an account? Sign up.",
+    auth_success: "Signed in",
     auth_config_missing: "Supabase config is missing. Fill config.js first.",
     stalk_h1: "X Stalk",
     stalk_sub: "Type a username, XORA takes a quiet look. This stays between us.",
@@ -657,9 +754,11 @@ var I18N = {
     profile_last: "Your Last Card",
     profile_history: "Past Analyses",
     profile_logout: "Log Out",
-    profile_nouser: "You haven't connected your account yet.",
-    profile_gomirror: "Sign in with X",
-    profile_empty: "No analyses yet. Get your first card!",
+    profile_nouser: "Sign in to continue.",
+    profile_gomirror: "Sign In",
+    profile_empty: "You do not have an X identity card yet.",
+    profile_empty_sub: "Start your first analysis.",
+    profile_actions: "Start Analysis",
     logout_confirm: "Log out? Your history will be cleared, credits stay.",
     logout_done: "Logged out",
     credits_h1: "Curiosity Credits",
@@ -725,12 +824,7 @@ function refreshTopbar() {
 }
 
 function openAuthModal() {
-  var modal = document.getElementById("authModal");
-  if (!modal) return;
-  modal.hidden = false;
-  applyI18n();
-  var btn = document.getElementById("authModalBtn");
-  if (btn) btn.focus();
+  window.location.href = "auth.html";
 }
 
 function closeAuthModal() {
@@ -739,26 +833,7 @@ function closeAuthModal() {
 }
 
 function ensureAuthModal() {
-  if (document.getElementById("authModal")) return;
-  var modal = document.createElement("div");
-  modal.className = "auth-modal";
-  modal.id = "authModal";
-  modal.hidden = true;
-  modal.innerHTML =
-    '<div class="auth-backdrop" data-auth-close></div>' +
-    '<div class="auth-dialog panel" role="dialog" aria-modal="true" aria-labelledby="authTitle">' +
-      '<button type="button" class="pill auth-close" data-auth-close>×</button>' +
-      '<h2 id="authTitle" data-i18n="auth_title">XORA’ya Giriş Yap</h2>' +
-      '<p class="history-date auth-copy" data-i18n="auth_sub">Kendi X kartını oluşturmak için hesabını bağla.</p>' +
-      '<button type="button" class="btn" id="authModalBtn" data-i18n="auth_x_btn">X ile Giriş Yap</button>' +
-    '</div>';
-  document.body.appendChild(modal);
-
-  var closers = modal.querySelectorAll("[data-auth-close]");
-  for (var i = 0; i < closers.length; i++) {
-    closers[i].addEventListener("click", closeAuthModal);
-  }
-  document.getElementById("authModalBtn").addEventListener("click", signInWithX);
+  return;
 }
 
 function refreshAuthUi() {
@@ -770,7 +845,7 @@ function refreshAuthUi() {
   var links = document.querySelectorAll('[data-i18n="nav_profile"]');
   for (var i = 0; i < links.length; i++) {
     links[i].textContent = loggedIn ? t("nav_profile") : t("nav_login");
-    links[i].setAttribute("href", loggedIn ? "profile.html" : "#auth");
+    links[i].setAttribute("href", loggedIn ? "profile.html" : "auth.html");
     links[i].onclick = loggedIn ? null : function (e) {
       e.preventDefault();
       openAuthModal();
@@ -780,7 +855,6 @@ function refreshAuthUi() {
 }
 
 function initTopbar() {
-  ensureAuthModal();
   refreshTopbar();
   refreshAuthUi();
   var lb = document.getElementById("langBtn");
@@ -791,11 +865,24 @@ function initTopbar() {
   }
 }
 
+function initAuthGuards() {
+  var links = document.querySelectorAll("[data-auth-required]");
+  for (var i = 0; i < links.length; i++) {
+    links[i].addEventListener("click", function (e) {
+      if (!isLoggedIn()) {
+        e.preventDefault();
+        window.location.href = "auth.html";
+      }
+    });
+  }
+}
+
 /* ---------------- sayfa açılışı ---------------- */
 
 document.addEventListener("DOMContentLoaded", function () {
   getCredits();   // ilk girişte 10 kredi tanımlanır
   initTopbar();
+  initAuthGuards();
   applyI18n();
   initSession();
 });

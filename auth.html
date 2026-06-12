@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giriş — XORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">XO<span>RA</span></a>
+  <nav class="topnav">
+    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">10</b></a>
+    <a href="profile.html" class="pill" data-i18n="nav_profile">Profil</a>
+    <button type="button" class="pill lang-btn" id="langBtn">EN</button>
+  </nav>
+</header>
+
+<main class="page">
+  <h1 data-i18n="auth_title">XORA’ya Giriş Yap</h1>
+  <p class="sub" data-i18n="auth_sub">Analizlerini kaydetmek için XORA hesabına giriş yap.</p>
+
+  <section class="panel">
+    <div class="result-actions">
+      <button type="button" class="btn btn-sm" id="loginModeBtn" data-i18n="auth_login_tab">Giriş Yap</button>
+      <button type="button" class="btn btn-sm btn-ghost" id="signupModeBtn" data-i18n="auth_signup_tab">Üye Ol</button>
+    </div>
+
+    <form class="handle-form" id="authForm">
+      <input type="email" id="emailInput" class="handle-input" data-i18n-ph="auth_email" placeholder="E-posta" autocomplete="email" required>
+      <input type="text" id="usernameInput" class="handle-input" data-i18n-ph="auth_username" placeholder="Kullanıcı adı" autocomplete="username" hidden>
+      <input type="password" id="passwordInput" class="handle-input" data-i18n-ph="auth_password" placeholder="Şifre" autocomplete="current-password" required>
+      <button type="submit" class="btn" id="submitBtn" data-i18n="auth_login_btn">Giriş Yap</button>
+      <p class="cost-note" id="modeHint" data-i18n="auth_need_account">Hesabın yoksa üye ol.</p>
+    </form>
+  </section>
+</main>
+
+<footer class="foot">XORA V1</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  var mode = "login";
+  var loginModeBtn = document.getElementById("loginModeBtn");
+  var signupModeBtn = document.getElementById("signupModeBtn");
+  var form = document.getElementById("authForm");
+  var emailInput = document.getElementById("emailInput");
+  var usernameInput = document.getElementById("usernameInput");
+  var passwordInput = document.getElementById("passwordInput");
+  var submitBtn = document.getElementById("submitBtn");
+  var modeHint = document.getElementById("modeHint");
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    usernameInput.hidden = mode !== "signup";
+    usernameInput.required = mode === "signup";
+    submitBtn.setAttribute("data-i18n", mode === "signup" ? "auth_signup_btn" : "auth_login_btn");
+    modeHint.setAttribute("data-i18n", mode === "signup" ? "auth_have_account" : "auth_need_account");
+    loginModeBtn.classList.toggle("btn-ghost", mode !== "login");
+    signupModeBtn.classList.toggle("btn-ghost", mode !== "signup");
+    applyI18n();
+  }
+
+  loginModeBtn.addEventListener("click", function () { setMode("login"); });
+  signupModeBtn.addEventListener("click", function () { setMode("signup"); });
+  modeHint.addEventListener("click", function () {
+    setMode(mode === "signup" ? "login" : "signup");
+  });
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    try {
+      if (mode === "signup") {
+        await signUpWithEmail(emailInput.value.trim(), usernameInput.value.trim(), passwordInput.value);
+      } else {
+        await signInWithEmail(emailInput.value.trim(), passwordInput.value);
+      }
+      toast(t("auth_success"));
+      window.location.href = "profile.html";
+    } catch (err) {
+      console.error("[XORA auth] email auth failed", err);
+      toast(err.message || String(err));
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  document.addEventListener("xora:session", function () {
+    if (isLoggedIn()) window.location.href = "profile.html";
+  });
+
+  setMode("login");
+})();
+</script>
+
+</body>
+</html>
