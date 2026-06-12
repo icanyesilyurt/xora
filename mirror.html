@@ -28,11 +28,8 @@
     <p class="sub" data-i18n="mirror_sub">Hesabını bağla, XORA son paylaşımlarına baksın. Kendi kartın her zaman ücretsiz.</p>
 
     <div class="handle-form">
-      <input type="text" id="handleInput" class="handle-input"
-             data-i18n-ph="mirror_ph" placeholder="@kullaniciadin"
-             maxlength="30" autocomplete="off" spellcheck="false">
-      <button type="button" class="btn" id="goBtn" data-i18n="mirror_btn">Aynaya Bak</button>
-      <p class="cost-note" id="mirrorLoginNote" data-i18n="mirror_login_note">Mirror için X hesabını bağlaman gerekir.</p>
+      <button type="button" class="btn" id="goBtn" data-i18n="mirror_login_cta">X ile giriş yap ve kartımı çıkar</button>
+      <p class="cost-note" id="mirrorLoginNote" data-i18n="mirror_login_note" hidden>Mirror için X hesabını bağlaman gerekir.</p>
     </div>
   </section>
 
@@ -74,56 +71,91 @@
 <script>
 (function () {
   var lastResult = null;
+  var mirrorStarted = false;
+  var mirrorSession = null;
 
   var stepInput  = document.getElementById("step-input");
   var stepThink  = document.getElementById("step-think");
   var stepResult = document.getElementById("step-result");
-  var input      = document.getElementById("handleInput");
   var goBtn      = document.getElementById("goBtn");
   var note       = document.getElementById("mirrorLoginNote");
 
-  function renderAuthState() {
-    var user = getUser();
-    if (user) {
-      input.hidden = false;
-      input.disabled = true;
-      input.value = "@" + user;
-      goBtn.setAttribute("data-i18n", "mirror_btn");
-      goBtn.textContent = t("mirror_btn");
-      note.hidden = true;
-    } else if (isAuthPending()) {
-      input.hidden = true;
-      input.disabled = true;
-      input.value = "";
-      goBtn.setAttribute("data-i18n", "auth_x_btn");
-      goBtn.textContent = t("auth_x_btn");
-      note.hidden = true;
-    } else {
-      input.hidden = true;
-      input.disabled = true;
-      input.value = "";
-      goBtn.setAttribute("data-i18n", "auth_x_btn");
-      goBtn.textContent = t("auth_x_btn");
-      note.hidden = false;
+  function mirrorLog(label, data) {
+    if (window.console) console.log("[XORA mirror]", label, data || "");
+  }
+
+  function cleanMirrorUrl() {
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState({}, "", "mirror.html");
     }
   }
-  renderAuthState();
+
+  function sessionFromResult(result) {
+    return result && result.data && result.data.session ? result.data.session : null;
+  }
+
+  function profileFromUser(user) {
+    var profile = normalizeXProfile(user);
+    mirrorLog("profile payload", profile);
+    return profile;
+  }
+
+  function renderMirrorHeader(hasSession) {
+    var nav = document.querySelector('[data-i18n="nav_profile"]');
+    if (!nav) return;
+
+    if (!hasSession) {
+      nav.textContent = t("nav_login");
+      nav.href = "#auth";
+      nav.onclick = function (e) {
+        e.preventDefault();
+        startLogin();
+      };
+      return;
+    }
+
+    nav.textContent = t("profile_logout");
+    nav.href = "#logout";
+    nav.onclick = async function (e) {
+      e.preventDefault();
+      await clearSession();
+      mirrorSession = null;
+      mirrorStarted = false;
+      renderLogin(false);
+    };
+  }
+
+  function renderLogin(showNote) {
+    stepInput.hidden = false;
+    stepThink.hidden = true;
+    stepResult.hidden = true;
+    goBtn.setAttribute("data-i18n", "mirror_login_cta");
+    goBtn.textContent = t("mirror_login_cta");
+    note.hidden = !showNote;
+    renderMirrorHeader(false);
+  }
 
   function showResult() {
     document.getElementById("cardHolder").innerHTML = buildIdentityCard(lastResult);
     stepThink.hidden = true;
     stepResult.hidden = false;
     applyI18n();
+    renderMirrorHeader(true);
+    mirrorLog("render card", { handle: lastResult && lastResult.handle });
   }
 
-  function start() {
-    if (!isLoggedIn()) {
-      signInWithX();
-      return;
-    }
-    var handle = normHandle(input.value);
-    if (!handle) { toast(t("toast_handle")); input.focus(); return; }
+  function startMirror(session) {
+    if (mirrorStarted || !session || !session.user) return;
+    mirrorStarted = true;
+    mirrorSession = session;
 
+    var profile = profileFromUser(session.user);
+    storeAuthUser(profile);
+    refreshAuthUi();
+    renderMirrorHeader(true);
+    cleanMirrorUrl();
+
+    var handle = normHandle(profile.username);
     lastResult = analyzeHandle(handle);
     addHistory({ type: "mirror", handles: [handle] });
 
@@ -132,11 +164,67 @@
     playThinking(document.getElementById("thinkMsg"), "mirror", showResult);
   }
 
-  document.getElementById("goBtn").addEventListener("click", start);
-  input.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") start();
-  });
-  document.addEventListener("xora:session", renderAuthState);
+  async function waitForMirrorSession(sb) {
+    for (var i = 0; i < 10; i++) {
+      var result = await sb.auth.getSession();
+      mirrorLog("getSession", {
+        attempt: i + 1,
+        hasSession: !!sessionFromResult(result),
+        error: result.error
+      });
+      var session = sessionFromResult(result);
+      if (session) return session;
+      await new Promise(function (resolve) { setTimeout(resolve, 300); });
+    }
+    return null;
+  }
+
+  async function startLogin() {
+    var sb = getSupabaseClient();
+    if (!sb) {
+      toast(t("auth_config_missing"));
+      return;
+    }
+
+    var result = await sb.auth.signInWithOAuth({
+      provider: "x",
+      options: {
+        redirectTo: "https://icanyesilyurt.github.io/xora/mirror.html"
+      }
+    });
+    mirrorLog("signInWithOAuth result", { data: result.data, error: result.error });
+    if (result.error) toast(result.error.message);
+  }
+
+  async function initMirror() {
+    mirrorLog("init", { url: window.location.href });
+    renderLogin(false);
+
+    var sb = getSupabaseClient();
+    if (!sb) {
+      renderLogin(true);
+      return;
+    }
+
+    sb.auth.onAuthStateChange(function (event, session) {
+      mirrorLog("auth event", {
+        event: event,
+        hasSession: !!session,
+        authUserId: session && session.user && session.user.id
+      });
+      if (session) startMirror(session);
+    });
+
+    var session = await waitForMirrorSession(sb);
+    if (session) {
+      mirrorLog("session ready", { authUserId: session.user && session.user.id });
+      startMirror(session);
+    } else {
+      renderLogin(true);
+    }
+  }
+
+  document.getElementById("goBtn").addEventListener("click", startLogin);
 
   document.getElementById("dlBtn").addEventListener("click", function () {
     if (lastResult) downloadCanvas(renderIdentityPNG(lastResult), "xora-mirror-" + lastResult.handle + ".png");
@@ -147,9 +235,12 @@
 
   // dil değişince kartı yeniden çiz
   document.addEventListener("xora:lang", function () {
-    renderAuthState();
+    renderMirrorHeader(!!mirrorSession);
+    if (!mirrorSession) renderLogin(!note.hidden);
     if (lastResult && !stepResult.hidden) showResult();
   });
+
+  initMirror();
 })();
 </script>
 
