@@ -33,6 +33,7 @@
       <input type="email" id="emailInput" class="handle-input" data-i18n-ph="auth_email" placeholder="E-posta" autocomplete="email" required>
       <input type="text" id="usernameInput" class="handle-input" data-i18n-ph="auth_username" placeholder="Kullanıcı adı" autocomplete="username" hidden>
       <input type="password" id="passwordInput" class="handle-input" data-i18n-ph="auth_password" placeholder="Şifre" autocomplete="current-password" required>
+      <input type="password" id="passwordConfirmInput" class="handle-input" data-i18n-ph="auth_password_confirm" placeholder="Şifre tekrar" autocomplete="new-password" hidden>
       <button type="submit" class="btn" id="submitBtn" data-i18n="auth_login_btn">Giriş Yap</button>
       <p class="cost-note" id="modeHint" data-i18n="auth_need_account">Hesabın yoksa üye ol.</p>
     </form>
@@ -53,6 +54,7 @@
   var emailInput = document.getElementById("emailInput");
   var usernameInput = document.getElementById("usernameInput");
   var passwordInput = document.getElementById("passwordInput");
+  var passwordConfirmInput = document.getElementById("passwordConfirmInput");
   var submitBtn = document.getElementById("submitBtn");
   var modeHint = document.getElementById("modeHint");
 
@@ -60,6 +62,9 @@
     authMode = nextMode;
     usernameInput.hidden = authMode !== "signup";
     usernameInput.required = authMode === "signup";
+    passwordConfirmInput.hidden = authMode !== "signup";
+    passwordConfirmInput.required = authMode === "signup";
+    passwordInput.autocomplete = authMode === "signup" ? "new-password" : "current-password";
     submitBtn.setAttribute("data-i18n", authMode === "signup" ? "auth_signup_btn" : "auth_login_btn");
     modeHint.setAttribute("data-i18n", authMode === "signup" ? "auth_have_account" : "auth_need_account");
     loginModeBtn.classList.toggle("btn-ghost", authMode !== "login");
@@ -82,11 +87,17 @@
     var email = emailInput.value.trim();
     var username = usernameInput.value.trim().replace(/^@+/, "");
     var password = passwordInput.value;
+    var passwordConfirm = passwordConfirmInput.value;
 
     try {
       if (!supabaseClient) throw new Error(t("auth_config_missing"));
 
       if (authMode === "signup") {
+        if (!username) throw new Error(t("auth_username_required"));
+        if (!email) throw new Error(t("auth_email_required"));
+        if (password.length < 6) throw new Error(t("auth_password_min"));
+        if (password !== passwordConfirm) throw new Error(t("auth_password_mismatch"));
+
         console.log("[XORA auth] calling SIGN UP ONLY");
         var signupResult = await supabaseClient.auth.signUp({
           email: email,
@@ -99,9 +110,19 @@
         });
         if (signupResult.error) throw signupResult.error;
         console.log("[XORA auth] signup result", signupResult.data);
+        if (signupResult.data && signupResult.data.session) {
+          await ensurePublicUser(signupResult.data.session);
+          window.location.href = "profile.html";
+          return;
+        }
+        toast(t("auth_signup_check_email"));
+        return;
       }
 
       if (authMode === "login") {
+        if (!email) throw new Error(t("auth_email_required"));
+        if (!password) throw new Error(t("auth_password_required"));
+
         console.log("[XORA auth] calling SIGN IN ONLY");
         var signinResult = await supabaseClient.auth.signInWithPassword({
           email: email,
@@ -109,10 +130,13 @@
         });
         if (signinResult.error) throw signinResult.error;
         console.log("[XORA auth] signin result", signinResult.data);
+        if (signinResult.data && signinResult.data.session) {
+          await ensurePublicUser(signinResult.data.session);
+        }
+        toast(t("auth_success"));
+        window.location.href = "profile.html";
+        return;
       }
-
-      toast(t("auth_success"));
-      window.location.href = "profile.html";
     } catch (err) {
       console.error("[XORA auth] error", err);
       toast(err.message || String(err));
