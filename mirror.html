@@ -149,6 +149,7 @@
     mirrorStarted = true;
     mirrorSession = session;
 
+    ensurePublicUser(session);
     var profile = profileFromUser(session.user);
     storeAuthUser(profile);
     refreshAuthUi();

@@ -160,6 +160,73 @@ function normalizeXProfile(authUser) {
   };
 }
 
+async function ensurePublicUser(session) {
+  if (!session || !session.user) {
+    console.warn("[XORA db] ensurePublicUser skipped: no session user");
+    return null;
+  }
+
+  var sb = getSupabaseClient();
+  if (!sb) {
+    console.warn("[XORA db] ensurePublicUser skipped: no Supabase client");
+    return null;
+  }
+
+  var user = session.user;
+  var meta = user.user_metadata || {};
+  var identities = user.identities || [];
+  var identity = identities.find(function (i) {
+    return i.provider === "x" || i.provider === "twitter";
+  }) || identities[0] || null;
+  var data = (identity && identity.identity_data) || {};
+
+  function pick(keys) {
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (meta[key]) return meta[key];
+      if (data[key]) return data[key];
+    }
+    return null;
+  }
+
+  var xHandle = pick(["user_name", "username", "preferred_username", "screen_name", "name"]) ||
+                (user.email ? user.email.split("@")[0] : null) ||
+                ("x_user_" + String(user.id || "").slice(0, 8));
+  xHandle = String(xHandle).replace(/^@+/, "");
+
+  var payload = {
+    id: user.id,
+    x_user_id: pick(["provider_id", "sub", "id"]) || (identity && identity.id) || user.id,
+    username: xHandle,
+    display_name: pick(["full_name", "name", "display_name"]) || xHandle,
+    avatar_url: pick(["avatar_url", "picture", "profile_image_url", "profile_image_url_https"]) || null,
+    lang: getLang(),
+    last_login_at: new Date().toISOString()
+  };
+
+  console.log("[XORA db] users upsert payload", payload);
+
+  var result;
+  try {
+    result = await sb
+      .from("users")
+      .upsert(payload, { onConflict: "id" })
+      .select()
+      .single();
+  } catch (err) {
+    console.error("[XORA db] users upsert failed", err);
+    return null;
+  }
+
+  if (result.error) {
+    console.error("[XORA db] users upsert failed", result.error);
+    return null;
+  }
+
+  console.log("[XORA db] users upsert result", result.data);
+  return result.data;
+}
+
 async function upsertSupabaseUser(profile) {
   var sb = getSupabaseClient();
   if (!sb || !profile) return profile;
@@ -312,6 +379,7 @@ async function syncSession() {
     return null;
   }
 
+  await ensurePublicUser(session);
   return hydrateAuthUser(session.user, "get-session");
 }
 
@@ -322,6 +390,7 @@ function initSession() {
     sb.auth.onAuthStateChange(function (event, session) {
       authDebug("auth event", { event: event, hasSession: !!session, authUserId: session && session.user && session.user.id });
       if (session && session.user) {
+        if (event === "SIGNED_IN") ensurePublicUser(session);
         xoraSessionPromise = hydrateAuthUser(session.user, "auth-event:" + event);
       } else if (event === "SIGNED_OUT") {
         xoraAuthCallbackPending = false;
