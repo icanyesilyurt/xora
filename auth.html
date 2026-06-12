@@ -46,7 +46,7 @@
 <script src="app.js"></script>
 <script>
 (function () {
-  var mode = "login";
+  var authMode = "login";
   var loginModeBtn = document.getElementById("loginModeBtn");
   var signupModeBtn = document.getElementById("signupModeBtn");
   var form = document.getElementById("authForm");
@@ -56,47 +56,72 @@
   var submitBtn = document.getElementById("submitBtn");
   var modeHint = document.getElementById("modeHint");
 
-  function setMode(nextMode) {
-    mode = nextMode;
-    usernameInput.hidden = mode !== "signup";
-    usernameInput.required = mode === "signup";
-    submitBtn.setAttribute("data-i18n", mode === "signup" ? "auth_signup_btn" : "auth_login_btn");
-    modeHint.setAttribute("data-i18n", mode === "signup" ? "auth_have_account" : "auth_need_account");
-    loginModeBtn.classList.toggle("btn-ghost", mode !== "login");
-    signupModeBtn.classList.toggle("btn-ghost", mode !== "signup");
+  function setAuthMode(nextMode) {
+    authMode = nextMode;
+    usernameInput.hidden = authMode !== "signup";
+    usernameInput.required = authMode === "signup";
+    submitBtn.setAttribute("data-i18n", authMode === "signup" ? "auth_signup_btn" : "auth_login_btn");
+    modeHint.setAttribute("data-i18n", authMode === "signup" ? "auth_have_account" : "auth_need_account");
+    loginModeBtn.classList.toggle("btn-ghost", authMode !== "login");
+    signupModeBtn.classList.toggle("btn-ghost", authMode !== "signup");
     applyI18n();
   }
 
-  loginModeBtn.addEventListener("click", function () { setMode("login"); });
-  signupModeBtn.addEventListener("click", function () { setMode("signup"); });
+  loginModeBtn.addEventListener("click", function () { setAuthMode("login"); });
+  signupModeBtn.addEventListener("click", function () { setAuthMode("signup"); });
   modeHint.addEventListener("click", function () {
-    setMode(mode === "signup" ? "login" : "signup");
+    setAuthMode(authMode === "signup" ? "login" : "signup");
   });
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
     submitBtn.disabled = true;
+    console.log("[XORA auth] submit mode:", authMode);
+
+    var supabaseClient = getSupabaseClient();
+    var email = emailInput.value.trim();
+    var username = usernameInput.value.trim().replace(/^@+/, "");
+    var password = passwordInput.value;
+
     try {
-      if (mode === "signup") {
-        await signUpWithEmail(emailInput.value.trim(), usernameInput.value.trim(), passwordInput.value);
-      } else {
-        await signInWithEmail(emailInput.value.trim(), passwordInput.value);
+      if (!supabaseClient) throw new Error(t("auth_config_missing"));
+
+      if (authMode === "signup") {
+        console.log("[XORA auth] calling SIGN UP ONLY");
+        var signupResult = await supabaseClient.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              username: username
+            }
+          }
+        });
+        if (signupResult.error) throw signupResult.error;
+        console.log("[XORA auth] signup result", signupResult.data);
       }
+
+      if (authMode === "login") {
+        console.log("[XORA auth] calling SIGN IN ONLY");
+        var signinResult = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+        if (signinResult.error) throw signinResult.error;
+        console.log("[XORA auth] signin result", signinResult.data);
+      }
+
       toast(t("auth_success"));
       window.location.href = "profile.html";
     } catch (err) {
-      console.error("[XORA auth] email auth failed", err);
+      console.error("[XORA auth] error", err);
       toast(err.message || String(err));
     } finally {
       submitBtn.disabled = false;
     }
   });
 
-  document.addEventListener("xora:session", function () {
-    if (isLoggedIn()) window.location.href = "profile.html";
-  });
-
-  setMode("login");
+  setAuthMode("login");
 })();
 </script>
 

@@ -249,53 +249,6 @@ async function ensurePublicProfile(session) {
   return result.data;
 }
 
-async function signUpWithEmail(email, username, password) {
-  var sb = getSupabaseClient();
-  if (!sb) throw new Error(t("auth_config_missing"));
-
-  username = String(username || "").replace(/^@+/, "").trim();
-  var result = await sb.auth.signUp({
-    email: email,
-    password: password,
-    options: {
-      data: {
-        username: username,
-        display_name: username,
-        avatar_url: null,
-        lang: getLang()
-      }
-    }
-  });
-
-  if (result.error) throw result.error;
-  if (result.data && result.data.session) {
-    await ensurePublicUser(result.data.session);
-    await ensurePublicProfile(result.data.session);
-    await hydrateAuthUser(result.data.session.user, "email-signup");
-  } else {
-    await signInWithEmail(email, password);
-  }
-  return result.data;
-}
-
-async function signInWithEmail(email, password) {
-  var sb = getSupabaseClient();
-  if (!sb) throw new Error(t("auth_config_missing"));
-
-  var result = await sb.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
-
-  if (result.error) throw result.error;
-  if (result.data && result.data.session) {
-    await ensurePublicUser(result.data.session);
-    await ensurePublicProfile(result.data.session);
-    await hydrateAuthUser(result.data.session.user, "email-signin");
-  }
-  return result.data;
-}
-
 async function upsertSupabaseUser(profile) {
   var sb = getSupabaseClient();
   if (!sb || !profile) return profile;
