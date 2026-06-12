@@ -41,6 +41,7 @@ var xoraSupabase = null;
 var xoraSessionReady = false;
 var xoraSessionPromise = null;
 var xoraAuthListenerReady = false;
+var xoraAuthCallbackPending = false;
 
 function authDebug(label, data) {
   if (!window.console) return;
@@ -73,6 +74,10 @@ function getCurrentUser() {
 
 function isLoggedIn() {
   return !!getStoredAuthUser();
+}
+
+function isAuthPending() {
+  return xoraAuthCallbackPending;
 }
 
 function setUser(h) {
@@ -229,13 +234,35 @@ function cleanOAuthUrl() {
   window.history.replaceState({}, document.title, window.location.pathname);
 }
 
+function sleep(ms) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function waitForSession(sb, attempts) {
+  for (var i = 0; i < attempts; i++) {
+    var result = await sb.auth.getSession();
+    authDebug("getSession result", {
+      attempt: i + 1,
+      hasSession: !!(result.data && result.data.session),
+      error: result.error
+    });
+    if (result.data && result.data.session) return result.data.session;
+    await sleep(350);
+  }
+  return null;
+}
+
 async function hydrateAuthUser(authUser, source) {
   authDebug("hydrate user", { source: source, hasUser: !!authUser, authUserId: authUser && authUser.id });
   var profile = normalizeXProfile(authUser);
 
   authDebug("derived profile payload", profile);
   storeAuthUser(profile);
+  xoraAuthCallbackPending = false;
   xoraSessionReady = true;
+  cleanOAuthUrl();
   refreshAuthUi();
   document.dispatchEvent(new CustomEvent("xora:session", { detail: profile }));
 
@@ -255,10 +282,13 @@ async function syncSession() {
   }
 
   var callback = getOAuthReturnInfo();
+  xoraAuthCallbackPending = callback.hasCallback;
   authDebug("sync start", {
+    callbackUrl: window.location.href,
     hasCallback: callback.hasCallback,
     hasCode: !!callback.code,
-    hasAccessToken: !!callback.accessToken
+    hasAccessToken: !!callback.accessToken,
+    codeExchange: callback.code ? "auto-detectSessionInUrl" : "not-needed"
   });
 
   if (callback.error) {
@@ -266,24 +296,15 @@ async function syncSession() {
   }
 
   if (callback.code) {
-    var exchangeResult = await sb.auth.exchangeCodeForSession(callback.code);
     authDebug("code exchange result", {
-      hasSession: !!(exchangeResult.data && exchangeResult.data.session),
-      error: exchangeResult.error
+      mode: "automatic",
+      manualExchangeCalled: false
     });
-    if (!exchangeResult.error && exchangeResult.data && exchangeResult.data.session) {
-      cleanOAuthUrl();
-      return hydrateAuthUser(exchangeResult.data.session.user, "code-exchange");
-    }
   }
 
-  var sessionResult = await sb.auth.getSession();
-  authDebug("getSession result", {
-    hasSession: !!(sessionResult.data && sessionResult.data.session),
-    error: sessionResult.error
-  });
-  var session = sessionResult.data && sessionResult.data.session;
+  var session = await waitForSession(sb, callback.hasCallback ? 12 : 1);
   if (!session) {
+    xoraAuthCallbackPending = false;
     storeAuthUser(null);
     xoraSessionReady = true;
     refreshAuthUi();
@@ -295,22 +316,23 @@ async function syncSession() {
 }
 
 function initSession() {
-  if (!xoraSessionPromise) {
-    xoraSessionPromise = syncSession();
-  }
   var sb = getSupabaseClient();
   if (sb && !xoraAuthListenerReady) {
     xoraAuthListenerReady = true;
     sb.auth.onAuthStateChange(function (event, session) {
-      authDebug("auth event", { event: event, hasSession: !!session });
+      authDebug("auth event", { event: event, hasSession: !!session, authUserId: session && session.user && session.user.id });
       if (session && session.user) {
         xoraSessionPromise = hydrateAuthUser(session.user, "auth-event:" + event);
       } else if (event === "SIGNED_OUT") {
+        xoraAuthCallbackPending = false;
         storeAuthUser(null);
         refreshAuthUi();
         document.dispatchEvent(new CustomEvent("xora:session"));
       }
     });
+  }
+  if (!xoraSessionPromise) {
+    xoraSessionPromise = syncSession();
   }
   return xoraSessionPromise;
 }
@@ -336,6 +358,7 @@ async function signInWithX() {
     provider: "x",
     options: { redirectTo: redirectTo }
   });
+  authDebug("signInWithOAuth result", { data: result.data, error: result.error });
   if (result.error) toast(result.error.message);
 }
 

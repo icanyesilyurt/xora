@@ -91,6 +91,13 @@
       goBtn.setAttribute("data-i18n", "mirror_btn");
       goBtn.textContent = t("mirror_btn");
       note.hidden = true;
+    } else if (isAuthPending()) {
+      input.hidden = true;
+      input.disabled = true;
+      input.value = "";
+      goBtn.setAttribute("data-i18n", "auth_x_btn");
+      goBtn.textContent = t("auth_x_btn");
+      note.hidden = true;
     } else {
       input.hidden = true;
       input.disabled = true;
