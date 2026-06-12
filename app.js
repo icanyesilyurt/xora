@@ -40,6 +40,12 @@ function toast(msg) {
 var xoraSupabase = null;
 var xoraSessionReady = false;
 var xoraSessionPromise = null;
+var xoraAuthListenerReady = false;
+
+function authDebug(label, data) {
+  if (!window.console) return;
+  console.log("[XORA auth]", label, data || "");
+}
 
 function getStoredAuthUser() {
   try { return JSON.parse(localStorage.getItem(LS.authUser)) || null; }
@@ -89,7 +95,8 @@ function getSupabaseClient() {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
-      detectSessionInUrl: true
+      detectSessionInUrl: true,
+      flowType: "pkce"
     }
   });
   return xoraSupabase;
@@ -98,17 +105,51 @@ function getSupabaseClient() {
 function normalizeXProfile(authUser) {
   if (!authUser) return null;
   var meta = authUser.user_metadata || {};
-  var identity = authUser.identities && authUser.identities[0];
+  var identities = authUser.identities || [];
+  var identity = identities.find(function (i) {
+    return i.provider === "x" || i.provider === "twitter";
+  }) || identities[0] || null;
   var data = (identity && identity.identity_data) || {};
-  var username = meta.user_name || meta.preferred_username || meta.screen_name ||
-                 data.user_name || data.preferred_username || data.screen_name || "";
+
+  function firstValue(keys) {
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (meta[key]) return meta[key];
+      if (data[key]) return data[key];
+    }
+    return "";
+  }
+
+  var username = firstValue([
+    "user_name",
+    "username",
+    "preferred_username",
+    "screen_name",
+    "nickname"
+  ]);
   username = String(username).replace(/^@+/, "");
+  if (!username && authUser.email) username = authUser.email.split("@")[0];
+  if (!username) username = String(authUser.id || "").slice(0, 8);
+
+  var displayName = firstValue(["name", "full_name", "display_name"]) || username;
+  var avatarUrl = firstValue(["avatar_url", "picture", "profile_image_url", "profile_image_url_https"]);
+  var providerId = firstValue(["provider_id", "sub", "id"]) ||
+                   (identity && identity.id) ||
+                   authUser.id;
+
+  authDebug("user metadata", {
+    provider: identity && identity.provider,
+    metadata: meta,
+    identityData: data,
+    mappedUsername: username
+  });
+
   return {
     id: authUser.id,
-    x_user_id: meta.provider_id || meta.sub || data.provider_id || data.sub || authUser.id,
+    x_user_id: providerId,
     username: username,
-    display_name: meta.name || meta.full_name || data.name || username,
-    avatar_url: meta.avatar_url || meta.picture || data.avatar_url || data.picture || "",
+    display_name: displayName,
+    avatar_url: avatarUrl || "",
     lang: getLang()
   };
 }
@@ -133,6 +174,8 @@ async function upsertSupabaseUser(profile) {
     .select("id,x_user_id,username,display_name,avatar_url,lang,credit_balance")
     .single();
 
+  authDebug("users upsert result", { data: result.data, error: result.error });
+
   if (result.error) {
     console.warn("XORA users upsert failed:", result.error.message);
     return profile;
@@ -155,6 +198,36 @@ async function upsertSupabaseUser(profile) {
   };
 }
 
+function getOAuthReturnInfo() {
+  var search = new URLSearchParams(window.location.search || "");
+  var hash = new URLSearchParams(String(window.location.hash || "").replace(/^#/, ""));
+  return {
+    code: search.get("code"),
+    state: search.get("state"),
+    error: search.get("error") || hash.get("error"),
+    errorDescription: search.get("error_description") || hash.get("error_description"),
+    accessToken: hash.get("access_token"),
+    refreshToken: hash.get("refresh_token"),
+    hasCallback: !!(search.get("code") || hash.get("access_token") || search.get("error") || hash.get("error"))
+  };
+}
+
+function cleanOAuthUrl() {
+  if (!window.history || !window.history.replaceState) return;
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+async function hydrateAuthUser(authUser, source) {
+  authDebug("hydrate user", { source: source, hasUser: !!authUser });
+  var profile = normalizeXProfile(authUser);
+  var saved = await upsertSupabaseUser(profile);
+  storeAuthUser(saved);
+  xoraSessionReady = true;
+  refreshAuthUi();
+  document.dispatchEvent(new CustomEvent("xora:session", { detail: saved }));
+  return saved;
+}
+
 async function syncSession() {
   var sb = getSupabaseClient();
   if (!sb) {
@@ -163,7 +236,34 @@ async function syncSession() {
     return getStoredAuthUser();
   }
 
+  var callback = getOAuthReturnInfo();
+  authDebug("sync start", {
+    hasCallback: callback.hasCallback,
+    hasCode: !!callback.code,
+    hasAccessToken: !!callback.accessToken
+  });
+
+  if (callback.error) {
+    console.warn("XORA OAuth callback error:", callback.error, callback.errorDescription || "");
+  }
+
+  if (callback.code) {
+    var exchangeResult = await sb.auth.exchangeCodeForSession(callback.code);
+    authDebug("code exchange result", {
+      hasSession: !!(exchangeResult.data && exchangeResult.data.session),
+      error: exchangeResult.error
+    });
+    if (!exchangeResult.error && exchangeResult.data && exchangeResult.data.session) {
+      cleanOAuthUrl();
+      return hydrateAuthUser(exchangeResult.data.session.user, "code-exchange");
+    }
+  }
+
   var sessionResult = await sb.auth.getSession();
+  authDebug("getSession result", {
+    hasSession: !!(sessionResult.data && sessionResult.data.session),
+    error: sessionResult.error
+  });
   var session = sessionResult.data && sessionResult.data.session;
   if (!session) {
     storeAuthUser(null);
@@ -173,27 +273,37 @@ async function syncSession() {
     return null;
   }
 
-  var authResult = await sb.auth.getUser();
-  var profile = normalizeXProfile(authResult.data && authResult.data.user);
-  var saved = await upsertSupabaseUser(profile);
-  storeAuthUser(saved);
-  xoraSessionReady = true;
-  refreshAuthUi();
-  document.dispatchEvent(new CustomEvent("xora:session", { detail: saved }));
-  return saved;
+  return hydrateAuthUser(session.user, "get-session");
 }
 
 function initSession() {
   if (!xoraSessionPromise) {
     xoraSessionPromise = syncSession();
-    var sb = getSupabaseClient();
-    if (sb) {
-      sb.auth.onAuthStateChange(function () {
-        xoraSessionPromise = syncSession();
-      });
-    }
+  }
+  var sb = getSupabaseClient();
+  if (sb && !xoraAuthListenerReady) {
+    xoraAuthListenerReady = true;
+    sb.auth.onAuthStateChange(function (event, session) {
+      authDebug("auth event", { event: event, hasSession: !!session });
+      if (session && session.user) {
+        xoraSessionPromise = hydrateAuthUser(session.user, "auth-event:" + event);
+      } else if (event === "SIGNED_OUT") {
+        storeAuthUser(null);
+        refreshAuthUi();
+        document.dispatchEvent(new CustomEvent("xora:session"));
+      }
+    });
   }
   return xoraSessionPromise;
+}
+
+function getRedirectUrl() {
+  var cfg = window.XORA_CONFIG || {};
+  if (cfg.AUTH_REDIRECT_URL) return cfg.AUTH_REDIRECT_URL;
+  if (window.location.hostname === "icanyesilyurt.github.io") {
+    return "https://icanyesilyurt.github.io/xora/mirror.html";
+  }
+  return window.location.href;
 }
 
 async function signInWithX() {
@@ -202,8 +312,8 @@ async function signInWithX() {
     toast(t("auth_config_missing"));
     return;
   }
-  var cfg = window.XORA_CONFIG || {};
-  var redirectTo = cfg.AUTH_REDIRECT_URL || window.location.href;
+  var redirectTo = getRedirectUrl();
+  authDebug("sign in redirect", { redirectTo: redirectTo });
   var result = await sb.auth.signInWithOAuth({
     provider: "x",
     options: { redirectTo: redirectTo }
