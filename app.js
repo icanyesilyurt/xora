@@ -133,7 +133,8 @@ function profileFromAuthUser(authUser, username) {
 
 async function insertPublicUser(authUser, username) {
   var sb = getSupabaseClient();
-  if (!sb || !authUser) return null;
+  if (!sb) throw new Error("Supabase client yok");
+  if (!authUser) throw new Error("Auth user yok");
 
   var profile = profileFromAuthUser(authUser, username);
   var payload = {
@@ -150,7 +151,7 @@ async function insertPublicUser(authUser, username) {
   console.log("[XORA db] users result", result);
   if (result.error) {
     console.error("[XORA db] users insert failed", result.error);
-    return profile;
+    throw result.error;
   }
 
   var row = result.data && result.data[0] ? result.data[0] : payload;
@@ -197,90 +198,57 @@ async function updatePublicUserLogin(authUser) {
 
 async function createLocalUser(username, email, password) {
   var sb = getSupabaseClient();
-  if (sb) {
-    var cleanUsername = String(username || "").replace(/^@+/, "").trim();
-    var cleanEmail = String(email || "").trim().toLowerCase();
+  if (!sb) return { success: false, error: "Supabase bağlantısı kurulamadı" };
+
+  var cleanUsername = String(username || "").replace(/^@+/, "").trim();
+  var cleanEmail = String(email || "").trim().toLowerCase();
+
+  try {
     var signup = await sb.auth.signUp({
       email: cleanEmail,
       password: password,
       options: { data: { username: cleanUsername } }
     });
     if (signup.error) return { success: false, error: signup.error.message };
-    if (signup.data && signup.data.user) {
-      console.log("[XORA auth] signup success", signup.data);
-      console.log("[XORA auth] session", signup.data.session);
-      console.log("[XORA auth] user", signup.data.user);
-      var profile = await insertPublicUser(signup.data.user, cleanUsername);
-      if (!profile) profile = profileFromAuthUser(signup.data.user, cleanUsername);
-      setCurrentUser(profile);
-      if (signup.data.session) {
-        return { success: true, user: getCurrentUser(), hasSession: true };
-      }
-      return { success: true, user: getCurrentUser(), hasSession: false };
-    }
-    return { success: false, error: "Üyelik oluşturulamadı" };
+    if (!signup.data || !signup.data.user) return { success: false, error: "Üyelik oluşturulamadı" };
+
+    console.log("[XORA auth] signup success", signup.data);
+    console.log("[XORA auth] session", signup.data.session);
+    console.log("[XORA auth] user", signup.data.user);
+
+    var profile = await insertPublicUser(signup.data.user, cleanUsername);
+    setCurrentUser(profile);
+    return { success: true, user: getCurrentUser(), hasSession: !!signup.data.session };
+  } catch (err) {
+    console.error("[XORA auth] createLocalUser failed", err);
+    return { success: false, error: err.message || String(err) };
   }
-
-  var users = getUsers();
-  var cleanUsername = String(username || "").replace(/^@+/, "").trim();
-  var cleanEmail = String(email || "").trim().toLowerCase();
-
-  if (!cleanUsername) return { success: false, error: t("auth_username_required") };
-  if (!cleanEmail) return { success: false, error: t("auth_email_required") };
-  if (String(password || "").length < 6) return { success: false, error: t("auth_password_min") };
-  if (users.some(function (u) { return String(u.email).toLowerCase() === cleanEmail; })) {
-    return { success: false, error: "Bu email zaten kayıtlı" };
-  }
-
-  var user = {
-    id: "local_" + Date.now(),
-    username: cleanUsername,
-    email: cleanEmail,
-    password: password,
-    display_name: cleanUsername,
-    avatar_url: null,
-    credit_balance: FREE_CREDITS,
-    created_at: new Date().toISOString(),
-    last_login_at: new Date().toISOString()
-  };
-
-  users.push(user);
-  saveUsers(users);
-  setCurrentUser(user);
-  localStorage.setItem(LS.credits, String(user.credit_balance));
-  return { success: true, user: user, hasSession: true };
 }
 
 async function loginLocalUser(email, password) {
   var sb = getSupabaseClient();
-  if (sb) {
+  if (!sb) return { success: false, error: "Supabase bağlantısı kurulamadı" };
+
+  try {
     var signin = await sb.auth.signInWithPassword({
       email: String(email || "").trim().toLowerCase(),
       password: password
     });
     if (signin.error) return { success: false, error: signin.error.message };
-    if (signin.data && signin.data.user) {
-      var profile = await updatePublicUserLogin(signin.data.user);
-      console.log("[XORA auth] login success", signin.data);
-      console.log("[XORA auth] session", signin.data.session);
-      console.log("[XORA auth] user", signin.data.user);
-      if (!profile) profile = await insertPublicUser(signin.data.user);
-      setCurrentUser(profile || profileFromAuthUser(signin.data.user));
-      return { success: true, user: getCurrentUser() };
-    }
-    return { success: false, error: "Giriş yapılamadı" };
+    if (!signin.data || !signin.data.user) return { success: false, error: "Giriş yapılamadı" };
+
+    console.log("[XORA auth] login success", signin.data);
+    console.log("[XORA auth] session", signin.data.session);
+    console.log("[XORA auth] user", signin.data.user);
+
+    var profile = await updatePublicUserLogin(signin.data.user);
+    if (!profile) profile = await insertPublicUser(signin.data.user);
+    setCurrentUser(profile);
+    return { success: true, user: getCurrentUser() };
+  } catch (err) {
+    console.error("[XORA auth] loginLocalUser failed", err);
+    return { success: false, error: err.message || String(err) };
   }
-
-  var cleanEmail = String(email || "").trim().toLowerCase();
-  var user = getUsers().find(function (u) {
-    return String(u.email).toLowerCase() === cleanEmail && u.password === password;
-  });
-
-  if (!user) return { success: false, error: "Email veya şifre hatalı" };
-  user.last_login_at = new Date().toISOString();
-  setCurrentUser(user);
-  localStorage.setItem(LS.credits, String(user.credit_balance != null ? user.credit_balance : FREE_CREDITS));
-  return { success: true, user: user };
 }
 
 function logout() {
