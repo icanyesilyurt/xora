@@ -42,6 +42,8 @@
 
 <footer class="foot">XORA V1</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script src="app.js"></script>
 <script>
 (function () {
@@ -105,7 +107,7 @@
         if (password.length < 6) throw new Error(t("auth_password_min"));
         if (password !== passwordConfirm) throw new Error(t("auth_password_mismatch"));
 
-        var signupResult = createLocalUser(username, email, password);
+        var signupResult = await createLocalUser(username, email, password);
         if (!signupResult.success) throw new Error(signupResult.error);
         console.log("[XORA auth] signup result", signupResult.user);
         window.location.href = "profile.html";
@@ -116,7 +118,7 @@
         if (!email) throw new Error(t("auth_email_required"));
         if (!password) throw new Error(t("auth_password_required"));
 
-        var signinResult = loginLocalUser(email, password);
+        var signinResult = await loginLocalUser(email, password);
         if (!signinResult.success) throw new Error(signinResult.error);
         console.log("[XORA auth] signin result", signinResult.user);
         toast(t("auth_success"));

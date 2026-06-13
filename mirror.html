@@ -66,6 +66,8 @@
 
 <footer class="foot">XORA V1</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script src="app.js"></script>
 <script src="xora.js"></script>
 <script src="card.js"></script>
@@ -139,6 +141,7 @@
 
   async function initMirror() {
     mirrorLog("init", { url: window.location.href });
+    await initSession();
     if (!isLoggedIn()) window.location.href = "auth.html";
     renderInput();
   }

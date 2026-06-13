@@ -14,6 +14,7 @@ var LS = {
 
 var COSTS = { stalk: 5, match: 10 };
 var FREE_CREDITS = 55;
+var xoraSupabase = null;
 
 /* ---------------- yardımcılar ---------------- */
 
@@ -37,6 +38,20 @@ function toast(msg) {
 }
 
 function authDebug() {}
+
+function getSupabaseClient() {
+  if (xoraSupabase) return xoraSupabase;
+  var cfg = window.XORA_CONFIG || {};
+  if (!window.supabase || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) return null;
+  xoraSupabase = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false
+    }
+  });
+  return xoraSupabase;
+}
 
 /* ---------------- kullanıcı / local auth ---------------- */
 
@@ -102,7 +117,106 @@ function setUser(username) {
   setCurrentUser(user);
 }
 
-function createLocalUser(username, email, password) {
+function profileFromAuthUser(authUser, username) {
+  var meta = (authUser && authUser.user_metadata) || {};
+  var cleanUsername = String(username || meta.username || meta.display_name || (authUser && authUser.email ? authUser.email.split("@")[0] : "") || "").replace(/^@+/, "").trim();
+  return {
+    id: authUser.id,
+    username: cleanUsername,
+    email: authUser.email || "",
+    display_name: cleanUsername,
+    avatar_url: null,
+    credit_balance: FREE_CREDITS,
+    last_login_at: new Date().toISOString()
+  };
+}
+
+async function upsertPublicUser(authUser, username) {
+  var sb = getSupabaseClient();
+  if (!sb || !authUser) return null;
+
+  var profile = profileFromAuthUser(authUser, username);
+  var payload = {
+    id: authUser.id,
+    x_user_id: authUser.id,
+    username: profile.username,
+    display_name: profile.display_name,
+    avatar_url: null,
+    credit_balance: FREE_CREDITS,
+    last_login_at: new Date().toISOString()
+  };
+
+  var result = await sb.from("users").upsert(payload, { onConflict: "id" }).select().single();
+  if (result.error) {
+    console.error("[XORA db] users upsert failed", result.error);
+    return profile;
+  }
+
+  var row = result.data || payload;
+  profile.username = row.username || profile.username;
+  profile.display_name = row.display_name || profile.display_name;
+  profile.avatar_url = row.avatar_url || null;
+  profile.credit_balance = row.credit_balance != null ? row.credit_balance : FREE_CREDITS;
+  setCurrentUser(profile);
+  localStorage.setItem(LS.credits, String(profile.credit_balance));
+  return profile;
+}
+
+async function updatePublicUserLogin(authUser) {
+  var sb = getSupabaseClient();
+  if (!sb || !authUser) return null;
+
+  var result = await sb
+    .from("users")
+    .update({ last_login_at: new Date().toISOString() })
+    .eq("id", authUser.id)
+    .select()
+    .single();
+
+  if (result.error) {
+    console.error("[XORA db] users login update failed", result.error);
+    return null;
+  }
+
+  var row = result.data || {};
+  if (!row.id) return null;
+  var profile = {
+    id: authUser.id,
+    username: row.username || ((authUser.email || "").split("@")[0]),
+    email: authUser.email || "",
+    display_name: row.display_name || row.username || ((authUser.email || "").split("@")[0]),
+    avatar_url: row.avatar_url || null,
+    credit_balance: row.credit_balance != null ? row.credit_balance : FREE_CREDITS,
+    last_login_at: row.last_login_at || new Date().toISOString()
+  };
+  setCurrentUser(profile);
+  localStorage.setItem(LS.credits, String(profile.credit_balance));
+  return profile;
+}
+
+async function createLocalUser(username, email, password) {
+  var sb = getSupabaseClient();
+  if (sb) {
+    var cleanUsername = String(username || "").replace(/^@+/, "").trim();
+    var cleanEmail = String(email || "").trim().toLowerCase();
+    var signup = await sb.auth.signUp({
+      email: cleanEmail,
+      password: password,
+      options: { data: { username: cleanUsername } }
+    });
+    if (signup.error) return { success: false, error: signup.error.message };
+    if (signup.data && signup.data.user) {
+      var profile = await upsertPublicUser(signup.data.user, cleanUsername);
+      if (!profile) profile = profileFromAuthUser(signup.data.user, cleanUsername);
+      setCurrentUser(profile);
+      if (signup.data.session) {
+        return { success: true, user: getCurrentUser(), hasSession: true };
+      }
+      return { success: true, user: getCurrentUser(), hasSession: false };
+    }
+    return { success: false, error: "Üyelik oluşturulamadı" };
+  }
+
   var users = getUsers();
   var cleanUsername = String(username || "").replace(/^@+/, "").trim();
   var cleanEmail = String(email || "").trim().toLowerCase();
@@ -130,10 +244,26 @@ function createLocalUser(username, email, password) {
   saveUsers(users);
   setCurrentUser(user);
   localStorage.setItem(LS.credits, String(user.credit_balance));
-  return { success: true, user: user };
+  return { success: true, user: user, hasSession: true };
 }
 
-function loginLocalUser(email, password) {
+async function loginLocalUser(email, password) {
+  var sb = getSupabaseClient();
+  if (sb) {
+    var signin = await sb.auth.signInWithPassword({
+      email: String(email || "").trim().toLowerCase(),
+      password: password
+    });
+    if (signin.error) return { success: false, error: signin.error.message };
+    if (signin.data && signin.data.user) {
+      var profile = await updatePublicUserLogin(signin.data.user);
+      if (!profile) profile = await upsertPublicUser(signin.data.user);
+      setCurrentUser(profile || profileFromAuthUser(signin.data.user));
+      return { success: true, user: getCurrentUser() };
+    }
+    return { success: false, error: "Giriş yapılamadı" };
+  }
+
   var cleanEmail = String(email || "").trim().toLowerCase();
   var user = getUsers().find(function (u) {
     return String(u.email).toLowerCase() === cleanEmail && u.password === password;
@@ -150,7 +280,9 @@ function logout() {
   localStorage.removeItem(LS.currentUser);
 }
 
-function clearSession() {
+async function clearSession() {
+  var sb = getSupabaseClient();
+  if (sb) await sb.auth.signOut();
   logout();
 }
 
@@ -160,9 +292,19 @@ function requireAuth() {
   return false;
 }
 
-function initSession() {
+async function initSession() {
+  var sb = getSupabaseClient();
+  if (sb) {
+    var result = await sb.auth.getSession();
+    var session = result && result.data && result.data.session;
+    if (session && session.user) {
+      var profile = await updatePublicUserLogin(session.user);
+      if (!profile) profile = await upsertPublicUser(session.user);
+      if (profile) setCurrentUser(profile);
+    }
+  }
   document.dispatchEvent(new CustomEvent("xora:session", { detail: getCurrentUser() }));
-  return Promise.resolve(getCurrentUser());
+  return getCurrentUser();
 }
 
 /* ---------------- krediler ---------------- */
@@ -232,8 +374,39 @@ function saveAnalysis(analysis) {
   user.last_analysis_id = item.id;
   user.last_card = item;
   setCurrentUser(user);
+  saveAnalysisToSupabase(item);
   document.dispatchEvent(new CustomEvent("xora:analysis-saved", { detail: item }));
   return item;
+}
+
+async function saveAnalysisToSupabase(item) {
+  var sb = getSupabaseClient();
+  var user = getCurrentUser();
+  if (!sb || !user || !item) return null;
+
+  var result = item.result || {};
+  var row = {
+    user_id: user.id,
+    type: item.type,
+    target_username: item.handles && item.handles[0] ? item.handles[0] : null,
+    target_username_2: item.handles && item.handles[1] ? item.handles[1] : null,
+    result_title: item.title || null,
+    result_subtitle: result.archetype && result.archetype.desc ? result.archetype.desc[getLang()] : null,
+    result_quote: result.quote || null,
+    avatar_emoji: result.archetype ? result.archetype.emoji : null,
+    metrics: result.scores || result.metrics || {},
+    raw_result: result,
+    language: getLang(),
+    cache_key: item.id
+  };
+
+  var response = await sb.from("analyses").insert(row).select();
+  if (response.error) {
+    console.error("[XORA db] analyses insert failed", response.error);
+    return null;
+  }
+  console.log("[XORA db] analyses insert result", response.data);
+  return response.data;
 }
 
 function getAnalysesForCurrentUser() {
@@ -245,6 +418,18 @@ function getAnalysesForCurrentUser() {
 }
 
 async function getRemoteAnalyses(limit) {
+  var sb = getSupabaseClient();
+  var user = getCurrentUser();
+  if (sb && user) {
+    var response = await sb
+      .from("analyses")
+      .select("id,type,target_username,target_username_2,result_title,result_subtitle,result_quote,avatar_emoji,metrics,raw_result,language,created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(limit || 30);
+    if (!response.error) return response.data || [];
+    console.error("[XORA db] analyses fetch failed", response.error);
+  }
   return getAnalysesForCurrentUser().slice(0, limit || 30);
 }
 
