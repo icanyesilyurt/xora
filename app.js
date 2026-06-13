@@ -229,6 +229,9 @@ function saveAnalysis(analysis) {
   var analyses = getAllAnalyses();
   analyses.unshift(item);
   saveAllAnalyses(analyses);
+  user.last_analysis_id = item.id;
+  user.last_card = item;
+  setCurrentUser(user);
   document.dispatchEvent(new CustomEvent("xora:analysis-saved", { detail: item }));
   return item;
 }
@@ -279,8 +282,8 @@ var I18N = {
     badge_c10: "10 Kredi",
     /* mirror */
     mirror_h1: "X Mirror",
-    mirror_sub: "Hesabını bağla, XORA son paylaşımlarına baksın. Kendi kartın her zaman ücretsiz.",
-    mirror_ph: "@kullaniciadin",
+    mirror_sub: "Kendi X karakterini görmek için X kullanıcı adını yaz.",
+    mirror_ph: "@kullaniciadi",
     mirror_btn: "Aynaya Bak",
     mirror_connect_cta: "X hesabını bağla ve analiz et",
     mirror_login_note: "Mirror için X hesabını bağlaman gerekir.",
@@ -389,7 +392,7 @@ var I18N = {
     badge_c5: "5 Credits",
     badge_c10: "10 Credits",
     mirror_h1: "X Mirror",
-    mirror_sub: "Connect your account and let XORA read your recent posts. Your own card is always free.",
+    mirror_sub: "Enter your X username to see your X character.",
     mirror_ph: "@yourhandle",
     mirror_btn: "Look in the Mirror",
     mirror_connect_cta: "Connect X account and analyze",

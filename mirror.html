@@ -25,10 +25,13 @@
   <section id="inputView">
     <span class="mode-emoji">🪞</span>
     <h1 data-i18n="mirror_h1">X Mirror</h1>
-    <p class="sub" data-i18n="mirror_sub">Hesabını bağla, XORA son paylaşımlarına baksın. Kendi kartın her zaman ücretsiz.</p>
+    <p class="sub" data-i18n="mirror_sub">Kendi X karakterini görmek için X kullanıcı adını yaz.</p>
 
     <div class="handle-form">
-      <button type="button" class="btn" id="goBtn" data-i18n="mirror_connect_cta">X hesabını bağla ve analiz et</button>
+      <input type="text" id="mirrorHandleInput" class="handle-input"
+             data-i18n-ph="mirror_ph" placeholder="@kullaniciadi"
+             maxlength="30" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn" id="goBtn" data-i18n="mirror_btn">Aynaya Bak</button>
     </div>
   </section>
 
@@ -50,6 +53,7 @@
     <div class="result-actions">
       <button type="button" class="btn btn-orange" id="dlBtn" data-i18n="btn_download">Kartı İndir</button>
       <button type="button" class="btn" id="shareBtn" data-i18n="btn_share">X'te Paylaş</button>
+      <a href="profile.html" class="btn btn-ghost">Profile dön</a>
     </div>
 
     <p class="upsell">
@@ -74,6 +78,7 @@
   var analyzingView  = document.getElementById("analyzingView");
   var resultView = document.getElementById("resultView");
   var goBtn      = document.getElementById("goBtn");
+  var handleInput = document.getElementById("mirrorHandleInput");
 
   function mirrorLog(label, data) {
     if (window.console) console.log("[XORA mirror]", label, data || "");
@@ -101,8 +106,8 @@
 
   function renderInput() {
     setMirrorState("input");
-    goBtn.setAttribute("data-i18n", "mirror_connect_cta");
-    goBtn.textContent = t("mirror_connect_cta");
+    goBtn.setAttribute("data-i18n", "mirror_btn");
+    goBtn.textContent = t("mirror_btn");
     applyI18n();
   }
 
@@ -118,9 +123,10 @@
       window.location.href = "auth.html";
       return;
     }
-    var handle = normHandle(getUser());
+    var handle = normHandle(handleInput.value);
     if (!handle) {
       toast(t("toast_handle"));
+      handleInput.focus();
       return;
     }
     lastResult = analyzeHandle(handle);
@@ -138,6 +144,9 @@
   }
 
   document.getElementById("goBtn").addEventListener("click", startMirror);
+  handleInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") startMirror();
+  });
 
   document.getElementById("dlBtn").addEventListener("click", function () {
     if (lastResult) downloadCanvas(renderIdentityPNG(lastResult), "xora-mirror-" + lastResult.handle + ".png");

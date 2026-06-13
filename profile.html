@@ -127,7 +127,7 @@
     if (hist.length === 0) {
       box.innerHTML = '<div class="empty-box">' +
                         "<p>" + esc(t("profile_empty")) + "</p>" +
-                        "<p>" + esc(t("profile_empty_sub")) + "</p>" +
+                        '<p><a href="mirror.html">' + esc(t("profile_empty_sub")) + "</a></p>" +
                       "</div>";
       return;
     }
@@ -189,7 +189,7 @@
     } else {
       holder.innerHTML = '<div class="empty-box">' +
                            "<p>" + esc(t("profile_empty")) + "</p>" +
-                           "<p>" + esc(t("profile_empty_sub")) + "</p>" +
+                           '<p><a href="mirror.html">' + esc(t("profile_empty_sub")) + "</a></p>" +
                          "</div>";
     }
 
