@@ -1,4 +1,4 @@
 window.XORA_CONFIG = {
   SUPABASE_URL: "https://jafrxhkppvvchyjbkldd.supabase.co",
-  SUPABASE_ANON_KEY: "sb_publishable_57Kowrhv4k30FoEDMBsIaw_WDh1c8kC"
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZnJ4aGtwcHZ2Y2h5amJrbGRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDc2NzksImV4cCI6MjA5Njc4MzY3OX0.DiDGpSyG7TScOffTpaZM5rIvhjcSIDSuMQim6Q5f4HQ"
 };

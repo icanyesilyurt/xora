@@ -40,10 +40,9 @@ function toast(msg) {
 function authDebug() {}
 
 function getSupabaseClient() {
-  if (xoraSupabase) { alert("STEP 0: supabase client CACHED"); return xoraSupabase; }
+  if (xoraSupabase) return xoraSupabase;
   var cfg = window.XORA_CONFIG || {};
-  alert("STEP 0: window.supabase=" + !!window.supabase + " URL=" + !!cfg.SUPABASE_URL + " KEY=" + !!cfg.SUPABASE_ANON_KEY);
-  if (!window.supabase || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) { alert("STEP 0: FAIL — client null dönüyor"); return null; }
+  if (!window.supabase || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) return null;
   xoraSupabase = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
     auth: {
       persistSession: true,
@@ -133,11 +132,9 @@ function profileFromAuthUser(authUser, username) {
 }
 
 async function insertPublicUser(authUser, username) {
-  alert("STEP 6a: insertPublicUser içine girdi");
   var sb = getSupabaseClient();
   if (!sb) throw new Error("Supabase client yok");
   if (!authUser) throw new Error("Auth user yok");
-  alert("STEP 6b: authUser.id=" + authUser.id);
 
   var profile = profileFromAuthUser(authUser, username);
   var payload = {
@@ -149,10 +146,8 @@ async function insertPublicUser(authUser, username) {
     last_login_at: new Date().toISOString()
   };
 
-  alert("STEP 6c: insert çağrılıyor — payload=" + JSON.stringify(payload));
   console.log("[XORA db] users payload", payload);
   var result = await sb.from("users").insert([payload]).select();
-  alert("STEP 6d: insert döndü — error=" + JSON.stringify(result.error) + " data=" + JSON.stringify(result.data));
   console.log("[XORA db] users result", result);
   if (result.error) {
     console.error("[XORA db] users insert failed", result.error);
@@ -202,37 +197,29 @@ async function updatePublicUserLogin(authUser) {
 }
 
 async function createLocalUser(username, email, password) {
-  alert("STEP 1: createLocalUser başladı");
   var sb = getSupabaseClient();
-  if (!sb) { alert("STEP 1: FAIL — sb null"); return { success: false, error: "Supabase bağlantısı kurulamadı" }; }
-  alert("STEP 2: supabase client OK");
+  if (!sb) return { success: false, error: "Supabase bağlantısı kurulamadı" };
 
   var cleanUsername = String(username || "").replace(/^@+/, "").trim();
   var cleanEmail = String(email || "").trim().toLowerCase();
 
   try {
-    alert("STEP 3: signUp çağrılıyor — email=" + cleanEmail);
     var signup = await sb.auth.signUp({
       email: cleanEmail,
       password: password,
       options: { data: { username: cleanUsername } }
     });
-    alert("STEP 4: signUp döndü — error=" + (signup.error ? signup.error.message : "yok") + " user=" + !!(signup.data && signup.data.user));
     if (signup.error) return { success: false, error: signup.error.message };
     if (!signup.data || !signup.data.user) return { success: false, error: "Üyelik oluşturulamadı" };
 
-    alert("STEP 5: user.id=" + signup.data.user.id);
     console.log("[XORA auth] signup success", signup.data);
     console.log("[XORA auth] session", signup.data.session);
     console.log("[XORA auth] user", signup.data.user);
 
-    alert("STEP 6: insertPublicUser çağrılıyor");
     var profile = await insertPublicUser(signup.data.user, cleanUsername);
-    alert("STEP 7: insertPublicUser döndü — profile=" + JSON.stringify(profile));
     setCurrentUser(profile);
     return { success: true, user: getCurrentUser(), hasSession: !!signup.data.session };
   } catch (err) {
-    alert("STEP ERROR: " + (err.message || String(err)));
     console.error("[XORA auth] createLocalUser failed", err);
     return { success: false, error: err.message || String(err) };
   }
