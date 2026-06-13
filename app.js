@@ -131,28 +131,29 @@ function profileFromAuthUser(authUser, username) {
   };
 }
 
-async function upsertPublicUser(authUser, username) {
+async function insertPublicUser(authUser, username) {
   var sb = getSupabaseClient();
   if (!sb || !authUser) return null;
 
   var profile = profileFromAuthUser(authUser, username);
   var payload = {
     id: authUser.id,
-    x_user_id: authUser.id,
     username: profile.username,
     display_name: profile.display_name,
     avatar_url: null,
-    credit_balance: FREE_CREDITS,
+    credit_balance: 50,
     last_login_at: new Date().toISOString()
   };
 
-  var result = await sb.from("users").upsert(payload, { onConflict: "id" }).select().single();
+  console.log("[XORA db] users payload", payload);
+  var result = await sb.from("users").insert([payload]).select();
+  console.log("[XORA db] users result", result);
   if (result.error) {
-    console.error("[XORA db] users upsert failed", result.error);
+    console.error("[XORA db] users insert failed", result.error);
     return profile;
   }
 
-  var row = result.data || payload;
+  var row = result.data && result.data[0] ? result.data[0] : payload;
   profile.username = row.username || profile.username;
   profile.display_name = row.display_name || profile.display_name;
   profile.avatar_url = row.avatar_url || null;
@@ -206,7 +207,10 @@ async function createLocalUser(username, email, password) {
     });
     if (signup.error) return { success: false, error: signup.error.message };
     if (signup.data && signup.data.user) {
-      var profile = await upsertPublicUser(signup.data.user, cleanUsername);
+      console.log("[XORA auth] signup success", signup.data);
+      console.log("[XORA auth] session", signup.data.session);
+      console.log("[XORA auth] user", signup.data.user);
+      var profile = await insertPublicUser(signup.data.user, cleanUsername);
       if (!profile) profile = profileFromAuthUser(signup.data.user, cleanUsername);
       setCurrentUser(profile);
       if (signup.data.session) {
@@ -257,7 +261,10 @@ async function loginLocalUser(email, password) {
     if (signin.error) return { success: false, error: signin.error.message };
     if (signin.data && signin.data.user) {
       var profile = await updatePublicUserLogin(signin.data.user);
-      if (!profile) profile = await upsertPublicUser(signin.data.user);
+      console.log("[XORA auth] login success", signin.data);
+      console.log("[XORA auth] session", signin.data.session);
+      console.log("[XORA auth] user", signin.data.user);
+      if (!profile) profile = await insertPublicUser(signin.data.user);
       setCurrentUser(profile || profileFromAuthUser(signin.data.user));
       return { success: true, user: getCurrentUser() };
     }
@@ -299,7 +306,7 @@ async function initSession() {
     var session = result && result.data && result.data.session;
     if (session && session.user) {
       var profile = await updatePublicUserLogin(session.user);
-      if (!profile) profile = await upsertPublicUser(session.user);
+      if (!profile) profile = await insertPublicUser(session.user);
       if (profile) setCurrentUser(profile);
     }
   }
