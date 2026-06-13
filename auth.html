@@ -29,11 +29,11 @@
       <button type="button" class="btn btn-sm btn-ghost" id="signupModeBtn" data-i18n="auth_signup_tab">Üye Ol</button>
     </div>
 
-    <form class="handle-form" id="authForm">
-      <input type="email" id="emailInput" class="handle-input" data-i18n-ph="auth_email" placeholder="E-posta" autocomplete="email" required>
-      <input type="text" id="usernameInput" class="handle-input" data-i18n-ph="auth_username" placeholder="Kullanıcı adı" autocomplete="username" hidden>
-      <input type="password" id="passwordInput" class="handle-input" data-i18n-ph="auth_password" placeholder="Şifre" autocomplete="current-password" required>
-      <input type="password" id="passwordConfirmInput" class="handle-input" data-i18n-ph="auth_password_confirm" placeholder="Şifre tekrar" autocomplete="new-password" hidden>
+    <form class="handle-form" id="authForm" autocomplete="off">
+      <input type="text" id="usernameInput" class="handle-input" data-i18n-ph="auth_username" placeholder="Kullanıcı adı" autocomplete="off" hidden>
+      <input type="email" id="emailInput" class="handle-input" data-i18n-ph="auth_email" placeholder="E-posta" autocomplete="off" required>
+      <input type="password" id="passwordInput" class="handle-input" data-i18n-ph="auth_password" placeholder="Şifre" autocomplete="off" required>
+      <input type="password" id="passwordConfirmInput" class="handle-input" data-i18n-ph="auth_password_confirm" placeholder="Şifre tekrar" autocomplete="off" hidden>
       <button type="submit" class="btn" id="submitBtn" data-i18n="auth_login_btn">Giriş Yap</button>
       <p class="cost-note" id="modeHint" data-i18n="auth_need_account">Hesabın yoksa üye ol.</p>
     </form>
@@ -56,13 +56,19 @@
   var submitBtn = document.getElementById("submitBtn");
   var modeHint = document.getElementById("modeHint");
 
+  form.reset();
+  usernameInput.value = "";
+  emailInput.value = "";
+  passwordInput.value = "";
+  passwordConfirmInput.value = "";
+
   function setAuthMode(nextMode) {
     authMode = nextMode;
     usernameInput.hidden = authMode !== "signup";
     usernameInput.required = authMode === "signup";
     passwordConfirmInput.hidden = authMode !== "signup";
     passwordConfirmInput.required = authMode === "signup";
-    passwordInput.autocomplete = authMode === "signup" ? "new-password" : "current-password";
+    passwordInput.autocomplete = "off";
     submitBtn.setAttribute("data-i18n", authMode === "signup" ? "auth_signup_btn" : "auth_login_btn");
     modeHint.setAttribute("data-i18n", authMode === "signup" ? "auth_have_account" : "auth_need_account");
     loginModeBtn.classList.toggle("btn-ghost", authMode !== "login");
