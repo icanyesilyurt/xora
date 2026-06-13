@@ -81,7 +81,9 @@
 <script src="card.js"></script>
 <script>
 (async function () {
+  try {
   await initSession();
+  } catch (e) { console.error("[XORA profile] initSession error", e); }
   if (!isLoggedIn()) {
     window.location.href = "auth.html";
     return;
@@ -160,6 +162,7 @@
   }
 
   function render() {
+    try {
     var profile = getCurrentUser();
     var user = getUser();
     document.getElementById("noUser").hidden = !!profile;
@@ -173,12 +176,14 @@
     avatar.hidden = !(profile && profile.avatar_url);
     if (profile && profile.avatar_url) avatar.src = profile.avatar_url;
 
-    var hist = remoteAnalyses.length > 0 ? remoteAnalyses.map(normalizeRemoteAnalysis) : getHistory().map(normalizeRemoteAnalysis);
+    var hist = [];
+    try {
+      hist = remoteAnalyses.length > 0 ? remoteAnalyses.map(normalizeRemoteAnalysis) : getHistory().map(normalizeRemoteAnalysis);
+    } catch (e) { console.error("[XORA profile] history parse error", e); }
 
-    // son kart: kayıt varsa geçmişteki ilk kayıttan gösterilir, yoksa boş durum kalır
-    var lastPanel = document.getElementById("lastCardPanel");
     var holder = document.getElementById("lastCardHolder");
     if (hist.length > 0) {
+      try {
       var last = hist[0];
       if (last.rawResult && last.type === "match") {
         holder.innerHTML = buildMatchCard(last.rawResult);
@@ -189,6 +194,7 @@
       } else {
         holder.innerHTML = buildIdentityCard(analyzeHandle(last.handles[0]));
       }
+      } catch (e) { console.error("[XORA profile] card render error", e); }
     } else {
       holder.innerHTML = '<div class="empty-box">' +
                            "<p>" + esc(t("profile_empty")) + "</p>" +
@@ -196,9 +202,14 @@
                          "</div>";
     }
 
-    renderHistoryList(hist);
+    try { renderHistoryList(hist); } catch (e) { console.error("[XORA profile] history render error", e); }
 
     applyI18n();
+    } catch (e) {
+      console.error("[XORA profile] render error", e);
+      document.getElementById("hasUser").hidden = false;
+      document.getElementById("noUser").hidden = true;
+    }
   }
 
   document.getElementById("logoutBtn").addEventListener("click", async function () {

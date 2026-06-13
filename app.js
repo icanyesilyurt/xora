@@ -270,12 +270,22 @@ function requireAuth() {
 async function initSession() {
   var sb = getSupabaseClient();
   if (sb) {
-    var result = await sb.auth.getSession();
-    var session = result && result.data && result.data.session;
-    if (session && session.user) {
-      var profile = await updatePublicUserLogin(session.user);
-      if (!profile) profile = await insertPublicUser(session.user);
-      if (profile) setCurrentUser(profile);
+    try {
+      var result = await sb.auth.getSession();
+      var session = result && result.data && result.data.session;
+      if (session && session.user) {
+        var profile = null;
+        try { profile = await updatePublicUserLogin(session.user); } catch (e) { console.error("[XORA session] update failed", e); }
+        if (!profile) {
+          try { profile = await insertPublicUser(session.user); } catch (e) { console.error("[XORA session] insert failed", e); }
+        }
+        if (!profile) {
+          profile = profileFromAuthUser(session.user);
+        }
+        setCurrentUser(profile);
+      }
+    } catch (e) {
+      console.error("[XORA session] init failed", e);
     }
   }
   document.dispatchEvent(new CustomEvent("xora:session", { detail: getCurrentUser() }));
