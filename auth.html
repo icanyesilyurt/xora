@@ -30,10 +30,10 @@
     </div>
 
     <form class="handle-form" id="authForm" autocomplete="off">
-      <input type="text" id="usernameInput" class="handle-input" data-i18n-ph="auth_username" placeholder="Kullanıcı adı" autocomplete="off" hidden>
-      <input type="email" id="emailInput" class="handle-input" data-i18n-ph="auth_email" placeholder="E-posta" autocomplete="off" required>
-      <input type="password" id="passwordInput" class="handle-input" data-i18n-ph="auth_password" placeholder="Şifre" autocomplete="off" required>
-      <input type="password" id="passwordConfirmInput" class="handle-input" data-i18n-ph="auth_password_confirm" placeholder="Şifre tekrar" autocomplete="off" hidden>
+      <input type="text" id="xora_auth_username" name="xora_auth_username" class="handle-input" data-i18n-ph="auth_username" placeholder="Kullanıcı adı" autocomplete="new-password" hidden>
+      <input type="email" id="xora_auth_email" name="xora_auth_email" class="handle-input" data-i18n-ph="auth_email" placeholder="E-posta" autocomplete="new-password" required>
+      <input type="password" id="xora_auth_password" name="xora_auth_password" class="handle-input" data-i18n-ph="auth_password" placeholder="Şifre" autocomplete="new-password" required>
+      <input type="password" id="xora_auth_password_confirm" name="xora_auth_password_confirm" class="handle-input" data-i18n-ph="auth_password_confirm" placeholder="Şifre tekrar" autocomplete="new-password" hidden>
       <button type="submit" class="btn" id="submitBtn" data-i18n="auth_login_btn">Giriş Yap</button>
       <p class="cost-note" id="modeHint" data-i18n="auth_need_account">Hesabın yoksa üye ol.</p>
     </form>
@@ -49,26 +49,32 @@
   var loginModeBtn = document.getElementById("loginModeBtn");
   var signupModeBtn = document.getElementById("signupModeBtn");
   var form = document.getElementById("authForm");
-  var emailInput = document.getElementById("emailInput");
-  var usernameInput = document.getElementById("usernameInput");
-  var passwordInput = document.getElementById("passwordInput");
-  var passwordConfirmInput = document.getElementById("passwordConfirmInput");
+  var emailInput = document.getElementById("xora_auth_email");
+  var usernameInput = document.getElementById("xora_auth_username");
+  var passwordInput = document.getElementById("xora_auth_password");
+  var passwordConfirmInput = document.getElementById("xora_auth_password_confirm");
   var submitBtn = document.getElementById("submitBtn");
   var modeHint = document.getElementById("modeHint");
 
-  form.reset();
-  usernameInput.value = "";
-  emailInput.value = "";
-  passwordInput.value = "";
-  passwordConfirmInput.value = "";
+  function clearAuthInputs() {
+    form.reset();
+    usernameInput.value = "";
+    emailInput.value = "";
+    passwordInput.value = "";
+    passwordConfirmInput.value = "";
+  }
 
   function setAuthMode(nextMode) {
     authMode = nextMode;
+    clearAuthInputs();
     usernameInput.hidden = authMode !== "signup";
     usernameInput.required = authMode === "signup";
     passwordConfirmInput.hidden = authMode !== "signup";
     passwordConfirmInput.required = authMode === "signup";
-    passwordInput.autocomplete = "off";
+    usernameInput.autocomplete = "new-password";
+    emailInput.autocomplete = "new-password";
+    passwordInput.autocomplete = "new-password";
+    passwordConfirmInput.autocomplete = "new-password";
     submitBtn.setAttribute("data-i18n", authMode === "signup" ? "auth_signup_btn" : "auth_login_btn");
     modeHint.setAttribute("data-i18n", authMode === "signup" ? "auth_have_account" : "auth_need_account");
     loginModeBtn.classList.toggle("btn-ghost", authMode !== "login");
@@ -125,6 +131,9 @@
     }
   });
 
+  clearAuthInputs();
+  setTimeout(clearAuthInputs, 50);
+  setTimeout(clearAuthInputs, 250);
   setAuthMode("login");
 })();
 </script>
