@@ -106,24 +106,18 @@
   var remoteAnalyses = [];
 
   function normalizeRemoteAnalysis(a) {
-    if (a.handles || a.result) {
-      return {
-        type: a.type,
-        handles: a.handles || [],
-        ts: a.createdAt,
-        resultTitle: a.title,
-        rawResult: a.result || {}
-      };
-    }
+    var res = a.result || {};
+    var type = a.analysis_type || a.type;
+    var handles = a.handles || [];
+    if (!handles.length && res.handles) handles = res.handles;
+    var title = a.title;
+    if (!title && res.archetype && res.archetype.name) title = res.archetype.name[getLang()];
     return {
-      type: a.type,
-      handles: a.target_username_2 ? [a.target_username, a.target_username_2] : [a.target_username],
-      ts: a.created_at,
-      resultTitle: a.result_title,
-      resultSubtitle: a.result_subtitle,
-      resultQuote: a.result_quote,
-      metrics: a.metrics || {},
-      rawResult: a.raw_result || {}
+      type: type,
+      handles: handles,
+      ts: a.created_at || a.createdAt,
+      resultTitle: title,
+      rawResult: res
     };
   }
 

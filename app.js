@@ -353,31 +353,30 @@ function saveAnalysis(analysis) {
 async function saveAnalysisToSupabase(item) {
   var sb = getSupabaseClient();
   var user = getCurrentUser();
-  if (!sb || !user || !item) return null;
+  if (!sb) { console.warn("[XORA db] analyses insert skipped — no Supabase client"); return null; }
+  if (!user || !user.id) { console.warn("[XORA db] analyses insert skipped — no user id"); return null; }
+  if (!item) { console.warn("[XORA db] analyses insert skipped — no item"); return null; }
 
-  var result = item.result || {};
   var row = {
     user_id: user.id,
-    type: item.type,
-    target_username: item.handles && item.handles[0] ? item.handles[0] : null,
-    target_username_2: item.handles && item.handles[1] ? item.handles[1] : null,
-    result_title: item.title || null,
-    result_subtitle: result.archetype && result.archetype.desc ? result.archetype.desc[getLang()] : null,
-    result_quote: result.quote || null,
-    avatar_emoji: result.archetype ? result.archetype.emoji : null,
-    metrics: result.scores || result.metrics || {},
-    raw_result: result,
-    language: getLang(),
-    cache_key: item.id
+    analysis_type: item.type,
+    title: item.title || null,
+    result: item.result || null
   };
 
-  var response = await sb.from("analyses").insert(row).select();
-  if (response.error) {
-    console.error("[XORA db] analyses insert failed", response.error);
+  console.log("[XORA db] analyses insert payload", row);
+  try {
+    var response = await sb.from("analyses").insert([row]).select();
+    if (response.error) {
+      console.error("[XORA db] analyses insert failed", response.error);
+      return null;
+    }
+    console.log("[XORA db] analyses insert success", response.data);
+    return response.data;
+  } catch (err) {
+    console.error("[XORA db] analyses insert failed", err);
     return null;
   }
-  console.log("[XORA db] analyses insert result", response.data);
-  return response.data;
 }
 
 function getAnalysesForCurrentUser() {
@@ -392,14 +391,18 @@ async function getRemoteAnalyses(limit) {
   var sb = getSupabaseClient();
   var user = getCurrentUser();
   if (sb && user) {
-    var response = await sb
-      .from("analyses")
-      .select("id,type,target_username,target_username_2,result_title,result_subtitle,result_quote,avatar_emoji,metrics,raw_result,language,created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(limit || 30);
-    if (!response.error) return response.data || [];
-    console.error("[XORA db] analyses fetch failed", response.error);
+    try {
+      var response = await sb
+        .from("analyses")
+        .select("id,user_id,analysis_type,title,result,created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(limit || 30);
+      if (!response.error) return response.data || [];
+      console.error("[XORA db] analyses fetch failed", response.error);
+    } catch (err) {
+      console.error("[XORA db] analyses fetch failed", err);
+    }
   }
   return getAnalysesForCurrentUser().slice(0, limit || 30);
 }
