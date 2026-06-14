@@ -343,11 +343,40 @@ function saveAnalysis(analysis) {
   analyses.unshift(item);
   saveAllAnalyses(analyses);
   user.last_analysis_id = item.id;
-  user.last_card = item;
+  if (item.type === "mirror") {
+    user.last_card = item;
+  }
   setCurrentUser(user);
   saveAnalysisToSupabase(item);
   document.dispatchEvent(new CustomEvent("xora:analysis-saved", { detail: item }));
   return item;
+}
+
+function getLastMirrorAnalysis() {
+  var analyses = getAllAnalyses();
+  var user = getCurrentUser();
+  if (!user) return null;
+  for (var i = 0; i < analyses.length; i++) {
+    if (analyses[i].userId === user.id && analyses[i].type === "mirror") return analyses[i];
+  }
+  return null;
+}
+
+var MIRROR_COOLDOWN_DAYS = 15;
+
+function isMirrorOnCooldown() {
+  var last = getLastMirrorAnalysis();
+  if (!last || !last.createdAt) return false;
+  var elapsed = Date.now() - new Date(last.createdAt).getTime();
+  return elapsed < MIRROR_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+}
+
+function getMirrorCooldownRemaining() {
+  var last = getLastMirrorAnalysis();
+  if (!last || !last.createdAt) return 0;
+  var elapsed = Date.now() - new Date(last.createdAt).getTime();
+  var remaining = (MIRROR_COOLDOWN_DAYS * 24 * 60 * 60 * 1000) - elapsed;
+  return remaining > 0 ? Math.ceil(remaining / (24 * 60 * 60 * 1000)) : 0;
 }
 
 async function saveAnalysisToSupabase(item) {
@@ -534,7 +563,10 @@ var I18N = {
     toast_nocredit: "Kredin yetersiz, yönlendiriyorum…",
     toast_saved: "Kart indirildi",
     cost_info: "kredi kullanıldı",
-    date_today: "bugün"
+    date_today: "bugün",
+    mirror_cooldown: "X kimlik kartın hâlâ güncel. Yeni kart için {days} gün sonra tekrar gel.",
+    view_card: "Kartı Görüntüle",
+    close: "Kapat"
   },
   en: {
     nav_profile: "Profile",
@@ -637,7 +669,10 @@ var I18N = {
     toast_nocredit: "Not enough credits, redirecting…",
     toast_saved: "Card downloaded",
     cost_info: "credits used",
-    date_today: "today"
+    date_today: "today",
+    mirror_cooldown: "Your X identity card is still current. Come back in {days} days for a new one.",
+    view_card: "View Card",
+    close: "Close"
   }
 };
 

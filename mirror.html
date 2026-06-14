@@ -125,6 +125,18 @@
       window.location.href = "auth.html";
       return;
     }
+
+    if (isMirrorOnCooldown()) {
+      var existing = getLastMirrorAnalysis();
+      if (existing && existing.result) {
+        lastResult = existing.result;
+        showResult();
+        var days = getMirrorCooldownRemaining();
+        toast(t("mirror_cooldown").replace("{days}", days));
+        return;
+      }
+    }
+
     var handle = normHandle(handleInput.value);
     if (!handle) {
       toast(t("toast_handle"));
@@ -143,6 +155,18 @@
     mirrorLog("init", { url: window.location.href });
     await initSession();
     if (!isLoggedIn()) window.location.href = "auth.html";
+
+    if (isMirrorOnCooldown()) {
+      var existing = getLastMirrorAnalysis();
+      if (existing && existing.result) {
+        lastResult = existing.result;
+        showResult();
+        var days = getMirrorCooldownRemaining();
+        toast(t("mirror_cooldown").replace("{days}", days));
+        return;
+      }
+    }
+
     renderInput();
   }
 
