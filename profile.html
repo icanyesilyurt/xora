@@ -271,15 +271,22 @@
     } catch (e) { console.error("[XORA profile] history parse error", e); }
 
     var holder = document.getElementById("lastCardHolder");
-    var lastMirror = null;
-    for (var i = 0; i < hist.length; i++) {
-      if (hist[i].type === "mirror" && hist[i].rawResult) { lastMirror = hist[i]; break; }
+    var lastCard = profile.last_card;
+    var cardExpired = false;
+    if (lastCard && lastCard.createdAt) {
+      var elapsed = Date.now() - new Date(lastCard.createdAt).getTime();
+      cardExpired = elapsed >= MIRROR_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
     }
 
-    if (lastMirror) {
+    if (lastCard && lastCard.result && !cardExpired) {
       try {
-        holder.innerHTML = buildIdentityCard(lastMirror.rawResult);
+        holder.innerHTML = buildIdentityCard(lastCard.result);
       } catch (e) { console.error("[XORA profile] card render error", e); }
+    } else if (cardExpired) {
+      holder.innerHTML = '<div class="empty-box">' +
+                           "<p>" + esc(t("profile_card_expired") || "Mirror kartın süresi doldu.") + "</p>" +
+                           '<p><a href="mirror.html">' + esc(t("profile_card_renew") || "Yeni Mirror çek") + "</a></p>" +
+                         "</div>";
     } else {
       holder.innerHTML = '<div class="empty-box">' +
                            "<p>" + esc(t("profile_empty")) + "</p>" +
@@ -318,48 +325,50 @@
 
     var localIds = [];
     var remoteIds = [];
+    var deleteSet = {};
     var rawHist = remoteAnalyses.length > 0 ? remoteAnalyses : getHistory();
     for (var i = 0; i < rawHist.length; i++) {
       var a = rawHist[i];
       var selKey = String(a.id != null ? a.id : ("idx_" + i));
       if (!selectedIds[selKey]) continue;
-      if (typeof a.id === "number") {
-        remoteIds.push(a.id);
-      }
-      if (typeof a.id === "string") {
-        localIds.push(a.id);
-      }
+      deleteSet[selKey] = true;
+      if (typeof a.id === "number") remoteIds.push(a.id);
+      if (typeof a.id === "string") localIds.push(a.id);
     }
 
     console.log("[XORA delete] selected", { localIds: localIds, remoteIds: remoteIds, selectedKeys: ids });
 
+    // 1) Optimistic UI: remove from list immediately
+    remoteAnalyses = remoteAnalyses.filter(function (a) {
+      return !deleteSet[String(a.id)];
+    });
+    selectMode = false;
+    selectedIds = {};
+    render();
+
+    // 2) Actual deletes
     var totalDeleted = 0;
 
     if (localIds.length > 0) {
       var localResult = deleteAnalysesLocal(localIds);
-      if (localResult.error) {
-        toast("Yerel silme hatasi: " + localResult.error);
-      }
+      if (localResult.error) toast("Yerel silme hatasi: " + localResult.error);
       totalDeleted += localResult.deleted;
     }
 
     if (remoteIds.length > 0) {
       var remoteResult = await deleteAnalysesRemote(remoteIds);
-      if (remoteResult.error) {
-        toast("Supabase silme hatasi: " + remoteResult.error);
-      }
+      if (remoteResult.error) toast("Supabase silme hatasi: " + remoteResult.error);
       totalDeleted += remoteResult.deleted;
     }
 
-    selectMode = false;
-    selectedIds = {};
+    // 3) Re-sync from server
     remoteAnalyses = await getRemoteAnalyses(30);
     render();
 
-    if (totalDeleted > 0) {
+    if (totalDeleted > 0 || Object.keys(deleteSet).length > 0) {
       toast(t("history_deleted"));
     } else {
-      toast(t("history_not_found") || "Silinecek kayit bulunamadi");
+      toast(t("history_not_found"));
     }
   });
 

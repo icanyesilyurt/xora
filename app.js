@@ -604,7 +604,9 @@ var I18N = {
     history_delete: "Seçilenleri Temizle",
     history_none_selected: "Temizlemek için analiz seç.",
     history_deleted: "Seçilen analizler silindi.",
-    history_not_found: "Silinecek kayıt bulunamadı."
+    history_not_found: "Silinecek kayıt bulunamadı.",
+    profile_card_expired: "Mirror kartının süresi doldu.",
+    profile_card_renew: "Yeni Mirror çek"
   },
   en: {
     nav_profile: "Profile",
@@ -716,7 +718,9 @@ var I18N = {
     history_delete: "Delete Selected",
     history_none_selected: "Select analyses to delete.",
     history_deleted: "Selected analyses deleted.",
-    history_not_found: "No records found to delete."
+    history_not_found: "No records found to delete.",
+    profile_card_expired: "Your Mirror card has expired.",
+    profile_card_renew: "Get a new Mirror"
   }
 };
 
