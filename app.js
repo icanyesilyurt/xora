@@ -436,6 +436,37 @@ async function getRemoteAnalyses(limit) {
   return getAnalysesForCurrentUser().slice(0, limit || 30);
 }
 
+function deleteAnalysesLocal(ids) {
+  if (!ids || !ids.length) return;
+  var idSet = {};
+  for (var i = 0; i < ids.length; i++) idSet[ids[i]] = true;
+  var all = getAllAnalyses();
+  var filtered = all.filter(function (item) { return !idSet[item.id]; });
+  saveAllAnalyses(filtered);
+  var user = getCurrentUser();
+  if (user && user.last_card && idSet[user.last_card.id]) {
+    var nextMirror = null;
+    for (var j = 0; j < filtered.length; j++) {
+      if (filtered[j].userId === user.id && filtered[j].type === "mirror") { nextMirror = filtered[j]; break; }
+    }
+    user.last_card = nextMirror || null;
+    setCurrentUser(user);
+  }
+}
+
+async function deleteAnalysesRemote(supabaseIds) {
+  var sb = getSupabaseClient();
+  var user = getCurrentUser();
+  if (!sb || !user || !supabaseIds || !supabaseIds.length) return;
+  try {
+    var response = await sb.from("analyses").delete().in("id", supabaseIds).eq("user_id", user.id);
+    if (response.error) console.error("[XORA db] analyses delete failed", response.error);
+    else console.log("[XORA db] analyses deleted", supabaseIds);
+  } catch (err) {
+    console.error("[XORA db] analyses delete failed", err);
+  }
+}
+
 function saveAnalysisRecord(type, handles, result) {
   var title = null;
   if (result && result.archetype && result.archetype.name) title = result.archetype.name[getLang()];
@@ -566,7 +597,12 @@ var I18N = {
     date_today: "bugün",
     mirror_cooldown: "X kimlik kartın hâlâ güncel. Yeni kart için {days} gün sonra tekrar gel.",
     view_card: "Kartı Görüntüle",
-    close: "Kapat"
+    close: "Kapat",
+    history_select: "Seç",
+    history_cancel: "İptal",
+    history_delete: "Seçilenleri Temizle",
+    history_none_selected: "Temizlemek için analiz seç.",
+    history_deleted: "Seçilen analizler silindi."
   },
   en: {
     nav_profile: "Profile",
@@ -672,7 +708,12 @@ var I18N = {
     date_today: "today",
     mirror_cooldown: "Your X identity card is still current. Come back in {days} days for a new one.",
     view_card: "View Card",
-    close: "Close"
+    close: "Close",
+    history_select: "Select",
+    history_cancel: "Cancel",
+    history_delete: "Delete Selected",
+    history_none_selected: "Select analyses to delete.",
+    history_deleted: "Selected analyses deleted."
   }
 };
 

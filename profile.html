@@ -63,8 +63,15 @@
     </div>
 
     <div class="panel">
-      <h2 data-i18n="profile_history">Geçmiş Analizler</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <h2 data-i18n="profile_history">Geçmiş Analizler</h2>
+        <button type="button" class="btn btn-sm btn-ghost" id="selectModeBtn" data-i18n="history_select">Seç</button>
+      </div>
       <div id="historyBox"></div>
+      <div id="selectActions" hidden>
+        <button type="button" class="btn btn-sm btn-orange" id="deleteSelectedBtn" data-i18n="history_delete">Seçilenleri Temizle</button>
+        <button type="button" class="btn btn-sm btn-ghost" id="cancelSelectBtn" data-i18n="history_cancel">İptal</button>
+      </div>
     </div>
 
     <button type="button" class="btn btn-ghost" id="logoutBtn" data-i18n="profile_logout">Çıkış Yap</button>
@@ -104,6 +111,8 @@
   }
 
   var remoteAnalyses = [];
+  var selectMode = false;
+  var selectedIds = {};
 
   function normalizeRemoteAnalysis(a) {
     var res = a.result || {};
@@ -113,6 +122,8 @@
     var title = a.title;
     if (!title && res.archetype && res.archetype.name) title = res.archetype.name[getLang()];
     return {
+      localId: a.id,
+      supabaseId: a.supabase_id || (typeof a.id === "number" ? a.id : null),
       type: type,
       handles: handles,
       ts: a.created_at || a.createdAt,
@@ -152,17 +163,33 @@
 
   function renderHistoryList(hist) {
     var box = document.getElementById("historyBox");
+    var selectBtn = document.getElementById("selectModeBtn");
+    var actionsDiv = document.getElementById("selectActions");
+
     if (hist.length === 0) {
       box.innerHTML = '<div class="empty-box">' +
                         "<p>" + esc(t("profile_empty")) + "</p>" +
                         '<p><a href="mirror.html">' + esc(t("profile_empty_sub")) + "</a></p>" +
                       "</div>";
+      selectBtn.hidden = true;
+      actionsDiv.hidden = true;
       return;
+    }
+
+    selectBtn.hidden = false;
+    selectBtn.textContent = selectMode ? esc(t("history_cancel")) : esc(t("history_select"));
+    if (selectMode) {
+      actionsDiv.hidden = false;
+      actionsDiv.style.cssText = "display:flex;gap:8px;margin-top:12px";
+    } else {
+      actionsDiv.hidden = true;
+      actionsDiv.removeAttribute("style");
     }
 
     var html = "";
     for (var i = 0; i < hist.length; i++) {
       var hh = hist[i];
+      var itemId = hh.localId || ("idx_" + i);
       var main;
       if (hh.resultTitle) {
         var target = hh.handles[0] ? "@" + esc(hh.handles[0]) : "";
@@ -175,20 +202,51 @@
       } else {
         main = esc(hh.type);
       }
-      html += '<div class="history-item">' +
-                typeLabel(hh.type) +
-                '<span class="history-main">' + main + "</span>" +
-                '<span class="history-date">' + fmtDate(hh.ts) + "</span>" +
-                (hh.rawResult ? '<button class="btn btn-sm btn-ghost history-view-btn" data-idx="' + i + '">' + esc(t("view_card")) + "</button>" : "") +
-              "</div>";
+
+      if (selectMode) {
+        var checked = selectedIds[itemId] ? " checked" : "";
+        html += '<div class="history-item" style="cursor:pointer" data-sel-id="' + esc(String(itemId)) + '">' +
+                  '<input type="checkbox" class="history-check" data-sel-id="' + esc(String(itemId)) + '"' + checked + ' style="accent-color:var(--orange);width:18px;height:18px;margin-right:8px;flex-shrink:0">' +
+                  typeLabel(hh.type) +
+                  '<span class="history-main">' + main + "</span>" +
+                  '<span class="history-date">' + fmtDate(hh.ts) + "</span>" +
+                "</div>";
+      } else {
+        html += '<div class="history-item">' +
+                  typeLabel(hh.type) +
+                  '<span class="history-main">' + main + "</span>" +
+                  '<span class="history-date">' + fmtDate(hh.ts) + "</span>" +
+                  (hh.rawResult ? '<button class="btn btn-sm btn-ghost history-view-btn" data-idx="' + i + '">' + esc(t("view_card")) + "</button>" : "") +
+                "</div>";
+      }
     }
     box.innerHTML = html;
 
-    var buttons = box.querySelectorAll(".history-view-btn");
-    for (var j = 0; j < buttons.length; j++) {
-      buttons[j].addEventListener("click", (function (idx) {
-        return function () { showCardModal(hist[idx]); };
-      })(parseInt(buttons[j].getAttribute("data-idx"), 10)));
+    if (selectMode) {
+      var checks = box.querySelectorAll(".history-check");
+      for (var c = 0; c < checks.length; c++) {
+        checks[c].addEventListener("change", function () {
+          var sid = this.getAttribute("data-sel-id");
+          if (this.checked) selectedIds[sid] = true;
+          else delete selectedIds[sid];
+        });
+      }
+      var rows = box.querySelectorAll("[data-sel-id]");
+      for (var r = 0; r < rows.length; r++) {
+        if (rows[r].tagName === "INPUT") continue;
+        rows[r].addEventListener("click", function (e) {
+          if (e.target.tagName === "INPUT") return;
+          var cb = this.querySelector(".history-check");
+          if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event("change")); }
+        });
+      }
+    } else {
+      var buttons = box.querySelectorAll(".history-view-btn");
+      for (var j = 0; j < buttons.length; j++) {
+        buttons[j].addEventListener("click", (function (idx) {
+          return function () { showCardModal(hist[idx]); };
+        })(parseInt(buttons[j].getAttribute("data-idx"), 10)));
+      }
     }
   }
 
@@ -238,6 +296,48 @@
       document.getElementById("noUser").hidden = true;
     }
   }
+
+  document.getElementById("selectModeBtn").addEventListener("click", function () {
+    selectMode = !selectMode;
+    selectedIds = {};
+    render();
+  });
+
+  document.getElementById("cancelSelectBtn").addEventListener("click", function () {
+    selectMode = false;
+    selectedIds = {};
+    render();
+  });
+
+  document.getElementById("deleteSelectedBtn").addEventListener("click", async function () {
+    var ids = Object.keys(selectedIds);
+    if (ids.length === 0) {
+      toast(t("history_none_selected"));
+      return;
+    }
+
+    var localIds = [];
+    var supabaseIds = [];
+    var hist = remoteAnalyses.length > 0 ? remoteAnalyses : getHistory();
+    for (var i = 0; i < hist.length; i++) {
+      var a = hist[i];
+      var lid = a.id || ("idx_" + i);
+      if (selectedIds[lid]) {
+        localIds.push(lid);
+        var sbId = a.supabase_id || (typeof a.id === "number" ? a.id : null);
+        if (sbId) supabaseIds.push(sbId);
+      }
+    }
+
+    deleteAnalysesLocal(localIds);
+    if (supabaseIds.length > 0) deleteAnalysesRemote(supabaseIds);
+
+    selectMode = false;
+    selectedIds = {};
+    remoteAnalyses = await getRemoteAnalyses(30);
+    render();
+    toast(t("history_deleted") || (localIds.length + " analiz silindi"));
+  });
 
   document.getElementById("logoutBtn").addEventListener("click", async function () {
     if (confirm(t("logout_confirm"))) {
