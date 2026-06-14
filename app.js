@@ -437,33 +437,34 @@ async function getRemoteAnalyses(limit) {
 }
 
 function deleteAnalysesLocal(ids) {
-  if (!ids || !ids.length) return;
+  if (!ids || !ids.length) return { deleted: 0, error: null };
   var idSet = {};
-  for (var i = 0; i < ids.length; i++) idSet[ids[i]] = true;
+  for (var i = 0; i < ids.length; i++) idSet[String(ids[i])] = true;
   var all = getAllAnalyses();
-  var filtered = all.filter(function (item) { return !idSet[item.id]; });
+  var before = all.length;
+  var filtered = all.filter(function (item) { return !idSet[String(item.id)]; });
+  var deleted = before - filtered.length;
   saveAllAnalyses(filtered);
-  var user = getCurrentUser();
-  if (user && user.last_card && idSet[user.last_card.id]) {
-    var nextMirror = null;
-    for (var j = 0; j < filtered.length; j++) {
-      if (filtered[j].userId === user.id && filtered[j].type === "mirror") { nextMirror = filtered[j]; break; }
-    }
-    user.last_card = nextMirror || null;
-    setCurrentUser(user);
-  }
+  console.log("[XORA delete] local result", { requested: ids.length, deleted: deleted });
+  return { deleted: deleted, error: null };
 }
 
 async function deleteAnalysesRemote(supabaseIds) {
   var sb = getSupabaseClient();
   var user = getCurrentUser();
-  if (!sb || !user || !supabaseIds || !supabaseIds.length) return;
+  if (!sb || !user || !supabaseIds || !supabaseIds.length) return { deleted: 0, error: null };
   try {
     var response = await sb.from("analyses").delete().in("id", supabaseIds).eq("user_id", user.id);
-    if (response.error) console.error("[XORA db] analyses delete failed", response.error);
-    else console.log("[XORA db] analyses deleted", supabaseIds);
+    if (response.error) {
+      console.error("[XORA delete] remote failed", response.error);
+      return { deleted: 0, error: response.error.message || "Supabase delete error" };
+    }
+    var count = (response.data && response.data.length) || supabaseIds.length;
+    console.log("[XORA delete] remote result", { requested: supabaseIds.length, deleted: count, ids: supabaseIds });
+    return { deleted: count, error: null };
   } catch (err) {
-    console.error("[XORA db] analyses delete failed", err);
+    console.error("[XORA delete] remote failed", err);
+    return { deleted: 0, error: err.message || "Supabase delete error" };
   }
 }
 
@@ -602,7 +603,8 @@ var I18N = {
     history_cancel: "İptal",
     history_delete: "Seçilenleri Temizle",
     history_none_selected: "Temizlemek için analiz seç.",
-    history_deleted: "Seçilen analizler silindi."
+    history_deleted: "Seçilen analizler silindi.",
+    history_not_found: "Silinecek kayıt bulunamadı."
   },
   en: {
     nav_profile: "Profile",
@@ -713,7 +715,8 @@ var I18N = {
     history_cancel: "Cancel",
     history_delete: "Delete Selected",
     history_none_selected: "Select analyses to delete.",
-    history_deleted: "Selected analyses deleted."
+    history_deleted: "Selected analyses deleted.",
+    history_not_found: "No records found to delete."
   }
 };
 

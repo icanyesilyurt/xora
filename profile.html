@@ -317,26 +317,50 @@
     }
 
     var localIds = [];
-    var supabaseIds = [];
-    var hist = remoteAnalyses.length > 0 ? remoteAnalyses : getHistory();
-    for (var i = 0; i < hist.length; i++) {
-      var a = hist[i];
-      var lid = a.id || ("idx_" + i);
-      if (selectedIds[lid]) {
-        localIds.push(lid);
-        var sbId = a.supabase_id || (typeof a.id === "number" ? a.id : null);
-        if (sbId) supabaseIds.push(sbId);
+    var remoteIds = [];
+    var rawHist = remoteAnalyses.length > 0 ? remoteAnalyses : getHistory();
+    for (var i = 0; i < rawHist.length; i++) {
+      var a = rawHist[i];
+      var selKey = String(a.id != null ? a.id : ("idx_" + i));
+      if (!selectedIds[selKey]) continue;
+      if (typeof a.id === "number") {
+        remoteIds.push(a.id);
+      }
+      if (typeof a.id === "string") {
+        localIds.push(a.id);
       }
     }
 
-    deleteAnalysesLocal(localIds);
-    if (supabaseIds.length > 0) deleteAnalysesRemote(supabaseIds);
+    console.log("[XORA delete] selected", { localIds: localIds, remoteIds: remoteIds, selectedKeys: ids });
+
+    var totalDeleted = 0;
+
+    if (localIds.length > 0) {
+      var localResult = deleteAnalysesLocal(localIds);
+      if (localResult.error) {
+        toast("Yerel silme hatasi: " + localResult.error);
+      }
+      totalDeleted += localResult.deleted;
+    }
+
+    if (remoteIds.length > 0) {
+      var remoteResult = await deleteAnalysesRemote(remoteIds);
+      if (remoteResult.error) {
+        toast("Supabase silme hatasi: " + remoteResult.error);
+      }
+      totalDeleted += remoteResult.deleted;
+    }
 
     selectMode = false;
     selectedIds = {};
     remoteAnalyses = await getRemoteAnalyses(30);
     render();
-    toast(t("history_deleted") || (localIds.length + " analiz silindi"));
+
+    if (totalDeleted > 0) {
+      toast(t("history_deleted"));
+    } else {
+      toast(t("history_not_found") || "Silinecek kayit bulunamadi");
+    }
   });
 
   document.getElementById("logoutBtn").addEventListener("click", async function () {
