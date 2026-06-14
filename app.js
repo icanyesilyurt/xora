@@ -349,7 +349,14 @@ function saveAnalysis(analysis) {
   saveAllAnalyses(analyses);
   user.last_analysis_id = item.id;
   if (item.type === "mirror") {
-    user.last_card = item;
+    user.last_card = {
+      id: item.id,
+      type: "mirror",
+      handle: (item.handles && item.handles[0]) || (item.result && item.result.handle) || null,
+      result: item.result,
+      createdAt: item.createdAt
+    };
+    console.log("[XORA] last_card updated", user.last_card);
   }
   setCurrentUser(user);
   saveAnalysisToSupabase(item);

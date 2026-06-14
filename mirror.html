@@ -49,6 +49,7 @@
   <!-- 3) KİMLİK KARTI -->
   <section id="resultView" hidden>
     <div id="cardHolder"></div>
+    <div id="cooldownInfo" hidden style="margin:12px auto;max-width:420px;padding:10px 14px;background:rgba(15,175,175,.1);border-radius:10px;text-align:center;font-size:.85rem;color:#8A8F9C"></div>
 
     <div class="result-actions">
       <button type="button" class="btn btn-orange" id="dlBtn" data-i18n="btn_download">Kartı İndir</button>
@@ -113,8 +114,15 @@
     applyI18n();
   }
 
-  function showResult() {
+  function showResult(cooldownDays) {
     document.getElementById("cardHolder").innerHTML = buildIdentityCard(lastResult);
+    var info = document.getElementById("cooldownInfo");
+    if (cooldownDays && cooldownDays > 0) {
+      info.textContent = t("mirror_cooldown").replace("{days}", cooldownDays);
+      info.hidden = false;
+    } else {
+      info.hidden = true;
+    }
     setMirrorState("result");
     applyI18n();
     mirrorLog("render card", { handle: lastResult && lastResult.handle });
@@ -130,9 +138,7 @@
       var existing = getLastMirrorAnalysis();
       if (existing && existing.result) {
         lastResult = existing.result;
-        showResult();
-        var days = getMirrorCooldownRemaining();
-        toast(t("mirror_cooldown").replace("{days}", days));
+        showResult(getMirrorCooldownRemaining());
         return;
       }
     }
@@ -148,7 +154,7 @@
     saveAnalysisRecord("mirror", [handle], lastResult);
 
     setMirrorState("analyzing");
-    playThinking(document.getElementById("thinkMsg"), "mirror", showResult);
+    playThinking(document.getElementById("thinkMsg"), "mirror", function () { showResult(0); });
   }
 
   async function initMirror() {
@@ -160,9 +166,7 @@
       var existing = getLastMirrorAnalysis();
       if (existing && existing.result) {
         lastResult = existing.result;
-        showResult();
-        var days = getMirrorCooldownRemaining();
-        toast(t("mirror_cooldown").replace("{days}", days));
+        showResult(getMirrorCooldownRemaining());
         return;
       }
     }
@@ -185,7 +189,7 @@
   // dil değişince kartı yeniden çiz
   document.addEventListener("xora:lang", function () {
     if (mirrorState === "input") renderInput();
-    if (lastResult && mirrorState === "result") showResult();
+    if (lastResult && mirrorState === "result") showResult(getMirrorCooldownRemaining());
   });
 
   initMirror();

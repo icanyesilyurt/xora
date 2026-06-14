@@ -280,21 +280,53 @@
     } catch (e) { console.error("[XORA profile] history parse error", e); }
 
     var holder = document.getElementById("lastCardHolder");
-    var lastCard = profile.last_card;
+
+    // 1) currentUser.last_card
+    var lastCard = profile.last_card || null;
+    console.log("[XORA profile] last_card from currentUser", lastCard ? "found" : "null");
+
+    // 2) fallback: localStorage analyses
+    if (!lastCard || !lastCard.result) {
+      var localMirror = getLastMirrorAnalysis();
+      if (localMirror && localMirror.result) {
+        lastCard = localMirror;
+        console.log("[XORA profile] last_card from localStorage", lastCard.id);
+      }
+    }
+
+    // 3) fallback: remote analyses
+    if (!lastCard || !lastCard.result) {
+      for (var mi = 0; mi < hist.length; mi++) {
+        if (hist[mi].type === "mirror" && hist[mi].rawResult && hist[mi].rawResult.handle) {
+          lastCard = { result: hist[mi].rawResult, createdAt: hist[mi].ts, type: "mirror" };
+          console.log("[XORA profile] last_card from remote analyses");
+          break;
+        }
+      }
+    }
+
     var cardExpired = false;
     if (lastCard && lastCard.createdAt) {
       var elapsed = Date.now() - new Date(lastCard.createdAt).getTime();
       cardExpired = elapsed >= MIRROR_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
     }
 
-    if (lastCard && lastCard.result && !cardExpired) {
+    if (lastCard && lastCard.result && lastCard.result.handle && !cardExpired) {
       try {
         holder.innerHTML = buildIdentityCard(lastCard.result);
+        var remain = 0;
+        if (lastCard.createdAt) {
+          remain = Math.ceil((MIRROR_COOLDOWN_DAYS * 86400000 - (Date.now() - new Date(lastCard.createdAt).getTime())) / 86400000);
+        }
+        if (remain > 0) {
+          holder.innerHTML += '<div class="info-box" style="margin-top:12px;padding:10px 14px;background:rgba(15,175,175,.1);border-radius:10px;text-align:center;font-size:.85rem;color:var(--muted,#8A8F9C)">' +
+            esc(t("mirror_cooldown").replace("{days}", remain)) + "</div>";
+        }
       } catch (e) { console.error("[XORA profile] card render error", e); }
     } else if (cardExpired) {
       holder.innerHTML = '<div class="empty-box">' +
-                           "<p>" + esc(t("profile_card_expired") || "Mirror kartın süresi doldu.") + "</p>" +
-                           '<p><a href="mirror.html">' + esc(t("profile_card_renew") || "Yeni Mirror çek") + "</a></p>" +
+                           "<p>" + esc(t("profile_card_expired")) + "</p>" +
+                           '<p><a href="mirror.html">' + esc(t("profile_card_renew")) + "</a></p>" +
                          "</div>";
     } else {
       holder.innerHTML = '<div class="empty-box">' +
