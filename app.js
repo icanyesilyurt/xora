@@ -453,19 +453,26 @@ async function deleteAnalysesRemote(supabaseIds) {
   var sb = getSupabaseClient();
   var user = getCurrentUser();
   if (!sb || !user || !supabaseIds || !supabaseIds.length) return { deleted: 0, error: null };
-  try {
-    var response = await sb.from("analyses").delete().in("id", supabaseIds).eq("user_id", user.id);
-    if (response.error) {
-      console.error("[XORA delete] remote failed", response.error);
-      return { deleted: 0, error: response.error.message || "Supabase delete error" };
+  console.log("[XORA delete] remote ids", supabaseIds, "user_id", user.id);
+  var deleted = 0;
+  var lastError = null;
+  for (var i = 0; i < supabaseIds.length; i++) {
+    try {
+      var response = await sb.from("analyses").delete().eq("id", supabaseIds[i]).eq("user_id", user.id).select();
+      console.log("[XORA delete] remote delete id=" + supabaseIds[i], "response", response);
+      if (response.error) {
+        console.error("[XORA delete] remote failed id=" + supabaseIds[i], response.error);
+        lastError = response.error.message || "Supabase delete error";
+      } else {
+        deleted += (response.data && response.data.length) || 0;
+      }
+    } catch (err) {
+      console.error("[XORA delete] remote failed id=" + supabaseIds[i], err);
+      lastError = err.message || "Supabase delete error";
     }
-    var count = (response.data && response.data.length) || supabaseIds.length;
-    console.log("[XORA delete] remote result", { requested: supabaseIds.length, deleted: count, ids: supabaseIds });
-    return { deleted: count, error: null };
-  } catch (err) {
-    console.error("[XORA delete] remote failed", err);
-    return { deleted: 0, error: err.message || "Supabase delete error" };
   }
+  console.log("[XORA delete] remote done", { requested: supabaseIds.length, deleted: deleted });
+  return { deleted: deleted, error: lastError };
 }
 
 function saveAnalysisRecord(type, handles, result) {

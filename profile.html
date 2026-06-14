@@ -121,9 +121,10 @@
     if (!handles.length && res.handles) handles = res.handles;
     var title = a.title;
     if (!title && res.archetype && res.archetype.name) title = res.archetype.name[getLang()];
+    var isRemote = typeof a.id === "number";
     return {
-      localId: a.id,
-      supabaseId: a.supabase_id || (typeof a.id === "number" ? a.id : null),
+      localId: isRemote ? null : a.id,
+      remoteId: isRemote ? a.id : (a.remote_id || null),
       type: type,
       handles: handles,
       ts: a.created_at || a.createdAt,
@@ -189,7 +190,7 @@
     var html = "";
     for (var i = 0; i < hist.length; i++) {
       var hh = hist[i];
-      var itemId = hh.localId || ("idx_" + i);
+      var itemId = hh.remoteId ? ("r_" + hh.remoteId) : (hh.localId ? ("l_" + hh.localId) : ("idx_" + i));
       var main;
       if (hh.resultTitle) {
         var target = hh.handles[0] ? "@" + esc(hh.handles[0]) : "";
@@ -317,55 +318,57 @@
   });
 
   document.getElementById("deleteSelectedBtn").addEventListener("click", async function () {
-    var ids = Object.keys(selectedIds);
-    if (ids.length === 0) {
+    var keys = Object.keys(selectedIds);
+    if (keys.length === 0) {
       toast(t("history_none_selected"));
       return;
     }
 
     var localIds = [];
     var remoteIds = [];
-    var deleteSet = {};
-    var rawHist = remoteAnalyses.length > 0 ? remoteAnalyses : getHistory();
-    for (var i = 0; i < rawHist.length; i++) {
-      var a = rawHist[i];
-      var selKey = String(a.id != null ? a.id : ("idx_" + i));
-      if (!selectedIds[selKey]) continue;
-      deleteSet[selKey] = true;
-      if (typeof a.id === "number") remoteIds.push(a.id);
-      if (typeof a.id === "string") localIds.push(a.id);
+    var remoteDeleteSet = {};
+    for (var k = 0; k < keys.length; k++) {
+      var key = keys[k];
+      if (key.indexOf("r_") === 0) {
+        var rid = parseInt(key.substring(2), 10);
+        remoteIds.push(rid);
+        remoteDeleteSet[rid] = true;
+      } else if (key.indexOf("l_") === 0) {
+        localIds.push(key.substring(2));
+      }
     }
 
-    console.log("[XORA delete] selected", { localIds: localIds, remoteIds: remoteIds, selectedKeys: ids });
+    console.log("[XORA delete] selected", { selectedKeys: keys, localIds: localIds, remoteIds: remoteIds });
 
-    // 1) Optimistic UI: remove from list immediately
+    // 1) Optimistic UI
     remoteAnalyses = remoteAnalyses.filter(function (a) {
-      return !deleteSet[String(a.id)];
+      return !remoteDeleteSet[a.id];
     });
     selectMode = false;
     selectedIds = {};
     render();
 
-    // 2) Actual deletes
-    var totalDeleted = 0;
-
+    // 2) Local delete
     if (localIds.length > 0) {
       var localResult = deleteAnalysesLocal(localIds);
+      console.log("[XORA delete] local result", localResult);
       if (localResult.error) toast("Yerel silme hatasi: " + localResult.error);
-      totalDeleted += localResult.deleted;
     }
 
+    // 3) Remote delete
     if (remoteIds.length > 0) {
       var remoteResult = await deleteAnalysesRemote(remoteIds);
-      if (remoteResult.error) toast("Supabase silme hatasi: " + remoteResult.error);
-      totalDeleted += remoteResult.deleted;
+      console.log("[XORA delete] remote result", remoteResult);
+      if (remoteResult.error) {
+        toast("Supabase silme hatasi: " + remoteResult.error);
+      }
     }
 
-    // 3) Re-sync from server
+    // 4) Re-sync
     remoteAnalyses = await getRemoteAnalyses(30);
     render();
 
-    if (totalDeleted > 0 || Object.keys(deleteSet).length > 0) {
+    if (localIds.length > 0 || remoteIds.length > 0) {
       toast(t("history_deleted"));
     } else {
       toast(t("history_not_found"));
