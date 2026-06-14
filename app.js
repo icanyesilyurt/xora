@@ -7,6 +7,7 @@ var LS = {
   users: "xora_users",
   currentUser: "xora_current_user",
   analyses: "xora_analyses",
+  hiddenAnalyses: "xora_hidden_analyses",
   credits: "xora_credits",
   history: "xora_history",
   lang: "xora_lang"
@@ -437,7 +438,7 @@ async function getRemoteAnalyses(limit) {
 }
 
 function deleteAnalysesLocal(ids) {
-  if (!ids || !ids.length) return { deleted: 0, error: null };
+  if (!ids || !ids.length) return { deleted: 0 };
   var idSet = {};
   for (var i = 0; i < ids.length; i++) idSet[String(ids[i])] = true;
   var all = getAllAnalyses();
@@ -446,33 +447,31 @@ function deleteAnalysesLocal(ids) {
   var deleted = before - filtered.length;
   saveAllAnalyses(filtered);
   console.log("[XORA delete] local result", { requested: ids.length, deleted: deleted });
-  return { deleted: deleted, error: null };
+  return { deleted: deleted };
 }
 
-async function deleteAnalysesRemote(supabaseIds) {
-  var sb = getSupabaseClient();
-  var user = getCurrentUser();
-  if (!sb || !user || !supabaseIds || !supabaseIds.length) return { deleted: 0, error: null };
-  console.log("[XORA delete] remote ids", supabaseIds, "user_id", user.id);
-  var deleted = 0;
-  var lastError = null;
-  for (var i = 0; i < supabaseIds.length; i++) {
-    try {
-      var response = await sb.from("analyses").delete().eq("id", supabaseIds[i]).eq("user_id", user.id).select();
-      console.log("[XORA delete] remote delete id=" + supabaseIds[i], "response", response);
-      if (response.error) {
-        console.error("[XORA delete] remote failed id=" + supabaseIds[i], response.error);
-        lastError = response.error.message || "Supabase delete error";
-      } else {
-        deleted += (response.data && response.data.length) || 0;
-      }
-    } catch (err) {
-      console.error("[XORA delete] remote failed id=" + supabaseIds[i], err);
-      lastError = err.message || "Supabase delete error";
-    }
+function getHiddenAnalyses() {
+  return readJson(LS.hiddenAnalyses, []);
+}
+
+function hideRemoteAnalyses(remoteIds) {
+  if (!remoteIds || !remoteIds.length) return;
+  var hidden = getHiddenAnalyses();
+  var existing = {};
+  for (var i = 0; i < hidden.length; i++) existing[hidden[i]] = true;
+  for (var j = 0; j < remoteIds.length; j++) {
+    if (!existing[remoteIds[j]]) hidden.push(remoteIds[j]);
   }
-  console.log("[XORA delete] remote done", { requested: supabaseIds.length, deleted: deleted });
-  return { deleted: deleted, error: lastError };
+  writeJson(LS.hiddenAnalyses, hidden);
+  console.log("[XORA delete] hidden remote ids updated", hidden);
+}
+
+function isAnalysisHidden(remoteId) {
+  var hidden = getHiddenAnalyses();
+  for (var i = 0; i < hidden.length; i++) {
+    if (hidden[i] === remoteId) return true;
+  }
+  return false;
 }
 
 function saveAnalysisRecord(type, handles, result) {
@@ -610,7 +609,7 @@ var I18N = {
     history_cancel: "İptal",
     history_delete: "Seçilenleri Temizle",
     history_none_selected: "Temizlemek için analiz seç.",
-    history_deleted: "Seçilen analizler silindi.",
+    history_deleted: "Seçilen analizler geçmişinden kaldırıldı.",
     history_not_found: "Silinecek kayıt bulunamadı.",
     profile_card_expired: "Mirror kartının süresi doldu.",
     profile_card_renew: "Yeni Mirror çek"
@@ -724,7 +723,7 @@ var I18N = {
     history_cancel: "Cancel",
     history_delete: "Delete Selected",
     history_none_selected: "Select analyses to delete.",
-    history_deleted: "Selected analyses deleted.",
+    history_deleted: "Selected analyses removed from history.",
     history_not_found: "No records found to delete.",
     profile_card_expired: "Your Mirror card has expired.",
     profile_card_renew: "Get a new Mirror"

@@ -268,7 +268,15 @@
 
     var hist = [];
     try {
-      hist = remoteAnalyses.length > 0 ? remoteAnalyses.map(normalizeRemoteAnalysis) : getHistory().map(normalizeRemoteAnalysis);
+      var raw = remoteAnalyses.length > 0 ? remoteAnalyses : getHistory();
+      var hiddenSet = {};
+      var hiddenList = getHiddenAnalyses();
+      for (var hi = 0; hi < hiddenList.length; hi++) hiddenSet[hiddenList[hi]] = true;
+      for (var ri = 0; ri < raw.length; ri++) {
+        var isRemote = typeof raw[ri].id === "number";
+        if (isRemote && hiddenSet[raw[ri].id]) continue;
+        hist.push(normalizeRemoteAnalysis(raw[ri]));
+      }
     } catch (e) { console.error("[XORA profile] history parse error", e); }
 
     var holder = document.getElementById("lastCardHolder");
@@ -317,7 +325,7 @@
     render();
   });
 
-  document.getElementById("deleteSelectedBtn").addEventListener("click", async function () {
+  document.getElementById("deleteSelectedBtn").addEventListener("click", function () {
     var keys = Object.keys(selectedIds);
     if (keys.length === 0) {
       toast(t("history_none_selected"));
@@ -326,13 +334,10 @@
 
     var localIds = [];
     var remoteIds = [];
-    var remoteDeleteSet = {};
     for (var k = 0; k < keys.length; k++) {
       var key = keys[k];
       if (key.indexOf("r_") === 0) {
-        var rid = parseInt(key.substring(2), 10);
-        remoteIds.push(rid);
-        remoteDeleteSet[rid] = true;
+        remoteIds.push(parseInt(key.substring(2), 10));
       } else if (key.indexOf("l_") === 0) {
         localIds.push(key.substring(2));
       }
@@ -340,39 +345,21 @@
 
     console.log("[XORA delete] selected", { selectedKeys: keys, localIds: localIds, remoteIds: remoteIds });
 
-    // 1) Optimistic UI
-    remoteAnalyses = remoteAnalyses.filter(function (a) {
-      return !remoteDeleteSet[a.id];
-    });
+    if (localIds.length > 0) {
+      var localResult = deleteAnalysesLocal(localIds);
+      console.log("[XORA delete] local result", localResult);
+    }
+
+    if (remoteIds.length > 0) {
+      hideRemoteAnalyses(remoteIds);
+      console.log("[XORA delete] hidden remote ids", remoteIds);
+    }
+
     selectMode = false;
     selectedIds = {};
     render();
 
-    // 2) Local delete
-    if (localIds.length > 0) {
-      var localResult = deleteAnalysesLocal(localIds);
-      console.log("[XORA delete] local result", localResult);
-      if (localResult.error) toast("Yerel silme hatasi: " + localResult.error);
-    }
-
-    // 3) Remote delete
-    if (remoteIds.length > 0) {
-      var remoteResult = await deleteAnalysesRemote(remoteIds);
-      console.log("[XORA delete] remote result", remoteResult);
-      if (remoteResult.error) {
-        toast("Supabase silme hatasi: " + remoteResult.error);
-      }
-    }
-
-    // 4) Re-sync
-    remoteAnalyses = await getRemoteAnalyses(30);
-    render();
-
-    if (localIds.length > 0 || remoteIds.length > 0) {
-      toast(t("history_deleted"));
-    } else {
-      toast(t("history_not_found"));
-    }
+    toast(t("history_deleted"));
   });
 
   document.getElementById("logoutBtn").addEventListener("click", async function () {
