@@ -131,68 +131,64 @@ function profileFromAuthUser(authUser, username) {
   };
 }
 
-async function insertPublicUser(authUser, username) {
+async function ensureUserRow(authUser, username) {
   var sb = getSupabaseClient();
   if (!sb) throw new Error("Supabase client yok");
-  if (!authUser) throw new Error("Auth user yok");
+  if (!authUser || !authUser.id) throw new Error("Auth user yok");
 
-  var profile = profileFromAuthUser(authUser, username);
-  var payload = {
-    id: authUser.id,
-    username: profile.username,
-    display_name: profile.display_name,
-    avatar_url: null,
-    credit_balance: 50,
-    last_login_at: new Date().toISOString()
-  };
+  console.log("[XORA db] ensureUserRow id=" + authUser.id);
 
-  console.log("[XORA db] users payload", payload);
-  var result = await sb.from("users").insert([payload]).select();
-  console.log("[XORA db] users result", result);
-  if (result.error) {
-    console.error("[XORA db] users insert failed", result.error);
-    throw result.error;
+  var sel = await sb.from("users").select("*").eq("id", authUser.id).maybeSingle();
+  console.log("[XORA db] select result", sel);
+
+  if (sel.error) {
+    console.error("[XORA db] select failed", sel.error);
+    throw sel.error;
   }
 
-  var row = result.data && result.data[0] ? result.data[0] : payload;
-  profile.username = row.username || profile.username;
-  profile.display_name = row.display_name || profile.display_name;
-  profile.avatar_url = row.avatar_url || null;
-  profile.credit_balance = row.credit_balance != null ? row.credit_balance : FREE_CREDITS;
-  setCurrentUser(profile);
-  localStorage.setItem(LS.credits, String(profile.credit_balance));
-  return profile;
-}
+  var row;
 
-async function updatePublicUserLogin(authUser) {
-  var sb = getSupabaseClient();
-  if (!sb || !authUser) return null;
-
-  var result = await sb
-    .from("users")
-    .update({ last_login_at: new Date().toISOString() })
-    .eq("id", authUser.id)
-    .select()
-    .single();
-
-  if (result.error) {
-    console.error("[XORA db] users login update failed", result.error);
-    return null;
+  if (sel.data) {
+    console.log("[XORA db] user exists, updating last_login_at");
+    var upd = await sb.from("users").update({ last_login_at: new Date().toISOString() }).eq("id", authUser.id).select().single();
+    console.log("[XORA db] update result", upd);
+    if (upd.error) {
+      console.error("[XORA db] update failed", upd.error);
+      throw upd.error;
+    }
+    row = upd.data;
+  } else {
+    var cleanUsername = String(username || (authUser.user_metadata && authUser.user_metadata.username) || (authUser.email ? authUser.email.split("@")[0] : "user")).replace(/^@+/, "").trim();
+    var payload = {
+      id: authUser.id,
+      username: cleanUsername,
+      display_name: cleanUsername,
+      avatar_url: null,
+      credit_balance: 50,
+      last_login_at: new Date().toISOString()
+    };
+    console.log("[XORA db] user not found, inserting", payload);
+    var ins = await sb.from("users").insert([payload]).select().single();
+    console.log("[XORA db] insert result", ins);
+    if (ins.error) {
+      console.error("[XORA db] insert failed", ins.error);
+      throw ins.error;
+    }
+    row = ins.data;
   }
 
-  var row = result.data || {};
-  if (!row.id) return null;
   var profile = {
     id: authUser.id,
-    username: row.username || ((authUser.email || "").split("@")[0]),
+    username: row.username || "",
     email: authUser.email || "",
-    display_name: row.display_name || row.username || ((authUser.email || "").split("@")[0]),
+    display_name: row.display_name || row.username || "",
     avatar_url: row.avatar_url || null,
     credit_balance: row.credit_balance != null ? row.credit_balance : FREE_CREDITS,
     last_login_at: row.last_login_at || new Date().toISOString()
   };
   setCurrentUser(profile);
   localStorage.setItem(LS.credits, String(profile.credit_balance));
+  console.log("[XORA db] ensureUserRow done", profile);
   return profile;
 }
 
@@ -204,21 +200,18 @@ async function createLocalUser(username, email, password) {
   var cleanEmail = String(email || "").trim().toLowerCase();
 
   try {
+    console.log("[XORA auth] signUp start", cleanEmail);
     var signup = await sb.auth.signUp({
       email: cleanEmail,
       password: password,
       options: { data: { username: cleanUsername } }
     });
+    console.log("[XORA auth] signUp result", signup);
     if (signup.error) return { success: false, error: signup.error.message };
     if (!signup.data || !signup.data.user) return { success: false, error: "Üyelik oluşturulamadı" };
 
-    console.log("[XORA auth] signup success", signup.data);
-    console.log("[XORA auth] session", signup.data.session);
-    console.log("[XORA auth] user", signup.data.user);
-
-    var profile = await insertPublicUser(signup.data.user, cleanUsername);
-    setCurrentUser(profile);
-    return { success: true, user: getCurrentUser(), hasSession: !!signup.data.session };
+    var profile = await ensureUserRow(signup.data.user, cleanUsername);
+    return { success: true, user: profile, hasSession: !!signup.data.session };
   } catch (err) {
     console.error("[XORA auth] createLocalUser failed", err);
     return { success: false, error: err.message || String(err) };
@@ -230,21 +223,17 @@ async function loginLocalUser(email, password) {
   if (!sb) return { success: false, error: "Supabase bağlantısı kurulamadı" };
 
   try {
+    console.log("[XORA auth] signIn start");
     var signin = await sb.auth.signInWithPassword({
       email: String(email || "").trim().toLowerCase(),
       password: password
     });
+    console.log("[XORA auth] signIn result", signin);
     if (signin.error) return { success: false, error: signin.error.message };
     if (!signin.data || !signin.data.user) return { success: false, error: "Giriş yapılamadı" };
 
-    console.log("[XORA auth] login success", signin.data);
-    console.log("[XORA auth] session", signin.data.session);
-    console.log("[XORA auth] user", signin.data.user);
-
-    var profile = await updatePublicUserLogin(signin.data.user);
-    if (!profile) profile = await insertPublicUser(signin.data.user);
-    setCurrentUser(profile);
-    return { success: true, user: getCurrentUser() };
+    var profile = await ensureUserRow(signin.data.user);
+    return { success: true, user: profile };
   } catch (err) {
     console.error("[XORA auth] loginLocalUser failed", err);
     return { success: false, error: err.message || String(err) };
@@ -274,15 +263,12 @@ async function initSession() {
       var result = await sb.auth.getSession();
       var session = result && result.data && result.data.session;
       if (session && session.user) {
-        var profile = null;
-        try { profile = await updatePublicUserLogin(session.user); } catch (e) { console.error("[XORA session] update failed", e); }
-        if (!profile) {
-          try { profile = await insertPublicUser(session.user); } catch (e) { console.error("[XORA session] insert failed", e); }
+        try {
+          await ensureUserRow(session.user);
+        } catch (e) {
+          console.error("[XORA session] ensureUserRow failed", e);
+          setCurrentUser(profileFromAuthUser(session.user));
         }
-        if (!profile) {
-          profile = profileFromAuthUser(session.user);
-        }
-        setCurrentUser(profile);
       }
     } catch (e) {
       console.error("[XORA session] init failed", e);
