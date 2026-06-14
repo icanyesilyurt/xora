@@ -121,6 +121,7 @@ function setUser(username) {
 function profileFromAuthUser(authUser, username) {
   var meta = (authUser && authUser.user_metadata) || {};
   var cleanUsername = String(username || meta.username || meta.display_name || (authUser && authUser.email ? authUser.email.split("@")[0] : "") || "").replace(/^@+/, "").trim();
+  var existing = getCurrentUser();
   return {
     id: authUser.id,
     username: cleanUsername,
@@ -128,7 +129,8 @@ function profileFromAuthUser(authUser, username) {
     display_name: cleanUsername,
     avatar_url: null,
     credit_balance: FREE_CREDITS,
-    last_login_at: new Date().toISOString()
+    last_login_at: new Date().toISOString(),
+    last_card: (existing && existing.id === authUser.id && existing.last_card) ? existing.last_card : null
   };
 }
 
@@ -178,6 +180,7 @@ async function ensureUserRow(authUser, username) {
     row = ins.data;
   }
 
+  var existing = getCurrentUser();
   var profile = {
     id: authUser.id,
     username: row.username || "",
@@ -185,7 +188,8 @@ async function ensureUserRow(authUser, username) {
     display_name: row.display_name || row.username || "",
     avatar_url: row.avatar_url || null,
     credit_balance: row.credit_balance != null ? row.credit_balance : FREE_CREDITS,
-    last_login_at: row.last_login_at || new Date().toISOString()
+    last_login_at: row.last_login_at || new Date().toISOString(),
+    last_card: (existing && existing.id === authUser.id && existing.last_card) ? existing.last_card : null
   };
   setCurrentUser(profile);
   localStorage.setItem(LS.credits, String(profile.credit_balance));
@@ -564,8 +568,11 @@ var I18N = {
     upsell_mirror_btn: "X Stalk ile bak",
     says: "XORA diyor ki",
     match_overall: "Genel Uyum",
-    match_friend: "Arkadaşlık",
-    match_work: "İş Ortaklığı",
+    match_flirt: "Flört Potansiyeli",
+    match_vibe: "Kafa Uyumu",
+    match_humor: "Mizah Uyumu",
+    match_chaos: "Kaos Riski",
+    match_romance: "Romantik Uyum",
     /* skorlar */
     sc_viral: "Viral Potansiyel",
     sc_kaos: "Kaos Seviyesi",
@@ -682,8 +689,11 @@ var I18N = {
     upsell_mirror_btn: "Check with X Stalk",
     says: "XORA says",
     match_overall: "Overall Match",
-    match_friend: "Friendship",
-    match_work: "Work Partnership",
+    match_flirt: "Flirt Potential",
+    match_vibe: "Vibe Match",
+    match_humor: "Humor Match",
+    match_chaos: "Chaos Risk",
+    match_romance: "Romantic Match",
     sc_viral: "Viral Potential",
     sc_kaos: "Chaos Level",
     sc_mizah: "Humor Dose",

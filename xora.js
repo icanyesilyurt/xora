@@ -274,20 +274,20 @@ function archetypeById(id) {
 
 var MATCH_COMMENTS = {
   tr: [
-    "{a} planlıyor, {b} sabote ediyor. Garip ama bu ikili çalışıyor.",
-    "{a} ile {b} aynı tweete iki zıt yorum yazar, sonra birlikte kahve içer. Nadir bulunan bir denge.",
-    "{a} gündemi yakalar, {b} gündemi yaratır. Birleşirlerse timeline'a huzur yok.",
-    "{a} konuşur, {b} kaydeder. On yıl sonra bu arşiv birinin başını yakar, muhtemelen {a}'nın.",
-    "{a} ve {b} birbirini takip ediyor ama beğenmiyor. Bu sessizlik bir anlaşma mı, gerilim mi? XORA gerilimden yana.",
-    "{a} fikri bulur, {b} fikri savunur. İş bölümü net, telif tartışması kaçınılmaz."
+    "{a} mesaj atar, {b} görüldü atar. Ama ikisi de gece 3'te birbirinin profiline bakar. Klasik.",
+    "{a} ile {b} flörtü tweet beğenisiyle başlar, relationship drama ile biter. XORA popcorn hazırladı.",
+    "{a} duygusal yazar, {b} ironiyle cevap verir. Bu gerilim ya aşka döner ya engele.",
+    "{a} ve {b} birbirini stalklıyor ama takip etmiyor. Bu ne cesaret, ne korkaklık — saf kaos.",
+    "{a} kalp atar, {b} alev atar. İkisi de ne istediğini bilmiyor ama kimya tartışılmaz.",
+    "{a} plan yapar, {b} planı havaya uçurur. Tam bir romantik komedi senaryosu."
   ],
   en: [
-    "{a} makes the plan, {b} sabotages it. Strange, but this duo works.",
-    "{a} and {b} would write opposite replies to the same post, then grab coffee together. A rare equilibrium.",
-    "{a} catches the trend, {b} creates it. If they team up, the timeline gets no rest.",
-    "{a} talks, {b} keeps receipts. In ten years that archive burns someone — probably {a}.",
-    "{a} and {b} follow each other but never like. Is that silence a treaty or tension? XORA votes tension.",
-    "{a} finds the idea, {b} defends it. Clear division of labor. Credit dispute inevitable."
+    "{a} sends the text, {b} leaves it on read. But both stalk each other's profiles at 3 AM. Classic.",
+    "{a} and {b}'s flirtation starts with a like, ends with relationship drama. XORA has the popcorn ready.",
+    "{a} writes emotionally, {b} replies with irony. This tension either becomes love or a block.",
+    "{a} and {b} stalk each other but won't follow. Not courage, not cowardice — pure chaos.",
+    "{a} sends hearts, {b} sends fire. Neither knows what they want, but the chemistry is undeniable.",
+    "{a} makes plans, {b} blows them up. A perfect romantic comedy script."
   ]
 };
 
@@ -297,17 +297,23 @@ function matchHandles(rawA, rawB) {
   var pair = [a, b].slice().sort();
   var c = xhash(pair[0] + "\u2022" + pair[1]);   // sıra bağımsız, deterministik
 
-  var friendship = 42 + (c % 57);                 // 42–98
-  var work = 40 + ((c >>> 4) % 59);               // 40–98
-  var overall = Math.round((friendship + work) / 2 + ((c >>> 8) % 7) - 3);
+  var flirt    = 38 + (c % 60);
+  var vibe     = 35 + ((c >>> 4) % 63);
+  var humor    = 30 + ((c >>> 7) % 68);
+  var chaos    = 20 + ((c >>> 10) % 75);
+  var romance  = 40 + ((c >>> 13) % 58);
+  var overall  = Math.round((flirt + vibe + humor + romance) / 4 + ((c >>> 8) % 7) - 3);
   overall = Math.max(35, Math.min(99, overall));
 
   return {
     a: a, b: b,
     resA: analyzeHandle(a),
     resB: analyzeHandle(b),
-    friendship: friendship,
-    work: work,
+    flirt: flirt,
+    vibe: vibe,
+    humor: humor,
+    chaos: chaos,
+    romance: romance,
     overall: overall,
     ci: (c >>> 6) % MATCH_COMMENTS.tr.length
   };

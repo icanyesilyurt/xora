@@ -72,14 +72,29 @@ function buildMatchCard(m) {
         '<p class="idcard-desc">' + esc(t("match_overall")) + "</p>" +
         '<div class="match-rows">' +
           '<div class="score-chip">' +
-            '<span class="score-name">' + esc(t("match_friend")) + "</span>" +
-            '<span class="score-bar"><i style="width:' + m.friendship + '%"></i></span>' +
-            '<span class="score-val">%' + m.friendship + "</span>" +
+            '<span class="score-name">' + esc(t("match_flirt")) + "</span>" +
+            '<span class="score-bar"><i style="width:' + m.flirt + '%"></i></span>' +
+            '<span class="score-val">%' + m.flirt + "</span>" +
           "</div>" +
           '<div class="score-chip">' +
-            '<span class="score-name">' + esc(t("match_work")) + "</span>" +
-            '<span class="score-bar"><i style="width:' + m.work + '%"></i></span>' +
-            '<span class="score-val">%' + m.work + "</span>" +
+            '<span class="score-name">' + esc(t("match_vibe")) + "</span>" +
+            '<span class="score-bar"><i style="width:' + m.vibe + '%"></i></span>' +
+            '<span class="score-val">%' + m.vibe + "</span>" +
+          "</div>" +
+          '<div class="score-chip">' +
+            '<span class="score-name">' + esc(t("match_humor")) + "</span>" +
+            '<span class="score-bar"><i style="width:' + m.humor + '%"></i></span>' +
+            '<span class="score-val">%' + m.humor + "</span>" +
+          "</div>" +
+          '<div class="score-chip">' +
+            '<span class="score-name">' + esc(t("match_chaos")) + "</span>" +
+            '<span class="score-bar"><i style="width:' + m.chaos + '%"></i></span>' +
+            '<span class="score-val">%' + m.chaos + "</span>" +
+          "</div>" +
+          '<div class="score-chip">' +
+            '<span class="score-name">' + esc(t("match_romance")) + "</span>" +
+            '<span class="score-bar"><i style="width:' + m.romance + '%"></i></span>' +
+            '<span class="score-val">%' + m.romance + "</span>" +
           "</div>" +
         "</div>" +
         '<div class="idcard-quote">' +
@@ -288,10 +303,15 @@ function renderMatchPNG(m) {
   ctx.fillText(t("match_overall"), 500, 728);
 
   // alt skorlar
-  ctx.font = "700 28px Nunito, Arial, sans-serif";
+  ctx.font = "700 24px Nunito, Arial, sans-serif";
   ctx.fillStyle = "#1E2330";
-  ctx.fillText(t("match_friend") + "  %" + m.friendship +
-               "      \u2022      " + t("match_work") + "  %" + m.work, 500, 790);
+  var mLine1 = t("match_flirt") + " %" + m.flirt + "  \u2022  " +
+               t("match_vibe") + " %" + m.vibe + "  \u2022  " +
+               t("match_humor") + " %" + m.humor;
+  var mLine2 = t("match_chaos") + " %" + m.chaos + "  \u2022  " +
+               t("match_romance") + " %" + m.romance;
+  ctx.fillText(mLine1, 500, 780);
+  ctx.fillText(mLine2, 500, 812);
 
   // XORA yorumu
   ctx.fillStyle = "#FFF1E3";
