@@ -487,7 +487,8 @@ function isAnalysisHidden(remoteId) {
 
 function saveAnalysisRecord(type, handles, result) {
   var title = null;
-  if (result && result.archetype && result.archetype.name) title = result.archetype.name[getLang()];
+  if (result && result.card && result.card.nickname) title = result.card.nickname[getLang()];
+  if (!title && result && result.archetype && result.archetype.name) title = result.archetype.name[getLang()];
   if (!title && result && result.title) title = result.title;
   if (!title && type === "match" && result && result.overall != null) title = "%" + result.overall;
 

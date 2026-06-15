@@ -120,6 +120,7 @@
     var handles = a.handles || [];
     if (!handles.length && res.handles) handles = res.handles;
     var title = a.title;
+    if (!title && res.card && res.card.nickname) title = res.card.nickname[getLang()];
     if (!title && res.archetype && res.archetype.name) title = res.archetype.name[getLang()];
     var isRemote = typeof a.id === "number";
     return {

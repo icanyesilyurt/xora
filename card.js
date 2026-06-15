@@ -1,6 +1,7 @@
 /* ============================================================
    XORA — card.js
    X Kimlik Kartı: ekranda gösterim, PNG indirme, X'te paylaşma
+   V2: Davranış Merkez Mimarisi desteği + backward compat
    ============================================================ */
 
 /* ---------------- yardımcı: hash'ten sahte barkod ---------------- */
@@ -8,15 +9,73 @@
 function fakeBarcode(h) {
   var s = "";
   for (var i = 0; i < 22; i++) {
-    s += ((h >>> (i % 28)) & 1) ? "\u258B" : "\u258F"; // ▋ ▏
+    s += ((h >>> (i % 28)) & 1) ? "▋" : "▏";
   }
   return s;
 }
 
-/* ---------------- kimlik kartı (Mirror & Stalk) ---------------- */
+/* ---------------- V2 format check ---------------- */
+
+function isV2Result(res) {
+  return res && res.card && res.card.top_behaviors && res.card.top_behaviors.length > 0;
+}
+
+/* ============================================================
+   KİMLİK KARTI (Mirror & Stalk)
+   V2: Davranış skorları + yorum
+   V1 fallback: archetype + SCORE_KEYS
+   ============================================================ */
 
 function buildIdentityCard(res) {
-  var lang = getLang();
+  if (isV2Result(res)) return buildIdentityCardV2(res);
+  return buildIdentityCardV1(res);
+}
+
+/* --- V2 kart: davranış skorları --- */
+function buildIdentityCardV2(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var c = res.card;
+  var comment = res.comment ? res.comment.mirror[lang] : "";
+
+  var chips = "";
+  for (var i = 0; i < c.top_behaviors.length; i++) {
+    var b = c.top_behaviors[i];
+    var label = b.label ? (b.label[lang] || b.label.tr) : b.key;
+    chips +=
+      '<div class="score-chip">' +
+        '<span class="score-name">' + esc(label) + "</span>" +
+        '<span class="score-bar"><i style="width:' + b.value + '%"></i></span>' +
+        '<span class="score-val">' + b.value + "</span>" +
+      "</div>";
+  }
+
+  return (
+    '<div class="idcard" style="--ac:' + c.color + '">' +
+      '<div class="idcard-band">' +
+        '<span class="idcard-avatar">' + c.emoji + "</span>" +
+      "</div>" +
+      '<div class="idcard-body">' +
+        '<p class="idcard-handle">@' + esc(res.handle) + "</p>" +
+        '<h2 class="idcard-type">' + esc(c.nickname[lang]) + "</h2>" +
+        '<p class="idcard-desc">' + esc(c.desc[lang]) + "</p>" +
+        '<div class="idcard-scores">' + chips + "</div>" +
+        '<div class="idcard-quote">' +
+          '<span class="quote-label">' + esc(t("says")) + "</span>" +
+          "<p>" + esc(comment) + "</p>" +
+        "</div>" +
+      "</div>" +
+      '<div class="idcard-foot">' +
+        "<span>XORA</span>" +
+        '<span class="barcode">' + fakeBarcode(res.hash) + "</span>" +
+        "<span>xora.app</span>" +
+      "</div>" +
+    "</div>"
+  );
+}
+
+/* --- V1 kart: archetype tabanlı (backward compat) --- */
+function buildIdentityCardV1(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
   var a = res.archetype;
   var comment = a.comments[lang][res.ci];
 
@@ -55,19 +114,21 @@ function buildIdentityCard(res) {
   );
 }
 
-/* ---------------- match kartı ---------------- */
+/* ============================================================
+   match kartı — unchanged
+   ============================================================ */
 
 function buildMatchCard(m) {
-  var lang = getLang();
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
   return (
     '<div class="idcard matchcard" style="--ac:#FF7A45">' +
       '<div class="idcard-band match-band">' +
         '<span class="idcard-avatar small">' + m.resA.archetype.emoji + "</span>" +
-        '<span class="match-x">\u00D7</span>' +
+        '<span class="match-x">×</span>' +
         '<span class="idcard-avatar small">' + m.resB.archetype.emoji + "</span>" +
       "</div>" +
       '<div class="idcard-body">' +
-        '<p class="idcard-handle">@' + esc(m.a) + " \u00D7 @" + esc(m.b) + "</p>" +
+        '<p class="idcard-handle">@' + esc(m.a) + " × @" + esc(m.b) + "</p>" +
         '<h2 class="idcard-type match-pct">%' + m.overall + "</h2>" +
         '<p class="idcard-desc">' + esc(t("match_overall")) + "</p>" +
         '<div class="match-rows">' +
@@ -149,7 +210,6 @@ function baseCanvas() {
   var ctx = cv.getContext("2d");
   ctx.textAlign = "center";
 
-  // krem zemin + köşelerde yumuşak lekeler
   ctx.fillStyle = "#FFF6E9";
   ctx.fillRect(0, 0, 1000, 1250);
   ctx.fillStyle = "rgba(15,189,189,0.12)";
@@ -160,7 +220,6 @@ function baseCanvas() {
 }
 
 function drawCardFrame(ctx, accent) {
-  // beyaz kart
   ctx.save();
   ctx.shadowColor = "rgba(30,35,48,0.18)";
   ctx.shadowBlur = 40;
@@ -174,7 +233,6 @@ function drawCardFrame(ctx, accent) {
   ctx.strokeStyle = "#1E2330";
   ctx.stroke();
 
-  // üst renkli bant
   ctx.save();
   roundRect(ctx, 70, 80, 860, 300, 36);
   ctx.clip();
@@ -209,21 +267,105 @@ function drawCardFooter(ctx, h) {
 
 /* --- kimlik kartı PNG --- */
 function renderIdentityPNG(res) {
-  var lang = getLang();
+  if (isV2Result(res)) return renderIdentityPNGV2(res);
+  return renderIdentityPNGV1(res);
+}
+
+/* --- V2 PNG: davranış skorları --- */
+function renderIdentityPNGV2(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var c = res.card;
+  var b = baseCanvas();
+  var ctx = b.ctx;
+
+  drawCardFrame(ctx, c.color);
+
+  ctx.beginPath(); ctx.arc(500, 380, 120, 0, 7);
+  ctx.fillStyle = "#FFFFFF"; ctx.fill();
+  ctx.lineWidth = 6; ctx.strokeStyle = "#1E2330"; ctx.stroke();
+  ctx.font = "130px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif";
+  ctx.fillText(c.emoji, 500, 428);
+
+  ctx.fillStyle = "#8A8F9C";
+  ctx.font = "700 30px Nunito, Arial, sans-serif";
+  ctx.fillText("@" + res.handle, 500, 560);
+
+  ctx.fillStyle = "#1E2330";
+  ctx.font = "900 56px Nunito, Arial, sans-serif";
+  ctx.fillText(c.nickname[lang], 500, 632);
+
+  ctx.fillStyle = "#5C6270";
+  ctx.font = "600 28px Nunito, Arial, sans-serif";
+  wrapText(ctx, c.desc[lang], 500, 678, 700, 34);
+
+  var scoreY = 730;
+  var top = c.top_behaviors;
+  for (var i = 0; i < top.length && i < 6; i++) {
+    var label = top[i].label ? (top[i].label[lang] || top[i].label.tr) : top[i].key;
+    var val = top[i].value;
+    var barX = 160;
+    var barW = 520;
+    var barH = 22;
+    var y = scoreY + (i * 42);
+
+    ctx.textAlign = "left";
+    ctx.font = "700 22px Nunito, Arial, sans-serif";
+    ctx.fillStyle = "#5C6270";
+    ctx.fillText(label, barX, y + 16);
+
+    ctx.fillStyle = "#ECEDF0";
+    roundRect(ctx, barX + 250, y, barW - 250, barH, 11);
+    ctx.fill();
+
+    ctx.fillStyle = c.color;
+    var fillW = Math.round((barW - 250) * val / 100);
+    roundRect(ctx, barX + 250, y, Math.max(fillW, 12), barH, 11);
+    ctx.fill();
+
+    ctx.textAlign = "right";
+    ctx.font = "800 22px Nunito, Arial, sans-serif";
+    ctx.fillStyle = "#1E2330";
+    ctx.fillText(val, barX + barW + 40, y + 17);
+  }
+
+  var commentY = scoreY + 6 * 42 + 20;
+  var comment = res.comment ? res.comment.mirror[lang] : "";
+
+  ctx.fillStyle = "#FFF1E3";
+  roundRect(ctx, 130, commentY, 740, 180, 24);
+  ctx.fill();
+  ctx.strokeStyle = c.color; ctx.lineWidth = 3;
+  roundRect(ctx, 130, commentY, 740, 180, 24);
+  ctx.stroke();
+
+  ctx.fillStyle = c.color;
+  ctx.font = "800 24px Nunito, Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(t("says").toUpperCase(), 500, commentY + 38);
+
+  ctx.fillStyle = "#1E2330";
+  ctx.font = "600 24px Nunito, Arial, sans-serif";
+  wrapText(ctx, comment, 500, commentY + 72, 660, 32);
+
+  drawCardFooter(ctx, res.hash);
+  return b.cv;
+}
+
+/* --- V1 PNG: archetype tabanlı (backward compat) --- */
+function renderIdentityPNGV1(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
   var a = res.archetype;
   var b = baseCanvas();
   var ctx = b.ctx;
 
   drawCardFrame(ctx, a.color);
 
-  // avatar halkası + emoji
   ctx.beginPath(); ctx.arc(500, 380, 120, 0, 7);
   ctx.fillStyle = "#FFFFFF"; ctx.fill();
   ctx.lineWidth = 6; ctx.strokeStyle = "#1E2330"; ctx.stroke();
   ctx.font = "130px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif";
   ctx.fillText(a.emoji, 500, 428);
 
-  // handle + arketip + tanım
   ctx.fillStyle = "#8A8F9C";
   ctx.font = "700 30px Nunito, Arial, sans-serif";
   ctx.fillText("@" + res.handle, 500, 560);
@@ -236,7 +378,6 @@ function renderIdentityPNG(res) {
   ctx.font = "600 30px Nunito, Arial, sans-serif";
   ctx.fillText(a.desc[lang], 500, 684);
 
-  // XORA yorumu kutusu
   ctx.fillStyle = "#FFF1E3";
   roundRect(ctx, 130, 730, 740, 230, 24);
   ctx.fill();
@@ -252,14 +393,12 @@ function renderIdentityPNG(res) {
   ctx.font = "600 30px Nunito, Arial, sans-serif";
   wrapText(ctx, a.comments[lang][res.ci], 500, 822, 660, 40);
 
-  // küçük skorlar (ikinci planda)
   ctx.font = "700 24px Nunito, Arial, sans-serif";
   ctx.fillStyle = "#8A8F9C";
-  var sx = [250, 500, 750, 500];
   var line1 = t("sc_viral") + " " + res.scores.sc_viral +
-              "   \u2022   " + t("sc_kaos") + " " + res.scores.sc_kaos;
+              "   •   " + t("sc_kaos") + " " + res.scores.sc_kaos;
   var line2 = t("sc_mizah") + " " + res.scores.sc_mizah +
-              "   \u2022   " + t("sc_gece") + " " + res.scores.sc_gece;
+              "   •   " + t("sc_gece") + " " + res.scores.sc_gece;
   ctx.fillText(line1, 500, 1010);
   ctx.fillText(line2, 500, 1048);
 
@@ -267,15 +406,14 @@ function renderIdentityPNG(res) {
   return b.cv;
 }
 
-/* --- match kartı PNG --- */
+/* --- match kartı PNG --- unchanged */
 function renderMatchPNG(m) {
-  var lang = getLang();
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
   var b = baseCanvas();
   var ctx = b.ctx;
 
   drawCardFrame(ctx, "#FF7A45");
 
-  // iki avatar
   function avatar(x, emoji) {
     ctx.beginPath(); ctx.arc(x, 380, 95, 0, 7);
     ctx.fillStyle = "#FFFFFF"; ctx.fill();
@@ -287,12 +425,11 @@ function renderMatchPNG(m) {
   avatar(660, m.resB.archetype.emoji);
   ctx.fillStyle = "#1E2330";
   ctx.font = "900 60px Nunito, Arial, sans-serif";
-  ctx.fillText("\u00D7", 500, 400);
+  ctx.fillText("×", 500, 400);
 
-  // handle'lar + genel uyum
   ctx.fillStyle = "#8A8F9C";
   ctx.font = "700 30px Nunito, Arial, sans-serif";
-  ctx.fillText("@" + m.a + "  \u00D7  @" + m.b, 500, 560);
+  ctx.fillText("@" + m.a + "  ×  @" + m.b, 500, 560);
 
   ctx.fillStyle = "#1E2330";
   ctx.font = "900 110px Nunito, Arial, sans-serif";
@@ -302,18 +439,16 @@ function renderMatchPNG(m) {
   ctx.font = "700 30px Nunito, Arial, sans-serif";
   ctx.fillText(t("match_overall"), 500, 728);
 
-  // alt skorlar
   ctx.font = "700 24px Nunito, Arial, sans-serif";
   ctx.fillStyle = "#1E2330";
-  var mLine1 = t("match_flirt") + " %" + m.flirt + "  \u2022  " +
-               t("match_vibe") + " %" + m.vibe + "  \u2022  " +
+  var mLine1 = t("match_flirt") + " %" + m.flirt + "  •  " +
+               t("match_vibe") + " %" + m.vibe + "  •  " +
                t("match_humor") + " %" + m.humor;
-  var mLine2 = t("match_chaos") + " %" + m.chaos + "  \u2022  " +
+  var mLine2 = t("match_chaos") + " %" + m.chaos + "  •  " +
                t("match_romance") + " %" + m.romance;
   ctx.fillText(mLine1, 500, 780);
   ctx.fillText(mLine2, 500, 812);
 
-  // XORA yorumu
   ctx.fillStyle = "#FFF1E3";
   roundRect(ctx, 130, 830, 740, 215, 24);
   ctx.fill();
@@ -351,20 +486,25 @@ function shareOnX(text) {
 }
 
 function shareIdentityText(res) {
-  var lang = getLang();
-  var name = res.archetype.name[lang];
-  if (lang === "tr") {
-    return 'XORA beni analiz etti: "' + name + '" \u00E7\u0131kt\u0131m \uD83D\uDC40 Sen ne \u00E7\u0131kars\u0131n? \u2192 xora.app';
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var name;
+  if (isV2Result(res)) {
+    name = res.card.nickname[lang];
+  } else {
+    name = res.archetype.name[lang];
   }
-  return 'XORA analyzed me: I\'m a "' + name + '" \uD83D\uDC40 What would you be? \u2192 xora.app';
+  if (lang === "tr") {
+    return 'XORA beni analiz etti: "' + name + '" çıktım 👀 Sen ne çıkarsın? → xora.app';
+  }
+  return 'XORA analyzed me: I\'m a "' + name + '" 👀 What would you be? → xora.app';
 }
 
 function shareMatchText(m) {
-  var lang = getLang();
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
   if (lang === "tr") {
-    return "@" + m.a + " \u00D7 @" + m.b + " uyumu: %" + m.overall +
-           " \uD83D\uDD25 XORA hesaplad\u0131. Siz ka\u00E7 \u00E7\u0131kars\u0131n\u0131z? \u2192 xora.app";
+    return "@" + m.a + " × @" + m.b + " uyumu: %" + m.overall +
+           " 🔥 XORA hesapladı. Siz kaç çıkarsınız? → xora.app";
   }
-  return "@" + m.a + " \u00D7 @" + m.b + " match: " + m.overall +
-         "% \uD83D\uDD25 Calculated by XORA. What's your score? \u2192 xora.app";
+  return "@" + m.a + " × @" + m.b + " match: " + m.overall +
+         "% 🔥 Calculated by XORA. What's your score? → xora.app";
 }
