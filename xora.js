@@ -191,9 +191,14 @@ var DEMO_PROFILES = [
 
 /* ---- 0: Beşiktaş Taraftarı ---- */
 {
+  nickname: { tr: "Tribüncü", en: "Die-Hard Fan" },
   profile_summary: {
-    tr: "Hesabın maç günü başka bir kişiye dönüşüyor. Yenilgi sonrası sessizleşip biriktiren, zafer anında tribün gibi patlayan bir timeline. Takım senin kimliğin, futbol senin dilin.",
-    en: "Your account transforms on match day. A timeline that goes silent after defeat then erupts, celebrating wins like a stadium. The team is your identity, football is your language."
+    tr: "Hesabın maç günü başka bir kişiye dönüşüyor. Yenilgi sonrası 35 dakika sessizlik, sonra 6+ tweet serisi. 'Biz' zamiri 50 tweetin 23'ünde — sadece takım bağlamında. Takım senin kimliğin.",
+    en: "Your account transforms on match day. 35 minutes of silence after defeat, then 6+ tweet bursts. 'We' appears in 23 of 50 tweets — only in team context. The team is your identity."
+  },
+  stalk_summary: {
+    tr: "Bu hesap maç günü başka bir profile dönüşüyor. Yenilgi sonrası 35 dakika sessizlik, sonra 6+ tweet serisi. 'Biz' zamiri 50 tweetin 23'ünde — sadece takım bağlamında.",
+    en: "This account transforms on match day. 35 minutes of silence after defeat, then 6+ tweet bursts. 'We' appears in 23 of 50 tweets — only in team context."
   },
   topics: [
     { label: { tr: "Futbol / Takım", en: "Football / Team" }, weight: 55, subtone: { tr: "Duygusal bağlılık", en: "Emotional devotion" } },
@@ -227,14 +232,25 @@ var DEMO_PROFILES = [
     mirror: { tr: "Eleştiri geldiğinde 4 dakikada cevap veriyorsun — ama yenilgiye 35 dakika dayanıyorsun. Asıl sabrın takıma, sabırsızlığın insanlara.", en: "You reply to criticism in 4 minutes — but you endure defeat for 35. Your patience is for the team, your impatience is for people." },
     prediction: { tr: "Bir sonraki derbi kaybedilirse gece 2'ye kadar tweet atıp sabah hepsini sileceksin.", en: "If the next derby is lost, you'll tweet until 2 AM then delete them all by morning." }
   },
+  stalk: {
+    observation: { tr: "Bu hesabın tweetlerinin neredeyse yarısı tek bir konu etrafında dönüyor. Yenilgi anında 35 dakika sessizlik — sonra 6 tweet art arda.", en: "Almost half this account's tweets revolve around one topic. 35 minutes of silence after defeat — then 6 tweets firing." },
+    reading: { tr: "Sabırsız bir taraftar gibi görünüyor ama o 35 dakikalık sessizlik başka bir şey söylüyor — patlama öncesi biriktirme. Duygularını ham haliyle vermiyor, önce içinde pişiriyor.", en: "Looks like an impatient fan, but that 35-minute silence says otherwise — building up before the burst. Emotions aren't served raw, they're cooked first." },
+    mirror: { tr: "Eleştiriye 4 dakikada cevap veriyor ama yenilgiye 35 dakika dayanıyor. Asıl sabır takıma, sabırsızlık insanlara.", en: "Replies to criticism in 4 minutes but endures defeat for 35. Patience is for the team, impatience is for people." },
+    prediction: { tr: "Bir sonraki derbi kaybedilirse gece 2'ye kadar tweet atıp sabah hepsini silecek.", en: "If the next derby is lost, this account will tweet until 2 AM then delete them all by morning." }
+  },
   card_color: "#1B1B1B"
 },
 
 /* ---- 1: Fenerbahçe Taraftarı ---- */
 {
+  nickname: { tr: "Reply Savaşçısı", en: "Reply Warrior" },
   profile_summary: {
-    tr: "Timeline'ın bir mahkeme salonu gibi çalışıyor. Hakem kararına 8 saniyede cevap, reply zincirlerinde son söz hep sende. Futbol senin için spor değil, savunduğun bir dava.",
-    en: "Your timeline operates like a courtroom. 8-second response to ref calls, the last word in reply chains is always yours. Football isn't sport for you — it's a case you're defending."
+    tr: "Timeline'ın bir mahkeme salonu gibi çalışıyor. Hakem kararına 8 saniyede cevap, reply zincirlerinde son söz hep sende. 'Adalet' kelimesi 50 tweette 11 kez geçiyor. Futbol senin için spor değil, savunduğun bir dava.",
+    en: "Your timeline operates like a courtroom. 8-second response to ref calls, the last word in reply chains is always yours. 'Justice' appears 11 times in 50 tweets. Football isn't sport for you — it's a case you're defending."
+  },
+  stalk_summary: {
+    tr: "Bu hesabın timeline'ı bir mahkeme salonu gibi çalışıyor. Hakem kararına 8 saniyede cevap, reply zincirlerinde son söz hep bu hesapta. 'Adalet' kelimesi 50 tweette 11 kez. Futbol bu profil için spor değil, savunulan bir dava.",
+    en: "This account's timeline operates like a courtroom. 8-second response to ref calls, the last word in reply chains is always this account's. 'Justice' appears 11 times in 50 tweets. Football isn't sport here — it's a case being defended."
   },
   topics: [
     { label: { tr: "Futbol / Adalet", en: "Football / Justice" }, weight: 50, subtone: { tr: "Dava savunması", en: "Case defense" } },
@@ -267,14 +283,25 @@ var DEMO_PROFILES = [
     mirror: { tr: "Herkes seni kavgacı sanıyor ama sen kavga etmiyorsun — müdafaa ediyorsun. Galibiyet sonrası bile huzursuz oluyorsun — çünkü dava bitmedi.", en: "Everyone thinks you're combative but you're not fighting — you're defending. Even after a win you're restless — the case isn't closed." },
     prediction: { tr: "Bir sonraki hakem tartışmasında yine ilk tweet atan sen olacaksın — ve reply zincirinden son çıkan da.", en: "In the next ref controversy, you'll be the first to tweet — and the last to leave the reply chain." }
   },
+  stalk: {
+    observation: { tr: "Bu hesabın paylaşımlarında futbol sadece bir spor değil, bir dava gibi işleniyor. Hakem kararlarına verilen tepki 8 saniye. Tartışmalarda her zaman son mesaj bu hesabın.", en: "Football isn't just sport on this feed — it's a case. Ref decisions get 8-second reactions. The last message in arguments always belongs to this account." },
+    reading: { tr: "Fenerbahçe bu profil için tutku değil, pozisyon. Savunulan bir dava var ve sürekli kanıt toplanıyor. Tartışmayı bırakmaması inatçılık değil — davayı bırakmak demek.", en: "Fenerbahçe isn't passion for this profile — it's a position. There's a case and evidence is always being collected. Not leaving arguments isn't stubbornness — it's not dropping the case." },
+    mirror: { tr: "Herkes bu hesabı kavgacı sanıyor ama kavga etmiyor — müdafaa ediyor. Galibiyet sonrası bile huzursuz — çünkü dava bitmedi.", en: "Everyone thinks this account is combative but it's not fighting — it's defending. Even after a win there's no rest — the case isn't closed." },
+    prediction: { tr: "Bir sonraki hakem tartışmasında yine ilk tweet atan bu hesap olacak — ve reply zincirinden son çıkan da.", en: "In the next ref controversy, this account will be the first to tweet — and the last to leave the reply chain." }
+  },
   card_color: "#1A3A5C"
 },
 
 /* ---- 2: Şair ---- */
 {
+  nickname: { tr: "Sessiz Gözlemci", en: "Silent Observer" },
   profile_summary: {
-    tr: "Hesabında konuşma yok, sahne var. 47/50 tweet orijinal, 0 RT, 0 QT. Kimseyle etkileşime girmiyorsun ama tweetlerin birine yazılmış mektup gibi. Gündüz kontrollü, gece çatlaklı.",
-    en: "No conversation on your feed — just a stage. 47/50 tweets original, 0 RT, 0 QT. You don't interact, yet your tweets read like letters to someone. Controlled by day, cracked by night."
+    tr: "Hesabında konuşma yok, sahne var. 47/50 tweet orijinal, 0 RT, 0 QT. 'Pencere' 6 kez, 'sessizlik' 5 kez — aynı imgelem dünyası. Tweetlerin birine yazılmış mektup gibi ama etiketlediğin kimse yok.",
+    en: "No conversation on your feed — just a stage. 47/50 tweets original, 0 RT, 0 QT. 'Window' 6 times, 'silence' 5 times — same imagery world. Your tweets read like letters to someone but you tag no one."
+  },
+  stalk_summary: {
+    tr: "Bu hesapta konuşma yok, sahne var. 47/50 tweet orijinal, 0 RT, 0 QT. 'Pencere' 6 kez, 'sessizlik' 5 kez — aynı imgelem dünyası. Tweetler birine yazılmış mektup gibi ama etiketlenen kimse yok.",
+    en: "No conversation on this feed — just a stage. 47/50 tweets original, 0 RT, 0 QT. 'Window' 6 times, 'silence' 5 times — same imagery world. Tweets read like letters to someone but no one is tagged."
   },
   topics: [
     { label: { tr: "Duygu / İçsel", en: "Emotion / Inner" }, weight: 50, subtone: { tr: "Damıtılmış", en: "Distilled" } },
@@ -307,11 +334,18 @@ var DEMO_PROFILES = [
     mirror: { tr: "Çok şey hisseden ama az gösteren birisin — ta ki yazmaya başlayana kadar. Gece tweetlerinde çatlaklar var. O kısa, kesik cümleler — senin filtresiz halin.", en: "You feel deeply but show little — until you start writing. Your night tweets have cracks. Those short, broken lines — that's you unfiltered." },
     prediction: { tr: "Yakında o 'sen'li tweetlerden birini sileceksin — çünkü fazla açık verdiğini hissedeceksin.", en: "Soon you'll delete one of those 'you' tweets — because you'll feel you revealed too much." }
   },
+  stalk: {
+    observation: { tr: "Bu hesapta konuşma yok, sahne var. Kimseyle etkileşime girmiyor ama tweetler birine yazılmış mektup gibi. Emoji yok, hashtag yok, filtre yok.", en: "No conversation on this feed — just a stage. No interaction, yet tweets read like letters to someone. No emoji, no hashtag, no filter." },
+    reading: { tr: "Yalnızlığını yaşamıyor, işliyor. Her tweet bir damıtma: yaşadığı şeyi en saf haline indiriyor. Birine yazıyor ama etiketlemiyor — belki cevap istemiyor.", en: "This account doesn't live loneliness — it processes it. Each tweet is distillation: reducing experience to its purest form. Writing to someone but never tagging — maybe no reply is wanted." },
+    mirror: { tr: "Çok şey hisseden ama az gösteren bir profil — ta ki yazmaya başlayana kadar. Gece tweetlerinde çatlaklar var. O kısa, kesik cümleler — filtresiz hali.", en: "A profile that feels deeply but shows little — until writing starts. Night tweets have cracks. Those short, broken lines — the unfiltered version." },
+    prediction: { tr: "Yakında o 'sen'li tweetlerden birini silecek — çünkü fazla açık verdiğini hissedecek.", en: "Soon one of those 'you' tweets will be deleted — because it'll feel like too much was revealed." }
+  },
   card_color: "#2C2137"
 },
 
 /* ---- 3: Gece Düşünürü ---- */
 {
+  nickname: { tr: "Gece Kuşu", en: "Night Owl" },
   profile_summary: {
     tr: "Gündüz hesabın ölü, gece canlanıyor. 'Acaba' 50 tweetin 14'ünde geçiyor ama hiçbirinin cevabını vermiyorsun. Thread'lerin hep gece 1'den sonra başlıyor ve hiçbiri sonuç cümlesiyle bitmiyor.",
     en: "Dead feed by day, alive by night. 'I wonder' appears in 14 of 50 tweets but you never answer any. Your threads always start after 1 AM and none end with a conclusion."
@@ -362,6 +396,7 @@ var DEMO_PROFILES = [
 
 /* ---- 4: Ayrılık Yaşayan ---- */
 {
+  nickname: { tr: "Yaz-Silci", en: "Post-Deleter" },
   profile_summary: {
     tr: "Son 2 haftada ritmin tamamen değişmiş. Tweet atıp siliyorsun, şarkı sözleriyle konuşuyorsun. 'Neyse' 50 tweetin 9'unda — her biri duygu cümlesinin hemen ardından. Birisi var ama adı hiçbir yerde geçmiyor.",
     en: "Your rhythm completely changed in the last 2 weeks. You post and delete, speak through lyrics. 'Whatever' appears in 9 of 50 tweets — always right after an emotional sentence. Someone exists but their name appears nowhere."
@@ -412,9 +447,14 @@ var DEMO_PROFILES = [
 
 /* ---- 5: Yazılımcı ---- */
 {
+  nickname: { tr: "Kod Makinesi", en: "Code Machine" },
   profile_summary: {
-    tr: "Hafta içi yazılımcı hesabı, hafta sonu insan hesabı — aynı hesap, iki farklı kişi. Deploy şakaların gece 11'den sonra geliyor ve yarı şaka yarı çığlık. Thread'ler senin vitrinin.",
-    en: "Developer account on weekdays, human account on weekends — same feed, two different people. Deploy jokes arrive after 11 PM, half humor half cry for help. Threads are your storefront."
+    tr: "Hafta içi %80 yazılım, hafta sonu %90 günlük hayat — iki ayrı hesap gibi. Deploy şakaların gece 11'den sonra, yarı şaka yarı çığlık. 'Öğrendiğim şeyler' thread formatı 4 kez tekrarlanmış.",
+    en: "80% coding on weekdays, 90% daily life on weekends — like two accounts. Deploy jokes after 11 PM, half humor half cry for help. 'Things I learned' thread format used 4 times."
+  },
+  stalk_summary: {
+    tr: "Hafta içi %80 yazılım, hafta sonu %90 günlük hayat — iki ayrı hesap gibi. Deploy şakaları gece 11'den sonra, yarı şaka yarı çığlık. 'Öğrendiğim şeyler' thread formatı 4 kez tekrarlanmış.",
+    en: "80% coding on weekdays, 90% daily life on weekends — like two accounts. Deploy jokes after 11 PM, half humor half cry for help. 'Things I learned' thread format used 4 times."
   },
   topics: [
     { label: { tr: "Yazılım / Tech", en: "Software / Tech" }, weight: 50, subtone: { tr: "Öğretici", en: "Educational" } },
@@ -447,14 +487,25 @@ var DEMO_PROFILES = [
     mirror: { tr: "Deploy gecelerindeki şakalar aslında yardım çağrısı — ama herkes gülüyor.", en: "Your deploy-night jokes are actually cries for help — but everyone laughs." },
     prediction: { tr: "Bu hafta yine bir 'öğrendiğim şeyler' thread'i açacaksın — ama cuma gece deploy tweeti daha çok seni anlatacak.", en: "This week you'll start another 'things I learned' thread — but the Friday night deploy tweet will say more about you." }
   },
+  stalk: {
+    observation: { tr: "Bu hesap hafta içi yazılımcı hesabı, hafta sonu insan hesabı. Deploy şakaları gece 11'den sonra geliyor.", en: "This feed is a developer account on weekdays, a human account on weekends. Deploy jokes arrive after 11 PM." },
+    reading: { tr: "Yazılım kimliği bu profili hafta içi yutmuş. Deploy şakalarındaki gerilim gerçek: kodu seviyor ama koşulları sevmiyor. Thread'ler vitrini.", en: "The developer identity has consumed this profile's weekdays. The tension in deploy jokes is real: loves code but hates the conditions. Threads are the storefront." },
+    mirror: { tr: "Deploy gecelerindeki şakalar aslında yardım çağrısı — ama herkes gülüyor.", en: "Deploy-night jokes are actually cries for help — but everyone laughs." },
+    prediction: { tr: "Bu hafta yine bir 'öğrendiğim şeyler' thread'i açacak — ama cuma gece deploy tweeti daha çok kendisini anlatacak.", en: "This week another 'things I learned' thread will start — but the Friday night deploy tweet will say more about this person." }
+  },
   card_color: "#24292E"
 },
 
 /* ---- 6: Siyasi Tartışmacı ---- */
 {
+  nickname: { tr: "Modern Filozof", en: "Armchair Activist" },
   profile_summary: {
-    tr: "Tweetlerin yarısı reply, reply'ların çoğu tartışma. Hiç yorumsuz haber paylaşmıyorsun. 11 mesajlık tartışmalarda son 3 mesaj yeni argüman eklemiyor — aynı noktayı tekrarlıyorsun.",
-    en: "Half your tweets are replies, most replies are arguments. You never share news without commentary. In 11-message debates the last 3 add nothing new — you repeat the same point."
+    tr: "Tweetlerin yarısı reply, reply'ların çoğu tartışma. 'Bu ülkede' ile başlayan 11 tweet var — farklı konular, aynı çaresizlik tonu. 11 mesajlık tartışmalarda son 3 mesaj yeni argüman eklemiyor.",
+    en: "Half your tweets are replies, most replies are arguments. 'In this country' starts 11 tweets — different topics, same helpless tone. In 11-message debates the last 3 add nothing new."
+  },
+  stalk_summary: {
+    tr: "Bu hesabın tweetlerinin yarısı reply, reply'ların çoğu tartışma. 'Bu ülkede' ile başlayan 11 tweet var — farklı konular, aynı çaresizlik tonu. 11 mesajlık tartışmalarda son 3 mesaj yeni argüman eklemiyor.",
+    en: "Half this account's tweets are replies, most replies are arguments. 'In this country' starts 11 tweets — different topics, same helpless tone. In 11-message debates the last 3 add nothing new."
   },
   topics: [
     { label: { tr: "Siyaset / Gündem", en: "Politics / News" }, weight: 55, subtone: { tr: "Öfkeli adalet", en: "Angry justice" } },
@@ -487,11 +538,18 @@ var DEMO_PROFILES = [
     mirror: { tr: "Çok şey hissediyorsun ve muhtemelen doğru. Ama 11 mesajlık tartışmada karşı tarafı ikna ettiğin bir tane yok — çünkü ikna etmiyorsun, haklı olduğunu gösteriyorsun.", en: "You feel a lot and you're probably right. But in 11-message debates you've convinced no one — because you're not convincing, you're proving." },
     prediction: { tr: "Yarınki habere ilk tepki veren sen olacaksın — ve yine 8 mesajlık bir reply zincirinden son çıkan da.", en: "You'll be first to react to tomorrow's news — and last to leave the 8-message reply chain." }
   },
+  stalk: {
+    observation: { tr: "Bu hesabın tweetlerinin yarısı reply, reply'ların çoğu tartışma. Hiç yorumsuz haber paylaşmıyor. Tartışmalarda aynı noktayı tekrarlıyor.", en: "Half this account's tweets are replies, most replies are arguments. Never shares news without commentary. Repeats the same point in debates." },
+    reading: { tr: "Siyaset bu hesabın varoluşsal alanı. Tartışmalarda son sözü bırakamaması ikna etmek için değil — bırakamamak için.", en: "Politics is this account's existential territory. Refusing to drop the last word isn't about persuasion — it's about inability to let go." },
+    mirror: { tr: "Çok şey hisseden ve muhtemelen haklı olan bir profil. Ama 11 mesajlık tartışmada karşı tarafı ikna ettiği bir tane yok — çünkü ikna etmiyor, haklı olduğunu gösteriyor.", en: "A profile that feels a lot and is probably right. But in 11-message debates, no one is convinced — because the goal isn't convincing, it's proving." },
+    prediction: { tr: "Yarınki habere ilk tepki veren bu hesap olacak — ve yine 8 mesajlık reply zincirinden son çıkan da.", en: "This account will be first to react to tomorrow's news — and last to leave the 8-message reply chain." }
+  },
   card_color: "#8B0000"
 },
 
 /* ---- 7: Mizah Hesabı ---- */
 {
+  nickname: { tr: "Mizahşör", en: "The Comedian" },
   profile_summary: {
     tr: "50 tweet okudum ve seni tanıyamadım. 50 tweette sıfır kişisel bilgi — ne yediğin, nerede olduğun, ne hissettiğin yok. Trending konulara 25 dakikada espri, her ciddi soruya şakayla cevap. Sahne hiç kapanmıyor.",
     en: "I read 50 tweets and couldn't get to know you. Zero personal info in 50 tweets — no food, no location, no feelings. 25-min jokes on trending topics, every serious question gets humor. The show never closes."
@@ -542,9 +600,14 @@ var DEMO_PROFILES = [
 
 /* ---- 8: Kripto Yatırımcısı ---- */
 {
+  nickname: { tr: "Kripto Meraklısı", en: "Crypto Bro" },
   profile_summary: {
-    tr: "Sabah analist, gece kehanetçi — aynı kişi değil. Haklı çıktığında 'demiştim', yanıldığında konu değişiyor. 'Herkes' kelimesi hep 'herkes yanlış yapıyor' formatında.",
-    en: "Analyst by morning, prophet by night — not the same person. 'Told you so' when right, topic change when wrong. 'Everyone' always means 'everyone is wrong.'"
+    tr: "Sabah analist, gece kehanetçi — aynı kişi değil. 'Herkes' kelimesi 8/50 tweette — hep 'herkes yanlış yapıyor' formatında. Haklı çıktığında 'demiştim', yanıldığında konu değişiyor.",
+    en: "Analyst by morning, prophet by night — not the same person. 'Everyone' in 8 of 50 tweets — always 'everyone is doing it wrong.' 'Told you so' when right, topic change when wrong."
+  },
+  stalk_summary: {
+    tr: "Sabah analist, gece kehanetçi — aynı kişi değil. 'Herkes' kelimesi 8/50 tweette — hep 'herkes yanlış yapıyor' formatında. Haklı çıktığında 'demiştim', yanıldığında konu değişiyor.",
+    en: "Analyst by morning, prophet by night — not the same person. 'Everyone' in 8 of 50 tweets — always 'everyone is doing it wrong.' 'Told you so' when right, topic change when wrong."
   },
   topics: [
     { label: { tr: "Kripto / Finans", en: "Crypto / Finance" }, weight: 55, subtone: { tr: "Haklı çıkma odaklı", en: "Being-right focused" } },
@@ -577,14 +640,25 @@ var DEMO_PROFILES = [
     mirror: { tr: "Asıl motivasyonun para değil — görünürlük. Haklı çıkmak kazanmaktan önemli. Geceleri yaptığın iddialı tweetler sabahki grafiklerden daha çok seni yansıtıyor.", en: "Your real motivation isn't money — it's visibility. Being right matters more than winning. Your bold night tweets reflect you more than your morning charts." },
     prediction: { tr: "Bir sonraki düşüşte yine sessizleşeceksin — ve yükseliş geldiğinde ilk 'demiştim' tweeti senin olacak.", en: "In the next dip you'll go silent again — and when the rise comes, the first 'told you so' will be yours." }
   },
+  stalk: {
+    observation: { tr: "Bu hesap iki modda çalışıyor: sabah analist, gece kehanetçi. Haklı çıktığında gösteriyor, yanıldığında konu değişiyor.", en: "This feed runs in two modes: morning analyst, night prophet. Shows wins, hides losses." },
+    reading: { tr: "Kripto bu profil için haklı çıkma oyunu. 'Demiştim' zafer narası. Yanıldığı zamanları saklamıyor — görmezden geliyor.", en: "Crypto is this profile's being-right game. 'Told you' is the victory cry. Wrongs aren't hidden — they're ignored." },
+    mirror: { tr: "Asıl motivasyon para değil — görünürlük. Haklı çıkmak kazanmaktan önemli. Geceleri yapılan iddialı tweetler sabahki grafiklerden daha çok bu profili yansıtıyor.", en: "The real motivation isn't money — it's visibility. Being right matters more than winning. Bold night tweets reflect this profile more than morning charts." },
+    prediction: { tr: "Bir sonraki düşüşte yine sessizleşecek — ve yükseliş geldiğinde ilk 'demiştim' tweeti bu hesaptan gelecek.", en: "In the next dip this account will go silent again — and when the rise comes, the first 'told you so' will be theirs." }
+  },
   card_color: "#0D7C3E"
 },
 
 /* ---- 9: Oyun Tutkunu ---- */
 {
+  nickname: { tr: "Gamer", en: "Gamer" },
   profile_summary: {
-    tr: "6 kez 'son kez oynuyorum' demişsin, 6'sında devam etmişsin. Zafer anında caps lock, yenilgide fısıltı. Gece 2-4 arası oyunla ilgisiz, dürüst tweetler var — asıl sen orada.",
-    en: "You said 'last time playing' 6 times, continued all 6. Caps lock in victory, whisper in defeat. Between 2-4 AM there are honest tweets unrelated to gaming — the real you lives there."
+    tr: "6 kez 'son kez oynuyorum' demişsin, 6'sında devam etmişsin. Zafer tweetlerinde %100 caps, yenilgide %0. Gece 2-4 arası oyunla ilgisiz, dürüst tweetler var — asıl sen orada.",
+    en: "You said 'last time playing' 6 times, continued all 6. 100% caps in victory tweets, 0% in defeat. Between 2-4 AM there are honest tweets unrelated to gaming — the real you lives there."
+  },
+  stalk_summary: {
+    tr: "6 kez 'son kez oynuyorum' demiş, 6'sında devam etmiş. Zafer tweetlerinde %100 caps, yenilgide %0. Gece 2-4 arası oyunla ilgisiz, dürüst tweetler var — asıl kişi orada.",
+    en: "Said 'last time playing' 6 times, continued all 6. 100% caps in victory tweets, 0% in defeat. Between 2-4 AM there are honest tweets unrelated to gaming — the real person lives there."
   },
   topics: [
     { label: { tr: "Oyun / E-Spor", en: "Gaming / E-Sports" }, weight: 55, subtone: { tr: "Rekabetçi performans", en: "Competitive performance" } },
@@ -616,6 +690,12 @@ var DEMO_PROFILES = [
     reading: { tr: "Oyun senin için savaş alanı. Kazanmak seni kanıtlıyor, kaybetmek yıkıyor — o yüzden bırakıyorsun ama geri geliyorsun. Oyun dışında bu kadar net bir hissiyat yok.", en: "Gaming is your battlefield. Winning proves you, losing breaks you — so you quit but return. Nothing else gives you such clear feelings." },
     mirror: { tr: "Oyun sana kaçış veriyor ama kaçtığın şeyi söylemiyorsun. 'Huzur' kelimesini oyun bağlamında kullanman gerçek hayatın huzursuz olduğunu farkında olmadan söylüyor.", en: "Gaming gives you escape but you never name what you're escaping. Using 'peace' in a gaming context accidentally reveals your real life isn't peaceful." },
     prediction: { tr: "Bu gece yine 'son kez' diyeceksin. Ve yine devam edeceksin — çünkü bırakacağın şey oyun değil, huzur.", en: "Tonight you'll say 'last time' again. And continue again — because what you'd quit isn't the game, it's the peace." }
+  },
+  stalk: {
+    observation: { tr: "6 kez 'son kez' demiş, 6'sında devam etmiş. Zafer anında bağırıyor, yenilgide sessizleşiyor. Gece 3'te oyunla ilgisiz, dürüst tweetler var.", en: "Said 'last time' 6 times, continued all 6. Shouts in victory, goes silent in defeat. At 3 AM there are honest tweets unrelated to gaming." },
+    reading: { tr: "Oyun bu profil için savaş alanı. Kazanmak kanıtlıyor, kaybetmek yıkıyor — o yüzden bırakıyor ama geri geliyor. Oyun dışında bu kadar net bir hissiyat yok.", en: "Gaming is this profile's battlefield. Winning proves, losing breaks — so quitting happens but return follows. Nothing else gives such clear feelings." },
+    mirror: { tr: "Oyun kaçış veriyor ama kaçılan şeyi söylemiyor. 'Huzur' kelimesini oyun bağlamında kullanması gerçek hayatın huzursuz olduğunu farkında olmadan söylüyor.", en: "Gaming gives escape but what's being escaped is never named. Using 'peace' in a gaming context accidentally reveals real life isn't peaceful." },
+    prediction: { tr: "Bu gece yine 'son kez' diyecek. Ve yine devam edecek — çünkü bırakacağı şey oyun değil, huzur.", en: "Tonight 'last time' will be said again. And the game will continue — because what would be quit isn't the game, it's the peace." }
   },
   card_color: "#7B1FA2"
 }
@@ -667,6 +747,7 @@ function analyzeHandle(rawHandle, mode) {
     hash: h,
     source: "demo",
 
+    nickname: profile.nickname,
     profile_summary: summary,
     topics: profile.topics,
     behaviors: behaviors,
@@ -682,6 +763,8 @@ function analyzeHandle(rawHandle, mode) {
   };
 
   /* --- backward compat shim for card.js V2/V1, match, profile --- */
+  var nickTr = profile.nickname ? profile.nickname.tr : "@" + handle;
+  var nickEn = profile.nickname ? profile.nickname.en : "@" + handle;
   var summaryTr = profile.profile_summary.tr;
   var summaryEn = profile.profile_summary.en;
   var shortTr = summaryTr.length > 60 ? summaryTr.substring(0, 57) + "..." : summaryTr;
@@ -691,7 +774,7 @@ function analyzeHandle(rawHandle, mode) {
     id: "v3-" + (h % DEMO_PROFILES.length),
     emoji: "🪞",
     color: profile.card_color,
-    name: { tr: "@" + handle, en: "@" + handle },
+    name: { tr: nickTr, en: nickEn },
     desc: { tr: shortTr, en: shortEn },
     comments: {
       tr: [profile.comment.mirror.tr],
@@ -705,7 +788,7 @@ function analyzeHandle(rawHandle, mode) {
     result.scores[scoreKeys[si]] = topBehaviors[si].value;
   }
   result.card = {
-    nickname: { tr: "@" + handle, en: "@" + handle },
+    nickname: { tr: nickTr, en: nickEn },
     desc: { tr: shortTr, en: shortEn },
     emoji: "🪞",
     color: profile.card_color,
@@ -736,20 +819,20 @@ var SCORE_KEYS = ["sc_viral", "sc_kaos", "sc_mizah", "sc_gece"];
 
 var MATCH_COMMENTS = {
   tr: [
-    "{a} mesaj atar, {b} görüldü atar. Ama ikisi de gece 3'te birbirinin profiline bakar. Klasik.",
-    "{a} ile {b} flörtü tweet beğenisiyle başlar, relationship drama ile biter. XORA popcorn hazırladı.",
-    "{a} duygusal yazar, {b} ironiyle cevap verir. Bu gerilim ya aşka döner ya engele.",
-    "{a} ve {b} birbirini stalklıyor ama takip etmiyor. Bu ne cesaret, ne korkaklık — saf kaos.",
-    "{a} kalp atar, {b} alev atar. İkisi de ne istediğini bilmiyor ama kimya tartışılmaz.",
-    "{a} plan yapar, {b} planı havaya uçurur. Tam bir romantik komedi senaryosu."
+    "{a} mesaj atar, {b} görüldü atar. Ama bu iki profil gece 3'te birbirinin sayfasında. Klasik.",
+    "Bu iki hesap arasındaki flört tweet beğenisiyle başlar, drama ile biter. XORA popcorn hazırladı.",
+    "{a} duygusal yazar, {b} ironiyle cevap verir. Bu iki profil arasındaki gerilim ya aşka döner ya engele.",
+    "{a} ve {b} birbirini stalklıyor ama takip etmiyor. Bu eşleşmede ne cesaret var ne korkaklık — saf kaos.",
+    "{a} kalp atar, {b} alev atar. Bu iki hesap da ne istediğini bilmiyor ama kimya tartışılmaz.",
+    "{a} plan yapar, {b} planı havaya uçurur. Bu ikili tam bir romantik komedi senaryosu."
   ],
   en: [
-    "{a} sends the text, {b} leaves it on read. But both stalk each other's profiles at 3 AM. Classic.",
-    "{a} and {b}'s flirtation starts with a like, ends with relationship drama. XORA has the popcorn ready.",
-    "{a} writes emotionally, {b} replies with irony. This tension either becomes love or a block.",
-    "{a} and {b} stalk each other but won't follow. Not courage, not cowardice — pure chaos.",
-    "{a} sends hearts, {b} sends fire. Neither knows what they want, but the chemistry is undeniable.",
-    "{a} makes plans, {b} blows them up. A perfect romantic comedy script."
+    "{a} sends the text, {b} leaves it on read. But these two profiles stalk each other at 3 AM. Classic.",
+    "The flirtation between these two accounts starts with a like, ends with drama. XORA has the popcorn ready.",
+    "{a} writes emotionally, {b} replies with irony. The tension between these two profiles either becomes love or a block.",
+    "{a} and {b} stalk each other but won't follow. This match has no courage, no cowardice — pure chaos.",
+    "{a} sends hearts, {b} sends fire. Neither account knows what it wants, but the chemistry is undeniable.",
+    "{a} makes plans, {b} blows them up. These two are a perfect romantic comedy script."
   ]
 };
 

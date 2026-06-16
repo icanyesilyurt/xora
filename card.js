@@ -41,6 +41,7 @@ function buildIdentityCard(res) {
 function buildIdentityCardV3(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var color = (res.card && res.card.color) || "#1B1B1B";
+  var nick = res.nickname ? (res.nickname[lang] || res.nickname.tr) : "";
   var summary = res.profile_summary ? res.profile_summary[lang] : "";
   var mirror = res.comment ? res.comment.mirror[lang] : "";
   var mode = res.mode || "mirror";
@@ -69,6 +70,7 @@ function buildIdentityCardV3(res) {
       "</div>" +
       '<div class="idcard-body">' +
         '<p class="idcard-handle">@' + esc(res.handle) + "</p>" +
+        (nick ? '<h2 class="idcard-type">' + esc(nick) + "</h2>" : "") +
         '<div class="v3-summary"><p>' + esc(summary) + "</p></div>" +
         '<div class="idcard-scores">' + chips + "</div>" +
         '<div class="idcard-quote">' +
@@ -330,6 +332,7 @@ function renderIdentityPNG(res) {
 function renderIdentityPNGV3(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var color = (res.card && res.card.color) || "#1B1B1B";
+  var nick = res.nickname ? (res.nickname[lang] || res.nickname.tr) : "";
   var mode = res.mode || "mirror";
   var emoji = mode === "stalk" ? "👀" : "🪞";
   var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : "XORA MIRROR");
@@ -348,10 +351,18 @@ function renderIdentityPNGV3(res) {
   ctx.font = "700 34px Nunito, Arial, sans-serif";
   ctx.fillText("@" + res.handle, 500, 250);
 
+  var curNickY = 530;
+  if (nick) {
+    ctx.fillStyle = "#1E2330";
+    ctx.font = "900 42px Nunito, Arial, sans-serif";
+    ctx.fillText(nick, 500, curNickY);
+    curNickY += 36;
+  }
+
   var summary = res.profile_summary ? res.profile_summary[lang] : "";
   ctx.fillStyle = "#5C6270";
   ctx.font = "600 24px Nunito, Arial, sans-serif";
-  var sumY = wrapText(ctx, summary, 500, 540, 700, 30);
+  var sumY = wrapText(ctx, summary, 500, curNickY + 10, 700, 30);
 
   var curY = sumY + 30;
 
