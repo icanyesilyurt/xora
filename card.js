@@ -42,10 +42,10 @@ function buildIdentityCardV3(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var color = (res.card && res.card.color) || "#1B1B1B";
   var nick = res.nickname ? (res.nickname[lang] || res.nickname.tr) : "";
-  var summary = res.profile_summary ? res.profile_summary[lang] : "";
+  var emoji = res.profile_emoji || "🪞";
+  var tagline = res.tagline ? (res.tagline[lang] || res.tagline.tr) : "";
   var mirror = res.comment ? res.comment.mirror[lang] : "";
   var mode = res.mode || "mirror";
-  var emoji = mode === "stalk" ? "👀" : "🪞";
   var quoteLabel = mode === "stalk"
     ? (lang === "tr" ? "XORA Stalk" : "XORA Stalk")
     : (lang === "tr" ? "XORA Ayna" : "XORA Mirror");
@@ -71,7 +71,7 @@ function buildIdentityCardV3(res) {
       '<div class="idcard-body">' +
         '<p class="idcard-handle">@' + esc(res.handle) + "</p>" +
         (nick ? '<h2 class="idcard-type">' + esc(nick) + "</h2>" : "") +
-        '<div class="v3-summary"><p>' + esc(summary) + "</p></div>" +
+        (tagline ? '<p class="idcard-desc">' + esc(tagline) + "</p>" : "") +
         '<div class="idcard-scores">' + chips + "</div>" +
         '<div class="idcard-quote">' +
           '<span class="quote-label">' + esc(quoteLabel) + "</span>" +
@@ -333,8 +333,9 @@ function renderIdentityPNGV3(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var color = (res.card && res.card.color) || "#1B1B1B";
   var nick = res.nickname ? (res.nickname[lang] || res.nickname.tr) : "";
+  var emoji = res.profile_emoji || "🪞";
+  var tagline = res.tagline ? (res.tagline[lang] || res.tagline.tr) : "";
   var mode = res.mode || "mirror";
-  var emoji = mode === "stalk" ? "👀" : "🪞";
   var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : "XORA MIRROR");
   var b = baseCanvas();
   var ctx = b.ctx;
@@ -359,10 +360,9 @@ function renderIdentityPNGV3(res) {
     curNickY += 36;
   }
 
-  var summary = res.profile_summary ? res.profile_summary[lang] : "";
   ctx.fillStyle = "#5C6270";
   ctx.font = "600 24px Nunito, Arial, sans-serif";
-  var sumY = wrapText(ctx, summary, 500, curNickY + 10, 700, 30);
+  var sumY = wrapText(ctx, tagline, 500, curNickY + 10, 700, 30);
 
   var curY = sumY + 30;
 

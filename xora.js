@@ -192,6 +192,15 @@ var DEMO_PROFILES = [
 /* ---- 0: Beşiktaş Taraftarı ---- */
 {
   nickname: { tr: "Tribüncü", en: "Die-Hard Fan" },
+  profile_emoji: "⚽",
+  tagline: {
+    tr: "Takım senin kimliğin, maç günü hesabın başka birine dönüşüyor.",
+    en: "The team is your identity — your account becomes someone else on match day."
+  },
+  stalk_tagline: {
+    tr: "Bu hesabın kimliği takımıyla iç içe, maç günü tamamen farklı bir profile dönüşüyor.",
+    en: "This account's identity is inseparable from its team — match day triggers a full transformation."
+  },
   profile_summary: {
     tr: "Hesabın maç günü başka bir kişiye dönüşüyor. Yenilgi sonrası 35 dakika sessizlik, sonra 6+ tweet serisi. 'Biz' zamiri 50 tweetin 23'ünde — sadece takım bağlamında. Takım senin kimliğin.",
     en: "Your account transforms on match day. 35 minutes of silence after defeat, then 6+ tweet bursts. 'We' appears in 23 of 50 tweets — only in team context. The team is your identity."
@@ -244,6 +253,15 @@ var DEMO_PROFILES = [
 /* ---- 1: Fenerbahçe Taraftarı ---- */
 {
   nickname: { tr: "Reply Savaşçısı", en: "Reply Warrior" },
+  profile_emoji: "⚔️",
+  tagline: {
+    tr: "Futbol senin için spor değil, savunduğun bir dava.",
+    en: "Football isn't sport for you — it's a case you're defending."
+  },
+  stalk_tagline: {
+    tr: "Futbol bu profil için spor değil, savunulan bir dava.",
+    en: "Football isn't sport for this profile — it's a case being defended."
+  },
   profile_summary: {
     tr: "Timeline'ın bir mahkeme salonu gibi çalışıyor. Hakem kararına 8 saniyede cevap, reply zincirlerinde son söz hep sende. 'Adalet' kelimesi 50 tweette 11 kez geçiyor. Futbol senin için spor değil, savunduğun bir dava.",
     en: "Your timeline operates like a courtroom. 8-second response to ref calls, the last word in reply chains is always yours. 'Justice' appears 11 times in 50 tweets. Football isn't sport for you — it's a case you're defending."
@@ -295,6 +313,15 @@ var DEMO_PROFILES = [
 /* ---- 2: Şair ---- */
 {
   nickname: { tr: "Sessiz Gözlemci", en: "Silent Observer" },
+  profile_emoji: "👁️",
+  tagline: {
+    tr: "Çok şey hisseden ama az gösteren birisin — ta ki yazmaya başlayana kadar.",
+    en: "You feel deeply but show little — until you start writing."
+  },
+  stalk_tagline: {
+    tr: "Çok şey hisseden ama az gösteren bir profil — ta ki yazmaya başlayana kadar.",
+    en: "A profile that feels deeply but shows little — until writing starts."
+  },
   profile_summary: {
     tr: "Hesabında konuşma yok, sahne var. 47/50 tweet orijinal, 0 RT, 0 QT. 'Pencere' 6 kez, 'sessizlik' 5 kez — aynı imgelem dünyası. Tweetlerin birine yazılmış mektup gibi ama etiketlediğin kimse yok.",
     en: "No conversation on your feed — just a stage. 47/50 tweets original, 0 RT, 0 QT. 'Window' 6 times, 'silence' 5 times — same imagery world. Your tweets read like letters to someone but you tag no one."
@@ -346,6 +373,15 @@ var DEMO_PROFILES = [
 /* ---- 3: Gece Düşünürü ---- */
 {
   nickname: { tr: "Gece Kuşu", en: "Night Owl" },
+  profile_emoji: "🌙",
+  tagline: {
+    tr: "Gündüz herkese benzeyen, gece kimseye benzemeyen bir hesap.",
+    en: "By day you blend in, by night you're unlike anyone."
+  },
+  stalk_tagline: {
+    tr: "Gündüz herkese benzeyen, gece kimseye benzemeyen bir hesap.",
+    en: "An account that blends in by day but becomes unlike anyone at night."
+  },
   profile_summary: {
     tr: "Gündüz hesabın ölü, gece canlanıyor. 'Acaba' 50 tweetin 14'ünde geçiyor ama hiçbirinin cevabını vermiyorsun. Thread'lerin hep gece 1'den sonra başlıyor ve hiçbiri sonuç cümlesiyle bitmiyor.",
     en: "Dead feed by day, alive by night. 'I wonder' appears in 14 of 50 tweets but you never answer any. Your threads always start after 1 AM and none end with a conclusion."
@@ -397,6 +433,15 @@ var DEMO_PROFILES = [
 /* ---- 4: Ayrılık Yaşayan ---- */
 {
   nickname: { tr: "Yaz-Silci", en: "Post-Deleter" },
+  profile_emoji: "✍️",
+  tagline: {
+    tr: "Birini kaybettin ya da kaybediyorsun — ve bunu tweet atıp silerek işliyorsun.",
+    en: "You've lost someone or you're losing them — and you process it by posting and deleting."
+  },
+  stalk_tagline: {
+    tr: "Bu hesap birini kaybetmiş ya da kaybediyor — ve bunu tweet atıp silerek işliyor.",
+    en: "This account has lost someone or is losing them — processing it by posting and deleting."
+  },
   profile_summary: {
     tr: "Son 2 haftada ritmin tamamen değişmiş. Tweet atıp siliyorsun, şarkı sözleriyle konuşuyorsun. 'Neyse' 50 tweetin 9'unda — her biri duygu cümlesinin hemen ardından. Birisi var ama adı hiçbir yerde geçmiyor.",
     en: "Your rhythm completely changed in the last 2 weeks. You post and delete, speak through lyrics. 'Whatever' appears in 9 of 50 tweets — always right after an emotional sentence. Someone exists but their name appears nowhere."
@@ -448,6 +493,15 @@ var DEMO_PROFILES = [
 /* ---- 5: Yazılımcı ---- */
 {
   nickname: { tr: "Kod Makinesi", en: "Code Machine" },
+  profile_emoji: "💻",
+  tagline: {
+    tr: "Hafta içi yazılımcı, hafta sonu insan — aynı hesap, iki farklı kişi.",
+    en: "Developer on weekdays, human on weekends — same account, two different people."
+  },
+  stalk_tagline: {
+    tr: "Hafta içi yazılımcı hesabı, hafta sonu insan hesabı — aynı profil, iki farklı kişi.",
+    en: "Developer account on weekdays, human account on weekends — same profile, two different people."
+  },
   profile_summary: {
     tr: "Hafta içi %80 yazılım, hafta sonu %90 günlük hayat — iki ayrı hesap gibi. Deploy şakaların gece 11'den sonra, yarı şaka yarı çığlık. 'Öğrendiğim şeyler' thread formatı 4 kez tekrarlanmış.",
     en: "80% coding on weekdays, 90% daily life on weekends — like two accounts. Deploy jokes after 11 PM, half humor half cry for help. 'Things I learned' thread format used 4 times."
@@ -499,6 +553,15 @@ var DEMO_PROFILES = [
 /* ---- 6: Siyasi Tartışmacı ---- */
 {
   nickname: { tr: "Modern Filozof", en: "Armchair Activist" },
+  profile_emoji: "🧠",
+  tagline: {
+    tr: "Çok şey hissediyorsun ve muhtemelen haklısın — ama ikna etmiyorsun, kanıtlıyorsun.",
+    en: "You feel a lot and you're probably right — but you're not convincing, you're proving."
+  },
+  stalk_tagline: {
+    tr: "Çok şey hisseden ve muhtemelen haklı olan bir profil — ama ikna etmiyor, kanıtlıyor.",
+    en: "A profile that feels a lot and is probably right — but doesn't convince, just proves."
+  },
   profile_summary: {
     tr: "Tweetlerin yarısı reply, reply'ların çoğu tartışma. 'Bu ülkede' ile başlayan 11 tweet var — farklı konular, aynı çaresizlik tonu. 11 mesajlık tartışmalarda son 3 mesaj yeni argüman eklemiyor.",
     en: "Half your tweets are replies, most replies are arguments. 'In this country' starts 11 tweets — different topics, same helpless tone. In 11-message debates the last 3 add nothing new."
@@ -550,6 +613,15 @@ var DEMO_PROFILES = [
 /* ---- 7: Mizah Hesabı ---- */
 {
   nickname: { tr: "Mizahşör", en: "The Comedian" },
+  profile_emoji: "🎭",
+  tagline: {
+    tr: "Bu hesap ciddi kalmayı değil, her şeyi şakaya çevirmeyi seçiyor.",
+    en: "This account chooses humor over sincerity — every time."
+  },
+  stalk_tagline: {
+    tr: "Bu profil ciddi kalmayı değil, her şeyi şakaya çevirmeyi seçiyor.",
+    en: "This profile chooses humor over sincerity — every time."
+  },
   profile_summary: {
     tr: "50 tweet okudum ve seni tanıyamadım. 50 tweette sıfır kişisel bilgi — ne yediğin, nerede olduğun, ne hissettiğin yok. Trending konulara 25 dakikada espri, her ciddi soruya şakayla cevap. Sahne hiç kapanmıyor.",
     en: "I read 50 tweets and couldn't get to know you. Zero personal info in 50 tweets — no food, no location, no feelings. 25-min jokes on trending topics, every serious question gets humor. The show never closes."
@@ -601,6 +673,15 @@ var DEMO_PROFILES = [
 /* ---- 8: Kripto Yatırımcısı ---- */
 {
   nickname: { tr: "Kripto Meraklısı", en: "Crypto Bro" },
+  profile_emoji: "📈",
+  tagline: {
+    tr: "Asıl motivasyonun para değil — haklı çıkmak.",
+    en: "Your real motivation isn't money — it's being right."
+  },
+  stalk_tagline: {
+    tr: "Bu hesabın asıl motivasyonu para değil — haklı çıkmak.",
+    en: "This account's real motivation isn't money — it's being right."
+  },
   profile_summary: {
     tr: "Sabah analist, gece kehanetçi — aynı kişi değil. 'Herkes' kelimesi 8/50 tweette — hep 'herkes yanlış yapıyor' formatında. Haklı çıktığında 'demiştim', yanıldığında konu değişiyor.",
     en: "Analyst by morning, prophet by night — not the same person. 'Everyone' in 8 of 50 tweets — always 'everyone is doing it wrong.' 'Told you so' when right, topic change when wrong."
@@ -652,6 +733,15 @@ var DEMO_PROFILES = [
 /* ---- 9: Oyun Tutkunu ---- */
 {
   nickname: { tr: "Gamer", en: "Gamer" },
+  profile_emoji: "🎮",
+  tagline: {
+    tr: "Oyun sana kaçış veriyor ama kaçtığın şeyi hiç söylemiyorsun.",
+    en: "Gaming gives you escape but you never name what you're escaping."
+  },
+  stalk_tagline: {
+    tr: "Oyun bu profile kaçış veriyor ama kaçılan şeyi hiç söylemiyor.",
+    en: "Gaming gives this profile escape but what's being escaped is never named."
+  },
   profile_summary: {
     tr: "6 kez 'son kez oynuyorum' demişsin, 6'sında devam etmişsin. Zafer tweetlerinde %100 caps, yenilgide %0. Gece 2-4 arası oyunla ilgisiz, dürüst tweetler var — asıl sen orada.",
     en: "You said 'last time playing' 6 times, continued all 6. 100% caps in victory tweets, 0% in defeat. Between 2-4 AM there are honest tweets unrelated to gaming — the real you lives there."
@@ -740,6 +830,7 @@ function analyzeHandle(rawHandle, mode) {
   var useStalked = (mode === "stalk");
   var summary = (useStalked && profile.stalk_summary) ? profile.stalk_summary : profile.profile_summary;
   var comment = (useStalked && profile.stalk) ? profile.stalk : profile.comment;
+  var tagline = (useStalked && profile.stalk_tagline) ? profile.stalk_tagline : profile.tagline;
 
   var result = {
     mode: mode,
@@ -748,6 +839,8 @@ function analyzeHandle(rawHandle, mode) {
     source: "demo",
 
     nickname: profile.nickname,
+    profile_emoji: profile.profile_emoji || "🪞",
+    tagline: tagline,
     profile_summary: summary,
     topics: profile.topics,
     behaviors: behaviors,
@@ -772,7 +865,7 @@ function analyzeHandle(rawHandle, mode) {
 
   result.archetype = {
     id: "v3-" + (h % DEMO_PROFILES.length),
-    emoji: "🪞",
+    emoji: profile.profile_emoji || "🪞",
     color: profile.card_color,
     name: { tr: nickTr, en: nickEn },
     desc: { tr: shortTr, en: shortEn },
@@ -790,7 +883,7 @@ function analyzeHandle(rawHandle, mode) {
   result.card = {
     nickname: { tr: nickTr, en: nickEn },
     desc: { tr: shortTr, en: shortEn },
-    emoji: "🪞",
+    emoji: profile.profile_emoji || "🪞",
     color: profile.card_color,
     top_behaviors: topBehaviors
   };
