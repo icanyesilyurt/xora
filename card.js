@@ -14,21 +14,94 @@ function fakeBarcode(h) {
   return s;
 }
 
-/* ---------------- V2 format check ---------------- */
+/* ---------------- version detection ---------------- */
+
+function isV3Result(res) {
+  return res && res.meta && res.meta.version === "mirror_v3";
+}
 
 function isV2Result(res) {
-  return res && res.card && res.card.top_behaviors && res.card.top_behaviors.length > 0;
+  return !isV3Result(res) && res && res.card && res.card.top_behaviors && res.card.top_behaviors.length > 0;
 }
 
 /* ============================================================
    KİMLİK KARTI (Mirror & Stalk)
-   V2: Davranış skorları + yorum
+   V3: Profil okuma — summary, topics, behaviors, signals, yorum
+   V2: Davranış skorları + nickname (backward compat)
    V1 fallback: archetype + SCORE_KEYS
    ============================================================ */
 
 function buildIdentityCard(res) {
+  if (isV3Result(res)) return buildIdentityCardV3(res);
   if (isV2Result(res)) return buildIdentityCardV2(res);
   return buildIdentityCardV1(res);
+}
+
+/* --- V3 kart: profil okuma --- */
+function buildIdentityCardV3(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var color = (res.card && res.card.color) || "#1B1B1B";
+  var summary = res.profile_summary ? res.profile_summary[lang] : "";
+  var mirror = res.comment ? res.comment.mirror[lang] : "";
+
+  var topicsHtml = "";
+  if (res.topics) {
+    for (var i = 0; i < res.topics.length && i < 3; i++) {
+      var tp = res.topics[i];
+      topicsHtml +=
+        '<div class="v3-topic">' +
+          '<span class="v3-topic-label">' + esc(tp.label[lang]) + "</span>" +
+          '<span class="v3-topic-bar"><i style="width:' + tp.weight + '%"></i></span>' +
+          '<span class="v3-topic-val">' + tp.weight + "</span>" +
+        "</div>";
+    }
+  }
+
+  var chips = "";
+  var top = res.top_behaviors || [];
+  for (var j = 0; j < top.length && j < 6; j++) {
+    var b = top[j];
+    var label = b.label ? (b.label[lang] || b.label.tr) : b.key;
+    chips +=
+      '<div class="score-chip">' +
+        '<span class="score-name">' + esc(label) + "</span>" +
+        '<span class="score-bar"><i style="width:' + b.value + '%"></i></span>' +
+        '<span class="score-val">' + b.value + "</span>" +
+      "</div>";
+  }
+
+  var signalsHtml = "";
+  if (res.repeated_signals) {
+    for (var s = 0; s < res.repeated_signals.length && s < 3; s++) {
+      var sig = res.repeated_signals[s];
+      var txt = sig.text ? sig.text[lang] : (sig.signal ? sig.signal[lang] : "");
+      signalsHtml += '<li class="v3-signal">' + esc(txt) + "</li>";
+    }
+  }
+
+  return (
+    '<div class="idcard v3card" style="--ac:' + color + '">' +
+      '<div class="idcard-band">' +
+        '<span class="idcard-avatar">🪞</span>' +
+      "</div>" +
+      '<div class="idcard-body">' +
+        '<p class="idcard-handle">@' + esc(res.handle) + "</p>" +
+        '<div class="v3-summary"><p>' + esc(summary) + "</p></div>" +
+        (topicsHtml ? '<div class="v3-topics"><span class="v3-section-label">' + esc(lang === "tr" ? "Konu Haritası" : "Topic Map") + "</span>" + topicsHtml + "</div>" : "") +
+        '<div class="idcard-scores">' + chips + "</div>" +
+        (signalsHtml ? '<div class="v3-signals"><span class="v3-section-label">' + esc(lang === "tr" ? "Tekrar Eden Sinyaller" : "Repeated Signals") + "</span><ul>" + signalsHtml + "</ul></div>" : "") +
+        '<div class="idcard-quote">' +
+          '<span class="quote-label">' + esc(lang === "tr" ? "XORA Ayna" : "XORA Mirror") + "</span>" +
+          "<p>" + esc(mirror) + "</p>" +
+        "</div>" +
+      "</div>" +
+      '<div class="idcard-foot">' +
+        "<span>XORA</span>" +
+        '<span class="barcode">' + fakeBarcode(res.hash) + "</span>" +
+        "<span>xora.app</span>" +
+      "</div>" +
+    "</div>"
+  );
 }
 
 /* --- V2 kart: davranış skorları --- */
@@ -267,8 +340,110 @@ function drawCardFooter(ctx, h) {
 
 /* --- kimlik kartı PNG --- */
 function renderIdentityPNG(res) {
+  if (isV3Result(res)) return renderIdentityPNGV3(res);
   if (isV2Result(res)) return renderIdentityPNGV2(res);
   return renderIdentityPNGV1(res);
+}
+
+/* --- V3 PNG: profil okuma --- */
+function renderIdentityPNGV3(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var color = (res.card && res.card.color) || "#1B1B1B";
+  var b = baseCanvas();
+  var ctx = b.ctx;
+
+  drawCardFrame(ctx, color);
+
+  ctx.beginPath(); ctx.arc(500, 380, 120, 0, 7);
+  ctx.fillStyle = "#FFFFFF"; ctx.fill();
+  ctx.lineWidth = 6; ctx.strokeStyle = "#1E2330"; ctx.stroke();
+  ctx.font = "130px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif";
+  ctx.fillText("🪞", 500, 428);
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "700 34px Nunito, Arial, sans-serif";
+  ctx.fillText("@" + res.handle, 500, 250);
+
+  var summary = res.profile_summary ? res.profile_summary[lang] : "";
+  ctx.fillStyle = "#5C6270";
+  ctx.font = "600 24px Nunito, Arial, sans-serif";
+  var sumY = wrapText(ctx, summary, 500, 540, 700, 30);
+
+  var curY = sumY + 30;
+
+  if (res.topics && res.topics.length > 0) {
+    ctx.fillStyle = color;
+    ctx.font = "800 20px Nunito, Arial, sans-serif";
+    ctx.fillText(lang === "tr" ? "KONU HARİTASI" : "TOPIC MAP", 500, curY);
+    curY += 10;
+    for (var ti = 0; ti < res.topics.length && ti < 3; ti++) {
+      var tp = res.topics[ti];
+      var tpLabel = tp.label[lang];
+      curY += 28;
+      ctx.textAlign = "left";
+      ctx.font = "700 20px Nunito, Arial, sans-serif";
+      ctx.fillStyle = "#5C6270";
+      ctx.fillText(tpLabel, 200, curY);
+      ctx.fillStyle = "#ECEDF0";
+      roundRect(ctx, 450, curY - 14, 250, 18, 9);
+      ctx.fill();
+      ctx.fillStyle = color;
+      roundRect(ctx, 450, curY - 14, Math.max(Math.round(250 * tp.weight / 100), 10), 18, 9);
+      ctx.fill();
+      ctx.textAlign = "right";
+      ctx.font = "800 18px Nunito, Arial, sans-serif";
+      ctx.fillStyle = "#1E2330";
+      ctx.fillText(tp.weight, 730, curY);
+    }
+    ctx.textAlign = "center";
+    curY += 20;
+  }
+
+  var top = res.top_behaviors || [];
+  for (var i = 0; i < top.length && i < 6; i++) {
+    var label = top[i].label ? (top[i].label[lang] || top[i].label.tr) : top[i].key;
+    var val = top[i].value;
+    curY += 32;
+    ctx.textAlign = "left";
+    ctx.font = "700 20px Nunito, Arial, sans-serif";
+    ctx.fillStyle = "#5C6270";
+    ctx.fillText(label, 200, curY);
+    ctx.fillStyle = "#ECEDF0";
+    roundRect(ctx, 430, curY - 14, 250, 18, 9);
+    ctx.fill();
+    ctx.fillStyle = color;
+    roundRect(ctx, 430, curY - 14, Math.max(Math.round(250 * val / 100), 10), 18, 9);
+    ctx.fill();
+    ctx.textAlign = "right";
+    ctx.font = "800 20px Nunito, Arial, sans-serif";
+    ctx.fillStyle = "#1E2330";
+    ctx.fillText(val, 720, curY);
+  }
+  ctx.textAlign = "center";
+  curY += 25;
+
+  var mirror = res.comment ? res.comment.mirror[lang] : "";
+  if (mirror) {
+    var boxH = 140;
+    if (curY + boxH > 1060) boxH = 1060 - curY;
+    ctx.fillStyle = "#FFF1E3";
+    roundRect(ctx, 130, curY, 740, boxH, 24);
+    ctx.fill();
+    ctx.strokeStyle = color; ctx.lineWidth = 3;
+    roundRect(ctx, 130, curY, 740, boxH, 24);
+    ctx.stroke();
+
+    ctx.fillStyle = color;
+    ctx.font = "800 20px Nunito, Arial, sans-serif";
+    ctx.fillText(lang === "tr" ? "XORA AYNA" : "XORA MIRROR", 500, curY + 30);
+
+    ctx.fillStyle = "#1E2330";
+    ctx.font = "600 20px Nunito, Arial, sans-serif";
+    wrapText(ctx, mirror, 500, curY + 56, 660, 26);
+  }
+
+  drawCardFooter(ctx, res.hash);
+  return b.cv;
 }
 
 /* --- V2 PNG: davranış skorları --- */
@@ -487,6 +662,12 @@ function shareOnX(text) {
 
 function shareIdentityText(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
+  if (isV3Result(res)) {
+    if (lang === "tr") {
+      return "XORA beni okudu 🪞 @" + res.handle + " profilim hazır 👀 Sen ne çıkarsın? → xora.app";
+    }
+    return "XORA read me 🪞 @" + res.handle + " profile ready 👀 What would yours say? → xora.app";
+  }
   var name;
   if (isV2Result(res)) {
     name = res.card.nickname[lang];

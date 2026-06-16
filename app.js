@@ -487,7 +487,8 @@ function isAnalysisHidden(remoteId) {
 
 function saveAnalysisRecord(type, handles, result) {
   var title = null;
-  if (result && result.card && result.card.nickname) title = result.card.nickname[getLang()];
+  if (result && result.meta && result.meta.version === "mirror_v3") title = "@" + (result.handle || (handles && handles[0]) || "?");
+  if (!title && result && result.card && result.card.nickname) title = result.card.nickname[getLang()];
   if (!title && result && result.archetype && result.archetype.name) title = result.archetype.name[getLang()];
   if (!title && result && result.title) title = result.title;
   if (!title && type === "match" && result && result.overall != null) title = "%" + result.overall;
