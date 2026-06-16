@@ -37,25 +37,17 @@ function buildIdentityCard(res) {
   return buildIdentityCardV1(res);
 }
 
-/* --- V3 kart: profil okuma --- */
+/* --- V3 kart: profil okuma (sadeleştirilmiş) --- */
 function buildIdentityCardV3(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var color = (res.card && res.card.color) || "#1B1B1B";
   var summary = res.profile_summary ? res.profile_summary[lang] : "";
   var mirror = res.comment ? res.comment.mirror[lang] : "";
-
-  var topicsHtml = "";
-  if (res.topics) {
-    for (var i = 0; i < res.topics.length && i < 3; i++) {
-      var tp = res.topics[i];
-      topicsHtml +=
-        '<div class="v3-topic">' +
-          '<span class="v3-topic-label">' + esc(tp.label[lang]) + "</span>" +
-          '<span class="v3-topic-bar"><i style="width:' + tp.weight + '%"></i></span>' +
-          '<span class="v3-topic-val">' + tp.weight + "</span>" +
-        "</div>";
-    }
-  }
+  var mode = res.mode || "mirror";
+  var emoji = mode === "stalk" ? "👀" : "🪞";
+  var quoteLabel = mode === "stalk"
+    ? (lang === "tr" ? "XORA Stalk" : "XORA Stalk")
+    : (lang === "tr" ? "XORA Ayna" : "XORA Mirror");
 
   var chips = "";
   var top = res.top_behaviors || [];
@@ -70,28 +62,17 @@ function buildIdentityCardV3(res) {
       "</div>";
   }
 
-  var signalsHtml = "";
-  if (res.repeated_signals) {
-    for (var s = 0; s < res.repeated_signals.length && s < 3; s++) {
-      var sig = res.repeated_signals[s];
-      var txt = sig.text ? sig.text[lang] : (sig.signal ? sig.signal[lang] : "");
-      signalsHtml += '<li class="v3-signal">' + esc(txt) + "</li>";
-    }
-  }
-
   return (
     '<div class="idcard v3card" style="--ac:' + color + '">' +
       '<div class="idcard-band">' +
-        '<span class="idcard-avatar">🪞</span>' +
+        '<span class="idcard-avatar">' + emoji + "</span>" +
       "</div>" +
       '<div class="idcard-body">' +
         '<p class="idcard-handle">@' + esc(res.handle) + "</p>" +
         '<div class="v3-summary"><p>' + esc(summary) + "</p></div>" +
-        (topicsHtml ? '<div class="v3-topics"><span class="v3-section-label">' + esc(lang === "tr" ? "Konu Haritası" : "Topic Map") + "</span>" + topicsHtml + "</div>" : "") +
         '<div class="idcard-scores">' + chips + "</div>" +
-        (signalsHtml ? '<div class="v3-signals"><span class="v3-section-label">' + esc(lang === "tr" ? "Tekrar Eden Sinyaller" : "Repeated Signals") + "</span><ul>" + signalsHtml + "</ul></div>" : "") +
         '<div class="idcard-quote">' +
-          '<span class="quote-label">' + esc(lang === "tr" ? "XORA Ayna" : "XORA Mirror") + "</span>" +
+          '<span class="quote-label">' + esc(quoteLabel) + "</span>" +
           "<p>" + esc(mirror) + "</p>" +
         "</div>" +
       "</div>" +
@@ -345,10 +326,13 @@ function renderIdentityPNG(res) {
   return renderIdentityPNGV1(res);
 }
 
-/* --- V3 PNG: profil okuma --- */
+/* --- V3 PNG: profil okuma (sadeleştirilmiş) --- */
 function renderIdentityPNGV3(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var color = (res.card && res.card.color) || "#1B1B1B";
+  var mode = res.mode || "mirror";
+  var emoji = mode === "stalk" ? "👀" : "🪞";
+  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : "XORA MIRROR");
   var b = baseCanvas();
   var ctx = b.ctx;
 
@@ -358,7 +342,7 @@ function renderIdentityPNGV3(res) {
   ctx.fillStyle = "#FFFFFF"; ctx.fill();
   ctx.lineWidth = 6; ctx.strokeStyle = "#1E2330"; ctx.stroke();
   ctx.font = "130px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif";
-  ctx.fillText("🪞", 500, 428);
+  ctx.fillText(emoji, 500, 428);
 
   ctx.fillStyle = "#FFFFFF";
   ctx.font = "700 34px Nunito, Arial, sans-serif";
@@ -371,60 +355,32 @@ function renderIdentityPNGV3(res) {
 
   var curY = sumY + 30;
 
-  if (res.topics && res.topics.length > 0) {
-    ctx.fillStyle = color;
-    ctx.font = "800 20px Nunito, Arial, sans-serif";
-    ctx.fillText(lang === "tr" ? "KONU HARİTASI" : "TOPIC MAP", 500, curY);
-    curY += 10;
-    for (var ti = 0; ti < res.topics.length && ti < 3; ti++) {
-      var tp = res.topics[ti];
-      var tpLabel = tp.label[lang];
-      curY += 28;
-      ctx.textAlign = "left";
-      ctx.font = "700 20px Nunito, Arial, sans-serif";
-      ctx.fillStyle = "#5C6270";
-      ctx.fillText(tpLabel, 200, curY);
-      ctx.fillStyle = "#ECEDF0";
-      roundRect(ctx, 450, curY - 14, 250, 18, 9);
-      ctx.fill();
-      ctx.fillStyle = color;
-      roundRect(ctx, 450, curY - 14, Math.max(Math.round(250 * tp.weight / 100), 10), 18, 9);
-      ctx.fill();
-      ctx.textAlign = "right";
-      ctx.font = "800 18px Nunito, Arial, sans-serif";
-      ctx.fillStyle = "#1E2330";
-      ctx.fillText(tp.weight, 730, curY);
-    }
-    ctx.textAlign = "center";
-    curY += 20;
-  }
-
   var top = res.top_behaviors || [];
   for (var i = 0; i < top.length && i < 6; i++) {
     var label = top[i].label ? (top[i].label[lang] || top[i].label.tr) : top[i].key;
     var val = top[i].value;
-    curY += 32;
+    curY += 36;
     ctx.textAlign = "left";
-    ctx.font = "700 20px Nunito, Arial, sans-serif";
+    ctx.font = "700 22px Nunito, Arial, sans-serif";
     ctx.fillStyle = "#5C6270";
-    ctx.fillText(label, 200, curY);
+    ctx.fillText(label, 180, curY);
     ctx.fillStyle = "#ECEDF0";
-    roundRect(ctx, 430, curY - 14, 250, 18, 9);
+    roundRect(ctx, 430, curY - 16, 270, 20, 10);
     ctx.fill();
     ctx.fillStyle = color;
-    roundRect(ctx, 430, curY - 14, Math.max(Math.round(250 * val / 100), 10), 18, 9);
+    roundRect(ctx, 430, curY - 16, Math.max(Math.round(270 * val / 100), 10), 20, 10);
     ctx.fill();
     ctx.textAlign = "right";
-    ctx.font = "800 20px Nunito, Arial, sans-serif";
+    ctx.font = "800 22px Nunito, Arial, sans-serif";
     ctx.fillStyle = "#1E2330";
-    ctx.fillText(val, 720, curY);
+    ctx.fillText(val, 740, curY);
   }
   ctx.textAlign = "center";
-  curY += 25;
+  curY += 30;
 
   var mirror = res.comment ? res.comment.mirror[lang] : "";
   if (mirror) {
-    var boxH = 140;
+    var boxH = 160;
     if (curY + boxH > 1060) boxH = 1060 - curY;
     ctx.fillStyle = "#FFF1E3";
     roundRect(ctx, 130, curY, 740, boxH, 24);
@@ -434,12 +390,12 @@ function renderIdentityPNGV3(res) {
     ctx.stroke();
 
     ctx.fillStyle = color;
-    ctx.font = "800 20px Nunito, Arial, sans-serif";
-    ctx.fillText(lang === "tr" ? "XORA AYNA" : "XORA MIRROR", 500, curY + 30);
+    ctx.font = "800 22px Nunito, Arial, sans-serif";
+    ctx.fillText(quoteLabel, 500, curY + 32);
 
     ctx.fillStyle = "#1E2330";
-    ctx.font = "600 20px Nunito, Arial, sans-serif";
-    wrapText(ctx, mirror, 500, curY + 56, 660, 26);
+    ctx.font = "600 22px Nunito, Arial, sans-serif";
+    wrapText(ctx, mirror, 500, curY + 62, 660, 28);
   }
 
   drawCardFooter(ctx, res.hash);
@@ -663,6 +619,13 @@ function shareOnX(text) {
 function shareIdentityText(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   if (isV3Result(res)) {
+    var mode = res.mode || "mirror";
+    if (mode === "stalk") {
+      if (lang === "tr") {
+        return "XORA @" + res.handle + " hesabını okudu 👀 Sonuçlar ilginç... → xora.app";
+      }
+      return "XORA read @" + res.handle + "'s profile 👀 Interesting results... → xora.app";
+    }
     if (lang === "tr") {
       return "XORA beni okudu 🪞 @" + res.handle + " profilim hazır 👀 Sen ne çıkarsın? → xora.app";
     }

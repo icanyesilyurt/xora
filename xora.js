@@ -313,8 +313,12 @@ var DEMO_PROFILES = [
 /* ---- 3: Gece Düşünürü ---- */
 {
   profile_summary: {
-    tr: "Gündüz hesabın ölü, gece canlanıyor. Sorular soruyorsun ama cevap aramıyorsun. Thread'lerin hiçbiri sonuç cümlesiyle bitmiyor. İki farklı kişi: gündüz herkese benzeyen, gece kimseye benzemeyen.",
-    en: "Dead feed by day, alive by night. You ask questions but don't seek answers. None of your threads end with a conclusion. Two people: by day you blend in, by night you're unlike anyone."
+    tr: "Gündüz hesabın ölü, gece canlanıyor. 'Acaba' 50 tweetin 14'ünde geçiyor ama hiçbirinin cevabını vermiyorsun. Thread'lerin hep gece 1'den sonra başlıyor ve hiçbiri sonuç cümlesiyle bitmiyor.",
+    en: "Dead feed by day, alive by night. 'I wonder' appears in 14 of 50 tweets but you never answer any. Your threads always start after 1 AM and none end with a conclusion."
+  },
+  stalk_summary: {
+    tr: "Gündüz bu hesap neredeyse ölü, gece canlanıyor. 'Acaba' 50 tweetin 14'ünde geçiyor ama hiçbirinin cevabı yok. Thread'ler hep gece 1'den sonra başlıyor ve hiçbiri sonuç cümlesiyle bitmiyor.",
+    en: "This account is nearly dead by day, comes alive at night. 'I wonder' appears in 14 of 50 tweets but none are answered. Threads always start after 1 AM and none end with a conclusion."
   },
   topics: [
     { label: { tr: "Varoluş / Sorgulama", en: "Existential / Questioning" }, weight: 45, subtone: { tr: "Cevapsız", en: "Unanswered" } },
@@ -347,14 +351,24 @@ var DEMO_PROFILES = [
     mirror: { tr: "İki kişisin. Gündüz herkese benzeyen, gece kimseye benzemeyen. Belki sorularınla yaşamayı öğrendin ve cevaplar seni yalnız bırakacak.", en: "You're two people. By day you blend in, by night you're unlike anyone. Maybe you've learned to live with questions, and answers would leave you alone." },
     prediction: { tr: "Bu gece yine 01:00'den sonra bir thread açacaksın — ve yine yarım bırakacaksın.", en: "Tonight you'll start another thread after 01:00 — and leave it unfinished again." }
   },
+  stalk: {
+    observation: { tr: "Gündüz bu hesap neredeyse ölü. Gece canlanıyor — sorular soruyor ama cevap aramıyor.", en: "This account is nearly dead by day. It wakes at night — asks but doesn't seek answers." },
+    reading: { tr: "Gece bu hesabın itiraf saati. 'Acaba' en dürüst kelimesi. Thread'leri yarım bırakması sonuca ulaşmaktan korktuğunu gösteriyor — sonuç gelirse soru biter.", en: "Night is this account's confession hour. 'I wonder' is its most honest word. Leaving threads unfinished shows a fear of conclusion — if it arrives, the question dies." },
+    mirror: { tr: "Bu hesap iki kişi. Gündüz herkese benzeyen, gece kimseye benzemeyen. Belki sorularıyla yaşamayı öğrenmiş ve cevaplar onu yalnız bırakacak.", en: "This account is two people. By day it blends in, by night it's unlike anyone. Maybe it learned to live with questions, and answers would leave it alone." },
+    prediction: { tr: "Bu gece yine 01:00'den sonra bir thread açacak — ve yine yarım bırakacak.", en: "Tonight this account will start another thread after 01:00 — and leave it unfinished again." }
+  },
   card_color: "#1A1A2E"
 },
 
 /* ---- 4: Ayrılık Yaşayan ---- */
 {
   profile_summary: {
-    tr: "Son 2 haftada ritmin tamamen değişmiş. Tweet atıp siliyorsun, şarkı sözleriyle konuşuyorsun. Birisi var ama adı hiçbir yerde geçmiyor. 'Neyse' senin kapattığın kapının sesi.",
-    en: "Your rhythm completely changed in the last 2 weeks. You post and delete, speak through lyrics. Someone exists but their name appears nowhere. 'Whatever' is the sound of you closing the door."
+    tr: "Son 2 haftada ritmin tamamen değişmiş. Tweet atıp siliyorsun, şarkı sözleriyle konuşuyorsun. 'Neyse' 50 tweetin 9'unda — her biri duygu cümlesinin hemen ardından. Birisi var ama adı hiçbir yerde geçmiyor.",
+    en: "Your rhythm completely changed in the last 2 weeks. You post and delete, speak through lyrics. 'Whatever' appears in 9 of 50 tweets — always right after an emotional sentence. Someone exists but their name appears nowhere."
+  },
+  stalk_summary: {
+    tr: "Son 2 haftada bu hesabın ritmi tamamen değişmiş. Tweet atıp siliyor, şarkı sözleriyle konuşuyor. 'Neyse' 50 tweetin 9'unda — her biri duygu cümlesinin hemen ardından. Birisi var ama adı hiçbir yerde geçmiyor.",
+    en: "This account's rhythm completely changed in the last 2 weeks. Posts and deletes, speaks through lyrics. 'Whatever' appears in 9 of 50 tweets — always right after an emotional sentence. Someone exists but their name appears nowhere."
   },
   topics: [
     { label: { tr: "İlişki / Kayıp", en: "Relationship / Loss" }, weight: 55, subtone: { tr: "İsimsiz özlem", en: "Unnamed longing" } },
@@ -386,6 +400,12 @@ var DEMO_PROFILES = [
     reading: { tr: "Tweet atıp silmen iki şeyi gösteriyor: söylemek istiyorsun ama sonuçlarından korkuyorsun. 'Neyse' senin kapattığın kapının sesi — ama 9 kez aynı kapıyı kapatman gerçekten kapatamadığını gösteriyor.", en: "Posting and deleting shows two things: you want to say it but fear the consequences. 'Whatever' is the sound of a door closing — but closing it 9 times proves it won't stay shut." },
     mirror: { tr: "Birini kaybettin — ya da kaybediyorsun. Kapatmak bitirmek demek ve sen henüz bitirmek istemiyorsun.", en: "You've lost someone — or you're losing them. Closing it means ending it, and you're not ready to end it yet." },
     prediction: { tr: "Bu gece yine bir şarkı sözü paylaşacaksın. Ve yine sileceksin — ama like bildirimi kalacak.", en: "Tonight you'll share lyrics again. And delete them again — but the like notification will stay." }
+  },
+  stalk: {
+    observation: { tr: "Son 2 haftada bu hesabın ritmi tamamen değişmiş. Şarkı sözleriyle konuşuyor. Birisi var ama adı hiçbir yerde geçmiyor.", en: "This account's rhythm has completely changed in the last 2 weeks. Speaks through lyrics. Someone exists but their name appears nowhere." },
+    reading: { tr: "Tweet atıp silmesi iki şeyi gösteriyor: söylemek istiyor ama sonuçlarından korkuyor. 'Neyse' kapattığı kapının sesi — ama 9 kez aynı kapıyı kapatması gerçekten kapatamadığını gösteriyor.", en: "Posting and deleting shows two things: wants to say it but fears the consequences. 'Whatever' is the sound of a door closing — but closing it 9 times proves it won't stay shut." },
+    mirror: { tr: "Birini kaybetmiş — ya da kaybediyor. Kapatmak bitirmek demek ve henüz bitirmek istemiyor.", en: "This person has lost someone — or is losing them. Closing it means ending it, and they're not ready to end it yet." },
+    prediction: { tr: "Bu gece yine bir şarkı sözü paylaşacak. Ve yine silecek — ama like bildirimi kalacak.", en: "Tonight this account will share lyrics again. And delete them again — but the like notification will stay." }
   },
   card_color: "#4A0E2E"
 },
@@ -473,8 +493,12 @@ var DEMO_PROFILES = [
 /* ---- 7: Mizah Hesabı ---- */
 {
   profile_summary: {
-    tr: "50 tweet okudum ve seni tanıyamadım. Sıfır kişisel bilgi, sıfır ciddi cümle. Trending konulara 25 dakikada espri, her ciddi soruya şakayla cevap. Sahne hiç kapanmıyor.",
-    en: "I read 50 tweets and couldn't get to know you. Zero personal info, zero serious sentences. 25-min jokes on trending topics, every serious question gets humor. The show never closes."
+    tr: "50 tweet okudum ve seni tanıyamadım. 50 tweette sıfır kişisel bilgi — ne yediğin, nerede olduğun, ne hissettiğin yok. Trending konulara 25 dakikada espri, her ciddi soruya şakayla cevap. Sahne hiç kapanmıyor.",
+    en: "I read 50 tweets and couldn't get to know you. Zero personal info in 50 tweets — no food, no location, no feelings. 25-min jokes on trending topics, every serious question gets humor. The show never closes."
+  },
+  stalk_summary: {
+    tr: "50 tweet okundu ve bu hesap tanınamadı. 50 tweette sıfır kişisel bilgi — ne yediği, nerede olduğu, ne hissettiği yok. Trending konulara 25 dakikada espri, her ciddi soruya şakayla cevap. Sahne hiç kapanmıyor.",
+    en: "50 tweets read and this account remains unknown. Zero personal info in 50 tweets — no food, no location, no feelings. 25-min jokes on trending topics, every serious question gets humor. The show never closes."
   },
   topics: [
     { label: { tr: "Mizah / Gündem", en: "Humor / Trending" }, weight: 60, subtone: { tr: "Performans odaklı", en: "Performance-driven" } },
@@ -506,6 +530,12 @@ var DEMO_PROFILES = [
     reading: { tr: "Espri senin sığınağın. 50 tweette sıfır kişisel bilgi bilinçli bir karar. Herkes seni güldüren biri olarak tanıyor ama kimse seni tanımıyor.", en: "Humor is your shelter. Zero personal info in 50 tweets is a conscious choice. Everyone knows you as funny — no one actually knows you." },
     mirror: { tr: "Sana ciddi soru soran birine espriyle cevap vermen en çok şey anlatan sinyalin. Cevabı biliyorsun — sadece söylersen espri bozulacak.", en: "Answering a serious question with a joke is your most telling signal. You know the answer — you just don't want to break the act." },
     prediction: { tr: "Bir gün ciddi bir tweet atacaksın — ve o tweet en az etkileşim alan ama en çok seni anlatan tweet olacak.", en: "One day you'll post a serious tweet — and it'll be the least engaged but most revealing thing you've ever written." }
+  },
+  stalk: {
+    observation: { tr: "50 tweet okundu ve bu hesap tanınamadı. Her tweet bir performans, her reply bir skeç.", en: "50 tweets read and this account remains unknown. Every tweet is a performance, every reply a sketch." },
+    reading: { tr: "Espri bu hesabın sığınağı. 50 tweette sıfır kişisel bilgi bilinçli bir karar. Herkes onu güldüren biri olarak tanıyor ama kimse gerçekten tanımıyor.", en: "Humor is this account's shelter. Zero personal info in 50 tweets is a conscious choice. Everyone knows it as funny — no one actually knows it." },
+    mirror: { tr: "Ciddi soru soran birine espriyle cevap vermesi en çok şey anlatan sinyal. Cevabı biliyor — sadece söylerse espri bozulacak.", en: "Answering a serious question with a joke is the most telling signal. The answer is known — but saying it would break the act." },
+    prediction: { tr: "Bir gün ciddi bir tweet atacak — ve o tweet en az etkileşim alan ama en çok kendisini anlatan tweet olacak.", en: "One day a serious tweet will come — and it'll be the least engaged but most revealing thing ever posted on this account." }
   },
   card_color: "#FFB300"
 },
@@ -597,10 +627,11 @@ var DEMO_PROFILES = [
    Backward compatible: result.archetype + result.scores + result.card shimmed
    ============================================================ */
 
-function analyzeHandle(rawHandle) {
+function analyzeHandle(rawHandle, mode) {
   var handle = normHandle(rawHandle);
   var h = xhash(handle);
   var profile = DEMO_PROFILES[h % DEMO_PROFILES.length];
+  mode = mode || "mirror";
 
   var behaviors = [];
   for (var i = 0; i < profile.behaviors.length; i++) {
@@ -626,18 +657,22 @@ function analyzeHandle(rawHandle) {
     }
   }
 
+  var useStalked = (mode === "stalk");
+  var summary = (useStalked && profile.stalk_summary) ? profile.stalk_summary : profile.profile_summary;
+  var comment = (useStalked && profile.stalk) ? profile.stalk : profile.comment;
+
   var result = {
-    mode: "mirror",
+    mode: mode,
     handle: handle,
     hash: h,
     source: "demo",
 
-    profile_summary: profile.profile_summary,
+    profile_summary: summary,
     topics: profile.topics,
     behaviors: behaviors,
     top_behaviors: topBehaviors,
     repeated_signals: profile.repeated_signals,
-    comment: profile.comment,
+    comment: comment,
 
     meta: {
       version: "mirror_v3",

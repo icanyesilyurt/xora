@@ -99,7 +99,7 @@
       return;
     }
 
-    lastResult = analyzeHandle(handle);
+    lastResult = analyzeHandle(handle, "stalk");
     addHistory({ type: "stalk", handles: [handle] });
     saveAnalysisRecord("stalk", [handle], lastResult);
 
