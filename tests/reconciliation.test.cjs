@@ -21,7 +21,7 @@ async function setup(){
  grant usage,select on all sequences in schema public to anon,authenticated,service_role;
  grant execute on function public.xora_begin_paid_attempt(uuid,text,text,integer,text,jsonb),public.xora_complete_paid_attempt(uuid,text),public.xora_refund_paid_attempt(uuid,text,text) to anon,authenticated;
  insert into auth.users values('${A}'),('${B}'),('00000000-0000-4000-8000-000000000003');insert into public.users(id,username,credit_balance) values('${A}','alice',100),('${B}','bob',100);insert into public.analyses(user_id,analysis_type,title,result) values('${B}','mirror','Bob old','{"meta":{"tier":"fun"}}');insert into public.x_cache(x_user_id,username,expires_at) values('x1','alice',now()+interval '1 day');`);
- await db.exec(MIG);await db.exec(fs.readFileSync('supabase/migrations/20260914195000_xora_real_validation_fix.sql','utf8'));return db;
+ await db.exec(MIG);await db.exec(fs.readFileSync('supabase/migrations/20260914195000_xora_real_validation_fix.sql','utf8'));await db.exec(fs.readFileSync('supabase/migrations/20260914201000_xora_claim_referral_compat.sql','utf8'));return db;
 }
 const q=(db,sql,args=[])=>db.query(sql,args).then(x=>x.rows);
 async function role(db,name,user){await db.exec('reset role');await db.exec(`set role ${name}`);if(user) await db.exec(`select set_config('request.user_id','${user}',false)`);}
@@ -102,4 +102,17 @@ test('Task 04C exact Mirror ledger and strict rarity across all modes',async()=>
    await db.exec('rollback to savepoint denied_case');
   }
  }finally{await db.close();}
+});
+
+test('server referral RPC matches analyze-real contract',async()=>{
+ const db=await setup();try{
+  await db.exec(`insert into public.affiliates(code) values('compat-a'),('compat-b');`);
+  await role(db,'service_role',A);
+  const first=(await q(db,`select public.xora_claim_referral($1,$2) as v`,[A,'compat-a']))[0].v;
+  assert.equal(first.referral_code,'compat-a');
+  assert.equal((await q(db,`select public.xora_claim_referral($1,$2) as v`,[A,'compat-b']))[0].v.referral_code,'compat-a');
+  assert.equal((await q(db,`select public.xora_claim_referral($1,$2) as v`,[A,'']))[0].v.referral_code,'compat-a');
+  await role(db,'authenticated',A);
+  await assert.rejects(q(db,`select public.xora_claim_referral($1,$2)`,[A,'compat-b']),e=>e.code==='42501');
+ } finally {await db.close();}
 });
