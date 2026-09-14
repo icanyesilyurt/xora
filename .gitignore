@@ -19,3 +19,17 @@ build/
 tmp/
 temp/
 *.tmp
+
+# Supabase CLI local state
+supabase/.temp/
+
+# Operational evidence and disposable local work (not product source)
+validation/
+work/
+.supabase/
+*.zip
+TASK*_REPORT.md
+TASK_02_SMOKE_TEST.md
+REMOTE_BEFORE_RECONCILIATION.md
+MIGRATION_HISTORY_PLAN.md
+SCM01_REPORT.md

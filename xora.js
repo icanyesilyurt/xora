@@ -797,9 +797,9 @@ var DEMO_PROFILES = [
    Backward compatible: result.archetype + result.scores + result.card shimmed
    ============================================================ */
 
-function analyzeHandle(rawHandle, mode) {
+function analyzeHandle(rawHandle, mode, seedKey) {
   var handle = normHandle(rawHandle);
-  var h = xhash(handle);
+  var h = xhash(seedKey || handle);
   var profile = DEMO_PROFILES[h % DEMO_PROFILES.length];
   mode = mode || "mirror";
 
@@ -891,6 +891,105 @@ function analyzeHandle(rawHandle, mode) {
   return result;
 }
 
+
+var FUN_CARD_POOL = [
+  { emoji:"🫥", color:"#19B8B8", nickname:{tr:"Sessiz Kaos",en:"Quiet Chaos"}, desc:{tr:"Hiçbir şey olmuyormuş gibi durup ortamın ayarını değiştirme enerjisi.",en:"The energy of changing the room while looking completely innocent."} },
+  { emoji:"🎭", color:"#7C4DFF", nickname:{tr:"İroni Müdürü",en:"Head of Irony"}, desc:{tr:"Ciddiyet departmanıyla profesyonel mesafeni koruyorsun.",en:"You maintain a professional distance from the seriousness department."} },
+  { emoji:"🧃", color:"#FF7A45", nickname:{tr:"Gündem Turisti",en:"Timeline Tourist"}, desc:{tr:"Her konuya uğrayıp hiçbirine depozito bırakmayan bir enerji.",en:"Visits every topic and leaves a deposit on none of them."} },
+  { emoji:"🧊", color:"#2F80ED", nickname:{tr:"Soğuk Mizah",en:"Dry Humor Unit"}, desc:{tr:"Şaka yaptığını üç dakika sonra fark ettiren türden.",en:"The kind of joke people realize was a joke three minutes later."} },
+  { emoji:"🛋️", color:"#5C6270", nickname:{tr:"Koltuk Filozofu",en:"Sofa Philosopher"}, desc:{tr:"Dünya sorunlarıyla aranda bir ekran ve çok güçlü fikirler var.",en:"One screen away from the world’s problems and several strong opinions."} },
+  { emoji:"📡", color:"#0FAFAF", nickname:{tr:"Vibe Radarı",en:"Vibe Radar"}, desc:{tr:"Ortamın havasını ölçüp sonucu kimse istemeden açıklama potansiyeli.",en:"Could measure the room and publish the findings without being asked."} },
+  { emoji:"🧯", color:"#FF6B57", nickname:{tr:"Drama İtfaiyesi",en:"Drama Fire Crew"}, desc:{tr:"Yangını söndürür müsün, körükler misin? Kartın da emin değil.",en:"Would you put the fire out or feed it? Even the card is unsure."} },
+  { emoji:"🧠", color:"#7C4DFF", nickname:{tr:"Fazla Düşünen",en:"Certified Overthinker"}, desc:{tr:"Basit bir şeyi zihninde yönetim kurulu toplantısına çevirebilirsin.",en:"Can turn a simple thought into a full board meeting."} },
+  { emoji:"🕶️", color:"#2D3445", nickname:{tr:"Gizli Başrol",en:"Lowkey Main Character"}, desc:{tr:"Başrol olduğunu söylemezsin; kamera zaten seni bulur.",en:"You would never call yourself the lead. The camera just finds you."} },
+  { emoji:"🪩", color:"#E75DAA", nickname:{tr:"Ortam Güncellemesi",en:"Room Update"}, desc:{tr:"Geldiğinde ortamın sürümü sessizce değişiyor.",en:"The room quietly ships a new version when you arrive."} },
+  { emoji:"🧲", color:"#FF7A45", nickname:{tr:"Konu Mıknatısı",en:"Topic Magnet"}, desc:{tr:"Bir şekilde konuşma dönüp dolaşıp ilginç bir yere geliyor.",en:"Somehow the conversation keeps ending up somewhere interesting."} },
+  { emoji:"🪄", color:"#19B8B8", nickname:{tr:"Cümle Cambazı",en:"Sentence Acrobat"}, desc:{tr:"Bir cümleyi normal bitirmek varken neden biraz kıvırmayasın?",en:"Why end a sentence normally when you can make it do a trick?"} }
+];
+
+function funModeComment(card, mode, lang) {
+  var nick = card.nickname[lang] || card.nickname.tr;
+  if (lang === "en") {
+    return mode === "stalk"
+      ? "Purely for fun: this account drew “" + nick + "”. XORA has no evidence and far too much confidence."
+      : "Purely for fun: you drew “" + nick + "”. Scientifically useless, socially shareable.";
+  }
+  return mode === "stalk"
+    ? "Tamamen eğlencesine: bu hesap “" + nick + "” çekti. XORA'nın kanıtı yok, özgüveni fazla."
+    : "Tamamen eğlencesine: “" + nick + "” çektin. Bilimsel değeri yok, paylaşmalık değeri var.";
+}
+
+function analyzeFunHandle(rawHandle, mode, rerollNonce) {
+  var handle = normHandle(rawHandle);
+  var actualMode = mode || "mirror";
+  var nonce = Number(rerollNonce || 0);
+  var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
+  var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
+  var comment = {
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en") }
+  };
+  return {
+    mode: actualMode,
+    handle: handle,
+    handles: [handle],
+    hash: seed,
+    source: "fun",
+    nickname: card.nickname,
+    tagline: card.desc,
+    profile_emoji: card.emoji,
+    comment: comment,
+    card: { nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en] } },
+    ci: 0,
+    meta: { version:"xora_fun_v1", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
+  };
+}
+
+var FUN_MATCH_COMMENTS = {
+  tr: [
+    "XORA'nın tamamen bilim dışı laboratuvarı bu ikiliyi fazla eğlenceli buldu.",
+    "Bu yüzde hiçbir şeyi kanıtlamıyor. Ama grup sohbetinde tartışma çıkarmaya yeter.",
+    "Kart eğlence amaçlı. Yüzde ise gereksiz derecede ciddi görünüyor.",
+    "Aynı masada ya efsane ikili olurlar ya da biri bildirimleri kapatır.",
+    "XORA bu eşleşmeye güveniyor. XORA'nın neden bu kadar özgüvenli olduğunu bilmiyoruz.",
+    "Bilim insanları bu hesabı reddetti. Biz yine de yüzde verdik."
+  ],
+  en: [
+    "XORA's completely unscientific lab finds this pairing suspiciously entertaining.",
+    "This percentage proves absolutely nothing. It can still start a group-chat argument.",
+    "The card is for fun. The percentage looks unnecessarily official.",
+    "At the same table they are either iconic or somebody mutes the chat.",
+    "XORA believes in this match. Nobody knows why XORA is this confident.",
+    "Science rejected the case. We gave it a percentage anyway."
+  ]
+};
+
+function matchFunHandles(rawA, rawB, rerollNonce) {
+  var a = normHandle(rawA);
+  var b = normHandle(rawB);
+  var nonce = Number(rerollNonce || 0);
+  var seedText = "fun•match•" + [a, b].slice().sort().join("•") + "•" + nonce;
+  var c = xhash(seedText);
+  var overall = Math.min(99, 35 + (c % 65));
+  var commentIndex = c % FUN_MATCH_COMMENTS.tr.length;
+  return {
+    a: a, b: b, handles:[a,b],
+    resA: analyzeFunHandle(a, "mirror", nonce),
+    resB: analyzeFunHandle(b, "mirror", nonce + 1),
+    flirt: 30 + ((c >>> 2) % 70),
+    vibe: 30 + ((c >>> 5) % 70),
+    humor: 30 + ((c >>> 8) % 70),
+    chaos: 30 + ((c >>> 11) % 70),
+    romance: 30 + ((c >>> 14) % 70),
+    overall: overall,
+    ci: commentIndex,
+    source: "fun",
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex] },
+    meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
+  };
+}
+
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
@@ -929,11 +1028,11 @@ var MATCH_COMMENTS = {
   ]
 };
 
-function matchHandles(rawA, rawB) {
+function matchHandles(rawA, rawB, seedKey) {
   var a = normHandle(rawA);
   var b = normHandle(rawB);
   var pair = [a, b].slice().sort();
-  var c = xhash(pair[0] + "•" + pair[1]);
+  var c = xhash(seedKey || (pair[0] + "•" + pair[1]));
 
   var flirt    = 38 + (c % 60);
   var vibe     = 35 + ((c >>> 4) % 63);
@@ -945,8 +1044,8 @@ function matchHandles(rawA, rawB) {
 
   return {
     a: a, b: b,
-    resA: analyzeHandle(a),
-    resB: analyzeHandle(b),
+    resA: analyzeHandle(a, "mirror", seedKey ? (seedKey + "•a") : null),
+    resB: analyzeHandle(b, "mirror", seedKey ? (seedKey + "•b") : null),
     flirt: flirt,
     vibe: vibe,
     humor: humor,
@@ -958,6 +1057,8 @@ function matchHandles(rawA, rawB) {
 }
 
 function matchComment(m, lang) {
+  if (m && m.fun_comment && m.fun_comment[lang]) return m.fun_comment[lang];
+  if (m && m.ai_comment && m.ai_comment[lang]) return m.ai_comment[lang];
   return MATCH_COMMENTS[lang][m.ci]
     .replace(/\{a\}/g, "@" + m.a)
     .replace(/\{b\}/g, "@" + m.b);
@@ -1024,6 +1125,24 @@ var THINKING = {
   }
 };
 
+function startThinkingLoop(msgEl, mode) {
+  var msgs = THINKING[mode][getLang()] || THINKING[mode].tr;
+  var i = 0;
+  if (msgEl) {
+    msgEl.textContent = msgs[0];
+    msgEl.classList.add("pop");
+  }
+  var iv = setInterval(function () {
+    i = (i + 1) % msgs.length;
+    if (!msgEl) return;
+    msgEl.classList.remove("pop");
+    void msgEl.offsetWidth;
+    msgEl.textContent = msgs[i];
+    msgEl.classList.add("pop");
+  }, 900);
+  return function stopThinkingLoop() { clearInterval(iv); };
+}
+
 function playThinking(msgEl, mode, onDone) {
   var msgs = THINKING[mode][getLang()] || THINKING[mode].tr;
   var i = 0;
@@ -1031,7 +1150,7 @@ function playThinking(msgEl, mode, onDone) {
   msgEl.classList.add("pop");
   var iv = setInterval(function () {
     i++;
-    if (i >= 5) {
+    if (i >= 2) {
       clearInterval(iv);
       onDone();
       return;
@@ -1040,5 +1159,5 @@ function playThinking(msgEl, mode, onDone) {
     void msgEl.offsetWidth;
     msgEl.textContent = msgs[i % msgs.length];
     msgEl.classList.add("pop");
-  }, 900);
+  }, 650);
 }

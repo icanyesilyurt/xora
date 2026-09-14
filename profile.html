@@ -55,10 +55,10 @@
 
     <div class="panel">
       <h2 data-i18n="profile_actions">Analiz Başlat</h2>
-      <div class="result-actions">
-        <a href="mirror.html" class="btn btn-sm">X Mirror</a>
-        <a href="stalk.html" class="btn btn-sm btn-orange">X Stalk</a>
-        <a href="match.html" class="btn btn-sm btn-ghost">X Match</a>
+      <div class="profile-mode-grid">
+        <div class="profile-mode-row"><b>🪞 X Mirror</b><span><a href="mirror.html?tier=fun" class="mini-mode fun">FREE</a><a href="mirror.html?tier=real" class="mini-mode real">REAL · 5⚡</a></span></div>
+        <div class="profile-mode-row"><b>👀 X Stalk</b><span><a href="stalk.html?tier=fun" class="mini-mode fun">FREE</a><a href="stalk.html?tier=real" class="mini-mode real">REAL · 5⚡</a></span></div>
+        <div class="profile-mode-row"><b>💞 X Match</b><span><a href="match.html?tier=fun" class="mini-mode fun">FREE</a><a href="match.html?tier=real" class="mini-mode real">REAL · 10⚡</a></span></div>
       </div>
     </div>
 
@@ -79,7 +79,7 @@
 
 </main>
 
-<footer class="foot">XORA V1</footer>
+<footer class="foot">XORA V2</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -96,10 +96,12 @@
     return;
   }
 
-  function typeLabel(type) {
-    if (type === "mirror") return '<span class="history-type">🪞 Mirror</span>';
-    if (type === "stalk")  return '<span class="history-type h-stalk">👀 Stalk</span>';
-    return '<span class="history-type h-match">💞 Match</span>';
+  function typeLabel(type, result) {
+    var tier = resultTier(result).toUpperCase();
+    var tierClass = tier === "REAL" ? " tier-real" : " tier-fun";
+    if (type === "mirror") return '<span class="history-type">🪞 Mirror</span><span class="history-tier' + tierClass + '">' + tier + '</span>';
+    if (type === "stalk")  return '<span class="history-type h-stalk">👀 Stalk</span><span class="history-tier' + tierClass + '">' + tier + '</span>';
+    return '<span class="history-type h-match">💞 Match</span><span class="history-tier' + tierClass + '">' + tier + '</span>';
   }
 
   function fmtDate(ts) {
@@ -115,15 +117,15 @@
   var selectedIds = {};
 
   function normalizeRemoteAnalysis(a) {
-    var res = a.result || {};
+    var res = a.result || a.raw_result || {};
     var type = a.analysis_type || a.type;
-    var handles = a.handles || [];
+    var handles = a.handles || (a.target_username ? [a.target_username].concat(a.target_username_2 ? [a.target_username_2] : []) : []);
     if (!handles.length && res.handles) handles = res.handles;
-    var title = a.title;
-    if (!title && res.meta && res.meta.version === "mirror_v3") title = "@" + (res.handle || (handles[0]) || "?");
+    var title = a.title || a.result_title;
+    if (!title && res.meta && /^mirror_v/.test(res.meta.version || "")) title = "@" + (res.handle || (handles[0]) || "?");
     if (!title && res.card && res.card.nickname) title = res.card.nickname[getLang()];
     if (!title && res.archetype && res.archetype.name) title = res.archetype.name[getLang()];
-    var isRemote = typeof a.id === "number";
+    var isRemote = !!a.user_id;
     return {
       localId: isRemote ? null : a.id,
       remoteId: isRemote ? a.id : (a.remote_id || null),
@@ -210,13 +212,13 @@
         var checked = selectedIds[itemId] ? " checked" : "";
         html += '<div class="history-item" style="cursor:pointer" data-sel-id="' + esc(String(itemId)) + '">' +
                   '<input type="checkbox" class="history-check" data-sel-id="' + esc(String(itemId)) + '"' + checked + ' style="accent-color:var(--orange);width:18px;height:18px;margin-right:8px;flex-shrink:0">' +
-                  typeLabel(hh.type) +
+                  typeLabel(hh.type, hh.rawResult) +
                   '<span class="history-main">' + main + "</span>" +
                   '<span class="history-date">' + fmtDate(hh.ts) + "</span>" +
                 "</div>";
       } else {
         html += '<div class="history-item">' +
-                  typeLabel(hh.type) +
+                  typeLabel(hh.type, hh.rawResult) +
                   '<span class="history-main">' + main + "</span>" +
                   '<span class="history-date">' + fmtDate(hh.ts) + "</span>" +
                   (hh.rawResult ? '<button class="btn btn-sm btn-ghost history-view-btn" data-idx="' + i + '">' + esc(t("view_card")) + "</button>" : "") +
@@ -275,7 +277,7 @@
       var hiddenList = getHiddenAnalyses();
       for (var hi = 0; hi < hiddenList.length; hi++) hiddenSet[hiddenList[hi]] = true;
       for (var ri = 0; ri < raw.length; ri++) {
-        var isRemote = typeof raw[ri].id === "number";
+        var isRemote = !!raw[ri].user_id;
         if (isRemote && hiddenSet[raw[ri].id]) continue;
         hist.push(normalizeRemoteAnalysis(raw[ri]));
       }
@@ -308,33 +310,14 @@
     }
 
     var cardExpired = false;
-    if (lastCard && lastCard.createdAt) {
-      var elapsed = Date.now() - new Date(lastCard.createdAt).getTime();
-      cardExpired = elapsed >= MIRROR_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
-    }
 
-    if (lastCard && lastCard.result && lastCard.result.handle && !cardExpired) {
-      try {
-        holder.innerHTML = buildIdentityCard(lastCard.result);
-        var remain = 0;
-        if (lastCard.createdAt) {
-          remain = Math.ceil((MIRROR_COOLDOWN_DAYS * 86400000 - (Date.now() - new Date(lastCard.createdAt).getTime())) / 86400000);
-        }
-        if (remain > 0) {
-          holder.innerHTML += '<div class="info-box" style="margin-top:12px;padding:10px 14px;background:rgba(15,175,175,.1);border-radius:10px;text-align:center;font-size:.85rem;color:var(--muted,#8A8F9C)">' +
-            esc(t("mirror_cooldown").replace("{days}", remain)) + "</div>";
-        }
-      } catch (e) { console.error("[XORA profile] card render error", e); }
-    } else if (cardExpired) {
-      holder.innerHTML = '<div class="empty-box">' +
-                           "<p>" + esc(t("profile_card_expired")) + "</p>" +
-                           '<p><a href="mirror.html">' + esc(t("profile_card_renew")) + "</a></p>" +
-                         "</div>";
+    if (lastCard && lastCard.result && lastCard.result.handle) {
+      try { holder.innerHTML = buildIdentityCard(lastCard.result); } catch (e) { console.error("[XORA profile] card render error", e); }
     } else {
       holder.innerHTML = '<div class="empty-box">' +
-                           "<p>" + esc(t("profile_empty")) + "</p>" +
-                           '<p><a href="mirror.html">' + esc(t("profile_empty_sub")) + "</a></p>" +
-                         "</div>";
+                         "<p>" + esc(t("profile_empty")) + "</p>" +
+                         '<p><a href="mirror.html?tier=fun">' + esc(t("profile_empty_sub")) + "</a></p>" +
+                       "</div>";
     }
 
     try { renderHistoryList(hist); } catch (e) { console.error("[XORA profile] history render error", e); }

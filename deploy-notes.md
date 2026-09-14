@@ -31,3 +31,9 @@ https://icanyesilyurt.github.io/xora/mirror.html
 
 Bu URL Supabase Auth redirect allow list'e eklenmeli ve `config.js` içinde
 `AUTH_REDIRECT_URL` olarak kullanılmalıdır.
+
+## XORA V2 / Real backend
+
+Fun/Real deployment and secret setup are documented in `XORA_V2_SETUP.md`.
+
+`XORA Real` must not be advertised as live until the V2 migration is applied, `analyze-real` is deployed, and a real X+AI smoke test succeeds. There is intentionally no fake/demo fallback on the paid Real path.

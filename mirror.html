@@ -9,64 +9,58 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header class="topbar">
   <a href="index.html" class="logo">XO<span>RA</span></a>
   <nav class="topnav">
-    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">10</b></a>
+    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">0</b></a>
     <a href="profile.html" class="pill" data-i18n="nav_profile">Profil</a>
     <button type="button" class="pill lang-btn" id="langBtn">EN</button>
   </nav>
 </header>
 
 <main class="page">
-
-  <!-- 1) X BAĞLA -->
   <section id="inputView">
     <span class="mode-emoji">🪞</span>
     <h1 data-i18n="mirror_h1">X Mirror</h1>
     <p class="sub" data-i18n="mirror_sub">Kendi X karakterini görmek için X kullanıcı adını yaz.</p>
 
+    <div class="tier-switch" role="tablist" aria-label="XORA modu">
+      <a id="funTab" class="tier-tab" href="mirror.html?tier=fun">
+        <strong data-i18n="tier_fun">Eğlence Kartı</strong><span data-i18n="badge_free">Ücretsiz</span>
+      </a>
+      <a id="realTab" class="tier-tab" href="mirror.html?tier=real" data-auth-required>
+        <strong data-i18n="tier_real">Gerçek Analiz</strong><span data-i18n="badge_c5">5 Kredi</span>
+      </a>
+    </div>
+    <p class="tier-note" id="tierNote"></p>
+
     <div class="handle-form">
-      <input type="text" id="mirrorHandleInput" class="handle-input"
-             data-i18n-ph="mirror_ph" placeholder="@kullaniciadi"
-             maxlength="30" autocomplete="off" spellcheck="false">
-      <button type="button" class="btn" id="goBtn" data-i18n="mirror_btn">Aynaya Bak</button>
+      <input type="text" id="mirrorHandleInput" class="handle-input" data-i18n-ph="mirror_ph" placeholder="@kullaniciadi" maxlength="30" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn" id="goBtn">Başla</button>
     </div>
   </section>
 
-  <!-- 2) XORA DÜŞÜNÜYOR -->
   <section id="analyzingView" hidden>
     <div class="thinking">
-      <div class="xora-face" aria-hidden="true">
-        <span class="xora-eye"></span><span class="xora-eye"></span>
-      </div>
+      <div class="xora-face" aria-hidden="true"><span class="xora-eye"></span><span class="xora-eye"></span></div>
       <p class="think-msg" id="thinkMsg"></p>
       <div class="think-dots" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
   </section>
 
-  <!-- 3) KİMLİK KARTI -->
   <section id="resultView" hidden>
     <div id="cardHolder"></div>
-    <div id="cooldownInfo" hidden style="margin:12px auto;max-width:420px;padding:10px 14px;background:rgba(15,175,175,.1);border-radius:10px;text-align:center;font-size:.85rem;color:#8A8F9C"></div>
-
+    <p class="tier-result-note" id="resultTierNote"></p>
     <div class="result-actions">
       <button type="button" class="btn btn-orange" id="dlBtn" data-i18n="btn_download">Kartı İndir</button>
       <button type="button" class="btn" id="shareBtn" data-i18n="btn_share">X'te Paylaş</button>
-      <a href="profile.html" class="btn btn-ghost">Profile dön</a>
+      <button type="button" class="btn btn-ghost" id="rerollBtn" data-i18n="reroll_btn">Tekrar Çek</button>
     </div>
-
-    <p class="upsell">
-      <span data-i18n="upsell_mirror">Peki ya o kişi? 👀</span>
-      <a href="stalk.html" data-i18n="upsell_mirror_btn">X Stalk ile bak</a>
-    </p>
+    <p class="upsell"><span data-i18n="upsell_mirror">Peki ya o kişi? 👀</span> <a href="stalk.html?tier=fun" data-i18n="upsell_mirror_btn">X Stalk ile bak</a></p>
   </section>
-
 </main>
 
-<footer class="foot">XORA V1</footer>
-
+<footer class="foot">XORA V2</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
@@ -74,127 +68,105 @@
 <script src="card.js"></script>
 <script>
 (function () {
+  var tier = getTierFromUrl();
   var lastResult = null;
-  var mirrorState = "input";
-
-  var inputView  = document.getElementById("inputView");
-  var analyzingView  = document.getElementById("analyzingView");
+  var lastHandle = "";
+  var reroll = 0;
+  var state = "input";
+  var inputView = document.getElementById("inputView");
+  var analyzingView = document.getElementById("analyzingView");
   var resultView = document.getElementById("resultView");
-  var goBtn      = document.getElementById("goBtn");
   var handleInput = document.getElementById("mirrorHandleInput");
+  var goBtn = document.getElementById("goBtn");
 
-  function mirrorLog(label, data) {
-    if (window.console) console.log("[XORA mirror]", label, data || "");
+  function setState(next) {
+    state = next;
+    inputView.hidden = next !== "input";
+    analyzingView.hidden = next !== "analyzing";
+    resultView.hidden = next !== "result";
   }
 
-  function setMirrorState(state) {
-    mirrorState = state;
-    [
-      inputView,
-      analyzingView,
-      resultView
-    ].forEach(function (view) {
-      if (view) view.hidden = true;
-    });
-
-    var selected = {
-      input: inputView,
-      analyzing: analyzingView,
-      result: resultView
-    }[state];
-
-    if (selected) selected.hidden = false;
-    mirrorLog("state", state);
+  function renderTierUi() {
+    document.getElementById("funTab").classList.toggle("active", tier === "fun");
+    document.getElementById("realTab").classList.toggle("active", tier === "real");
+    document.getElementById("tierNote").textContent = tier === "real" ? t("real_explainer") : t("fun_explainer");
+    document.getElementById("resultTierNote").textContent = tier === "real" ? t("real_explainer") : t("fun_explainer");
+    goBtn.textContent = tier === "real" ? t("real_btn_5") : t("fun_btn");
+    document.getElementById("rerollBtn").hidden = tier !== "fun";
   }
 
-  function renderInput() {
-    setMirrorState("input");
-    goBtn.setAttribute("data-i18n", "mirror_btn");
-    goBtn.textContent = t("mirror_btn");
-    applyI18n();
-  }
-
-  function showResult(cooldownDays) {
+  function showResult() {
     document.getElementById("cardHolder").innerHTML = buildIdentityCard(lastResult);
-    var info = document.getElementById("cooldownInfo");
-    if (cooldownDays && cooldownDays > 0) {
-      info.textContent = t("mirror_cooldown").replace("{days}", cooldownDays);
-      info.hidden = false;
-    } else {
-      info.hidden = true;
-    }
-    setMirrorState("result");
+    setState("result");
+    renderTierUi();
     applyI18n();
-    mirrorLog("render card", { handle: lastResult && lastResult.handle });
   }
 
-  function startMirror() {
-    if (!isLoggedIn()) {
+  async function start() {
+    if (state === "analyzing") return;
+    var handle = /^@?[a-zA-Z0-9_]{1,15}$/.test(handleInput.value.trim()) ? normHandle(handleInput.value) : "";
+    if (!handle) { toast(t("toast_handle")); handleInput.focus(); return; }
+    lastHandle = handle;
+
+    if (tier === "real" && !isLoggedIn()) {
       window.location.href = "auth.html";
       return;
     }
 
-    if (isMirrorOnCooldown()) {
-      var existing = getLastMirrorAnalysis();
-      if (existing && existing.result) {
-        lastResult = existing.result;
-        showResult(getMirrorCooldownRemaining());
-        return;
-      }
-    }
-
-    var handle = normHandle(handleInput.value);
-    if (!handle) {
-      toast(t("toast_handle"));
-      handleInput.focus();
+    if (tier === "fun") {
+      lastResult = markAnalysisTier(analyzeFunHandle(handle, "mirror", reroll), "fun", "mirror");
+      if (isLoggedIn()) saveAnalysisRecord("mirror", [handle], lastResult);
+      setState("analyzing");
+      playThinking(document.getElementById("thinkMsg"), "mirror", showResult);
       return;
     }
-    lastResult = analyzeHandle(handle);
-    addHistory({ type: "mirror", handles: [handle] });
-    saveAnalysisRecord("mirror", [handle], lastResult);
 
-    setMirrorState("analyzing");
-    playThinking(document.getElementById("thinkMsg"), "mirror", function () { showResult(0); });
-  }
-
-  async function initMirror() {
-    mirrorLog("init", { url: window.location.href });
-    await initSession();
-    if (!isLoggedIn()) window.location.href = "auth.html";
-
-    if (isMirrorOnCooldown()) {
-      var existing = getLastMirrorAnalysis();
-      if (existing && existing.result) {
-        lastResult = existing.result;
-        showResult(getMirrorCooldownRemaining());
-        return;
-      }
+    setState("analyzing");
+    var stop = startThinkingLoop(document.getElementById("thinkMsg"), "mirror");
+    try {
+      lastResult = await requestRealAnalysis("mirror", { handle: handle });
+      saveAnalysisLocalOnly("mirror", [handle], lastResult);
+      stop();
+      showResult();
+    } catch (err) {
+      stop();
+      setState("input");
+      toast(realErrorMessage(err));
+      renderTierUi();
     }
-
-    renderInput();
   }
 
-  document.getElementById("goBtn").addEventListener("click", startMirror);
-  handleInput.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") startMirror();
+  goBtn.addEventListener("click", start);
+  handleInput.addEventListener("keydown", function (e) { if (e.key === "Enter") start(); });
+  document.getElementById("rerollBtn").addEventListener("click", function () {
+    if (tier !== "fun" || !lastHandle) return;
+    reroll += 1;
+    handleInput.value = "@" + lastHandle;
+    start();
   });
-
   document.getElementById("dlBtn").addEventListener("click", function () {
-    if (lastResult) downloadCanvas(renderIdentityPNG(lastResult), "xora-mirror-" + lastResult.handle + ".png");
+    if (lastResult) downloadCanvas(renderIdentityPNG(lastResult), "xora-" + tier + "-mirror-" + lastResult.handle + ".png");
   });
   document.getElementById("shareBtn").addEventListener("click", function () {
     if (lastResult) shareOnX(shareIdentityText(lastResult));
   });
-
-  // dil değişince kartı yeniden çiz
   document.addEventListener("xora:lang", function () {
-    if (mirrorState === "input") renderInput();
-    if (lastResult && mirrorState === "result") showResult(getMirrorCooldownRemaining());
+    renderTierUi();
+    if (lastResult && state === "result") showResult();
   });
 
-  initMirror();
+  (async function init() {
+    await initSession();
+    renderTierUi();
+    if (tier === "real" && !isLoggedIn()) {
+      window.location.href = "auth.html";
+      return;
+    }
+    var user = getUser();
+    if (user && tier === "real") handleInput.value = "@" + user;
+    setState("input");
+  })();
 })();
 </script>
-
 </body>
 </html>

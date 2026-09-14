@@ -14,6 +14,82 @@ function fakeBarcode(h) {
   return s;
 }
 
+/* ---------------- Fun / Real katmanı ---------------- */
+
+function resultTier(res) {
+  return res && res.meta && ["real","fun"].indexOf(res.meta.tier) >= 0 ? res.meta.tier : "legacy";
+}
+
+function rarityName(res) {
+  if (typeof ensureRealRarity === "function") ensureRealRarity(res);
+  return (res && res.rarity && res.rarity.name) || (res && res.meta && res.meta.rarity) || "common";
+}
+
+function rarityText(res) {
+  var name = rarityName(res);
+  return typeof t === "function" ? t("rarity_" + name) : name.toUpperCase();
+}
+
+function realRibbonHtml(res) {
+  return '<div class="card-status real-status"><span>' + esc(t("real_label")) + '</span><b>' + esc(rarityText(res)) + '</b></div>';
+}
+
+function funRibbonHtml() {
+  return '<div class="card-status fun-status"><span>' + esc(t("fun_label")) + '</span></div>';
+}
+
+function decorateRealCardHtml(html, res) {
+  var idx = html.indexOf(">");
+  if (idx < 0) return html;
+  html = html.slice(0, idx) + ' data-tier="real"' + html.slice(idx);
+  idx = html.indexOf(">");
+  return html.slice(0, idx + 1) + realRibbonHtml(res) + html.slice(idx + 1);
+}
+
+function localized(v, lang) {
+  if (v == null) return "";
+  if (typeof v === "string") return v;
+  return v[lang] || v.tr || v.en || "";
+}
+
+function buildFunIdentityCard(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var color = (res.card && res.card.color) || (res.archetype && res.archetype.color) || "#10B8B8";
+  var emoji = res.profile_emoji || (res.card && res.card.emoji) || (res.archetype && res.archetype.emoji) || "✨";
+  var nick = localized(res.nickname || (res.card && res.card.nickname) || (res.archetype && res.archetype.name), lang);
+  var desc = localized(res.tagline || (res.card && res.card.desc) || (res.archetype && res.archetype.desc), lang);
+  var comment = "";
+  if (res.comment && res.comment.mirror) comment = localized(res.comment[res.mode === "stalk" ? "stalk" : "mirror"], lang);
+  if (!comment && res.archetype && res.archetype.comments && res.archetype.comments[lang]) comment = res.archetype.comments[lang][res.ci || 0] || "";
+
+  return (
+    '<div class="idcard funcard" style="--ac:' + color + '" data-tier="fun">' +
+      funRibbonHtml() +
+      '<div class="idcard-band"><span class="idcard-avatar">' + emoji + '</span></div>' +
+      '<div class="idcard-body">' +
+        '<p class="idcard-handle">@' + esc(res.handle) + '</p>' +
+        '<h2 class="idcard-type">' + esc(nick) + '</h2>' +
+        (desc ? '<p class="idcard-desc">' + esc(desc) + '</p>' : '') +
+        '<div class="idcard-quote fun-quote"><span class="quote-label">XORA FUN</span><p>' + esc(comment) + '</p></div>' +
+      '</div>' +
+      '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(res.hash || 1) + '</span><span>xora.app</span></div>' +
+    '</div>'
+  );
+}
+
+function buildFunMatchCard(m) {
+  var comment = typeof matchComment === "function" ? matchComment(m, getLang()) : "";
+  return (
+    '<div class="idcard matchcard funcard" style="--ac:#FF7A45" data-tier="fun">' +
+      funRibbonHtml() +
+      '<div class="idcard-band match-band"><span class="idcard-avatar small">' + m.resA.archetype.emoji + '</span><span class="match-x">×</span><span class="idcard-avatar small">' + m.resB.archetype.emoji + '</span></div>' +
+      '<div class="idcard-body"><p class="idcard-handle">@' + esc(m.a) + ' × @' + esc(m.b) + '</p>' +
+      '<h2 class="idcard-type match-pct">%' + m.overall + '</h2><p class="idcard-desc">' + esc(t("match_overall")) + '</p>' +
+      '<div class="idcard-quote fun-quote"><span class="quote-label">XORA FUN</span><p>' + esc(comment) + '</p></div></div>' +
+      '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(xhash(m.a + m.b)) + '</span><span>xora.app</span></div></div>'
+  );
+}
+
 /* ---------------- version detection ---------------- */
 
 function isV3Result(res) {
@@ -32,9 +108,12 @@ function isV2Result(res) {
    ============================================================ */
 
 function buildIdentityCard(res) {
-  if (isV3Result(res)) return buildIdentityCardV3(res);
-  if (isV2Result(res)) return buildIdentityCardV2(res);
-  return buildIdentityCardV1(res);
+  if (resultTier(res) === "fun") return buildFunIdentityCard(res);
+  var html;
+  if (isV3Result(res)) html = buildIdentityCardV3(res);
+  else if (isV2Result(res)) html = buildIdentityCardV2(res);
+  else html = buildIdentityCardV1(res);
+  return resultTier(res) === "real" ? decorateRealCardHtml(html, res) : html;
 }
 
 /* --- V3 kart: profil okuma (sadeleştirilmiş) --- */
@@ -175,6 +254,11 @@ function buildIdentityCardV1(res) {
    ============================================================ */
 
 function buildMatchCard(m) {
+  if (resultTier(m) === "fun") return buildFunMatchCard(m);
+  return resultTier(m) === "real" ? decorateRealCardHtml(buildMatchCardBase(m), m) : buildMatchCardBase(m);
+}
+
+function buildMatchCardBase(m) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   return (
     '<div class="idcard matchcard" style="--ac:#FF7A45">' +
@@ -323,12 +407,66 @@ function drawCardFooter(ctx, h) {
 
 /* --- kimlik kartı PNG --- */
 function renderIdentityPNG(res) {
-  if (isV3Result(res)) return renderIdentityPNGV3(res);
-  if (isV2Result(res)) return renderIdentityPNGV2(res);
-  return renderIdentityPNGV1(res);
+  if (resultTier(res) === "fun") return renderFunIdentityPNG(res);
+  var cv;
+  if (isV3Result(res)) cv = renderIdentityPNGV3(res);
+  else if (isV2Result(res)) cv = renderIdentityPNGV2(res);
+  else cv = renderIdentityPNGV1(res);
+  return resultTier(res) === "real" ? stampRealCanvas(cv, res) : cv;
 }
 
 /* --- V3 PNG: profil okuma (sadeleştirilmiş) --- */
+function stampRealCanvas(cv, res) {
+  var ctx = cv.getContext("2d");
+  var label = "XORA REAL · " + rarityText(res);
+  ctx.save();
+  ctx.textAlign = "left";
+  ctx.font = "900 24px Nunito, Arial, sans-serif";
+  var w = ctx.measureText(label).width + 44;
+  ctx.fillStyle = "#1E2330";
+  roundRect(ctx, 48, 46, w, 54, 27); ctx.fill();
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillText(label, 70, 81);
+  ctx.restore();
+  return cv;
+}
+
+function renderFunIdentityPNG(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var c = res.card || {};
+  var a = res.archetype || {};
+  var color = c.color || a.color || "#10B8B8";
+  var emoji = res.profile_emoji || c.emoji || a.emoji || "✨";
+  var nick = localized(res.nickname || c.nickname || a.name, lang);
+  var desc = localized(res.tagline || c.desc || a.desc, lang);
+  var comment = res.comment && res.comment.mirror ? localized(res.comment.mirror, lang) : "";
+  if (!comment && a.comments && a.comments[lang]) comment = a.comments[lang][res.ci || 0] || "";
+  var b = baseCanvas(), ctx = b.ctx;
+  drawCardFrame(ctx, color);
+  ctx.fillStyle = "#1E2330"; roundRect(ctx, 50, 45, 260, 54, 27); ctx.fill();
+  ctx.fillStyle = "#FFFFFF"; ctx.textAlign = "left"; ctx.font = "900 24px Nunito, Arial, sans-serif"; ctx.fillText("XORA FUN · FREE", 72, 80);
+  ctx.textAlign = "center";
+  ctx.beginPath(); ctx.arc(500, 355, 118, 0, 7); ctx.fillStyle="#FFFFFF"; ctx.fill(); ctx.lineWidth=6; ctx.strokeStyle="#1E2330"; ctx.stroke();
+  ctx.font = "126px 'Segoe UI Emoji','Apple Color Emoji',sans-serif"; ctx.fillText(emoji,500,402);
+  ctx.fillStyle="#8A8F9C"; ctx.font="700 30px Nunito, Arial, sans-serif"; ctx.fillText("@"+res.handle,500,540);
+  ctx.fillStyle="#1E2330"; ctx.font="900 56px Nunito, Arial, sans-serif"; var yNick=wrapText(ctx,nick,500,615,720,62);
+  ctx.fillStyle="#5C6270"; ctx.font="600 28px Nunito, Arial, sans-serif"; var y=wrapText(ctx,desc,500,yNick+70,700,34)+42;
+  ctx.fillStyle="#FFF1E3"; roundRect(ctx,130,y,740,220,24); ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=3; roundRect(ctx,130,y,740,220,24); ctx.stroke();
+  ctx.fillStyle=color; ctx.font="900 22px Nunito, Arial, sans-serif"; ctx.fillText("XORA FUN",500,y+42);
+  ctx.fillStyle="#1E2330"; ctx.font="700 26px Nunito, Arial, sans-serif"; wrapText(ctx,comment,500,y+82,660,34);
+  drawCardFooter(ctx,res.hash||1);
+  return b.cv;
+}
+
+function renderFunMatchPNG(m) {
+  var cv = renderMatchPNGBase(m), ctx = cv.getContext("2d");
+  ctx.save();
+  ctx.fillStyle="#1E2330"; roundRect(ctx,48,46,260,54,27); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.font="900 24px Nunito, Arial, sans-serif"; ctx.textAlign="left"; ctx.fillText("XORA FUN · FREE",70,81);
+  ctx.restore();
+  return cv;
+}
+
 function renderIdentityPNGV3(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var color = (res.card && res.card.color) || "#1B1B1B";
@@ -550,6 +688,11 @@ function renderIdentityPNGV1(res) {
 
 /* --- match kartı PNG --- unchanged */
 function renderMatchPNG(m) {
+  if (resultTier(m) === "fun") return renderFunMatchPNG(m);
+  return resultTier(m) === "real" ? stampRealCanvas(renderMatchPNGBase(m), m) : renderMatchPNGBase(m);
+}
+
+function renderMatchPNGBase(m) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var b = baseCanvas();
   var ctx = b.ctx;
@@ -629,37 +772,47 @@ function shareOnX(text) {
 
 function shareIdentityText(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
-  if (isV3Result(res)) {
-    var mode = res.mode || "mirror";
-    if (mode === "stalk") {
-      if (lang === "tr") {
-        return "XORA @" + res.handle + " hesabını okudu 👀 Sonuçlar ilginç... → xora.app";
-      }
-      return "XORA read @" + res.handle + "'s profile 👀 Interesting results... → xora.app";
-    }
-    if (lang === "tr") {
-      return "XORA beni okudu 🪞 @" + res.handle + " profilim hazır 👀 Sen ne çıkarsın? → xora.app";
-    }
-    return "XORA read me 🪞 @" + res.handle + " profile ready 👀 What would yours say? → xora.app";
+  var name = "";
+  if (isV3Result(res)) name = localized(res.nickname, lang);
+  else if (isV2Result(res)) name = localized(res.card && res.card.nickname, lang);
+  else name = localized(res.archetype && res.archetype.name, lang);
+
+  if (resultTier(res) === "real") {
+    var rarity = rarityText(res);
+    if (lang === "tr") return 'XORA REAL beni okudu: "' + name + '" · ' + rarity + ' 👀 Sen ne çıkarsın? → ' + getPublicSiteUrl();
+    return 'XORA REAL read me: "' + name + '" · ' + rarity + ' 👀 What would yours say? → ' + getPublicSiteUrl();
   }
-  var name;
-  if (isV2Result(res)) {
-    name = res.card.nickname[lang];
-  } else {
-    name = res.archetype.name[lang];
-  }
-  if (lang === "tr") {
-    return 'XORA beni analiz etti: "' + name + '" çıktım 👀 Sen ne çıkarsın? → xora.app';
-  }
-  return 'XORA analyzed me: I\'m a "' + name + '" 👀 What would you be? → xora.app';
+  if (lang === "tr") return 'XORA FUN kartım: "' + name + '" 😅 Seninkini çek → ' + getPublicSiteUrl();
+  return 'My XORA FUN card: "' + name + '" 😅 Draw yours → ' + getPublicSiteUrl();
 }
 
 function shareMatchText(m) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
-  if (lang === "tr") {
-    return "@" + m.a + " × @" + m.b + " uyumu: %" + m.overall +
-           " 🔥 XORA hesapladı. Siz kaç çıkarsınız? → xora.app";
+  if (resultTier(m) === "real") {
+    var rarity = rarityText(m);
+    if (lang === "tr") return "XORA REAL: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " · " + rarity + " 🔥 → " + getPublicSiteUrl();
+    return "XORA REAL: @" + m.a + " × @" + m.b + " match " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
   }
-  return "@" + m.a + " × @" + m.b + " match: " + m.overall +
-         "% 🔥 Calculated by XORA. What's your score? → xora.app";
+  if (lang === "tr") return "XORA FUN: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " 😅 Siz kaç çıkarsınız? → " + getPublicSiteUrl();
+  return "XORA FUN: @" + m.a + " × @" + m.b + " match " + m.overall + "% 😅 Try yours → " + getPublicSiteUrl();
 }
+
+
+// Suppress sample-count sentences in historical cards as well as new cards/exports.
+function cardPresentationCopy(value, key) {
+  if (key === "meta") return value;
+  if (typeof value === "string") {
+    return value.split(/(?<=[.!?])\s+/).filter(function(sentence) {
+      return !/\d[\d\s/.,%'-]*(?:posts?|tweets?|paylaşım|gönderi|tweet)|(?:posts?|tweets?|paylaşım|gönderi|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen)[^.!?]{0,35}(?:posts?|tweets?|paylaşım|gönderi)/iu.test(sentence);
+    }).join(" ");
+  }
+  if (Array.isArray(value)) return value.map(function(v){return cardPresentationCopy(v);});
+  if (value && typeof value === "object") {
+    var copy={}; Object.keys(value).forEach(function(k){copy[k]=cardPresentationCopy(value[k],k);}); return copy;
+  }
+  return value;
+}
+["buildIdentityCard","buildMatchCard","renderIdentityPNG","renderMatchPNG","shareIdentityText","shareMatchText"].forEach(function(name){
+  var original=window[name];
+  window[name]=function(result){return original(cardPresentationCopy(result));};
+});

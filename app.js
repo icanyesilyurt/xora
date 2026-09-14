@@ -10,11 +10,12 @@ var LS = {
   hiddenAnalyses: "xora_hidden_analyses",
   credits: "xora_credits",
   history: "xora_history",
-  lang: "xora_lang"
+  lang: "xora_lang",
+  referral: "xora_referral"
 };
 
-var COSTS = { stalk: 5, match: 10 };
-var FREE_CREDITS = 55;
+var COSTS = { mirror: 5, stalk: 5, match: 10 };
+var FREE_CREDITS = 0;
 var xoraSupabase = null;
 
 /* ---------------- yardımcılar ---------------- */
@@ -167,7 +168,6 @@ async function ensureUserRow(authUser, username) {
       username: cleanUsername,
       display_name: cleanUsername,
       avatar_url: null,
-      credit_balance: 50,
       last_login_at: new Date().toISOString()
     };
     console.log("[XORA db] user not found, inserting", payload);
@@ -194,6 +194,7 @@ async function ensureUserRow(authUser, username) {
   setCurrentUser(profile);
   localStorage.setItem(LS.credits, String(profile.credit_balance));
   console.log("[XORA db] ensureUserRow done", profile);
+  await syncReferral();
   return profile;
 }
 
@@ -283,6 +284,189 @@ async function initSession() {
   return getCurrentUser();
 }
 
+/* ---------------- ürün katmanları / referral ---------------- */
+
+function getTierFromUrl() {
+  var params = new URLSearchParams(window.location.search || "");
+  return params.get("tier") === "real" ? "real" : "fun";
+}
+
+function withTier(path, tier) {
+  return path + (path.indexOf("?") >= 0 ? "&" : "?") + "tier=" + (tier === "real" ? "real" : "fun");
+}
+
+function captureReferral() {
+  try {
+    var params = new URLSearchParams(window.location.search || "");
+    var ref = String(params.get("ref") || "").trim().toLowerCase();
+    if (!/^[a-z0-9_-]{2,64}$/.test(ref)) return;
+    if (!ref) return;
+    var existing = readJson(LS.referral, null);
+    if (existing && existing.code && existing.expires_at && Date.now() < new Date(existing.expires_at).getTime()) return;
+    writeJson(LS.referral, { code: ref, first_seen_at: new Date().toISOString(), expires_at: new Date(Date.now() + 30 * 86400000).toISOString(), model: "first_touch" });
+  } catch (e) {}
+}
+
+function getReferralCode() {
+  var item = readJson(LS.referral, null);
+  if (!item || !item.code || !item.expires_at) return "";
+  if (!/^[a-z0-9_-]{2,64}$/.test(item.code) || !Number.isFinite(Date.parse(item.expires_at)) || Date.now() >= Date.parse(item.expires_at)) {
+    localStorage.removeItem(LS.referral);
+    return "";
+  }
+  return item.code;
+}
+
+async function syncReferral() {
+  var sb = getSupabaseClient();
+  if (!sb || !getCurrentUser()) return;
+  captureReferral();
+  try {
+    var response = await sb.rpc("xora_capture_referral", {p_code:getReferralCode()});
+    if (response.error) { console.warn("referral_sync_failed"); return; }
+    if (response.data) writeJson(LS.referral, {code:response.data.referral_code, expires_at:response.data.expires_at, model:"first_touch"});
+    else localStorage.removeItem(LS.referral);
+  } catch (e) { console.warn("referral_sync_failed"); }
+}
+
+function markAnalysisTier(result, tier, mode) {
+  if (!result) return result;
+  result.mode = result.mode || mode || "mirror";
+  result.meta = result.meta || {};
+  result.meta.tier = tier === "real" ? "real" : "fun";
+  if (tier !== "real") result.meta.referral_code = getReferralCode() || null;
+  return result;
+}
+
+function collectScoreValues(result) {
+  var values = [];
+  function push(v) {
+    var n = Number(v);
+    if (isFinite(n)) values.push(Math.max(0, Math.min(100, n)));
+  }
+  if (!result) return values;
+  var list = result.top_behaviors || (result.card && (result.card.top_behaviors || result.card.scores)) || result.metrics || [];
+  if (Array.isArray(list)) {
+    for (var i = 0; i < list.length; i++) push(list[i] && (list[i].value != null ? list[i].value : list[i].score));
+  } else if (list && typeof list === "object") {
+    Object.keys(list).forEach(function (k) {
+      var v = list[k];
+      push(v && typeof v === "object" && v.value != null ? v.value : v);
+    });
+  }
+  return values;
+}
+
+function ensureRealRarity(result) {
+  if (!result) return result;
+  result.meta = result.meta || {};
+  if (result.rarity && result.rarity.name) return result;
+  var values = collectScoreValues(result);
+  var extremes = values.map(function (v) { return Math.abs(v - 50); });
+  var avgExtreme = extremes.length ? extremes.reduce(function (a, b) { return a + b; }, 0) / extremes.length : 0;
+  var peakExtreme = extremes.length ? Math.max.apply(Math, extremes) : 0;
+  var score = Math.max(20, Math.min(99, Math.round(35 + (avgExtreme * 1.25) + (peakExtreme * 0.6))));
+  var name = score >= 90 ? "legendary" : score >= 76 ? "epic" : score >= 58 ? "rare" : "common";
+  result.rarity = { name: name, score: score };
+  result.meta.rarity = name;
+  result.meta.rarity_score = score;
+  return result;
+}
+
+function normalizeRealResult(result, mode) {
+  if (!result || !result.meta || result.meta.tier !== "real" || !result.rarity || ["common","rare","epic","legendary"].indexOf(result.rarity.name) < 0) throw new Error("bad_response");
+  markAnalysisTier(result, "real", mode);
+  return result;
+}
+
+function realFunctionName() {
+  return "analyze-real";
+}
+
+async function requestRealAnalysis(mode, payload) {
+  var sb = getSupabaseClient();
+  if (!sb) throw new Error("real_unavailable");
+  var sessionRes = await sb.auth.getSession();
+  var session = sessionRes && sessionRes.data && sessionRes.data.session;
+  if (!session || !session.user) throw new Error("unauthorized");
+
+  var pendingKey = "xora_real_pending:" + session.user.id + ":" + mode + ":" + getLang() + ":" + JSON.stringify(payload || {});
+  var requestId = sessionStorage.getItem(pendingKey) || ((window.crypto && typeof window.crypto.randomUUID === "function")
+    ? window.crypto.randomUUID()
+    : (Date.now().toString(36) + Math.random().toString(36).slice(2)));
+  sessionStorage.setItem(pendingKey, requestId);
+  var body = Object.assign({}, payload || {}, {
+    mode: mode,
+    locale: getLang(),
+    referral_code: getReferralCode() || null,
+    request_id: requestId
+  });
+
+  var response = await sb.functions.invoke(realFunctionName(mode), { body: body });
+  if (response.error) {
+    var msg = response.error.message || "real_unavailable";
+    try {
+      var context = response.error.context;
+      if (context && typeof context.clone === "function") context = context.clone();
+      if (context && typeof context.json === "function") {
+        var errorBody = await context.json();
+        if (errorBody && errorBody.code) msg = errorBody.code;
+      }
+    } catch (e) {}
+    if (["request_failed","insufficient_credits","bad_request","user_not_found","protected_account","insufficient_posts","rate_limited","analysis_failed","unauthorized"].indexOf(msg) >= 0) sessionStorage.removeItem(pendingKey);
+    await refreshCreditsFromServer();
+    throw new Error(msg);
+  }
+  var data = response.data || {};
+  if (data.status === "error") throw new Error(data.code || "internal_error");
+  if (!data.result) throw new Error("bad_response");
+  sessionStorage.removeItem(pendingKey);
+  if (data.result.meta && data.result.meta.referral_code && data.result.meta.referral_expires_at) {
+    writeJson(LS.referral, {code:data.result.meta.referral_code, expires_at:data.result.meta.referral_expires_at, model:"first_touch"});
+  } else { localStorage.removeItem(LS.referral); }
+  await refreshCreditsFromServer();
+  return normalizeRealResult(data.result, mode);
+}
+
+async function refreshCreditsFromServer() {
+  var sb = getSupabaseClient();
+  var user = getCurrentUser();
+  if (!sb || !user || !user.id) return getCredits();
+  try {
+    var res = await sb.from("users").select("credit_balance").eq("id", user.id).maybeSingle();
+    if (!res.error && res.data && res.data.credit_balance != null) {
+      user.credit_balance = Number(res.data.credit_balance) || 0;
+      setCurrentUser(user);
+      localStorage.setItem(LS.credits, String(user.credit_balance));
+      refreshTopbar();
+    }
+  } catch (e) {}
+  return user.credit_balance;
+}
+
+function realErrorMessage(err) {
+  var code = String((err && err.message) || err || "internal_error").toLowerCase();
+  if (code.indexOf("refund_pending") >= 0) return getLang() === "tr" ? "İade bekliyor. İstek kimliğin korunuyor; daha sonra tekrar kontrol et." : "Refund pending. Your request ID is retained; check again later.";
+  if (code.indexOf("insufficient") >= 0 || code.indexOf("credit") >= 0) return t("real_err_credit");
+  if (code.indexOf("protected") >= 0) return t("real_err_protected");
+  if (code.indexOf("user_not_found") >= 0 || code.indexOf("not found") >= 0) return t("real_err_not_found");
+  if (code.indexOf("posts") >= 0) return t("real_err_posts");
+  if (code.indexOf("rate") >= 0) return t("real_err_rate");
+  if (code.indexOf("unauthorized") >= 0) return t("real_err_auth");
+  return t("real_err_unavailable");
+}
+
+function getPublicSiteUrl() {
+  var cfg = window.XORA_CONFIG || {};
+  var base = cfg.PUBLIC_URL ? String(cfg.PUBLIC_URL) : "";
+  try {
+    var url = new URL(base || "index.html", base ? window.location.origin : window.location.href);
+    var ref = getReferralCode();
+    if (ref) url.searchParams.set("ref", ref);
+    return url.href;
+  } catch (e) { return base || ""; }
+}
+
 /* ---------------- krediler ---------------- */
 
 function getCredits() {
@@ -293,26 +477,8 @@ function getCredits() {
   return isNaN(n) ? 0 : n;
 }
 
-function addCredits(n) {
-  localStorage.setItem(LS.credits, String(getCredits() + n));
-  refreshTopbar();
-}
-
-function spendCredits(n) {
-  var c = getCredits();
-  if (c < n) return false;
-  var next = c - n;
-  localStorage.setItem(LS.credits, String(next));
-  var user = getCurrentUser();
-  if (user) {
-    user.credit_balance = next;
-    setCurrentUser(user);
-  }
-  refreshTopbar();
-  return true;
-}
-
-/* ---------------- geçmiş ---------------- */
+function addCredits() { throw new Error("server_only_credits"); }
+function spendCredits() { throw new Error("server_only_credits"); }
 
 function getHistory() {
   return getAnalysesForCurrentUser();
@@ -360,6 +526,35 @@ function saveAnalysis(analysis) {
   }
   setCurrentUser(user);
   saveAnalysisToSupabase(item);
+  document.dispatchEvent(new CustomEvent("xora:analysis-saved", { detail: item }));
+  return item;
+}
+
+function saveAnalysisLocalOnly(type, handles, result) {
+  var user = getCurrentUser();
+  if (!user || !result) return null;
+  var item = {
+    id: "analysis_local_" + Date.now(),
+    userId: user.id,
+    type: type,
+    title: result && result.nickname ? (result.nickname[getLang()] || result.nickname.tr || null) : null,
+    handles: handles || [],
+    result: result,
+    createdAt: new Date().toISOString()
+  };
+  var analyses = getAllAnalyses();
+  analyses.unshift(item);
+  saveAllAnalyses(analyses);
+  if (type === "mirror") {
+    user.last_card = {
+      id: item.id,
+      type: type,
+      handle: (handles && handles[0]) || result.handle || null,
+      result: result,
+      createdAt: item.createdAt
+    };
+    setCurrentUser(user);
+  }
   document.dispatchEvent(new CustomEvent("xora:analysis-saved", { detail: item }));
   return item;
 }
@@ -487,7 +682,7 @@ function isAnalysisHidden(remoteId) {
 
 function saveAnalysisRecord(type, handles, result) {
   var title = null;
-  if (result && result.meta && result.meta.version === "mirror_v3") title = "@" + (result.handle || (handles && handles[0]) || "?");
+  if (result && result.meta && /^mirror_v/.test(result.meta.version || "")) title = "@" + (result.handle || (handles && handles[0]) || "?");
   if (!title && result && result.card && result.card.nickname) title = result.card.nickname[getLang()];
   if (!title && result && result.archetype && result.archetype.name) title = result.archetype.name[getLang()];
   if (!title && result && result.title) title = result.title;
@@ -509,7 +704,7 @@ var I18N = {
     nav_login: "Giriş Yap",
     /* ana sayfa */
     home_hi: "Merhaba, ben XORA.",
-    home_sub: "X'te aslında kim olduğunu söylerim. Hazırsan başlayalım.",
+    home_sub: "İstersen eğlen, istersen gerçekten analiz ettir. XORA iki durumda da fazla konuşur.",
     card_mirror_t: "X Mirror",
     card_mirror_d: "Kendi X karakterini çıkar. Aynaya bak, kim olduğunu gör.",
     card_stalk_t: "X Stalk",
@@ -517,6 +712,18 @@ var I18N = {
     card_match_t: "X Match",
     card_match_d: "İki hesabı karşılaştır. Uyum mu, felaket mi?",
     badge_free: "Ücretsiz",
+    tier_fun: "Eğlence Kartı",
+    tier_real: "Gerçek Analiz",
+    tier_fun_short: "FREE",
+    tier_real_short: "REAL",
+    tier_free_note: "Ücretsiz · X verisi okunmaz",
+    tier_real_note: "X verisine dayalı · kredi kullanır",
+    home_diff_h: "İki XORA var. İkisi de aynı derecede meraklı.",
+    home_fun_h: "XORA Fun",
+    home_fun_d: "Ücretsizdir. X verilerini okumaz; eğlence kartını anında üretir. Reroll serbest.",
+    home_real_h: "XORA Real",
+    home_real_d: "Gerçek X verisini analiz eder. X API ve analiz altyapısı bize de ücretli; bu yüzden kredi kullanır.",
+    home_real_joke: "Yine de sizi eğlenceden mahrum bırakacak kadar kapitalist değiliz.",
     badge_c5: "5 Kredi",
     badge_c10: "10 Kredi",
     /* mirror */
@@ -524,6 +731,14 @@ var I18N = {
     mirror_sub: "Kendi X karakterini görmek için X kullanıcı adını yaz.",
     mirror_ph: "@kullaniciadi",
     mirror_btn: "Aynaya Bak",
+    fun_btn: "Ücretsiz Kartı Çek",
+    real_btn_5: "Gerçek Analiz · 5 Kredi",
+    real_btn_10: "Gerçek Analiz · 10 Kredi",
+    reroll_btn: "Tekrar Çek",
+    real_label: "XORA REAL",
+    fun_label: "XORA FUN · FREE",
+    real_explainer: "Bu kart gerçek X verisine dayalıdır. API ve analiz maliyeti nedeniyle kredi kullanır.",
+    fun_explainer: "Bu kart eğlence amaçlıdır; X verilerini analiz etmez.",
     mirror_connect_cta: "X hesabını bağla ve analiz et",
     mirror_login_note: "Mirror için X hesabını bağlaman gerekir.",
     mirror_profile_h: "Profilini Tamamla",
@@ -602,14 +817,26 @@ var I18N = {
     logout_done: "Çıkış yapıldı",
     /* krediler */
     credits_h1: "Merak Kredisi",
-    credits_sub: "Kendi kartın hep ücretsiz. Başkalarını merak etmek kredi ister.",
+    credits_sub: "Fun bedava. Real analiz ise X verisini gerçekten okuduğu için kredi kullanır.",
     credits_balance: "Bakiyen",
-    credits_buy: "Yükle",
-    credits_note: "V1 demo: ödeme alınmaz, krediler anında yüklenir.",
-    pkg1_n: "Çaylak Paketi",
-    pkg2_n: "Meraklı Paketi",
-    pkg3_n: "Dedektif Paketi",
+    credits_buy: "Satın Al",
+    credits_note: "Ödeme iyzico ile bağlanacak. Bu sürümde satın alma butonları test amaçlı pasiftir.",
+    pkg1_n: "2 Real Analiz",
+    pkg2_n: "4 Real Analiz",
+    pkg3_n: "10 Real Analiz",
     toast_loaded: "kredi yüklendi ⚡",
+    payment_soon: "iyzico bağlantısını bir sonraki adımda açıyoruz.",
+    real_err_credit: "Kredin bu analiz için yetmiyor.",
+    real_err_protected: "Bu hesap korumalı; XORA kapıyı kıramıyor.",
+    real_err_not_found: "Bu X hesabını bulamadım.",
+    real_err_posts: "Gerçek analiz için yeterli paylaşım yok.",
+    real_err_rate: "X şu an biraz huysuz. Kısa süre sonra tekrar dene.",
+    real_err_auth: "Gerçek analiz için XORA hesabına giriş yapmalısın.",
+    real_err_unavailable: "Analiz tamamlanamadı. Bakiye ve geçmişini kontrol edip tekrar dene.",
+    rarity_common: "COMMON",
+    rarity_rare: "RARE",
+    rarity_epic: "EPIC",
+    rarity_legendary: "LEGENDARY",
     /* hatalar / bildirimler */
     toast_handle: "Önce bir kullanıcı adı yaz",
     toast_two: "İki kullanıcı adı da gerekli",
@@ -634,7 +861,7 @@ var I18N = {
     nav_profile: "Profile",
     nav_login: "Sign In",
     home_hi: "Hi, I'm XORA.",
-    home_sub: "I'll tell you who you really are on X. Ready when you are.",
+    home_sub: "Come for the joke, stay for the real analysis. XORA talks too much either way.",
     card_mirror_t: "X Mirror",
     card_mirror_d: "Reveal your own X character. Look in the mirror.",
     card_stalk_t: "X Stalk",
@@ -642,12 +869,32 @@ var I18N = {
     card_match_t: "X Match",
     card_match_d: "Compare two accounts. Soulmates or disaster?",
     badge_free: "Free",
+    tier_fun: "Fun Card",
+    tier_real: "Real Analysis",
+    tier_fun_short: "FREE",
+    tier_real_short: "REAL",
+    tier_free_note: "Free · no X data read",
+    tier_real_note: "Based on X data · uses credits",
+    home_diff_h: "Two XORAs. Both equally nosy.",
+    home_fun_h: "XORA Fun",
+    home_fun_d: "Free. It does not read your X data; it creates an instant entertainment card. Rerolls are on us.",
+    home_real_h: "XORA Real",
+    home_real_d: "Reads real X data. X API and analysis cost us money too, so Real uses credits.",
+    home_real_joke: "We are still not capitalist enough to take the fun away from you.",
     badge_c5: "5 Credits",
     badge_c10: "10 Credits",
     mirror_h1: "X Mirror",
     mirror_sub: "Enter your X username to see your X character.",
     mirror_ph: "@yourhandle",
     mirror_btn: "Look in the Mirror",
+    fun_btn: "Draw Free Card",
+    real_btn_5: "Real Analysis · 5 Credits",
+    real_btn_10: "Real Analysis · 10 Credits",
+    reroll_btn: "Reroll",
+    real_label: "XORA REAL",
+    fun_label: "XORA FUN · FREE",
+    real_explainer: "This card is based on real X data. API and analysis costs are why it uses credits.",
+    fun_explainer: "This is an entertainment card; it does not analyze X data.",
     mirror_connect_cta: "Connect X account and analyze",
     mirror_login_note: "Mirror requires connecting your X account.",
     mirror_profile_h: "Complete Your Profile",
@@ -720,14 +967,26 @@ var I18N = {
     logout_confirm: "Log out?",
     logout_done: "Logged out",
     credits_h1: "Curiosity Credits",
-    credits_sub: "Your own card is always free. Curiosity about others costs credits.",
+    credits_sub: "Fun is free. Real uses credits because it actually reads X data.",
     credits_balance: "Your balance",
-    credits_buy: "Load",
-    credits_note: "V1 demo: no payment taken, credits load instantly.",
-    pkg1_n: "Rookie Pack",
-    pkg2_n: "Curious Pack",
-    pkg3_n: "Detective Pack",
+    credits_buy: "Buy",
+    credits_note: "Payments will be connected through iyzico. Purchase buttons are disabled in this build.",
+    pkg1_n: "2 Real Analyses",
+    pkg2_n: "4 Real Analyses",
+    pkg3_n: "10 Real Analyses",
     toast_loaded: "credits loaded ⚡",
+    payment_soon: "We are connecting iyzico in the next step.",
+    real_err_credit: "You do not have enough credits for this analysis.",
+    real_err_protected: "That account is protected. Even XORA has boundaries.",
+    real_err_not_found: "I could not find that X account.",
+    real_err_posts: "There are not enough posts for a real analysis.",
+    real_err_rate: "X is being difficult right now. Try again shortly.",
+    real_err_auth: "Sign in to your XORA account for Real analysis.",
+    real_err_unavailable: "Analysis could not finish. Check your balance and history before retrying.",
+    rarity_common: "COMMON",
+    rarity_rare: "RARE",
+    rarity_epic: "EPIC",
+    rarity_legendary: "LEGENDARY",
     toast_handle: "Type a username first",
     toast_two: "Both usernames are required",
     toast_same: "Enter two different accounts 🙂",
@@ -849,7 +1108,8 @@ function initAuthGuards() {
 /* ---------------- sayfa açılışı ---------------- */
 
 document.addEventListener("DOMContentLoaded", function () {
-  getCredits();   // ilk girişte 10 kredi tanımlanır
+  captureReferral();
+  getCredits();
   initTopbar();
   initAuthGuards();
   applyI18n();

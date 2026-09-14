@@ -9,122 +9,146 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header class="topbar">
   <a href="index.html" class="logo">XO<span>RA</span></a>
   <nav class="topnav">
-    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">10</b></a>
+    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">0</b></a>
     <a href="profile.html" class="pill" data-i18n="nav_profile">Profil</a>
     <button type="button" class="pill lang-btn" id="langBtn">EN</button>
   </nav>
 </header>
 
 <main class="page">
-
-  <!-- 1) GİRİŞ -->
   <section id="step-input">
     <span class="mode-emoji">👀</span>
     <h1 data-i18n="stalk_h1">X Stalk</h1>
     <p class="sub" data-i18n="stalk_sub">Bir kullanıcı adı yaz, XORA gizlice baksın. Bu iş aramızda kalır.</p>
 
+    <div class="tier-switch" role="tablist" aria-label="XORA modu">
+      <a id="funTab" class="tier-tab" href="stalk.html?tier=fun"><strong data-i18n="tier_fun">Eğlence Kartı</strong><span data-i18n="badge_free">Ücretsiz</span></a>
+      <a id="realTab" class="tier-tab" href="stalk.html?tier=real" data-auth-required><strong data-i18n="tier_real">Gerçek Analiz</strong><span data-i18n="badge_c5">5 Kredi</span></a>
+    </div>
+    <p class="tier-note" id="tierNote"></p>
+
     <div class="handle-form">
-      <input type="text" id="handleInput" class="handle-input"
-             data-i18n-ph="stalk_ph" placeholder="@merakettigin"
-             maxlength="30" autocomplete="off" spellcheck="false">
-      <button type="button" class="btn btn-orange" id="goBtn" data-i18n="stalk_btn">Gizlice Analiz Et</button>
-      <p class="cost-note">⚡ <span data-i18n="stalk_note">Bu analiz 5 Merak Kredisi kullanır.</span></p>
+      <input type="text" id="handleInput" class="handle-input" data-i18n-ph="stalk_ph" placeholder="@merakettigin" maxlength="30" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn btn-orange" id="goBtn">Başla</button>
     </div>
   </section>
 
-  <!-- 2) XORA DÜŞÜNÜYOR -->
   <section id="step-think" hidden>
     <div class="thinking">
-      <div class="xora-face" aria-hidden="true">
-        <span class="xora-eye"></span><span class="xora-eye"></span>
-      </div>
+      <div class="xora-face" aria-hidden="true"><span class="xora-eye"></span><span class="xora-eye"></span></div>
       <p class="think-msg" id="thinkMsg"></p>
       <div class="think-dots" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
   </section>
 
-  <!-- 3) KİMLİK KARTI -->
   <section id="step-result" hidden>
     <div id="cardHolder"></div>
-
+    <p class="tier-result-note" id="resultTierNote"></p>
     <div class="result-actions">
       <button type="button" class="btn btn-orange" id="dlBtn" data-i18n="btn_download">Kartı İndir</button>
       <button type="button" class="btn" id="shareBtn" data-i18n="btn_share">X'te Paylaş</button>
-      <a href="stalk.html" class="btn btn-ghost" data-i18n="btn_again">Tekrar Dene</a>
+      <button type="button" class="btn btn-ghost" id="rerollBtn" data-i18n="reroll_btn">Tekrar Çek</button>
+      <a href="stalk.html?tier=fun" class="btn btn-ghost" id="againBtn" data-i18n="btn_again">Tekrar Dene</a>
     </div>
   </section>
-
 </main>
 
-<footer class="foot">XORA V1</footer>
-
+<footer class="foot">XORA V2</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script src="xora.js"></script>
 <script src="card.js"></script>
 <script>
- (async function () {
-  await initSession();
-  if (!isLoggedIn()) {
-    window.location.href = "auth.html";
-    return;
-  }
-
+(function () {
+  var tier = getTierFromUrl();
   var lastResult = null;
-
-  var stepInput  = document.getElementById("step-input");
-  var stepThink  = document.getElementById("step-think");
+  var lastHandle = "";
+  var reroll = 0;
+  var stepInput = document.getElementById("step-input");
+  var stepThink = document.getElementById("step-think");
   var stepResult = document.getElementById("step-result");
-  var input      = document.getElementById("handleInput");
+  var input = document.getElementById("handleInput");
+  var goBtn = document.getElementById("goBtn");
 
+  var currentState = "input";
+  function setState(state) {
+    currentState = state;
+    stepInput.hidden = state !== "input";
+    stepThink.hidden = state !== "think";
+    stepResult.hidden = state !== "result";
+  }
+  function renderTierUi() {
+    document.getElementById("funTab").classList.toggle("active", tier === "fun");
+    document.getElementById("realTab").classList.toggle("active", tier === "real");
+    document.getElementById("tierNote").textContent = tier === "real" ? t("real_explainer") : t("fun_explainer");
+    document.getElementById("resultTierNote").textContent = tier === "real" ? t("real_explainer") : t("fun_explainer");
+    goBtn.textContent = tier === "real" ? t("real_btn_5") : t("fun_btn");
+    document.getElementById("rerollBtn").hidden = tier !== "fun";
+    document.getElementById("againBtn").href = "stalk.html?tier=" + tier;
+  }
   function showResult() {
     document.getElementById("cardHolder").innerHTML = buildIdentityCard(lastResult);
-    stepThink.hidden = true;
-    stepResult.hidden = false;
+    setState("result");
+    renderTierUi();
     applyI18n();
   }
-
-  function start() {
-    var handle = normHandle(input.value);
+  async function start() {
+    if (currentState === "think") return;
+    var handle = /^@?[a-zA-Z0-9_]{1,15}$/.test(input.value.trim()) ? normHandle(input.value) : "";
     if (!handle) { toast(t("toast_handle")); input.focus(); return; }
+    lastHandle = handle;
+    if (tier === "real" && !isLoggedIn()) { window.location.href = "auth.html"; return; }
 
-    if (!spendCredits(COSTS.stalk)) {
-      toast(t("toast_nocredit"));
-      setTimeout(function () { window.location.href = "credits.html"; }, 1200);
+    if (tier === "fun") {
+      lastResult = markAnalysisTier(analyzeFunHandle(handle, "stalk", reroll), "fun", "stalk");
+      if (isLoggedIn()) saveAnalysisRecord("stalk", [handle], lastResult);
+      setState("think");
+      playThinking(document.getElementById("thinkMsg"), "stalk", showResult);
       return;
     }
 
-    lastResult = analyzeHandle(handle, "stalk");
-    addHistory({ type: "stalk", handles: [handle] });
-    saveAnalysisRecord("stalk", [handle], lastResult);
-
-    stepInput.hidden = true;
-    stepThink.hidden = false;
-    playThinking(document.getElementById("thinkMsg"), "stalk", showResult);
+    setState("think");
+    var stop = startThinkingLoop(document.getElementById("thinkMsg"), "stalk");
+    try {
+      lastResult = await requestRealAnalysis("stalk", { handle: handle });
+      saveAnalysisLocalOnly("stalk", [handle], lastResult);
+      stop();
+      showResult();
+    } catch (err) {
+      stop();
+      setState("input");
+      toast(realErrorMessage(err));
+      renderTierUi();
+    }
   }
 
-  document.getElementById("goBtn").addEventListener("click", start);
-  input.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") start();
+  goBtn.addEventListener("click", start);
+  input.addEventListener("keydown", function (e) { if (e.key === "Enter") start(); });
+  document.getElementById("rerollBtn").addEventListener("click", function () {
+    if (tier !== "fun" || !lastHandle) return;
+    reroll += 1;
+    input.value = "@" + lastHandle;
+    start();
   });
-
   document.getElementById("dlBtn").addEventListener("click", function () {
-    if (lastResult) downloadCanvas(renderIdentityPNG(lastResult), "xora-stalk-" + lastResult.handle + ".png");
+    if (lastResult) downloadCanvas(renderIdentityPNG(lastResult), "xora-" + tier + "-stalk-" + lastResult.handle + ".png");
   });
   document.getElementById("shareBtn").addEventListener("click", function () {
     if (lastResult) shareOnX(shareIdentityText(lastResult));
   });
+  document.addEventListener("xora:lang", function () { renderTierUi(); if (lastResult && !stepResult.hidden) showResult(); });
 
-  document.addEventListener("xora:lang", function () {
-    if (lastResult && !stepResult.hidden) showResult();
-  });
+  (async function init() {
+    await initSession();
+    renderTierUi();
+    if (tier === "real" && !isLoggedIn()) { window.location.href = "auth.html"; return; }
+    setState("input");
+  })();
 })();
 </script>
-
 </body>
 </html>

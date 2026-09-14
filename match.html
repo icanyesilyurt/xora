@@ -9,134 +9,153 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header class="topbar">
   <a href="index.html" class="logo">XO<span>RA</span></a>
   <nav class="topnav">
-    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">10</b></a>
+    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">0</b></a>
     <a href="profile.html" class="pill" data-i18n="nav_profile">Profil</a>
     <button type="button" class="pill lang-btn" id="langBtn">EN</button>
   </nav>
 </header>
 
 <main class="page">
-
-  <!-- 1) GİRİŞ -->
   <section id="step-input">
     <span class="mode-emoji">💞</span>
     <h1 data-i18n="match_h1">X Match</h1>
     <p class="sub" data-i18n="match_sub">İki hesabı yan yana koy. XORA uyumu söylesin, kavgayı sen çıkar.</p>
 
+    <div class="tier-switch" role="tablist" aria-label="XORA modu">
+      <a id="funTab" class="tier-tab" href="match.html?tier=fun"><strong data-i18n="tier_fun">Eğlence Kartı</strong><span data-i18n="badge_free">Ücretsiz</span></a>
+      <a id="realTab" class="tier-tab" href="match.html?tier=real" data-auth-required><strong data-i18n="tier_real">Gerçek Analiz</strong><span data-i18n="badge_c10">10 Kredi</span></a>
+    </div>
+    <p class="tier-note" id="tierNote"></p>
+
     <div class="handle-form">
-      <input type="text" id="handleA" class="handle-input"
-             data-i18n-ph="match_ph1" placeholder="@birinci"
-             maxlength="30" autocomplete="off" spellcheck="false">
-      <input type="text" id="handleB" class="handle-input"
-             data-i18n-ph="match_ph2" placeholder="@ikinci"
-             maxlength="30" autocomplete="off" spellcheck="false">
-      <button type="button" class="btn btn-orange" id="goBtn" data-i18n="match_btn">Uyumu Hesapla</button>
-      <p class="cost-note">⚡ <span data-i18n="match_note">Bu karşılaştırma 10 Merak Kredisi kullanır.</span></p>
+      <input type="text" id="handleA" class="handle-input" data-i18n-ph="match_ph1" placeholder="@birinci" maxlength="30" autocomplete="off" spellcheck="false">
+      <input type="text" id="handleB" class="handle-input" data-i18n-ph="match_ph2" placeholder="@ikinci" maxlength="30" autocomplete="off" spellcheck="false">
+      <button type="button" class="btn btn-orange" id="goBtn">Başla</button>
     </div>
   </section>
 
-  <!-- 2) XORA DÜŞÜNÜYOR -->
   <section id="step-think" hidden>
     <div class="thinking">
-      <div class="xora-face" aria-hidden="true">
-        <span class="xora-eye"></span><span class="xora-eye"></span>
-      </div>
+      <div class="xora-face" aria-hidden="true"><span class="xora-eye"></span><span class="xora-eye"></span></div>
       <p class="think-msg" id="thinkMsg"></p>
       <div class="think-dots" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
   </section>
 
-  <!-- 3) UYUM KARTI -->
   <section id="step-result" hidden>
     <div id="cardHolder"></div>
-
+    <p class="tier-result-note" id="resultTierNote"></p>
     <div class="result-actions">
       <button type="button" class="btn btn-orange" id="dlBtn" data-i18n="btn_download">Kartı İndir</button>
       <button type="button" class="btn" id="shareBtn" data-i18n="btn_share">X'te Paylaş</button>
-      <a href="match.html" class="btn btn-ghost" data-i18n="btn_again">Tekrar Dene</a>
+      <button type="button" class="btn btn-ghost" id="rerollBtn" data-i18n="reroll_btn">Tekrar Çek</button>
+      <a href="match.html?tier=fun" class="btn btn-ghost" id="againBtn" data-i18n="btn_again">Tekrar Dene</a>
     </div>
   </section>
-
 </main>
 
-<footer class="foot">XORA V1</footer>
-
+<footer class="foot">XORA V2</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script src="xora.js"></script>
 <script src="card.js"></script>
 <script>
- (async function () {
-  await initSession();
-  if (!isLoggedIn()) {
-    window.location.href = "auth.html";
-    return;
-  }
-
+(function () {
+  var tier = getTierFromUrl();
   var lastMatch = null;
-
-  var stepInput  = document.getElementById("step-input");
-  var stepThink  = document.getElementById("step-think");
+  var lastA = "";
+  var lastB = "";
+  var reroll = 0;
+  var stepInput = document.getElementById("step-input");
+  var stepThink = document.getElementById("step-think");
   var stepResult = document.getElementById("step-result");
   var inA = document.getElementById("handleA");
   var inB = document.getElementById("handleB");
+  var goBtn = document.getElementById("goBtn");
 
-  // ilk kutuyu kullanıcının kendi hesabıyla doldur (varsa)
-  if (getUser()) inA.value = "@" + getUser();
-  document.addEventListener("xora:session", function () {
-    if (getUser() && !inA.value) inA.value = "@" + getUser();
-  });
-
+  var currentState = "input";
+  function setState(state) {
+    currentState = state;
+    stepInput.hidden = state !== "input";
+    stepThink.hidden = state !== "think";
+    stepResult.hidden = state !== "result";
+  }
+  function renderTierUi() {
+    document.getElementById("funTab").classList.toggle("active", tier === "fun");
+    document.getElementById("realTab").classList.toggle("active", tier === "real");
+    document.getElementById("tierNote").textContent = tier === "real" ? t("real_explainer") : t("fun_explainer");
+    document.getElementById("resultTierNote").textContent = tier === "real" ? t("real_explainer") : t("fun_explainer");
+    goBtn.textContent = tier === "real" ? t("real_btn_10") : t("fun_btn");
+    document.getElementById("rerollBtn").hidden = tier !== "fun";
+    document.getElementById("againBtn").href = "match.html?tier=" + tier;
+  }
   function showResult() {
     document.getElementById("cardHolder").innerHTML = buildMatchCard(lastMatch);
-    stepThink.hidden = true;
-    stepResult.hidden = false;
+    setState("result");
+    renderTierUi();
     applyI18n();
   }
-
-  function start() {
-    var a = normHandle(inA.value);
-    var b = normHandle(inB.value);
+  async function start() {
+    if (currentState === "think") return;
+    var a = /^@?[a-zA-Z0-9_]{1,15}$/.test(inA.value.trim()) ? normHandle(inA.value) : "";
+    var b = /^@?[a-zA-Z0-9_]{1,15}$/.test(inB.value.trim()) ? normHandle(inB.value) : "";
     if (!a || !b) { toast(t("toast_two")); (!a ? inA : inB).focus(); return; }
-    if (a === b)  { toast(t("toast_same")); inB.focus(); return; }
+    if (a === b) { toast(t("toast_same")); inB.focus(); return; }
+    lastA = a; lastB = b;
+    if (tier === "real" && !isLoggedIn()) { window.location.href = "auth.html"; return; }
 
-    if (!spendCredits(COSTS.match)) {
-      toast(t("toast_nocredit"));
-      setTimeout(function () { window.location.href = "credits.html"; }, 1200);
+    if (tier === "fun") {
+      lastMatch = matchFunHandles(a, b, reroll);
+      markAnalysisTier(lastMatch, "fun", "match");
+      if (isLoggedIn()) saveAnalysisRecord("match", [a, b], lastMatch);
+      setState("think");
+      playThinking(document.getElementById("thinkMsg"), "match", showResult);
       return;
     }
 
-    lastMatch = matchHandles(a, b);
-    addHistory({ type: "match", handles: [a, b] });
-    saveAnalysisRecord("match", [a, b], lastMatch);
-
-    stepInput.hidden = true;
-    stepThink.hidden = false;
-    playThinking(document.getElementById("thinkMsg"), "match", showResult);
+    setState("think");
+    var stop = startThinkingLoop(document.getElementById("thinkMsg"), "match");
+    try {
+      lastMatch = await requestRealAnalysis("match", { handles: [a, b], handle_a: a, handle_b: b });
+      saveAnalysisLocalOnly("match", [a, b], lastMatch);
+      stop();
+      showResult();
+    } catch (err) {
+      stop();
+      setState("input");
+      toast(realErrorMessage(err));
+      renderTierUi();
+    }
   }
 
-  document.getElementById("goBtn").addEventListener("click", start);
-  inB.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") start();
+  goBtn.addEventListener("click", start);
+  inB.addEventListener("keydown", function (e) { if (e.key === "Enter") start(); });
+  document.getElementById("rerollBtn").addEventListener("click", function () {
+    if (tier !== "fun" || !lastA || !lastB) return;
+    reroll += 1;
+    inA.value = "@" + lastA; inB.value = "@" + lastB;
+    start();
   });
-
   document.getElementById("dlBtn").addEventListener("click", function () {
-    if (lastMatch) downloadCanvas(renderMatchPNG(lastMatch), "xora-match-" + lastMatch.a + "-" + lastMatch.b + ".png");
+    if (lastMatch) downloadCanvas(renderMatchPNG(lastMatch), "xora-" + tier + "-match-" + lastMatch.a + "-" + lastMatch.b + ".png");
   });
   document.getElementById("shareBtn").addEventListener("click", function () {
     if (lastMatch) shareOnX(shareMatchText(lastMatch));
   });
+  document.addEventListener("xora:lang", function () { renderTierUi(); if (lastMatch && !stepResult.hidden) showResult(); });
 
-  document.addEventListener("xora:lang", function () {
-    if (lastMatch && !stepResult.hidden) showResult();
-  });
+  (async function init() {
+    await initSession();
+    renderTierUi();
+    if (tier === "real" && !isLoggedIn()) { window.location.href = "auth.html"; return; }
+    if (getUser()) inA.value = "@" + getUser();
+    setState("input");
+  })();
 })();
 </script>
-
 </body>
 </html>

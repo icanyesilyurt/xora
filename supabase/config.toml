@@ -1,0 +1,4 @@
+project_id = "jafrxhkppvvchyjbkldd"
+
+[functions.analyze-real]
+verify_jwt = true
