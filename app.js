@@ -384,6 +384,7 @@ function realFunctionName() {
 }
 
 async function requestRealAnalysis(mode, payload) {
+  if (isProductionRealDisabled()) throw new Error("real_temporarily_unavailable");
   var sb = getSupabaseClient();
   if (!sb) throw new Error("real_unavailable");
   var sessionRes = await sb.auth.getSession();
@@ -454,6 +455,27 @@ function realErrorMessage(err) {
   if (code.indexOf("rate") >= 0) return t("real_err_rate");
   if (code.indexOf("unauthorized") >= 0) return t("real_err_auth");
   return t("real_err_unavailable");
+}
+
+function isProductionRealDisabled() {
+  return String(window.location && window.location.hostname || "").toLowerCase() === "icanyesilyurt.github.io";
+}
+
+function disableProductionRealCtas() {
+  if (!isProductionRealDisabled()) return;
+  var links = document.querySelectorAll('a[href*="tier=real"], .choice-action-real, .mini-mode.real');
+  for (var i = 0; i < links.length; i++) {
+    var link = links[i];
+    link.setAttribute("aria-disabled", "true");
+    link.classList.add("real-disabled");
+    link.removeAttribute("href");
+    link.setAttribute("title", getLang() === "tr" ? "REAL yakında aktif" : "REAL coming soon");
+    var status = document.createElement("small");
+    status.className = "real-coming-soon";
+    status.textContent = getLang() === "tr" ? "REAL yakında aktif" : "REAL coming soon";
+    link.appendChild(status);
+    link.onclick = function (e) { e.preventDefault(); };
+  }
 }
 
 function getPublicSiteUrl() {
@@ -1112,6 +1134,7 @@ document.addEventListener("DOMContentLoaded", function () {
   getCredits();
   initTopbar();
   initAuthGuards();
+  disableProductionRealCtas();
   applyI18n();
   initSession();
 });
