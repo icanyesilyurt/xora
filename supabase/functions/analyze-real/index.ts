@@ -93,7 +93,7 @@ async function getDataset(service: any, username: string): Promise<Dataset> {
   const uRes = await fetch(`https://api.x.com/2/users/by/username/${encodeURIComponent(username)}?user.fields=id,name,username,description,protected`, { headers, signal:AbortSignal.timeout(20000) });
   if (uRes.status === 404) throw new Error("user_not_found");
   if (uRes.status === 429) throw new Error("rate_limited");
-  if (!uRes.ok) throw new Error("x_api_error");
+  if (!uRes.ok) { await reportXError(uRes,"profile_lookup"); throw new Error("x_api_error"); }
   const uJson = await uRes.json();
   const profile = uJson.data;
   if (!profile) throw new Error("user_not_found");
@@ -102,7 +102,7 @@ async function getDataset(service: any, username: string): Promise<Dataset> {
   const fields = "created_at,lang,public_metrics,referenced_tweets";
   const tRes = await fetch(`https://api.x.com/2/users/${profile.id}/tweets?max_results=${MAX_POSTS}&tweet.fields=${encodeURIComponent(fields)}`, { headers, signal:AbortSignal.timeout(20000) });
   if (tRes.status === 429) throw new Error("rate_limited");
-  if (!tRes.ok) throw new Error("x_api_error");
+  if (!tRes.ok) { await reportXError(tRes,"tweets_fetch"); throw new Error("x_api_error"); }
   const tJson = await tRes.json();
   const posts: Post[] = (tJson.data || []).map((p: any) => ({
     id: String(p.id),
@@ -121,6 +121,31 @@ async function getDataset(service: any, username: string): Promise<Dataset> {
   const expires = new Date(Date.now() + CACHE_DAYS * 86400000).toISOString();
   await service.from("x_cache").upsert({ x_user_id: String(profile.id), username, profile, posts, schema_version: 1, fetched_at: nowIso, expires_at: expires }, { onConflict: "x_user_id" });
   return { profile, posts, cache_hit: false };
+}
+
+function safeDiagnosticText(value: unknown, max = 240) {
+  return String(value ?? "").replace(/[\u0000-\u001f\u007f]/g," ").replace(/Authorization\s*:\s*/gi,"[redacted] ").replace(/Bearer\s+[^\s]+/gi,"[redacted]").replace(/(?:sk|xox[baprs]?)-[A-Za-z0-9_-]+/gi,"[redacted]").trim().slice(0,max);
+}
+
+function xErrorDiagnostic(phase: "profile_lookup"|"tweets_fetch", status: number, raw: string) {
+  let parsed: any = null;
+  try { parsed = JSON.parse(raw); } catch { /* plain-text upstream error */ }
+  const diagnostic: any = { phase, status };
+  for (const key of ["title","detail","type"]) if (typeof parsed?.[key] === "string") diagnostic[key] = safeDiagnosticText(parsed[key]);
+  if (Array.isArray(parsed?.errors)) diagnostic.errors = parsed.errors.slice(0,8).map((item:any) => {
+    const out:any = {};
+    if (typeof item?.message === "string") out.message = safeDiagnosticText(item.message);
+    if (typeof item?.code === "string" || typeof item?.code === "number") out.code = safeDiagnosticText(item.code);
+    return out;
+  }).filter((item:any) => Object.keys(item).length);
+  if (!diagnostic.title && !diagnostic.detail && !diagnostic.type && !diagnostic.errors?.length && raw.trim()) diagnostic.detail = safeDiagnosticText(raw,160);
+  return diagnostic;
+}
+
+async function reportXError(response: Response, phase: "profile_lookup"|"tweets_fetch") {
+  let raw = "";
+  try { raw = await response.text(); } catch { /* diagnostic body unavailable */ }
+  console.error("x_api_error", xErrorDiagnostic(phase,response.status,raw));
 }
 
 function extractJson(text: string) {
@@ -444,5 +469,5 @@ async function main(req: Request) {
   }
 }
 
-export {main,analyzeMatch,analyzeOne,validateRequest,validateMetrics,aliasValid,activeAliasEvidence,pickAliasPair,normalizeAIProfile,normalizeMatchAI,computeSignals,validCopy,callAI,getAIConfig,aiResultSchema,parseProviderResult};
+export {main,analyzeMatch,analyzeOne,validateRequest,validateMetrics,aliasValid,activeAliasEvidence,pickAliasPair,normalizeAIProfile,normalizeMatchAI,computeSignals,validCopy,callAI,getAIConfig,aiResultSchema,parseProviderResult,xErrorDiagnostic,safeDiagnosticText};
 Deno.serve(main);

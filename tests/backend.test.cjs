@@ -5,6 +5,13 @@ test('strict request validation before billing',()=>{
  assert.equal(e.validateRequest(base).handles[0],'alice');
  for(const patch of [{mode:'fun'},{mode:'oops'},{locale:'fr'},{handle:'abc!'},{handle:'a b'},{handle:'a'.repeat(16)},{handle:32},{request_id:'../id'},{mode:'match',handles:['Alice','@alice']}]) assert.throws(()=>e.validateRequest({...base,...patch}),/bad_request/);
 });
+test('X upstream diagnostics are phase-specific and sanitized',()=>{
+ const e=edge();
+ const d=e.xErrorDiagnostic('profile_lookup',403,JSON.stringify({title:'Forbidden',detail:'Bearer secret-token sk-live-abc and raw tweet text',type:'https://api.x.com/problems/auth',errors:[{message:'Invalid token',code:'invalid_token'}]}));
+ assert.equal(JSON.stringify(d),JSON.stringify({phase:'profile_lookup',status:403,title:'Forbidden',detail:'[redacted] [redacted] and raw tweet text',type:'https://api.x.com/problems/auth',errors:[{message:'Invalid token',code:'invalid_token'}]}));
+ const plain=e.xErrorDiagnostic('tweets_fetch',503,'Authorization: Bearer abcdefghijklmnopqrstuvwxyz\ninternal failure');
+ assert.equal(plain.phase,'tweets_fetch');assert.equal(plain.status,503);assert.ok(plain.detail.length<=160);assert.doesNotMatch(plain.detail,/Bearer\s+abcdefghijklmnopqrstuvwxyz/);assert.doesNotMatch(plain.detail,/Authorization/i);
+});
 test('REAL shape, rarity, nickname evidence and safe deterministic fallback',()=>{
  const e=edge();const sig={question_ratio:.8,own_posts:8};const raw=profileAI();
  const result=e.normalizeAIProfile(raw,'alice','mirror',sig,'tr');
