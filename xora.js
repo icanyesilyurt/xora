@@ -907,16 +907,71 @@ var FUN_CARD_POOL = [
   { emoji:"🪄", color:"#19B8B8", nickname:{tr:"Cümle Cambazı",en:"Sentence Acrobat"}, desc:{tr:"Bir cümleyi normal bitirmek varken neden biraz kıvırmayasın?",en:"Why end a sentence normally when you can make it do a trick?"} }
 ];
 
-function funModeComment(card, mode, lang) {
-  var nick = card.nickname[lang] || card.nickname.tr;
-  if (lang === "en") {
-    return mode === "stalk"
-      ? "Purely for fun: this account drew “" + nick + "”. XORA has no evidence and far too much confidence."
-      : "Purely for fun: you drew “" + nick + "”. Scientifically useless, socially shareable.";
+var FUN_PERSONA_COMMENTS = {
+  "Sessiz Kaos": {
+    tr:"Herkes planı onaylarken sen tek bir küçük soru soruyorsun ve toplantı başka bir evrene taşınıyor. Sonra da çayını içip olanları izliyorsun. Ortalık karışsa bile yüzündeki sakinlik yerinden oynamıyor.",
+    en:"Everyone agrees on the plan until you ask one tiny question and send the meeting into another universe. Then you sip your tea and watch it unfold. Even when the room erupts, your calm expression stays put."
+  },
+  "İroni Müdürü": {
+    tr:"Fazla ciddi bir cümle duyunca zihninde hemen alternatif bir altyazı beliriyor. İtirazını uzun uzun anlatmak yerine tek bir ince dokunuşla bırakıyorsun. Seni anlayanla göz göze gelmek, şakanın ikinci yarısı.",
+    en:"An overly serious sentence instantly gets alternative subtitles in your head. Instead of a long objection, you leave one perfectly placed remark. Catching the eye of someone who gets it is the second half of the joke."
+  },
+  "Gündem Turisti": {
+    tr:"Bir sohbete meraktan girip cebinde üç yeni konu ve yarım kalmış bir tartışmayla çıkıyorsun. Bir meseleye kamp kurmak yerine yan sokakta ne konuşulduğunu merak ediyorsun. Muhabbetin bavulu hep kapının yanında.",
+    en:"You wander into a conversation out of curiosity and leave with three new topics and half a debate. Rather than setting up camp on one subject, you wonder what people are discussing around the corner. Your conversational suitcase is always by the door."
+  },
+  "Soğuk Mizah": {
+    tr:"En absürt cümleyi hava durumunu bildirir gibi söyleyip susuyorsun. Karşındaki şakayı yakalayana kadar yüzünden tek bir ipucu çıkmıyor. Kahkaha gecikince açıklama yapmıyorsun; o küçük sessizlik de esprinin bir parçası.",
+    en:"You deliver the most absurd line as though you were reading the weather forecast. Your face offers no clues while the other person catches up. When the laugh arrives late, you let the little silence be part of the joke."
+  },
+  "Koltuk Filozofu": {
+    tr:"Sıradan bir sohbet sende beklenmedik bir hayat teorisine dönüşebiliyor. Çayın soğusa da fikrini biraz daha pişirmeden konuyu kapatmıyorsun. Biri küçük bir itiraz getirsin yeter; koltuk aynı yerde, düşünce çoktan üç mahalle ötede.",
+    en:"An ordinary chat can turn into an unexpected theory of life when you get involved. Your tea may go cold, but you still need another minute to develop the idea. One small objection is enough to send your thoughts three neighborhoods away while the sofa stays put."
+  },
+  "Vibe Radarı": {
+    tr:"Bir masaya oturunca önce konuşulan konuya değil, aradaki küçük sessizliklere takılıyorsun. Herkesin aynı anda sustuğu anı bir cümleyle yumuşatmayı seviyorsun. Ortamın ayar düğmesini sana vermeseler de elin hep yakınında.",
+    en:"At a table, the little pauses catch your attention before the topic does. You like finding the one sentence that softens a sudden silence. Nobody handed you the room's mood dial, but your hand is always nearby."
+  },
+  "Drama İtfaiyesi": {
+    tr:"Tartışmayı sakinleştirmeye gelirken önce hikâyenin bütün ayrıntılarını öğrenmek istiyorsun. Barış sağlansın istiyorsun ama en heyecanlı kısmı da atlamayalım diyorsun. Elinde su kovası, aklında son bir soru var.",
+    en:"You arrive to calm an argument, but first you need every detail of the story. You want peace, just without skipping the most interesting part. There is a bucket of water in your hand and one last question on your mind."
+  },
+  "Fazla Düşünen": {
+    tr:"Kısa bir mesaj yazarken noktanın fazla ciddi, ünlemin fazla hevesli olduğuna karar verebiliyorsun. Gönder tuşuna gelene kadar zihninde üç farklı konuşma çoktan bitmiş oluyor. En sonunda ilk yazdığını seçmen de bu küçük maceranın finali.",
+    en:"Writing a short message can become a debate over whether a period is too stern or an exclamation mark too eager. Three possible conversations have already ended in your head before you hit send. Choosing your first draft after all that is the grand finale."
+  },
+  "Gizli Başrol": {
+    tr:"Dikkat çekmek için sahnenin ortasına koşmuyorsun; kenardan söylediğin tek cümle zaten akılda kalıyor. Kalabalık dağılınca hikâyenin en çok senin kısmın anlatılıyor. Sen ise bütün bunlar çok normalmiş gibi ceketini alıp çıkıyorsun.",
+    en:"You do not rush to center stage; one remark from the sidelines is enough to be remembered. Once the crowd leaves, your part becomes the bit everyone retells. You just pick up your jacket as if nothing unusual happened."
+  },
+  "Ortam Güncellemesi": {
+    tr:"Durgun bir buluşmaya küçük bir oyun, yeni bir konu ya da beklenmedik bir planla giriyorsun. Beş dakika önce eve gitmeyi düşünenler bir tur daha kalıyor. Senin için iyi bir akşamın programı, başladıktan sonra yazılıyor.",
+    en:"You bring a little game, a new topic, or an unexpected plan to a quiet gathering. People who were about to leave suddenly stay for another round. For you, the best evening gets its schedule after it starts."
+  },
+  "Konu Mıknatısı": {
+    tr:"Birine gününün nasıl geçtiğini sorup çocukluk hayaline kadar uzanan bir sohbete dalabiliyorsun. Tam konu kapanacakken aklına gelen soru yeni bir kapı açıyor. Seninle kısa bir kahvenin neden uzadığını kimse tam açıklayamıyor.",
+    en:"You ask how someone's day went and somehow end up talking about their childhood dream. Just as a subject winds down, your next question opens another door. Nobody can quite explain why a quick coffee with you takes so long."
+  },
+  "Cümle Cambazı": {
+    tr:"Düz bir anlatım işini görse bile cümlenin sonuna küçük bir takla eklemeden duramıyorsun. Kelimeleri yan yana değil, birbirine göz kırpacak şekilde diziyorsun. Anlattığın olay unutulsa da onu nasıl söylediğin masada kalıyor.",
+    en:"A plain explanation would do, but you cannot resist giving the last line a little somersault. Your words seem to wink at each other instead of simply standing in a row. Even when the story fades, people remember how you told it."
   }
-  return mode === "stalk"
-    ? "Tamamen eğlencesine: bu hesap “" + nick + "” çekti. XORA'nın kanıtı yok, özgüveni fazla."
-    : "Tamamen eğlencesine: “" + nick + "” çektin. Bilimsel değeri yok, paylaşmalık değeri var.";
+};
+
+function funModeComment(card, mode, lang) {
+  var persona = FUN_PERSONA_COMMENTS[card.nickname.tr];
+  return persona ? (persona[lang] || persona.tr) : "";
+}
+
+// Resolve known personas again so saved FUN cards also lose the old disclaimer template.
+function funIdentityComment(res, lang) {
+  var nickname = res.nickname || (res.card && res.card.nickname) || (res.archetype && res.archetype.name);
+  var card = FUN_CARD_POOL.find(function (entry) {
+    return typeof nickname === "string"
+      ? nickname === entry.nickname.tr || nickname === entry.nickname.en
+      : nickname && (nickname.tr === entry.nickname.tr || nickname.en === entry.nickname.en);
+  });
+  return card ? funModeComment(card, res.mode, lang) : "";
 }
 
 function analyzeFunHandle(rawHandle, mode, rerollNonce) {

@@ -3,7 +3,7 @@ const vm=require('node:vm');
 const ts=require('typescript');
 function edge(options={}) {
   let source=fs.readFileSync('supabase/functions/analyze-real/index.ts','utf8');
-  source=source.replace(/^import .*\n/,'').replace('Deno.serve(main);','');
+  source=source.replace(/^import .*\r?\n/,'').replace('Deno.serve(main);','');
   const output=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
   const context={exports:{},console,Error,Response,Request,Headers,AbortSignal,crypto,fetch:async()=>{throw Error('Unexpected live fetch');},Deno:{env:{get:k=>({SUPABASE_URL:'http://local.test',SUPABASE_ANON_KEY:'test-anon',SUPABASE_SERVICE_ROLE_KEY:'test-service',X_BEARER_TOKEN:'test-x',AI_PROVIDER:'anthropic',AI_API_KEY:'test-ai',AI_MODEL:'mock-model'})[k]}},...options};
   vm.createContext(context); vm.runInContext(output,context);

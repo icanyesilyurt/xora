@@ -58,9 +58,7 @@ function buildFunIdentityCard(res) {
   var emoji = res.profile_emoji || (res.card && res.card.emoji) || (res.archetype && res.archetype.emoji) || "✨";
   var nick = localized(res.nickname || (res.card && res.card.nickname) || (res.archetype && res.archetype.name), lang);
   var desc = localized(res.tagline || (res.card && res.card.desc) || (res.archetype && res.archetype.desc), lang);
-  var comment = "";
-  if (res.comment && res.comment.mirror) comment = localized(res.comment[res.mode === "stalk" ? "stalk" : "mirror"], lang);
-  if (!comment && res.archetype && res.archetype.comments && res.archetype.comments[lang]) comment = res.archetype.comments[lang][res.ci || 0] || "";
+  var comment = funIdentityComment(res, lang);
 
   return (
     '<div class="idcard funcard" style="--ac:' + color + '" data-tier="fun">' +
@@ -70,7 +68,7 @@ function buildFunIdentityCard(res) {
         '<p class="idcard-handle">@' + esc(res.handle) + '</p>' +
         '<h2 class="idcard-type">' + esc(nick) + '</h2>' +
         (desc ? '<p class="idcard-desc">' + esc(desc) + '</p>' : '') +
-        '<div class="idcard-quote fun-quote"><span class="quote-label">XORA FUN</span><p>' + esc(comment) + '</p></div>' +
+        '<div class="idcard-quote fun-quote"><p>' + esc(comment) + '</p></div>' +
       '</div>' +
       '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(res.hash || 1) + '</span><span>xora.app</span></div>' +
     '</div>'
@@ -439,8 +437,7 @@ function renderFunIdentityPNG(res) {
   var emoji = res.profile_emoji || c.emoji || a.emoji || "✨";
   var nick = localized(res.nickname || c.nickname || a.name, lang);
   var desc = localized(res.tagline || c.desc || a.desc, lang);
-  var comment = res.comment && res.comment.mirror ? localized(res.comment.mirror, lang) : "";
-  if (!comment && a.comments && a.comments[lang]) comment = a.comments[lang][res.ci || 0] || "";
+  var comment = funIdentityComment(res, lang);
   var b = baseCanvas(), ctx = b.ctx;
   drawCardFrame(ctx, color);
   ctx.fillStyle = "#1E2330"; roundRect(ctx, 50, 45, 260, 54, 27); ctx.fill();
@@ -451,9 +448,15 @@ function renderFunIdentityPNG(res) {
   ctx.fillStyle="#8A8F9C"; ctx.font="700 30px Nunito, Arial, sans-serif"; ctx.fillText("@"+res.handle,500,540);
   ctx.fillStyle="#1E2330"; ctx.font="900 56px Nunito, Arial, sans-serif"; var yNick=wrapText(ctx,nick,500,615,720,62);
   ctx.fillStyle="#5C6270"; ctx.font="600 28px Nunito, Arial, sans-serif"; var y=wrapText(ctx,desc,500,yNick+70,700,34)+42;
-  ctx.fillStyle="#FFF1E3"; roundRect(ctx,130,y,740,220,24); ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=3; roundRect(ctx,130,y,740,220,24); ctx.stroke();
-  ctx.fillStyle=color; ctx.font="900 22px Nunito, Arial, sans-serif"; ctx.fillText("XORA FUN",500,y+42);
-  ctx.fillStyle="#1E2330"; ctx.font="700 26px Nunito, Arial, sans-serif"; wrapText(ctx,comment,500,y+82,660,34);
+  ctx.font="700 26px Nunito, Arial, sans-serif";
+  var commentLines=1, line="";
+  comment.split(" ").forEach(function(word) {
+    if (line && ctx.measureText(line+word+" ").width>660) { commentLines++; line=""; }
+    line+=word+" ";
+  });
+  var quoteHeight=Math.max(220,70+(commentLines-1)*34);
+  ctx.fillStyle="#FFF1E3"; roundRect(ctx,130,y,740,quoteHeight,24); ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=3; roundRect(ctx,130,y,740,quoteHeight,24); ctx.stroke();
+  ctx.fillStyle="#1E2330"; ctx.font="700 26px Nunito, Arial, sans-serif"; wrapText(ctx,comment,500,y+42,660,34);
   drawCardFooter(ctx,res.hash||1);
   return b.cv;
 }

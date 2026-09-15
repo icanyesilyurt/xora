@@ -1,4 +1,45 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const vm=require('node:vm');const fs=require('node:fs');const {browser}=require('./helpers.cjs');
+test('every FUN persona has distinct localized character copy in generated, saved HTML and PNG results',()=>{
+ const c=browser();
+ const forbidden=/tamamen eğlencesine|çektin|çekti\b|bilimsel değeri yok|XORA['’]nın kanıtı yok|paylaşmalık değeri var|ücretsiz|\bfree\b|X verilerini analiz etmez|purely for fun|you drew|this account drew|no evidence|scientifically useless|socially shareable/i;
+ const seen=new Map();
+ for(let nonce=0;nonce<1000 && seen.size<c.FUN_CARD_POOL.length;nonce++){
+  const result=c.analyzeFunHandle('alice','mirror',nonce);seen.set(result.nickname.tr,result);
+ }
+ assert.equal(seen.size,c.FUN_CARD_POOL.length);
+ for(const lang of ['tr','en']){
+  c.getLang=()=>lang;
+  const unique=new Set();
+  for(const [name,result] of seen){
+   const expected=result.comment.mirror[lang];unique.add(expected);
+   assert.doesNotMatch(expected,forbidden,name);
+   const sentences=expected.match(/[^.!?]+[.!?]/g)||[];
+   assert.ok(sentences.length>=2 && sentences.length<=4,name);
+   assert.equal(result.archetype.comments[lang][0],expected);
+   // Historical cards must resolve their persona rather than redisplay stored boilerplate.
+   const saved=structuredClone(result);
+   saved.comment.mirror[lang]='Tamamen eğlencesine: bu hesap çekti. XORA’nın kanıtı yok.';
+   saved.archetype.comments[lang]=['Scientifically useless, socially shareable.'];
+   const html=c.buildIdentityCard(saved);
+   const middle=html.match(/<div class="idcard-quote fun-quote">([\s\S]*?)<\/div>/)[1];
+   assert.equal(middle,'<p>'+c.esc(expected)+'</p>');
+   assert.doesNotMatch(middle,forbidden);assert.doesNotMatch(middle,/XORA FUN|quote-label/);
+   assert.ok(html.includes('XORA FUN · FREE'));
+   assert.equal(saved.comment.mirror[lang],'Tamamen eğlencesine: bu hesap çekti. XORA’nın kanıtı yok.');
+   const text=[];const ctx=new Proxy({measureText:v=>({width:String(v).length*13}),fillText:(v,x,y)=>text.push({v,x,y}),createLinearGradient:()=>({addColorStop(){}})},{get:(o,k)=>k in o?o[k]:()=>{}});
+   let box;const originalRect=c.roundRect;
+   c.roundRect=(ctx,x,y,w,h,r)=>{if(x===130)box={y,h};originalRect(ctx,x,y,w,h,r);};
+   c.document.createElement=()=>({getContext:()=>ctx});c.renderIdentityPNG(saved);c.roundRect=originalRect;
+   assert.ok(text.some(p=>p.v==='XORA FUN · FREE'));assert.ok(!text.some(p=>p.v==='XORA FUN'));
+   const copy=text.filter(p=>p.x===500 && p.y>700 && p.y<1090).map(p=>p.v).join(' ');
+   assert.ok(copy.includes(expected),name+' PNG contains the full persona comment');
+   assert.doesNotMatch(copy,forbidden);
+   assert.ok(box.y+box.h<1090,name+' comment box stays above footer');
+   assert.ok(text.filter(p=>p.x===500 && p.y>=box.y && p.y<1090).every(p=>p.y<box.y+box.h-15),name+' text fits inside comment box');
+  }
+  assert.equal(unique.size,c.FUN_CARD_POOL.length,'each nickname has its own '+lang+' comment');
+ }
+});
 test('FUN generators are deterministic, rerollable, free and never access REAL APIs',()=>{
  const c=browser();c.requestRealAnalysis=()=>{throw Error('REAL called from FUN');};c.getSupabaseClient=()=>{throw Error('DB called from FUN');};
  for(const mode of ['mirror','stalk','match'])for(let nonce=0;nonce<12;nonce++) {
