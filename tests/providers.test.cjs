@@ -44,15 +44,15 @@ for(const provider of ['openai','anthropic']) {
  test(`${provider}: aliases allow novel natural phrases only with active evidence`,async()=>{
   const rejected=[
    [{tr:'Kozmik Salatalık',en:'Cosmic Cucumber',evidence:'question_ratio'}],
-   [{tr:'Soru Avcısı',en:'Question Hunter',evidence:'invented'}],
+   [{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',evidence:'invented'}],
    [{tr:'Reply Avcısı',en:'Reply Hunter',evidence:'reply_ratio'}],
    [{tr:'Çok Fazla Uzun Kelimeli İsim',en:'Far Too Many Alias Words',evidence:'question_ratio'}]
   ];
   for(const candidates of rejected) {
-   const f=fixture(provider,{mutate:raw=>{raw.nickname_candidates=candidates;}});const response=await f.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'fallback');assert.equal(result.nickname.en,'Question Machine');assert.match(JSON.stringify(f.logs),/nickname_fallback/);
+   const f=fixture(provider,{mutate:raw=>{raw.nickname_candidates=candidates;}});const response=await f.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'fallback');assert.equal(result.nickname.en,'Curious Mind');assert.match(JSON.stringify(f.logs),/nickname_fallback/);
   }
-  const accepted=fixture(provider,{mutate:raw=>{raw.nickname_candidates=[{tr:'Soru Avcısı',en:'Question Hunter',evidence:'question_ratio'}];}});
-  const response=await accepted.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'ai_generated_validated');assert.equal(result.nickname.tr,'Soru Avcısı');assert.equal(result.nickname.en,'Question Hunter');
+  const accepted=fixture(provider,{mutate:raw=>{raw.nickname_candidates=[{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',evidence:'question_ratio'}];}});
+  const response=await accepted.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'ai_generated_validated');assert.equal(result.nickname.tr,'Meraklı Muhabbetçi');assert.equal(result.nickname.en,'Thoughtful Conversationalist');
  });
  test(`${provider}: HTTP failure, refusal/truncation and malformed JSON use existing refund`,async()=>{
   const cases=provider==='openai'

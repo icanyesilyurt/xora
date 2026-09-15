@@ -17,11 +17,11 @@ test('REAL shape, rarity, nickname evidence and safe deterministic fallback',()=
  const result=e.normalizeAIProfile(raw,'alice','mirror',sig,'tr');
  assert.equal(result.meta.tier,'real');assert.ok(['common','rare','epic','legendary'].includes(result.rarity.name));
  assert.equal(result.meta.alias_source,'ai_generated_validated');
- for(const v of ['Cosmic Potato Wizard','Kozmik Salatalık','Bipolar Genius','a','<img src=x>','Soru Makinesi https://x.test','One Two Three Four Five']) assert.equal(e.aliasValid(v),false,v);
- for(const v of ['Soru Makinesi','Sessiz Gözlemci','Question Hunter','İroni Memuru']) assert.equal(e.aliasValid(v),true,v);
+ for(const v of ['Cosmic Potato Wizard','Kozmik Salatalık','Bipolar Genius','a','<img src=x>','Meraklı Biri https://x.test','One Two Three Four Five']) assert.equal(e.aliasValid(v,'en'),false,v);
+ for(const [v,lang] of [['Meraklı Biri','tr'],['Sessiz Gözlemci','tr'],['Thoughtful Conversationalist','en'],['Inquisitive Mind','en']]) assert.equal(e.aliasValid(v,lang),true,v);
  raw.nickname_candidates[0].evidence='invented';assert.equal(e.pickAliasPair(raw,sig).source,'fallback');
  raw.nickname_candidates[0].evidence='question_ratio';assert.equal(e.pickAliasPair(raw,{own_posts:8,question_ratio:0}).source,'fallback');
- const novel={nickname_candidates:[{tr:'Soru Avcısı',en:'Question Hunter',evidence:'question_ratio'}]};assert.equal(e.pickAliasPair(novel,{own_posts:8,question_ratio:.8}).source,'ai_generated_validated');
+ const novel={nickname_candidates:[{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',evidence:'question_ratio'}]};assert.equal(e.pickAliasPair(novel,{own_posts:8,question_ratio:.8}).source,'ai_generated_validated');
 });
 test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=>{
  const e=edge();

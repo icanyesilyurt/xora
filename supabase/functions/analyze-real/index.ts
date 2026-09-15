@@ -237,15 +237,15 @@ async function callAI(input: unknown) {
 // and cite a deterministic behavioral signal that is actually active for this dataset.
 // This keeps names personal without allowing random word salad or sensitive-trait labels.
 const ALIASES = [
-  {tr:"Reply Müdavimi", en:"Reply Regular", key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
-  {tr:"Uzun Cümle Ustası", en:"Longform Regular", key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
-  {tr:"Emoji Sözcüsü", en:"Emoji Spokesperson", key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
-  {tr:"Soru Makinesi", en:"Question Machine", key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
-  {tr:"Kelime Koleksiyoncusu", en:"Word Collector", key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
-  {tr:"Kendi Sözleriyle", en:"In Their Words", key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
-  {tr:"Alıntı Avcısı", en:"Quote Hunter", key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
-  {tr:"Paylaşım Seçkisi", en:"Shared Selections", key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
-  {tr:"Ünlem Müdavimi", en:"Exclamation Regular", key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
+  {tr:"Sohbeti Seven", en:"Always Up for Conversation", key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
+  {tr:"Uzun Uzun Anlatan", en:"Detailed Storyteller", key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
+  {tr:"Renkli Anlatıcı", en:"Expressive Soul", key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
+  {tr:"Meraklı Biri", en:"Curious Mind", key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
+  {tr:"Sözü Kuvvetli", en:"Way with Words", key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
+  {tr:"Özgün Anlatıcı", en:"Original Voice", key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
+  {tr:"Alıntı Seven", en:"Thoughtful Reader", key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
+  {tr:"Paylaşmayı Seven", en:"Keen Sharer", key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
+  {tr:"Coşkulu Anlatıcı", en:"Full of Enthusiasm", key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
   {tr:"X Yazarı", en:"X Contributor", key:"own_posts", test:(s:any)=>s.own_posts >= 6}
 ];
 const ALIAS_EVIDENCE = ALIASES.map(a=>({key:a.key,test:a.test}));
@@ -260,15 +260,40 @@ function activeAliasEvidence(signals:any) {
   for (const rule of ALIAS_EVIDENCE) if (rule.test(signals)) active.push(rule.key);
   return [...new Set(active)];
 }
-function aliasValid(v: unknown) {
-  if (typeof v !== "string") return false;
-  const text=v.trim();
+// A conservative lexical guard, not a claim to understand arbitrary language.
+// Curated FUN copy is reviewed separately; AI candidates still need active evidence.
+const ALIAS_LOCALE_RULES: Record<Locale, {forced:RegExp;sensitive:RegExp;foreign:RegExp}> = {
+  tr: {
+    forced: /makine|motor|fabrika|jeneratör|radar|itfaiye|savaşçı|avcı|avcısı|memur|müdür|mıknatıs|turisti|güncellemesi|kozmik|kadife|tost|salatalık|patates/u,
+    sensitive: /şizofren|otistik|otizm|depres|psikopat|sosyopat|narsis|anksiyete|dikkat eksikliği|eşcinsel|lezbiyen|heteroseks|biseks|transseks|müslüman|hristiyan|hıristiyan|yahudi|ateist|sünni|alevi|kürt|ermeni|engelli|kanser|diyabet|travma/u,
+    foreign: /\b(?:reply|question|machine|factory|engine|warrior|hunter|firefighter|generator|quiet|cheek|charmer)\b/u
+  },
+  en: {
+    forced: /\b(?:machines?|factories|factory|generators?|engines?|radars?|firefighters?|warriors?|hunters?|wizards?|magnets?|units?|spokespersons?|velvet|toasters?|cucumbers?|potatoes|potato)\b/u,
+    sensitive: /\b(?:bipolar|schizo\w*|autis\w*|adhd|depress\w*|psychopath\w*|sociopath\w*|narciss\w*|anxiety|ocd|ptsd|gay|lesbian|heterosexual|bisexual|transgender|muslim|christian|jewish|atheist|sunni|shia|kurdish|armenian|disabled|cancer|diabet\w*|trauma\w*)\b/u,
+    foreign: /[çğıöşü]|\b(?:soru|mizah|koltuk|filozofu|sessiz|merakli)\b/u
+  }
+};
+const UNNATURAL_ALIAS_PHRASES: Record<Locale, string[]> = {
+  tr:["kadife mantık","mor düşünce","cümle tostçusu","emoji sözcüsü"],
+  en:["head of irony","dry wit operator","room update","timeline tourist","sentence acrobat","drama fire crew","velvet logic","purple thought","quantum spoon"]
+};
+function aliasValid(v: unknown, locale: Locale) {
+  if (typeof v !== "string" || !Object.hasOwn(ALIAS_LOCALE_RULES,locale)) return false;
+  const text=v.normalize("NFKC").trim();
   if (text.length < 4 || text.length > 38 || !/^[\p{L}][\p{L}'’ -]*$/u.test(text)) return false;
   const words=text.split(/\s+/).filter(Boolean);
   if (words.length < 2 || words.length > 4) return false;
-  const normalized=text.toLocaleLowerCase("tr-TR");
+  const normalized=text.toLocaleLowerCase(locale === "tr" ? "tr-TR" : "en-US");
+  const tokens=normalized.split(/[\s'’-]+/);
+  if (new Set(tokens).size===1 || /--|''|’’/.test(text)) return false;
   if (["x profili","x profile"].includes(normalized)) return false;
   if (BANNED_ALIAS_TERMS.some(term=>normalized.includes(term))) return false;
+  const rules=ALIAS_LOCALE_RULES[locale];
+  if (UNNATURAL_ALIAS_PHRASES[locale].includes(normalized.replace(/\s+/g," "))) return false;
+  if (rules.forced.test(normalized) || rules.sensitive.test(normalized) || rules.foreign.test(normalized)) return false;
+  // Sensitive labels are unsafe even when the model puts the other language in a field.
+  if (ALIAS_LOCALE_RULES.tr.sensitive.test(text.toLocaleLowerCase("tr-TR")) || ALIAS_LOCALE_RULES.en.sensitive.test(text.toLocaleLowerCase("en-US"))) return false;
   return true;
 }
 function fallbackAlias(signals: any, lang: Locale) {
@@ -278,7 +303,7 @@ function pickAliasPair(raw: any, signals: any) {
   const active=new Set(activeAliasEvidence(signals));
   for (const c of (Array.isArray(raw?.nickname_candidates) ? raw.nickname_candidates : []).slice(0,6)) {
     if (!c || typeof c.evidence!=="string" || !active.has(c.evidence)) continue;
-    if (!aliasValid(c.tr) || !aliasValid(c.en)) continue;
+    if (!aliasValid(c.tr,"tr") || !aliasValid(c.en,"en")) continue;
     return {tr:c.tr.trim(),en:c.en.trim(),source:"ai_generated_validated",evidence:c.evidence};
   }
   console.warn("nickname_fallback");
@@ -358,10 +383,10 @@ async function analyzeOne(service:any, handle:string, mode:"mirror"|"stalk", loc
     nickname_evidence: activeAliasEvidence(signals).map(key=>({key,value:(signals as Record<string,unknown>)[key]})),
     nickname_style_examples: [
       {tr:"Sessiz Gözlemci",en:"Quiet Observer"},
-      {tr:"Reply Müdavimi",en:"Reply Regular"},
-      {tr:"Soru Avcısı",en:"Question Hunter"},
-      {tr:"Uzun Cümle Ustası",en:"Longform Regular"},
-      {tr:"İroni Memuru",en:"Dry Wit Operator"}
+      {tr:"Sohbeti Seven",en:"Always Up for Conversation"},
+      {tr:"Meraklı Biri",en:"Curious Mind"},
+      {tr:"Uzun Uzun Anlatan",en:"Detailed Storyteller"},
+      {tr:"İnce Alaycı",en:"Tongue in Cheek"}
     ],
     rules: [
       "Generate 3-6 original nickname candidate pairs. Examples are style references, not a fixed list.",

@@ -19,6 +19,6 @@ function browser() {
  return context;
 }
 const metrics=['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label_tr:'Yorum',label_en:'Comment',value:70}));
-const profileAI=()=>({nickname_candidates:[{tr:'Soru Makinesi',en:'Question Machine',evidence:'question_ratio'}],metrics:structuredClone(metrics),tagline_tr:'Sorularla ilerliyor.',tagline_en:'Questions lead the way.',summary_tr:'Açık sorular soruyor.',summary_en:'Asks open questions.',comment_tr:'Sorularla konuşmayı açıyorsun.',comment_en:'You open conversations with questions.',observations:['Uses questions.'],emoji:'🪞'});
+const profileAI=()=>({nickname_candidates:[{tr:'Meraklı Biri',en:'Curious Mind',evidence:'question_ratio'}],metrics:structuredClone(metrics),tagline_tr:'Sorularla ilerliyor.',tagline_en:'Questions lead the way.',summary_tr:'Açık sorular soruyor.',summary_en:'Asks open questions.',comment_tr:'Sorularla konuşmayı açıyorsun.',comment_en:'You open conversations with questions.',observations:['Uses questions.'],emoji:'🪞'});
 const matchAI=()=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment_tr:'İki hesap da soru soruyor.',comment_en:'Both accounts ask questions.'});
 module.exports={edge,browser,profileAI,matchAI};

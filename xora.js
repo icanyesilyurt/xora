@@ -892,86 +892,306 @@ function analyzeHandle(rawHandle, mode, seedKey) {
 }
 
 
-var FUN_CARD_POOL = [
-  { emoji:"🫥", color:"#19B8B8", nickname:{tr:"Sessiz Kaos",en:"Quiet Chaos"}, desc:{tr:"Hiçbir şey olmuyormuş gibi durup ortamın ayarını değiştirme enerjisi.",en:"The energy of changing the room while looking completely innocent."} },
-  { emoji:"🎭", color:"#7C4DFF", nickname:{tr:"İroni Müdürü",en:"Head of Irony"}, desc:{tr:"Ciddiyet departmanıyla profesyonel mesafeni koruyorsun.",en:"You maintain a professional distance from the seriousness department."} },
-  { emoji:"🧃", color:"#FF7A45", nickname:{tr:"Gündem Turisti",en:"Timeline Tourist"}, desc:{tr:"Her konuya uğrayıp hiçbirine depozito bırakmayan bir enerji.",en:"Visits every topic and leaves a deposit on none of them."} },
-  { emoji:"🧊", color:"#2F80ED", nickname:{tr:"Soğuk Mizah",en:"Dry Humor Unit"}, desc:{tr:"Şaka yaptığını üç dakika sonra fark ettiren türden.",en:"The kind of joke people realize was a joke three minutes later."} },
-  { emoji:"🛋️", color:"#5C6270", nickname:{tr:"Koltuk Filozofu",en:"Sofa Philosopher"}, desc:{tr:"Dünya sorunlarıyla aranda bir ekran ve çok güçlü fikirler var.",en:"One screen away from the world’s problems and several strong opinions."} },
-  { emoji:"📡", color:"#0FAFAF", nickname:{tr:"Vibe Radarı",en:"Vibe Radar"}, desc:{tr:"Ortamın havasını ölçüp sonucu kimse istemeden açıklama potansiyeli.",en:"Could measure the room and publish the findings without being asked."} },
-  { emoji:"🧯", color:"#FF6B57", nickname:{tr:"Drama İtfaiyesi",en:"Drama Fire Crew"}, desc:{tr:"Yangını söndürür müsün, körükler misin? Kartın da emin değil.",en:"Would you put the fire out or feed it? Even the card is unsure."} },
-  { emoji:"🧠", color:"#7C4DFF", nickname:{tr:"Fazla Düşünen",en:"Certified Overthinker"}, desc:{tr:"Basit bir şeyi zihninde yönetim kurulu toplantısına çevirebilirsin.",en:"Can turn a simple thought into a full board meeting."} },
-  { emoji:"🕶️", color:"#2D3445", nickname:{tr:"Gizli Başrol",en:"Lowkey Main Character"}, desc:{tr:"Başrol olduğunu söylemezsin; kamera zaten seni bulur.",en:"You would never call yourself the lead. The camera just finds you."} },
-  { emoji:"🪩", color:"#E75DAA", nickname:{tr:"Ortam Güncellemesi",en:"Room Update"}, desc:{tr:"Geldiğinde ortamın sürümü sessizce değişiyor.",en:"The room quietly ships a new version when you arrive."} },
-  { emoji:"🧲", color:"#FF7A45", nickname:{tr:"Konu Mıknatısı",en:"Topic Magnet"}, desc:{tr:"Bir şekilde konuşma dönüp dolaşıp ilginç bir yere geliyor.",en:"Somehow the conversation keeps ending up somewhere interesting."} },
-  { emoji:"🪄", color:"#19B8B8", nickname:{tr:"Cümle Cambazı",en:"Sentence Acrobat"}, desc:{tr:"Bir cümleyi normal bitirmek varken neden biraz kıvırmayasın?",en:"Why end a sentence normally when you can make it do a trick?"} }
+// IDs describe behavior, never translated display names. Keep order stable for seeded draws.
+// Every supported locale needs independently curated copy; do not synthesize translations.
+// legacy_names exist only to read cards saved before canonical IDs were introduced.
+var FUN_PERSONAS = [
+  {
+    "id": "quiet_instigator",
+    "semantic": "Quietly challenges expectations with understated mischief.",
+    "emoji": "🫥",
+    "color": "#19B8B8",
+    "legacy_names": [
+      "Sessiz Kaos",
+      "Quiet Chaos"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Sessiz Muzip",
+        "tagline": "Sakin görünüşünün altında küçük bir muziplik var.",
+        "comment": "Herkes aynı fikirdeyken küçük bir itirazla sohbetin yönünü değiştiriyorsun. Bunu öyle sakin söylüyorsun ki ilk anda şaka mı ciddi mi olduğun anlaşılmıyor. En çok da seni anlayan biriyle sessizce gülüşmek hoşuna gidiyor."
+      },
+      "en": {
+        "nickname": "Quiet Instigator",
+        "tagline": "You ask the question everyone else was avoiding.",
+        "comment": "You can get a whole table talking with one casually delivered question. You seem perfectly content to listen while everyone works out what they think. The fun is in the tiny grin you share with whoever caught on first."
+      }
+    }
+  },
+  {
+    "id": "ironic_observer",
+    "semantic": "Notices contradictions and expresses them through gentle irony.",
+    "emoji": "🎭",
+    "color": "#7C4DFF",
+    "legacy_names": [
+      "İroni Müdürü",
+      "Head of Irony"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "İnce Alaycı",
+        "tagline": "Ciddiyeti bozmadan cümlenin anlamını değiştiriyorsun.",
+        "comment": "Fazla iddialı bir söz duyunca içindeki küçük çelişkiyi fark ediyorsun. Uzun bir itiraz yerine kısa, hafif alaylı bir karşılık vermek sana daha cazip geliyor. Şakayı açıklamak yerine anlayanların gülümsemesini bekliyorsun."
+      },
+      "en": {
+        "nickname": "Tongue in Cheek",
+        "tagline": "Almost serious, but never quite.",
+        "comment": "You enjoy saying something almost sincerely and letting the last few words give you away. A grand announcement is usually an invitation for a gentle tease. You would rather earn a knowing smile than explain why you were funny."
+      }
+    }
+  },
+  {
+    "id": "topic_explorer",
+    "semantic": "Enjoys exploring many topics without needing to settle on one.",
+    "emoji": "🧃",
+    "color": "#FF7A45",
+    "legacy_names": [
+      "Gündem Turisti",
+      "Timeline Tourist"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Her Konuya Meraklı",
+        "tagline": "Bir konu bitmeden ötekini merak etmeye başlıyorsun.",
+        "comment": "Bilmediğin bir konu açılınca susmak yerine soru soruyorsun. Sohbet ilerledikçe öğrenmek istediğin başka şeyler de çıkıyor. Her konuda uzman olmaktan çok, yeni bir şey duymak hoşuna gidiyor."
+      },
+      "en": {
+        "nickname": "Endlessly Curious",
+        "tagline": "There is always something else worth asking about.",
+        "comment": "You are happy to be the person who asks how something works. One interesting answer tends to lead to another question, even when the subject is completely new to you. Knowing a little more than you did an hour ago feels like a good afternoon."
+      }
+    }
+  },
+  {
+    "id": "deadpan_humor",
+    "semantic": "Delivers understated humor with a straight face and patient timing.",
+    "emoji": "🧊",
+    "color": "#2F80ED",
+    "legacy_names": [
+      "Soğuk Mizah",
+      "Dry Humor Unit"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Soğuk Mizah",
+        "tagline": "Şakanın anlaşılması için acele etmiyorsun.",
+        "comment": "En absürt cümleyi sıradan bir şey söylüyormuş gibi söyleyip susuyorsun. Karşındaki şakayı yakalayana kadar yüzünden tek bir ipucu çıkmıyor. Kahkaha gecikince açıklama yapmıyorsun; o küçük sessizlik de esprinin bir parçası."
+      },
+      "en": {
+        "nickname": "Dry Wit",
+        "tagline": "The straight face is part of the joke.",
+        "comment": "You deliver a ridiculous observation with the same composure as a perfectly ordinary remark. Someone usually has to check whether you meant it. You let them take their time, because the pause makes it better."
+      }
+    }
+  },
+  {
+    "id": "armchair_thinker",
+    "semantic": "Enjoys developing personal theories through relaxed discussion.",
+    "emoji": "🛋️",
+    "color": "#5C6270",
+    "legacy_names": [
+      "Koltuk Filozofu",
+      "Sofa Philosopher"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Koltuk Filozofu",
+        "tagline": "Sıradan bir sorunun uzun bir cevabı olabilir.",
+        "comment": "Sıradan bir sohbet sende beklenmedik bir hayat teorisine dönüşebiliyor. Çayın soğusa da fikrini biraz daha düşünmeden konuyu kapatmıyorsun. Birinin itiraz etmesi keyfini kaçırmıyor; asıl o zaman konuşacak yeni bir şey çıkıyor."
+      },
+      "en": {
+        "nickname": "Armchair Philosopher",
+        "tagline": "A casual chat rarely stays casual for long.",
+        "comment": "You can turn a passing question into a surprisingly thoughtful conversation. You enjoy trying out an idea before deciding whether you believe it. A good objection is a reason to stay and talk, especially if everyone is comfortable."
+      }
+    }
+  },
+  {
+    "id": "socially_attuned",
+    "semantic": "Pays attention to conversational timing and others comfort.",
+    "emoji": "📡",
+    "color": "#0FAFAF",
+    "legacy_names": [
+      "Vibe Radarı",
+      "Vibe Radar"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Ortamı Okuyan",
+        "tagline": "Ne söyleyeceğin kadar ne zaman söyleyeceğini de önemsiyorsun.",
+        "comment": "Bir sohbette yalnız söylenenlere değil, kimin söze giremediğine de dikkat ediyorsun. Bazen bir soru sormanın, bazen de konuyu değiştirmenin daha iyi geldiğini düşünüyorsun. Herkes rahatça konuşabildiğinde sen de daha çok keyif alıyorsun."
+      },
+      "en": {
+        "nickname": "Reads the Room",
+        "tagline": "You know when a change of subject would help.",
+        "comment": "You notice when someone has been trying to join in and make a little space for them. You are just as happy to change the subject when a joke has run its course. A good conversation, to you, is one where nobody has to fight to be heard."
+      }
+    }
+  },
+  {
+    "id": "conversation_mediator",
+    "semantic": "Helps people understand differing views without escalating disagreement.",
+    "emoji": "🧯",
+    "color": "#FF6B57",
+    "legacy_names": [
+      "Drama İtfaiyesi",
+      "Drama Fire Crew"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Masadaki Hakem",
+        "tagline": "Haklı çıkmaktan önce anlaşmayı önemsiyorsun.",
+        "comment": "İki kişi birbirini dinlemeyi bırakınca önce ne demek istediklerini anlamaya çalışıyorsun. Birine hak vermek için ötekini susturmak gerektiğini düşünmüyorsun. Tartışma sonunda herkes biraz daha sakin konuşabiliyorsa senin için iyi bir sonuç."
+      },
+      "en": {
+        "nickname": "Voice of Reason",
+        "tagline": "You can disagree without making it personal.",
+        "comment": "When a disagreement gets heated, you try to separate the actual point from the irritation. You can acknowledge a fair argument without choosing a side in everything. You are happiest when people leave understanding each other a little better."
+      }
+    }
+  },
+  {
+    "id": "deliberate_overthinker",
+    "semantic": "Reconsiders small choices and rehearses possible interpretations.",
+    "emoji": "🧠",
+    "color": "#7C4DFF",
+    "legacy_names": [
+      "Fazla Düşünen",
+      "Certified Overthinker"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Fazla Düşünen",
+        "tagline": "Göndermeden önce bir kez daha okuyorsun.",
+        "comment": "Kısa bir mesaj yazarken noktanın fazla ciddi, ünlemin fazla hevesli olduğuna karar verebiliyorsun. Göndermeden önce karşındakinin nasıl okuyacağını birkaç kez düşünüyorsun. Sonunda ilk yazdığını seçince kendine biraz gülüyorsun."
+      },
+      "en": {
+        "nickname": "Second Guesser",
+        "tagline": "Even a short reply deserves another look.",
+        "comment": "You can have a perfectly good reply ready and still wonder whether it sounds right. A different word seems worth considering, then perhaps the original was better. Sending the first version after all that is a familiar little victory."
+      }
+    }
+  },
+  {
+    "id": "understated_presence",
+    "semantic": "Leaves a memorable impression without seeking attention.",
+    "emoji": "🕶️",
+    "color": "#2D3445",
+    "legacy_names": [
+      "Gizli Başrol",
+      "Lowkey Main Character"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Gizli Başrol",
+        "tagline": "Çok konuşmadan da akılda kalabiliyorsun.",
+        "comment": "Kalabalıkta her boşluğu konuşarak doldurma ihtiyacı duymuyorsun. Söze girdiğinde kısa ama akılda kalan bir şey söylemek sana daha yakın geliyor. Buluşma bittikten sonra birinin senin sözünü hatırlaması hoşuna gidiyor."
+      },
+      "en": {
+        "nickname": "Quiet Charmer",
+        "tagline": "You do not need to be the loudest person there.",
+        "comment": "You are comfortable listening while other people take their turn. When you do speak, a thoughtful remark or a well-timed joke is usually enough. People tend to remember how easy it felt to talk to you."
+      }
+    }
+  },
+  {
+    "id": "social_catalyst",
+    "semantic": "Encourages participation and adds energy to social gatherings.",
+    "emoji": "🪩",
+    "color": "#E75DAA",
+    "legacy_names": [
+      "Ortam Güncellemesi",
+      "Room Update"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Ortamı Canlandıran",
+        "tagline": "Birlikte iyi vakit geçirmek için ilk adımı atıyorsun.",
+        "comment": "Buluşma durgunlaşınca küçük bir oyun ya da herkesin katılabileceği bir konu öneriyorsun. İnsanları zorlamadan sohbete dahil etmek hoşuna gidiyor. Planın kusursuz olmasından çok, kimsenin sıkılmamasını önemsiyorsun."
+      },
+      "en": {
+        "nickname": "Life of the Party",
+        "tagline": "You make joining in feel easy.",
+        "comment": "You are often the first to suggest something everyone can join in with. You enjoy getting people laughing together without putting anyone on the spot. The plan can change completely as long as people are having a good time."
+      }
+    }
+  },
+  {
+    "id": "curious_listener",
+    "semantic": "Uses sincere follow-up questions to invite richer conversations.",
+    "emoji": "🧲",
+    "color": "#FF7A45",
+    "legacy_names": [
+      "Konu Mıknatısı",
+      "Topic Magnet"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Lafı Açan",
+        "tagline": "İyi bir soruyla sohbeti derinleştiriyorsun.",
+        "comment": "Birine gününün nasıl geçtiğini sorunca cevabı gerçekten dinlemek istiyorsun. Küçük bir ayrıntı ilgini çekiyor ve onu biraz daha anlatmasını istiyorsun. Seninle kısa bir kahvenin uzaması çoğu zaman bu yüzden."
+      },
+      "en": {
+        "nickname": "Good Listener",
+        "tagline": "You remember to ask what happened next.",
+        "comment": "You do not ask a question just to wait for your own turn to speak. A small detail catches your interest and you want to hear the rest. People often find themselves telling you a story they had not planned to share."
+      }
+    }
+  },
+  {
+    "id": "playful_storyteller",
+    "semantic": "Enjoys expressive storytelling and well-timed wordplay.",
+    "emoji": "🪄",
+    "color": "#19B8B8",
+    "legacy_names": [
+      "Cümle Cambazı",
+      "Sentence Acrobat"
+    ],
+    "locales": {
+      "tr": {
+        "nickname": "Nüktedan Anlatıcı",
+        "tagline": "Bir olayı anlatış biçimin de hikâyenin parçası.",
+        "comment": "Sıradan bir olayı anlatırken en komik ayrıntıyı sona saklamayı seviyorsun. Aynı hikâyeyi başka biri anlatsa senin seçtiğin kelimeler eksik kalırmış gibi geliyor. İnsanların yalnız olaya değil, anlatışına da gülmesi hoşuna gidiyor."
+      },
+      "en": {
+        "nickname": "Way with Words",
+        "tagline": "You know which detail makes the story.",
+        "comment": "You know when to leave a detail out and when to bring it back at exactly the right moment. An ordinary mishap becomes worth retelling once you have found the right phrasing. Half the pleasure is hearing someone repeat your best line later."
+      }
+    }
+  }
 ];
 
-var FUN_PERSONA_COMMENTS = {
-  "Sessiz Kaos": {
-    tr:"Herkes planı onaylarken sen tek bir küçük soru soruyorsun ve toplantı başka bir evrene taşınıyor. Sonra da çayını içip olanları izliyorsun. Ortalık karışsa bile yüzündeki sakinlik yerinden oynamıyor.",
-    en:"Everyone agrees on the plan until you ask one tiny question and send the meeting into another universe. Then you sip your tea and watch it unfold. Even when the room erupts, your calm expression stays put."
-  },
-  "İroni Müdürü": {
-    tr:"Fazla ciddi bir cümle duyunca zihninde hemen alternatif bir altyazı beliriyor. İtirazını uzun uzun anlatmak yerine tek bir ince dokunuşla bırakıyorsun. Seni anlayanla göz göze gelmek, şakanın ikinci yarısı.",
-    en:"An overly serious sentence instantly gets alternative subtitles in your head. Instead of a long objection, you leave one perfectly placed remark. Catching the eye of someone who gets it is the second half of the joke."
-  },
-  "Gündem Turisti": {
-    tr:"Bir sohbete meraktan girip cebinde üç yeni konu ve yarım kalmış bir tartışmayla çıkıyorsun. Bir meseleye kamp kurmak yerine yan sokakta ne konuşulduğunu merak ediyorsun. Muhabbetin bavulu hep kapının yanında.",
-    en:"You wander into a conversation out of curiosity and leave with three new topics and half a debate. Rather than setting up camp on one subject, you wonder what people are discussing around the corner. Your conversational suitcase is always by the door."
-  },
-  "Soğuk Mizah": {
-    tr:"En absürt cümleyi hava durumunu bildirir gibi söyleyip susuyorsun. Karşındaki şakayı yakalayana kadar yüzünden tek bir ipucu çıkmıyor. Kahkaha gecikince açıklama yapmıyorsun; o küçük sessizlik de esprinin bir parçası.",
-    en:"You deliver the most absurd line as though you were reading the weather forecast. Your face offers no clues while the other person catches up. When the laugh arrives late, you let the little silence be part of the joke."
-  },
-  "Koltuk Filozofu": {
-    tr:"Sıradan bir sohbet sende beklenmedik bir hayat teorisine dönüşebiliyor. Çayın soğusa da fikrini biraz daha pişirmeden konuyu kapatmıyorsun. Biri küçük bir itiraz getirsin yeter; koltuk aynı yerde, düşünce çoktan üç mahalle ötede.",
-    en:"An ordinary chat can turn into an unexpected theory of life when you get involved. Your tea may go cold, but you still need another minute to develop the idea. One small objection is enough to send your thoughts three neighborhoods away while the sofa stays put."
-  },
-  "Vibe Radarı": {
-    tr:"Bir masaya oturunca önce konuşulan konuya değil, aradaki küçük sessizliklere takılıyorsun. Herkesin aynı anda sustuğu anı bir cümleyle yumuşatmayı seviyorsun. Ortamın ayar düğmesini sana vermeseler de elin hep yakınında.",
-    en:"At a table, the little pauses catch your attention before the topic does. You like finding the one sentence that softens a sudden silence. Nobody handed you the room's mood dial, but your hand is always nearby."
-  },
-  "Drama İtfaiyesi": {
-    tr:"Tartışmayı sakinleştirmeye gelirken önce hikâyenin bütün ayrıntılarını öğrenmek istiyorsun. Barış sağlansın istiyorsun ama en heyecanlı kısmı da atlamayalım diyorsun. Elinde su kovası, aklında son bir soru var.",
-    en:"You arrive to calm an argument, but first you need every detail of the story. You want peace, just without skipping the most interesting part. There is a bucket of water in your hand and one last question on your mind."
-  },
-  "Fazla Düşünen": {
-    tr:"Kısa bir mesaj yazarken noktanın fazla ciddi, ünlemin fazla hevesli olduğuna karar verebiliyorsun. Gönder tuşuna gelene kadar zihninde üç farklı konuşma çoktan bitmiş oluyor. En sonunda ilk yazdığını seçmen de bu küçük maceranın finali.",
-    en:"Writing a short message can become a debate over whether a period is too stern or an exclamation mark too eager. Three possible conversations have already ended in your head before you hit send. Choosing your first draft after all that is the grand finale."
-  },
-  "Gizli Başrol": {
-    tr:"Dikkat çekmek için sahnenin ortasına koşmuyorsun; kenardan söylediğin tek cümle zaten akılda kalıyor. Kalabalık dağılınca hikâyenin en çok senin kısmın anlatılıyor. Sen ise bütün bunlar çok normalmiş gibi ceketini alıp çıkıyorsun.",
-    en:"You do not rush to center stage; one remark from the sidelines is enough to be remembered. Once the crowd leaves, your part becomes the bit everyone retells. You just pick up your jacket as if nothing unusual happened."
-  },
-  "Ortam Güncellemesi": {
-    tr:"Durgun bir buluşmaya küçük bir oyun, yeni bir konu ya da beklenmedik bir planla giriyorsun. Beş dakika önce eve gitmeyi düşünenler bir tur daha kalıyor. Senin için iyi bir akşamın programı, başladıktan sonra yazılıyor.",
-    en:"You bring a little game, a new topic, or an unexpected plan to a quiet gathering. People who were about to leave suddenly stay for another round. For you, the best evening gets its schedule after it starts."
-  },
-  "Konu Mıknatısı": {
-    tr:"Birine gününün nasıl geçtiğini sorup çocukluk hayaline kadar uzanan bir sohbete dalabiliyorsun. Tam konu kapanacakken aklına gelen soru yeni bir kapı açıyor. Seninle kısa bir kahvenin neden uzadığını kimse tam açıklayamıyor.",
-    en:"You ask how someone's day went and somehow end up talking about their childhood dream. Just as a subject winds down, your next question opens another door. Nobody can quite explain why a quick coffee with you takes so long."
-  },
-  "Cümle Cambazı": {
-    tr:"Düz bir anlatım işini görse bile cümlenin sonuna küçük bir takla eklemeden duramıyorsun. Kelimeleri yan yana değil, birbirine göz kırpacak şekilde diziyorsun. Anlattığın olay unutulsa da onu nasıl söylediğin masada kalıyor.",
-    en:"A plain explanation would do, but you cannot resist giving the last line a little somersault. Your words seem to wink at each other instead of simply standing in a row. Even when the story fades, people remember how you told it."
-  }
-};
+// Compatibility view for the existing result/card contract.
+var FUN_CARD_POOL = FUN_PERSONAS.map(function(persona) {
+  var card = { id:persona.id, emoji:persona.emoji, color:persona.color, nickname:{}, desc:{}, comments:{} };
+  Object.keys(persona.locales).forEach(function(lang) {
+    card.nickname[lang]=persona.locales[lang].nickname;
+    card.desc[lang]=persona.locales[lang].tagline;
+    card.comments[lang]=persona.locales[lang].comment;
+  });
+  return card;
+});
 
 function funModeComment(card, mode, lang) {
-  var persona = FUN_PERSONA_COMMENTS[card.nickname.tr];
-  return persona ? (persona[lang] || persona.tr) : "";
+  return card.comments[lang] || "";
 }
 
-// Resolve known personas again so saved FUN cards also lose the old disclaimer template.
-function funIdentityComment(res, lang) {
-  var nickname = res.nickname || (res.card && res.card.nickname) || (res.archetype && res.archetype.name);
-  var card = FUN_CARD_POOL.find(function (entry) {
-    return typeof nickname === "string"
-      ? nickname === entry.nickname.tr || nickname === entry.nickname.en
-      : nickname && (nickname.tr === entry.nickname.tr || nickname.en === entry.nickname.en);
+function funIdentityPersona(res) {
+  var id=res.persona_id || (res.card && res.card.persona_id);
+  if (id) return FUN_CARD_POOL.find(function(card) { return card.id===id; });
+  var nickname=res.nickname || (res.card && res.card.nickname) || (res.archetype && res.archetype.name);
+  var names=typeof nickname==="string" ? [nickname] : Object.values(nickname || {});
+  var persona=FUN_PERSONAS.find(function(entry) {
+    var known=entry.legacy_names.concat(Object.values(entry.locales).map(function(copy) { return copy.nickname; }));
+    return names.some(function(name) { return known.indexOf(name)>=0; });
   });
-  return card ? funModeComment(card, res.mode, lang) : "";
+  return persona && FUN_CARD_POOL.find(function(card) { return card.id===persona.id; });
+}
+
+function funIdentityComment(res, lang) {
+  var card=funIdentityPersona(res);
+  return card ? funModeComment(card,res.mode,lang) : "";
 }
 
 function analyzeFunHandle(rawHandle, mode, rerollNonce) {
@@ -990,14 +1210,15 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     handles: [handle],
     hash: seed,
     source: "fun",
+    persona_id: card.id,
     nickname: card.nickname,
     tagline: card.desc,
     profile_emoji: card.emoji,
     comment: comment,
-    card: { nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
+    card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
     archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en] } },
     ci: 0,
-    meta: { version:"xora_fun_v1", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
+    meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
 }
 

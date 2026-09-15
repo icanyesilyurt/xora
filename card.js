@@ -54,10 +54,11 @@ function localized(v, lang) {
 
 function buildFunIdentityCard(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var persona = funIdentityPersona(res);
   var color = (res.card && res.card.color) || (res.archetype && res.archetype.color) || "#10B8B8";
   var emoji = res.profile_emoji || (res.card && res.card.emoji) || (res.archetype && res.archetype.emoji) || "✨";
-  var nick = localized(res.nickname || (res.card && res.card.nickname) || (res.archetype && res.archetype.name), lang);
-  var desc = localized(res.tagline || (res.card && res.card.desc) || (res.archetype && res.archetype.desc), lang);
+  var nick = localized((persona && persona.nickname) || res.nickname || (res.card && res.card.nickname) || (res.archetype && res.archetype.name), lang);
+  var desc = localized((persona && persona.desc) || res.tagline || (res.card && res.card.desc) || (res.archetype && res.archetype.desc), lang);
   var comment = funIdentityComment(res, lang);
 
   return (
@@ -431,12 +432,13 @@ function stampRealCanvas(cv, res) {
 
 function renderFunIdentityPNG(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var persona = funIdentityPersona(res);
   var c = res.card || {};
   var a = res.archetype || {};
   var color = c.color || a.color || "#10B8B8";
   var emoji = res.profile_emoji || c.emoji || a.emoji || "✨";
-  var nick = localized(res.nickname || c.nickname || a.name, lang);
-  var desc = localized(res.tagline || c.desc || a.desc, lang);
+  var nick = localized((persona && persona.nickname) || res.nickname || c.nickname || a.name, lang);
+  var desc = localized((persona && persona.desc) || res.tagline || c.desc || a.desc, lang);
   var comment = funIdentityComment(res, lang);
   var b = baseCanvas(), ctx = b.ctx;
   drawCardFrame(ctx, color);
@@ -779,6 +781,10 @@ function shareIdentityText(res) {
   if (isV3Result(res)) name = localized(res.nickname, lang);
   else if (isV2Result(res)) name = localized(res.card && res.card.nickname, lang);
   else name = localized(res.archetype && res.archetype.name, lang);
+  if (resultTier(res) === "fun") {
+    var persona=funIdentityPersona(res);
+    if (persona) name=localized(persona.nickname,lang);
+  }
 
   if (resultTier(res) === "real") {
     var rarity = rarityText(res);
