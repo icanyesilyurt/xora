@@ -50,13 +50,44 @@ test('FUN generators are deterministic, rerollable, free and never access REAL A
 });
 test('FUN product button paths execute without auth, credits or REAL network',async()=>{
  for(const name of ['mirror','stalk','match']) {
-  const c=browser(),nodes=new Map();
+  const c=browser(),nodes=new Map();c.location.hostname='icanyesilyurt.github.io';
   function node(id){if(!nodes.has(id))nodes.set(id,{value:id==='handleB'?'bob':'alice',hidden:false,textContent:'',innerHTML:'',classList:{toggle(){}},addEventListener(ev,fn){this[ev]=fn;},focus(){}});return nodes.get(id);}
   c.document.getElementById=node;c.initSession=async()=>{};c.isLoggedIn=()=>false;c.getUser=()=>null;c.applyI18n=()=>{};c.playThinking=(_e,_m,done)=>done();
   c.requestRealAnalysis=()=>{throw Error('FUN invoked REAL');};c.saveAnalysisRecord=()=>{throw Error('Anonymous FUN saved');};
   const inline=[...fs.readFileSync(name+'.html','utf8').matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map(x=>x[1]).filter(x=>x.trim()).pop();vm.runInContext(inline,c);await new Promise(resolve=>setImmediate(resolve));
   await node('goBtn').click();assert.match(node('cardHolder').innerHTML,/XORA FUN/);assert.equal(node('rerollBtn').hidden,false);
  }
+});
+test('production direct REAL URLs stay on a disabled input view without auth or API errors',async()=>{
+ for(const name of ['mirror','stalk','match'])for(const lang of ['tr','en']){
+  const c=browser(),nodes=new Map();c.location.hostname='icanyesilyurt.github.io';c.location.search='?tier=real';c.getLang=()=>lang;
+  function node(id){if(!nodes.has(id))nodes.set(id,{value:'',hidden:false,textContent:'',innerHTML:'',classList:{toggle(){}},addEventListener(ev,fn){this[ev]=fn;},focus(){}});return nodes.get(id);}
+  c.document.getElementById=node;
+  c.initSession=async()=>{throw Error('Paused REAL initiated auth');};c.requestRealAnalysis=async()=>{throw Error('Paused REAL invoked API');};c.toast=()=>{throw Error('Paused REAL showed an error');};
+  const originalUrl=c.location.href;
+  const inline=[...fs.readFileSync(name+'.html','utf8').matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map(x=>x[1]).filter(x=>x.trim()).pop();
+  vm.runInContext(inline,c);await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(node('goBtn').disabled,true);assert.equal(node('goBtn').textContent,c.realComingSoonText());assert.equal(node('tierNote').textContent,c.realComingSoonText());
+  await node('goBtn').click();
+  const input=node(name==='match'?'handleB':name==='mirror'?'mirrorHandleInput':'handleInput');
+  await input.keydown({key:'Enter'});
+  assert.equal(c.location.href,originalUrl);
+  assert.equal(node(name==='mirror'?'inputView':'step-input').hidden,false);
+ }
+ const c=browser();c.location.hostname='icanyesilyurt.github.io';
+ c.getSupabaseClient=()=>{throw Error('Network client initialized');};
+ await assert.rejects(c.requestRealAnalysis('mirror',{handle:'alice'}),/real_temporarily_unavailable/);
+ c.location.hostname='localhost';assert.equal(c.showProductionRealPause('real'),false);
+});
+test('disabled production REAL links cannot redirect to auth and status updates without duplication',()=>{
+ const c=browser();c.location.hostname='icanyesilyurt.github.io';
+ const attrs=new Map([['href','mirror.html?tier=real']]);const handlers=[];let child;
+ const link={classList:{add(){}},setAttribute:(k,v)=>attrs.set(k,v),getAttribute:k=>attrs.get(k),removeAttribute:k=>attrs.delete(k),querySelector:()=>child,appendChild:n=>{child=n;},addEventListener:(_ev,fn)=>handlers.push(fn)};
+ c.document.querySelectorAll=()=>[link];c.document.createElement=()=>({});
+ c.initAuthGuards();c.disableProductionRealCtas();const status=child;
+ assert.equal(attrs.has('href'),false);assert.equal(attrs.get('aria-disabled'),'true');
+ const url=c.location.href;handlers.forEach(fn=>fn.call(link,{preventDefault(){}}));assert.equal(c.location.href,url);
+ c.getLang=()=> 'en';c.disableProductionRealCtas();assert.equal(child,status);assert.equal(child.textContent,'Real analysis coming soon');
 });
 test('legacy V1/V2/V3 and Match preserve original renderer paths without a fabricated REAL badge',()=>{
  const c=browser();const old=c.analyzeHandle('alice','mirror');

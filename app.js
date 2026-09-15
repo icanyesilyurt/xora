@@ -463,19 +463,32 @@ function isProductionRealDisabled() {
 
 function disableProductionRealCtas() {
   if (!isProductionRealDisabled()) return;
-  var links = document.querySelectorAll('a[href*="tier=real"], .choice-action-real, .mini-mode.real');
+  var links = document.querySelectorAll('a[href*="tier=real"], a.real-disabled, .choice-action-real, .mini-mode.real');
   for (var i = 0; i < links.length; i++) {
     var link = links[i];
     link.setAttribute("aria-disabled", "true");
     link.classList.add("real-disabled");
     link.removeAttribute("href");
-    link.setAttribute("title", getLang() === "tr" ? "REAL yakında aktif" : "REAL coming soon");
-    var status = document.createElement("small");
+    link.setAttribute("title", realComingSoonText());
+    var status = link.querySelector(".real-coming-soon") || document.createElement("small");
     status.className = "real-coming-soon";
-    status.textContent = getLang() === "tr" ? "REAL yakında aktif" : "REAL coming soon";
+    status.textContent = realComingSoonText();
     link.appendChild(status);
     link.onclick = function (e) { e.preventDefault(); };
   }
+}
+
+function realComingSoonText() {
+  return getLang() === "tr" ? "Gerçek analiz yakında aktif" : "Real analysis coming soon";
+}
+
+function showProductionRealPause(tier) {
+  if (tier !== "real" || !isProductionRealDisabled()) return false;
+  var button = document.getElementById("goBtn");
+  if (button) { button.disabled = true; button.textContent = realComingSoonText(); }
+  var note = document.getElementById("tierNote");
+  if (note) note.textContent = realComingSoonText();
+  return true;
 }
 
 function getPublicSiteUrl() {
@@ -1119,6 +1132,7 @@ function initAuthGuards() {
   var links = document.querySelectorAll("[data-auth-required]");
   for (var i = 0; i < links.length; i++) {
     links[i].addEventListener("click", function (e) {
+      if (this.getAttribute("aria-disabled") === "true") { e.preventDefault(); return; }
       if (!isLoggedIn()) {
         e.preventDefault();
         window.location.href = "auth.html";
@@ -1138,3 +1152,4 @@ document.addEventListener("DOMContentLoaded", function () {
   applyI18n();
   initSession();
 });
+document.addEventListener("xora:lang", disableProductionRealCtas);
