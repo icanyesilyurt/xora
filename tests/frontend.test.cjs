@@ -1,20 +1,20 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const vm=require('node:vm');const fs=require('node:fs');const {browser}=require('./helpers.cjs');
 test('every FUN persona has distinct localized character copy in generated, saved HTML and PNG results',()=>{
  const c=browser();
- const forbidden=/tamamen eğlencesine|çektin|çekti\b|bilimsel değeri yok|XORA['’]nın kanıtı yok|paylaşmalık değeri var|ücretsiz|\bfree\b|X verilerini analiz etmez|purely for fun|you drew|this account drew|no evidence|scientifically useless|socially shareable|solo por diversión|puramente divertid|sin valor científico|no tiene evidencia|sin evidencia|\bgratis\b|para compartir|esta cuenta sacó|no analiza datos de X|só por diversão|apenas por diversão|por pura diversão|não é científic|sem valor científico|sem evidência|sem provas|grátis|gratuito|para compartilhar|compartilhável|esta conta tirou|você tirou|não analisa dados do X|للتسلية فقط|مجرد تسلية|من باب التسلية|للترفيه فقط|ليس علمي|غير علمي|بلا دليل|لا دليل|دون دليل|قابل للمشاركة|يستحق المشاركة|للمشاركة|مجان|هذا الحساب سحب|سحب هذا الحساب|سحبت بطاقة|لا تحلل بيانات|لا يحلل بيانات|juste pour s'amuser|pour le fun|pour rire|pas scientifique|aucune valeur scientifique|sans preuve|aucune preuve|gratuit|à partager|partageable|ce compte a tiré|tu as tiré|vous avez tiré|n'analyse pas les données|nur zum spaß|nur so zum spaß|nicht wissenschaftlich|unwissenschaftlich|ohne beweis|keine beweise|kostenlos|zum teilen|teilenswert|dieses konto hat gezogen|du hast gezogen|analysiert keine x-daten|solo per divertimento|solo per ridere|per gioco|non è scientific|non scientific|senza prove|nessuna prova|gratis|gratuit|da condividere|condivisibile|questo account ha pescato|hai pescato|non analizza i dati|楽しむためだけ|遊びのためだけ|ただの遊び|科学的根拠|科学的じゃない|科学的ではない|根拠なし|根拠はない|証拠はない|証拠なし|シェア用|無料|このアカウントが引いた|あなたが引いた|データは分析しません|재미로만|재미로 보는|그냥 재미|과학적이지 않|과학적 근거|근거가 없|근거는 없|증거가 없|증거는 없|공유용|무료|이 계정이 뽑|당신이 뽑|데이터를 분석하지 않|데이터는 분석하지/i;
+ const forbidden=/tamamen eğlencesine|çektin|çekti\b|bilimsel değeri yok|XORA['’]nın kanıtı yok|paylaşmalık değeri var|ücretsiz|\bfree\b|X verilerini analiz etmez|purely for fun|you drew|this account drew|no evidence|scientifically useless|socially shareable|solo por diversión|puramente divertid|sin valor científico|no tiene evidencia|sin evidencia|\bgratis\b|para compartir|esta cuenta sacó|no analiza datos de X|só por diversão|apenas por diversão|por pura diversão|não é científic|sem valor científico|sem evidência|sem provas|grátis|gratuito|para compartilhar|compartilhável|esta conta tirou|você tirou|não analisa dados do X|للتسلية فقط|مجرد تسلية|من باب التسلية|للترفيه فقط|ليس علمي|غير علمي|بلا دليل|لا دليل|دون دليل|قابل للمشاركة|يستحق المشاركة|للمشاركة|مجان|هذا الحساب سحب|سحب هذا الحساب|سحبت بطاقة|لا تحلل بيانات|لا يحلل بيانات|juste pour s'amuser|pour le fun|pour rire|pas scientifique|aucune valeur scientifique|sans preuve|aucune preuve|gratuit|à partager|partageable|ce compte a tiré|tu as tiré|vous avez tiré|n'analyse pas les données|nur zum spaß|nur so zum spaß|nicht wissenschaftlich|unwissenschaftlich|ohne beweis|keine beweise|kostenlos|zum teilen|teilenswert|dieses konto hat gezogen|du hast gezogen|analysiert keine x-daten|solo per divertimento|solo per ridere|per gioco|non è scientific|non scientific|senza prove|nessuna prova|gratis|gratuit|da condividere|condivisibile|questo account ha pescato|hai pescato|non analizza i dati|楽しむためだけ|遊びのためだけ|ただの遊び|科学的根拠|科学的じゃない|科学的ではない|根拠なし|根拠はない|証拠はない|証拠なし|シェア用|無料|このアカウントが引いた|あなたが引いた|データは分析しません|재미로만|재미로 보는|그냥 재미|과학적이지 않|과학적 근거|근거가 없|근거는 없|증거가 없|증거는 없|공유용|무료|이 계정이 뽑|당신이 뽑|데이터를 분석하지 않|데이터는 분석하지|純粹好玩|只是好玩|不科學|沒有科學|沒有根據|沒有證據|值得分享|免費|這個帳號抽|你抽到了|不會分析 X 資料|不分析 X 的資料/i;
  const seen=new Map();
  for(let nonce=0;nonce<1000 && seen.size<c.FUN_CARD_POOL.length;nonce++){
   const result=c.analyzeFunHandle('alice','mirror',nonce);seen.set(result.nickname.tr,result);
  }
  assert.equal(seen.size,c.FUN_CARD_POOL.length);
- for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko']){
+ for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh']){
   c.getLang=()=>lang;
   const unique=new Set();
   for(const [name,result] of seen){
    const expected=result.comment.mirror[lang];unique.add(expected);
    assert.doesNotMatch(expected,forbidden,name);
    // Japanese sentences end with 。！？ and carry no trailing space.
-   const sentences=expected.match(lang==='ja'?/[^。！？]+[。！？]/g:/[^.!?]+[.!?]/g)||[];
+   const sentences=expected.match((lang==='ja'||lang==='zh')?/[^。！？]+[。！？]/g:/[^.!?]+[.!?]/g)||[];
    assert.ok(sentences.length>=2 && sentences.length<=4,name);
    assert.equal(result.archetype.comments[lang][0],expected);
    // Historical cards must resolve their persona rather than redisplay stored boilerplate.
@@ -32,7 +32,7 @@ test('every FUN persona has distinct localized character copy in generated, save
    c.roundRect=(ctx,x,y,w,h,r)=>{if(x===130)box={y,h};originalRect(ctx,x,y,w,h,r);};
    c.document.createElement=()=>({getContext:()=>ctx});c.renderIdentityPNG(saved);c.roundRect=originalRect;
    assert.ok(text.some(p=>p.v==='XORA FUN · FREE'));assert.ok(!text.some(p=>p.v==='XORA FUN'));
-   const copy=text.filter(p=>p.x===500 && p.y>700 && p.y<1090).map(p=>p.v).join(lang==='ja'?'':' ');
+   const copy=text.filter(p=>p.x===500 && p.y>700 && p.y<1090).map(p=>p.v).join((lang==='ja'||lang==='zh')?'':' ');
    assert.ok(copy.includes(expected),name+' PNG contains the full persona comment');
    assert.doesNotMatch(copy,forbidden);
    assert.ok(box.y+box.h<1090,name+' comment box stays above footer');
@@ -60,7 +60,7 @@ test('FUN product button paths execute without auth, credits or REAL network',as
  }
 });
 test('production direct REAL URLs stay on a disabled input view without auth or API errors',async()=>{
- for(const name of ['mirror','stalk','match'])for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko']){
+ for(const name of ['mirror','stalk','match'])for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh']){
   const c=browser(),nodes=new Map();c.location.hostname='icanyesilyurt.github.io';c.location.search='?tier=real';c.getLang=()=>lang;
   function node(id){if(!nodes.has(id))nodes.set(id,{value:'',hidden:false,textContent:'',innerHTML:'',classList:{toggle(){}},addEventListener(ev,fn){this[ev]=fn;},focus(){}});return nodes.get(id);}
   c.document.getElementById=node;
@@ -125,15 +125,15 @@ test('ambiguous REAL failure retains request ID and successful retry uses server
 });
 test('every I18N locale exposes the complete key set with non-empty strings; missing keys fail',()=>{
  const c=browser();
- assert.deepEqual(Object.keys(c.I18N).sort(),['ar','de','en','es','fr','it','ja','ko','pt','tr']);
+ assert.deepEqual(Object.keys(c.I18N).sort(),['ar','de','en','es','fr','it','ja','ko','pt','tr','zh']);
  const keys=Object.keys(c.I18N.tr).sort();
- for(const lang of ['en','es','pt','ar','fr','de','it','ja','ko']) assert.deepEqual(Object.keys(c.I18N[lang]).sort(),keys,lang+' must cover every tr key');
- for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko'])for(const key of keys){
+ for(const lang of ['en','es','pt','ar','fr','de','it','ja','ko','zh']) assert.deepEqual(Object.keys(c.I18N[lang]).sort(),keys,lang+' must cover every tr key');
+ for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh'])for(const key of keys){
   const value=c.I18N[lang][key];
   assert.ok(typeof value==='string' && value.trim().length>0,lang+'.'+key+' must be a non-empty string');
  }
  // t() must never fall back to another language for a supported locale.
- for(const lang of ['es','pt','ar','fr','de','it','ja','ko']){
+ for(const lang of ['es','pt','ar','fr','de','it','ja','ko','zh']){
   c.localStorage.setItem(c.LS.lang,lang);
   for(const key of keys) assert.equal(c.t(key),c.I18N[lang][key]);
  }
@@ -151,6 +151,16 @@ test('every I18N locale exposes the complete key set with non-empty strings; mis
  for(const key of keys){
   const latin=(c.I18N.ko[key].replace(/\{\w+\}/g,'').match(/[A-Za-z]+/g)||[]).filter(w=>!/^(?:XORA|X|FUN|FREE|REAL|Fun|Real|Mirror|Stalk|Match|API|ID|URL|iyzico|Supabase)$/.test(w));
   assert.deepEqual(latin,[],'ko.'+key+' has no stray Latin words');
+ }
+ // Chinese copy is Traditional Han; Latin appears only for product names.
+ const zhCopy=JSON.stringify(c.I18N.zh)+JSON.stringify(c.FUN_PERSONAS.map(p=>p.locales.zh));
+ assert.match(zhCopy,/[\u4e00-\u9fff]/,'Chinese copy contains Han');
+ assert.doesNotMatch(zhCopy,/[\u3040-\u30ff\uac00-\ud7af]/,'Chinese copy has no kana or hangul');
+ assert.doesNotMatch(zhCopy,/[这个们说见会时现样觉认为么过还来对开关点边进问让给东车马书长风话图网爱乐热无与头没当发汉语业产单卖买亲习乡终经级体种]/u,'Chinese copy must be Traditional');
+ for(const ch of ['個','會','說','時','點','來','沒','們','麼','過','話','無']) assert.ok(zhCopy.includes(ch),'Traditional form '+ch+' appears');
+ for(const key of keys){
+  const latin=(c.I18N.zh[key].replace(/\{\w+\}/g,'').match(/[A-Za-z]+/g)||[]).filter(w=>!/^(?:XORA|X|FUN|FREE|REAL|Fun|Real|Mirror|Stalk|Match|API|ID|URL|iyzico|Supabase)$/.test(w));
+  assert.deepEqual(latin,[],'zh.'+key+' has no stray Latin words');
  }
  const itCopy=JSON.stringify(c.I18N.it)+JSON.stringify(c.FUN_PERSONAS.map(p=>p.locales.it));
  for(const ch of ['à','è','é','ì','ò','ù']) assert.ok(itCopy.includes(ch),'Italian copy contains '+ch);
@@ -172,11 +182,11 @@ test('every I18N locale exposes the complete key set with non-empty strings; mis
  const ptCopy=JSON.stringify(c.I18N.pt)+JSON.stringify(c.FUN_PERSONAS.map(p=>p.locales.pt));
  for(const ch of ['ã','õ','ç','á','é','í','ó','ú','â','ê']) assert.ok(ptCopy.includes(ch),'Portuguese copy contains '+ch);
 });
-test('language selector cycles tr→en→es→pt→ar→fr→de→it→ja→ko→tr, ES/PT/AR/FR/DE/IT/JA/KO persist, unknown stored values fall back to tr',()=>{
+test('language selector cycles tr→en→es→pt→ar→fr→de→it→ja→ko→zh→tr, ES/PT/AR/FR/DE/IT/JA/KO/ZH persist, unknown stored values fall back to tr',()=>{
  const c=browser();
  assert.equal(c.getLang(),'tr');
- assert.equal(c.nextLang('tr'),'en');assert.equal(c.nextLang('en'),'es');assert.equal(c.nextLang('es'),'pt');assert.equal(c.nextLang('pt'),'ar');assert.equal(c.nextLang('ar'),'fr');assert.equal(c.nextLang('fr'),'de');assert.equal(c.nextLang('de'),'it');assert.equal(c.nextLang('it'),'ja');assert.equal(c.nextLang('ja'),'ko');assert.equal(c.nextLang('ko'),'tr');
- assert.equal(c.LANG_NAMES.pt,'Português');assert.equal(c.LANG_NAMES.ar,'العربية');assert.equal(c.LANG_NAMES.fr,'Français');assert.equal(c.LANG_NAMES.de,'Deutsch');assert.equal(c.LANG_NAMES.it,'Italiano');assert.equal(c.LANG_NAMES.ja,'日本語');assert.equal(c.LANG_NAMES.ko,'한국어');
+ assert.equal(c.nextLang('tr'),'en');assert.equal(c.nextLang('en'),'es');assert.equal(c.nextLang('es'),'pt');assert.equal(c.nextLang('pt'),'ar');assert.equal(c.nextLang('ar'),'fr');assert.equal(c.nextLang('fr'),'de');assert.equal(c.nextLang('de'),'it');assert.equal(c.nextLang('it'),'ja');assert.equal(c.nextLang('ja'),'ko');assert.equal(c.nextLang('ko'),'zh');assert.equal(c.nextLang('zh'),'tr');
+ assert.equal(c.LANG_NAMES.pt,'Português');assert.equal(c.LANG_NAMES.ar,'العربية');assert.equal(c.LANG_NAMES.fr,'Français');assert.equal(c.LANG_NAMES.de,'Deutsch');assert.equal(c.LANG_NAMES.it,'Italiano');assert.equal(c.LANG_NAMES.ja,'日本語');assert.equal(c.LANG_NAMES.ko,'한국어');assert.equal(c.LANG_NAMES.zh,'繁體中文');
  c.localStorage.setItem(c.LS.lang,'es');assert.equal(c.getLang(),'es');
  assert.equal(c.t('nav_profile'),'Perfil');
  assert.equal(c.realComingSoonText(),'El análisis real llegará pronto');
@@ -201,11 +211,14 @@ test('language selector cycles tr→en→es→pt→ar→fr→de→it→ja→ko�
  c.localStorage.setItem(c.LS.lang,'ko');assert.equal(c.getLang(),'ko');
  assert.equal(c.t('nav_login'),'로그인');
  assert.equal(c.realComingSoonText(),'정식 분석 곧 공개');
+ c.localStorage.setItem(c.LS.lang,'zh');assert.equal(c.getLang(),'zh');
+ assert.equal(c.t('nav_login'),'登入');
+ assert.equal(c.realComingSoonText(),'正式分析即將推出');
  c.localStorage.setItem(c.LS.lang,'xx');assert.equal(c.getLang(),'tr');
 });
-for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/Compatibilidad General/,/compatibilidad/],['pt',/Meu cartão XORA FUN/,/Compatibilidade Geral/,/compatibilidade/],['ar',/بطاقتي في XORA FUN/,/التوافق العام/,/توافق/],['fr',/Ma carte XORA FUN/,/Compatibilité globale/,/compatibilité/],['de',/Meine XORA FUN-Karte/,/Gesamtübereinstimmung/,/Übereinstimmung/],['it',/La mia carta XORA FUN/,/Affinità generale/,/affinità/],['ja',/XORA FUNのカード/,/総合相性/,/相性/],['ko',/내 XORA FUN 카드/,/전체 궁합/,/궁합/]]) test(lang.toUpperCase()+' FUN cards, PNG, share and match render natively without fallback to other locales',()=>{
+for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/Compatibilidad General/,/compatibilidad/],['pt',/Meu cartão XORA FUN/,/Compatibilidade Geral/,/compatibilidade/],['ar',/بطاقتي في XORA FUN/,/التوافق العام/,/توافق/],['fr',/Ma carte XORA FUN/,/Compatibilité globale/,/compatibilité/],['de',/Meine XORA FUN-Karte/,/Gesamtübereinstimmung/,/Übereinstimmung/],['it',/La mia carta XORA FUN/,/Affinità generale/,/affinità/],['ja',/XORA FUNのカード/,/総合相性/,/相性/],['ko',/내 XORA FUN 카드/,/전체 궁합/,/궁합/],['zh',/我的 XORA FUN 卡片/,/整體速配/,/速配/]]) test(lang.toUpperCase()+' FUN cards, PNG, share and match render natively without fallback to other locales',()=>{
  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
- const others=['tr','en','es','pt','ar','fr','de','it','ja','ko'].filter(l=>l!==lang);
+ const others=['tr','en','es','pt','ar','fr','de','it','ja','ko','zh'].filter(l=>l!==lang);
  for(let nonce=0;nonce<24;nonce++){
   const r=c.analyzeFunHandle('alice','mirror',nonce);
   const persona=c.FUN_PERSONAS.find(p=>p.id===r.persona_id);
@@ -230,7 +243,7 @@ for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/Co
  assert.match(c.matchComment({a:'alice',b:'bob',ci:0},lang),/@alice/);
  for(const mode of ['mirror','stalk','match']) assert.ok(c.THINKING[mode][lang].length===6);
 });
-for(const lang of ['pt','ar','fr','de','it','ja','ko']) test('every '+lang.toUpperCase()+' persona renders nickname, tagline and comment intact in HTML and PNG without overflow',()=>{
+for(const lang of ['pt','ar','fr','de','it','ja','ko','zh']) test('every '+lang.toUpperCase()+' persona renders nickname, tagline and comment intact in HTML and PNG without overflow',()=>{
  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
  const seen=new Map();
  for(let nonce=0;nonce<1000 && seen.size<12;nonce++){const r=c.analyzeFunHandle('alice','mirror',nonce);seen.set(r.persona_id,r);}
@@ -243,7 +256,7 @@ for(const lang of ['pt','ar','fr','de','it','ja','ko']) test('every '+lang.toUpp
   const ctx=new Proxy(target,{get:(o,k)=>k in o?o[k]:()=>{}});
   const originalRect=c.roundRect;c.roundRect=(ctx,x,y,w,h,rr)=>{if(x===130)box={y,h};originalRect(ctx,x,y,w,h,rr);};
   c.document.createElement=()=>({getContext:()=>ctx});c.renderIdentityPNG(r);c.roundRect=originalRect;
-  const drawn=text.filter(p=>p.x===500 && p.y>500 && p.y<1090).map(p=>p.v).join(lang==='ja'?'':' ');
+  const drawn=text.filter(p=>p.x===500 && p.y>500 && p.y<1090).map(p=>p.v).join((lang==='ja'||lang==='zh')?'':' ');
   for(const field of ['nickname','tagline','comment']) assert.ok(drawn.includes(copy[field]),id+' PNG '+field+' intact: '+copy[field]);
   // Localized copy follows the language direction; handle and footer brand text stay LTR.
   const copyDir=lang==='ar'?'rtl':'ltr';
@@ -253,7 +266,7 @@ for(const lang of ['pt','ar','fr','de','it','ja','ko']) test('every '+lang.toUpp
   for(const p of text.filter(p=>p.x===500 && p.y>560 && p.y<1090)) assert.doesNotMatch(p.v,/^['’]|(?:^|\s)(?:l|un|dell|all|d|c|s|n|com|tutt)['’]$/i,id+' broken elision: '+p.v);
   for(const v of ['XORA','xora.app','XORA FUN · FREE']) assert.equal(text.find(p=>p.v===v).dir,'ltr',v+' stays LTR');
   // Japanese wraps between characters, so check the basic kinsoku rules on the drawn lines.
-  if(lang==='ja') for(const p of text.filter(p=>p.x===500 && p.y>560 && p.y<1090)){
+  if(lang==='ja'||lang==='zh') for(const p of text.filter(p=>p.x===500 && p.y>560 && p.y<1090)){
    assert.doesNotMatch(p.v,/^[、。，．・：；？！）」』】〕…]/,id+' line starts with closing punctuation: '+p.v);
    assert.doesNotMatch(p.v,/[（「『【〔]$/,id+' line ends with an opening bracket: '+p.v);
   }
@@ -261,7 +274,7 @@ for(const lang of ['pt','ar','fr','de','it','ja','ko']) test('every '+lang.toUpp
   assert.ok(text.filter(p=>p.x===500 && p.y>=box.y && p.y<1090).every(p=>p.y<box.y+box.h-15),id+' text fits inside comment box');
  }
 });
-for(const [lang,funBtn,funNote] of [['es','Saca tu Tarjeta Gratis','Esta tarjeta es de entretenimiento; no analiza datos de X.'],['pt','Tirar Cartão Grátis','Este cartão é de entretenimento; não analisa dados do X.'],['ar','اسحب بطاقة مجانية','هذه بطاقة ترفيهية؛ ولا تحلل بيانات X.'],['fr','Tirer une carte gratuite',"Cette carte est un divertissement\u00a0; elle n'analyse pas les données X."],['de','Kostenlose Karte ziehen','Diese Karte dient der Unterhaltung; sie analysiert keine X-Daten.'],['it','Pesca una carta gratis','Questa carta è solo intrattenimento; non analizza i dati di X.'],['ja','無料カードを引く','このカードはエンタメ用です。Xのデータは分析しません。'],['ko','무료 카드 뽑기','이 카드는 재미로 보는 카드예요. X 데이터는 분석하지 않습니다.']]) test('Mirror/Stalk/Match screens are '+lang.toUpperCase()+' from first paint, before any session call',async()=>{
+for(const [lang,funBtn,funNote] of [['es','Saca tu Tarjeta Gratis','Esta tarjeta es de entretenimiento; no analiza datos de X.'],['pt','Tirar Cartão Grátis','Este cartão é de entretenimento; não analisa dados do X.'],['ar','اسحب بطاقة مجانية','هذه بطاقة ترفيهية؛ ولا تحلل بيانات X.'],['fr','Tirer une carte gratuite',"Cette carte est un divertissement\u00a0; elle n'analyse pas les données X."],['de','Kostenlose Karte ziehen','Diese Karte dient der Unterhaltung; sie analysiert keine X-Daten.'],['it','Pesca una carta gratis','Questa carta è solo intrattenimento; non analizza i dati di X.'],['ja','無料カードを引く','このカードはエンタメ用です。Xのデータは分析しません。'],['ko','무료 카드 뽑기','이 카드는 재미로 보는 카드예요. X 데이터는 분석하지 않습니다.'],['zh','抽免費卡片','這張卡片只是好玩用的，不會分析 X 資料。']]) test('Mirror/Stalk/Match screens are '+lang.toUpperCase()+' from first paint, before any session call',async()=>{
  for(const name of ['mirror','stalk','match']) {
   const c=browser(),nodes=new Map();c.localStorage.setItem(c.LS.lang,lang);
   let sessionResolved=false;
@@ -290,8 +303,8 @@ for(const [lang,funBtn,funNote] of [['es','Saca tu Tarjeta Gratis','Esta tarjeta
 });
 test('static FUN personas keep TR/EN/ES/PT/AR/FR/DE/IT/JA copy and are untouched by the single-locale REAL view',()=>{
  const c=browser();
- for(const p of c.FUN_PERSONAS) assert.deepEqual(Object.keys(p.locales).sort(),['ar','de','en','es','fr','it','ja','ko','pt','tr']);
- for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko']){
+ for(const p of c.FUN_PERSONAS) assert.deepEqual(Object.keys(p.locales).sort(),['ar','de','en','es','fr','it','ja','ko','pt','tr','zh']);
+ for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh']){
   c.localStorage.setItem(c.LS.lang,lang);
   for(let nonce=0;nonce<12;nonce++){
    const fun=c.analyzeFunHandle('alice',nonce%2?'stalk':'mirror',nonce);
@@ -299,11 +312,11 @@ test('static FUN personas keep TR/EN/ES/PT/AR/FR/DE/IT/JA copy and are untouched
    const copy=c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[lang];
    const html=c.buildIdentityCard(fun);
    assert.ok(html.includes(c.esc(copy.nickname)) && html.includes(c.esc(copy.tagline)) && html.includes(c.esc(copy.comment)),lang+' '+fun.persona_id);
-   for(const other of ['tr','en','es','pt','ar','fr','de','it','ja','ko'].filter(l=>l!==lang)) assert.ok(!html.includes(c.esc(c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[other].comment)));
+   for(const other of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh'].filter(l=>l!==lang)) assert.ok(!html.includes(c.esc(c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[other].comment)));
   }
   const m=c.matchFunHandles('alice','bob',3);
   assert.equal(c.realCopyForActiveLang(m),m);
-  assert.deepEqual(Object.keys(m.fun_comment).sort(),['ar','de','en','es','fr','it','ja','ko','pt','tr']);
+  assert.deepEqual(Object.keys(m.fun_comment).sort(),['ar','de','en','es','fr','it','ja','ko','pt','tr','zh']);
   assert.ok(c.buildMatchCard(m).includes(c.esc(m.fun_comment[lang])));
  }
 });
@@ -323,7 +336,7 @@ test('legacy multi-locale REAL results render unchanged; the view only fills a m
 });
 test('RTL applies only to Arabic: page direction, scoped CSS and LTR technical inputs',()=>{
  const c=browser();c.document.documentElement={};
- for(const [lang,dir] of [['tr','ltr'],['en','ltr'],['es','ltr'],['pt','ltr'],['ar','rtl'],['fr','ltr'],['ar','rtl'],['de','ltr'],['ar','rtl'],['it','ltr'],['ar','rtl'],['ja','ltr'],['ar','rtl'],['ko','ltr'],['ar','rtl'],['tr','ltr']]){
+ for(const [lang,dir] of [['tr','ltr'],['en','ltr'],['es','ltr'],['pt','ltr'],['ar','rtl'],['fr','ltr'],['ar','rtl'],['de','ltr'],['ar','rtl'],['it','ltr'],['ar','rtl'],['ja','ltr'],['ar','rtl'],['ko','ltr'],['ar','rtl'],['zh','ltr'],['ar','rtl'],['tr','ltr']]){
   c.localStorage.setItem(c.LS.lang,lang);c.applyI18n();
   assert.equal(c.document.documentElement.lang,lang);assert.equal(c.document.documentElement.dir,dir,lang);
  }
@@ -344,7 +357,7 @@ test('RTL applies only to Arabic: page direction, scoped CSS and LTR technical i
 test('Arabic mixed-direction content keeps handles, URL, percentages and brand names in LTR order',()=>{
  const c=browser();const LRI='\u2066',PDI='\u2069';
  const fun=c.analyzeFunHandle('alice','mirror',2),m=c.matchFunHandles('alice','bob',1);
- for(const lang of ['tr','en','es','pt','fr','de','it','ja','ko']){
+ for(const lang of ['tr','en','es','pt','fr','de','it','ja','ko','zh']){
   c.localStorage.setItem(c.LS.lang,lang);
   for(const text of [c.shareIdentityText(fun),c.shareMatchText(m),c.matchComment({a:'alice',b:'bob',ci:0},lang)])assert.ok(!text.includes(LRI)&&!text.includes(PDI),lang+' output has no bidi controls');
  }
@@ -381,7 +394,7 @@ test('German copy has no word too long for the card: nickname, tagline and comme
  assert.ok(line('de').length<=64,line('de'));
  assert.ok(['match_chaos','match_romance'].map(k=>c.I18N.de[k]+' %73').join('  •  ').length<=64);
 });
-test('Match PNG score rows fit the card frame in every locale, including ES, FR, IT, JA and KO',()=>{
+test('Match PNG score rows fit the card frame in every locale, including ES, FR, IT, JA, KO and ZH',()=>{
  const c=browser();
  // renderMatchPNGBase draws both rows unwrapped at 700 24px Nunito inside an 860px frame (850px inside the border).
  // Browser measurements with worst-case %99 values ranged 11.8-12.1px per character; 12.5px is a conservative bound
@@ -390,21 +403,21 @@ test('Match PNG score rows fit the card frame in every locale, including ES, FR,
  // Full-width Japanese and Korean glyphs are about one em wide at 24px.
  const width=row=>[...row].reduce((w,ch)=>w+(/[\u3000-\u30ff\u3400-\u9fff\uac00-\ud7af\uff00-\uffef]/.test(ch)?24:pxPerChar),0);
  const rows=L=>[L.match_flirt+' %99  •  '+L.match_vibe+' %99  •  '+L.match_humor+' %99',L.match_chaos+' %99  •  '+L.match_romance+' %99'];
- for(const lang of ['tr','en','es','pt','fr','de','it','ja','ko'])for(const row of rows(c.I18N[lang])) assert.ok(width(row)<=maxWidth,lang+' score row too wide ('+Math.round(width(row))+'px): '+row);
+ for(const lang of ['tr','en','es','pt','fr','de','it','ja','ko','zh'])for(const row of rows(c.I18N[lang])) assert.ok(width(row)<=maxWidth,lang+' score row too wide ('+Math.round(width(row))+'px): '+row);
  // The previous ES/FR labels measured 901px and 917px in the browser and must stay out.
  assert.notEqual(c.I18N.es.match_vibe,'Conexión de Vibra');assert.notEqual(c.I18N.fr.match_vibe,"Même longueur d'onde");
  assert.equal(c.I18N.es.match_vibe,'Sintonía');assert.equal(c.I18N.fr.match_vibe,'Complicité');
  // Rendering path: the actual PNG draws exactly these rows.
  const text=[];const ctx=new Proxy({measureText:v=>({width:String(v).length*12}),fillText:(v,x,y)=>text.push({v:String(v),y}),createLinearGradient:()=>({addColorStop(){}})},{get:(o,k)=>k in o?o[k]:()=>{}});
  c.document.createElement=()=>({getContext:()=>ctx});
- for(const lang of ['es','fr','it','ja','ko']){
+ for(const lang of ['es','fr','it','ja','ko','zh']){
   c.localStorage.setItem(c.LS.lang,lang);text.length=0;
   const m=c.matchFunHandles('alice','bob',1);Object.assign(m,{flirt:99,vibe:99,humor:99,chaos:99,romance:99});
   c.renderMatchPNG(m);
   assert.deepEqual(text.filter(p=>p.y===780||p.y===812).map(p=>p.v),rows(c.I18N[lang]),lang+' PNG score rows');
  }
 });
-test('wrapText keeps space wrapping for other scripts, including Korean, and wraps Japanese on character boundaries',()=>{
+test('wrapText keeps space wrapping for other scripts, including Korean, and wraps Japanese and Chinese on character boundaries',()=>{
  const c=browser();
  const cjk=/[\u3000-\u30ff\u3400-\u9fff\uff00-\uffef]/;
  const ctx={measureText:v=>({width:[...String(v)].reduce((w,ch)=>w+(cjk.test(ch)?26:13),0)}),fillText(){}};
@@ -415,9 +428,9 @@ test('wrapText keeps space wrapping for other scripts, including Korean, and wra
   const text=p.locales[lang][field];
   assert.deepEqual(drawnLines(text),reference(text,660),lang+' '+p.id+' '+field+' wrapping unchanged');
  }
- // Japanese has no spaces: it must still wrap, keep every character and respect basic kinsoku.
- for(const p of c.FUN_PERSONAS){
-  const text=p.locales.ja.comment;
+ // Japanese and Chinese have no spaces: they must still wrap, keep every character and respect basic kinsoku.
+ for(const lang of ['ja','zh'])for(const p of c.FUN_PERSONAS){
+  const text=p.locales[lang].comment;
   const lines=c.wrapCjkLines(ctx,text,660);
   assert.ok(lines.length>1,p.id+' Japanese comment wraps');
   assert.equal(lines.join(''),text,p.id+' no character lost');
@@ -427,6 +440,13 @@ test('wrapText keeps space wrapping for other scripts, including Korean, and wra
    assert.doesNotMatch(line,/[（「『【〔]$/,p.id+' line ends with an opening bracket: '+line);
   }
  }
+ // Traditional Chinese punctuation is already covered by the existing kinsoku sets; no new characters were added.
+ const zhStress='他說：「這件事很有趣。」然後呢？（真的）就這樣了…'.repeat(4);
+ for(const line of c.wrapCjkLines(ctx,zhStress,200)){
+  assert.doesNotMatch(line,/^[，。！？：；」』）…]/,'zh kinsoku start: '+line);
+  assert.doesNotMatch(line,/[「『（]$/,'zh kinsoku end: '+line);
+ }
+ assert.equal(c.wrapCjkLines(ctx,zhStress,200).join(''),zhStress);
  // Punctuation stress: 。 and 、 never begin a line and 「 never ends one.
  const stress='最初の文です。次は「引用」から始まります、そして続きます。'.repeat(4);
  for(const line of c.wrapCjkLines(ctx,stress,200)){
@@ -445,7 +465,7 @@ test('wrapText keeps space wrapping for other scripts, including Korean, and wra
   for(const line of lines) assert.doesNotMatch(line,/^[.,!?…)\]}’”]/,p.id+' line starts with closing punctuation: '+line);
  }
 });
-test('canvas names Japanese and Korean system fonts only for ja and ko, leaving other locales byte-identical',()=>{
+test('canvas names Japanese, Korean and Traditional Chinese system fonts only for ja, ko and zh, leaving other locales byte-identical',()=>{
  const c=browser();
  class FakeCtx { set font(v){ this._font=v; } get font(){ return this._font; } }
  const ja=new FakeCtx();c.applyLocaleFont(ja,'ja');
@@ -462,6 +482,13 @@ test('canvas names Japanese and Korean system fonts only for ja and ko, leaving 
  assert.match(ko.font,/sans-serif$/);
  assert.doesNotMatch(ko.font,/Hiragino|Meiryo/);
  ko.font='26px monospace';assert.equal(ko.font,'26px monospace');
+ const zh=new FakeCtx();c.applyLocaleFont(zh,'zh');
+ zh.font='900 56px Nunito, Arial, sans-serif';
+ assert.match(zh.font,/^900 56px Nunito, Arial,/);
+ assert.match(zh.font,/"PingFang TC".*"Microsoft JhengHei".*"Noto Sans TC"/);
+ assert.match(zh.font,/sans-serif$/);
+ assert.doesNotMatch(zh.font,/Hiragino|Meiryo|Malgun/);
+ zh.font='26px monospace';assert.equal(zh.font,'26px monospace');
  for(const lang of ['tr','en','es','pt','ar','fr','de','it']){
   const other=new FakeCtx();c.applyLocaleFont(other,lang);
   other.font='900 56px Nunito, Arial, sans-serif';

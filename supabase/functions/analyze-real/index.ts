@@ -5,7 +5,7 @@ type Mode = "mirror" | "stalk" | "match";
 // once it has an entry in REAL_LOCALES plus nickname quality rules and fallback aliases below.
 const PLANNED_LOCALES = ["tr","en","es","pt","it","fr","de","ru","ja","ko","zh","ar"] as const;
 type PlannedLocale = typeof PLANNED_LOCALES[number];
-type Locale = Extract<PlannedLocale, "tr" | "en" | "es" | "pt" | "ar" | "fr" | "de" | "it" | "ja" | "ko">;
+type Locale = Extract<PlannedLocale, "tr" | "en" | "es" | "pt" | "ar" | "fr" | "de" | "it" | "ja" | "ko" | "zh">;
 const REAL_LOCALES: Record<Locale, {language:string; bcp47:string; unspaced?:boolean; minChars?:number; maxChars?:number; minWords?:number; maxWords?:number}> = {
   tr: {language:"Turkish", bcp47:"tr-TR"},
   en: {language:"English", bcp47:"en-US"},
@@ -17,6 +17,7 @@ const REAL_LOCALES: Record<Locale, {language:string; bcp47:string; unspaced?:boo
   it: {language:"natural, modern Italian as spoken in Italy (no heavy regional slang, no English words, not overly formal or literary)", bcp47:"it-IT"},
   ja: {language:"natural, modern Japanese for a general web audience (no heavy keigo, no anime or internet slang, no unnecessary Latin-script words; nicknames are 3-12 characters with no spaces)", bcp47:"ja-JP", unspaced:true},
   ko: {language:"natural, modern standard Korean for a general web audience (plain 해요/합니다 politeness, no heavy honorifics, no internet slang or K-pop and K-drama jargon, no unnecessary Latin-script words; nicknames are 1-4 short Korean words)", bcp47:"ko-KR", minChars:3, maxChars:20, minWords:1, maxWords:4},
+  zh: {language:"written Traditional Chinese that reads naturally in Taiwan and Hong Kong (Traditional characters only, never Simplified; no heavy Taiwanese or Cantonese colloquialisms, no mainland internet slang, no unnecessary Latin-script words; nicknames are 3-12 characters with no spaces)", bcp47:"zh-TW", unspaced:true},
 };
 function isRealLocale(v: unknown): v is Locale {
   return typeof v === "string" && Object.hasOwn(REAL_LOCALES, v);
@@ -261,18 +262,18 @@ async function callAI(input: unknown) {
 // and cite a deterministic behavioral signal that is actually active for this dataset.
 // This keeps names personal without allowing random word salad or sensitive-trait labels.
 const ALIASES: Array<{names:Record<Locale,string>; key:string; test:(s:any)=>boolean}> = [
-  {names:{tr:"Sohbeti Seven", en:"Always Up for Conversation", es:"Siempre de Charla", pt:"Bom de Conversa", ar:"يحب الحوار", fr:"Aime Échanger", de:"Immer im Gespräch", it:"Ama Chiacchierare", ja:"おしゃべり好き", ko:"대화를 즐기는 사람"}, key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
-  {names:{tr:"Uzun Uzun Anlatan", en:"Detailed Storyteller", es:"Narrador Detallista", pt:"Conta Tudo em Detalhes", ar:"يروي بالتفاصيل", fr:"Raconte en Détail", de:"Erzählt gern ausführlich", it:"Racconta nei Dettagli", ja:"じっくり語る人", ko:"길게 쓰는 사람"}, key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
-  {names:{tr:"Renkli Anlatıcı", en:"Expressive Soul", es:"Alma Expresiva", pt:"Cheio de Expressão", ar:"معبر بطبعه", fr:"Très Expressif", de:"Sehr ausdrucksstark", it:"Molto Espressivo", ja:"表現豊か", ko:"표현이 풍부한 사람"}, key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
-  {names:{tr:"Meraklı Biri", en:"Curious Mind", es:"Mente Curiosa", pt:"Curioso por Natureza", ar:"كثير السؤال", fr:"Toujours une Question", de:"Fragt gern nach", it:"Fa Tante Domande", ja:"質問好き", ko:"질문이 많은 사람"}, key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
-  {names:{tr:"Sözü Kuvvetli", en:"Way with Words", es:"Buena Pluma", pt:"Bom com as Palavras", ar:"يحسن التعبير", fr:"Le Mot Juste", de:"Hat das richtige Wort", it:"Lessico Ricco", ja:"言葉選び上手", ko:"단어 선택이 좋은 사람"}, key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
-  {names:{tr:"Özgün Anlatıcı", en:"Original Voice", es:"Voz Propia", pt:"Estilo Próprio", ar:"له أسلوبه الخاص", fr:"Une Voix à Part", de:"Ganz eigener Stil", it:"Stile Tutto Suo", ja:"自分の言葉派", ko:"자기 말로 쓰는 사람"}, key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
-  {names:{tr:"Alıntı Seven", en:"Thoughtful Reader", es:"Lector Atento", pt:"Bom Leitor", ar:"قارئ متأمل", fr:"Lecteur Attentif", de:"Liest aufmerksam", it:"Legge con Attenzione", ja:"読み込み派", ko:"꼼꼼히 읽는 사람"}, key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
-  {names:{tr:"Paylaşmayı Seven", en:"Keen Sharer", es:"Le Encanta Compartir", pt:"Adora Compartilhar", ar:"يحب المشاركة", fr:"Aime Partager", de:"Teilt gern", it:"Ama Condividere", ja:"シェア好き", ko:"공유를 좋아하는 사람"}, key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
-  {names:{tr:"Coşkulu Anlatıcı", en:"Full of Enthusiasm", es:"Puro Entusiasmo", pt:"Sempre Empolgado", ar:"مليء بالحماس", fr:"Plein d'Enthousiasme", de:"Voller Begeisterung", it:"Sempre Entusiasta", ja:"テンション高め", ko:"신나 있는 사람"}, key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
-  {names:{tr:"X Yazarı", en:"X Contributor", es:"Autor en X", pt:"Autor no X", ar:"كاتب نشيط", fr:"Plume Active", de:"Schreibt fleißig", it:"Scrive Spesso", ja:"よく書く人", ko:"자주 쓰는 사람"}, key:"own_posts", test:(s:any)=>s.own_posts >= 6}
+  {names:{tr:"Sohbeti Seven", en:"Always Up for Conversation", es:"Siempre de Charla", pt:"Bom de Conversa", ar:"يحب الحوار", fr:"Aime Échanger", de:"Immer im Gespräch", it:"Ama Chiacchierare", ja:"おしゃべり好き", ko:"대화를 즐기는 사람", zh:"很愛聊天"}, key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
+  {names:{tr:"Uzun Uzun Anlatan", en:"Detailed Storyteller", es:"Narrador Detallista", pt:"Conta Tudo em Detalhes", ar:"يروي بالتفاصيل", fr:"Raconte en Détail", de:"Erzählt gern ausführlich", it:"Racconta nei Dettagli", ja:"じっくり語る人", ko:"길게 쓰는 사람", zh:"話比較長"}, key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
+  {names:{tr:"Renkli Anlatıcı", en:"Expressive Soul", es:"Alma Expresiva", pt:"Cheio de Expressão", ar:"معبر بطبعه", fr:"Très Expressif", de:"Sehr ausdrucksstark", it:"Molto Espressivo", ja:"表現豊か", ko:"표현이 풍부한 사람", zh:"表情很豐富"}, key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
+  {names:{tr:"Meraklı Biri", en:"Curious Mind", es:"Mente Curiosa", pt:"Curioso por Natureza", ar:"كثير السؤال", fr:"Toujours une Question", de:"Fragt gern nach", it:"Fa Tante Domande", ja:"質問好き", ko:"질문이 많은 사람", zh:"問題很多"}, key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
+  {names:{tr:"Sözü Kuvvetli", en:"Way with Words", es:"Buena Pluma", pt:"Bom com as Palavras", ar:"يحسن التعبير", fr:"Le Mot Juste", de:"Hat das richtige Wort", it:"Lessico Ricco", ja:"言葉選び上手", ko:"단어 선택이 좋은 사람", zh:"很會用詞"}, key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
+  {names:{tr:"Özgün Anlatıcı", en:"Original Voice", es:"Voz Propia", pt:"Estilo Próprio", ar:"له أسلوبه الخاص", fr:"Une Voix à Part", de:"Ganz eigener Stil", it:"Stile Tutto Suo", ja:"自分の言葉派", ko:"자기 말로 쓰는 사람", zh:"用自己的話"}, key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
+  {names:{tr:"Alıntı Seven", en:"Thoughtful Reader", es:"Lector Atento", pt:"Bom Leitor", ar:"قارئ متأمل", fr:"Lecteur Attentif", de:"Liest aufmerksam", it:"Legge con Attenzione", ja:"読み込み派", ko:"꼼꼼히 읽는 사람", zh:"讀得很仔細"}, key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
+  {names:{tr:"Paylaşmayı Seven", en:"Keen Sharer", es:"Le Encanta Compartir", pt:"Adora Compartilhar", ar:"يحب المشاركة", fr:"Aime Partager", de:"Teilt gern", it:"Ama Condividere", ja:"シェア好き", ko:"공유를 좋아하는 사람", zh:"很愛分享"}, key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
+  {names:{tr:"Coşkulu Anlatıcı", en:"Full of Enthusiasm", es:"Puro Entusiasmo", pt:"Sempre Empolgado", ar:"مليء بالحماس", fr:"Plein d'Enthousiasme", de:"Voller Begeisterung", it:"Sempre Entusiasta", ja:"テンション高め", ko:"신나 있는 사람", zh:"很有熱情"}, key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
+  {names:{tr:"X Yazarı", en:"X Contributor", es:"Autor en X", pt:"Autor no X", ar:"كاتب نشيط", fr:"Plume Active", de:"Schreibt fleißig", it:"Scrive Spesso", ja:"よく書く人", ko:"자주 쓰는 사람", zh:"很常發文"}, key:"own_posts", test:(s:any)=>s.own_posts >= 6}
 ];
-const DEFAULT_ALIAS: Record<Locale,string> = {tr:"Sade Gözlemci", en:"Quiet Observer", es:"Observador Sereno", pt:"Observador Tranquilo", ar:"مراقب هادئ", fr:"Observateur Discret", de:"Beobachtet in Ruhe", it:"Osserva in Silenzio", ja:"静かな観察者", ko:"조용한 관찰자"};
+const DEFAULT_ALIAS: Record<Locale,string> = {tr:"Sade Gözlemci", en:"Quiet Observer", es:"Observador Sereno", pt:"Observador Tranquilo", ar:"مراقب هادئ", fr:"Observateur Discret", de:"Beobachtet in Ruhe", it:"Osserva in Silenzio", ja:"静かな観察者", ko:"조용한 관찰자", zh:"安靜的觀察者"};
 const NICKNAME_STYLE_EXAMPLES: Record<Locale,string[]> = {
   tr: ["Sessiz Gözlemci","Sohbeti Seven","Meraklı Biri","Uzun Uzun Anlatan","İnce Alaycı"],
   en: ["Quiet Observer","Always Up for Conversation","Curious Mind","Detailed Storyteller","Tongue in Cheek"],
@@ -284,6 +285,7 @@ const NICKNAME_STYLE_EXAMPLES: Record<Locale,string[]> = {
   it: ["Osserva in Silenzio","Ama Chiacchierare","Fa Tante Domande","Racconta nei Dettagli","Ironia Sottile"],
   ja: ["静かな観察者","おしゃべり好き","質問好き","じっくり語る人","ツッコミ上手"],
   ko: ["조용한 관찰자","대화를 즐기는 사람","질문이 많은 사람","길게 쓰는 사람","은근한 장난꾼"],
+  zh: ["安靜的觀察者","很愛聊天","問題很多","話比較長","一句話收尾"],
 };
 const ALIAS_EVIDENCE = ALIASES.map(a=>({key:a.key,test:a.test}));
 const BANNED_ALIAS_TERMS = [
@@ -357,6 +359,13 @@ const ALIAS_LOCALE_RULES: Record<Locale, {forced:RegExp;sensitive:RegExp;foreign
     forced: /(?:기계|공장|엔진|발전기|레이더|소방관|전사|사냥꾼|마법사|마술사|자석|유닛|대변인|벨벳|토스터|오이|감자|관광객|업데이트|우주적|은하|드래곤|용사|유니콘|로봇|제조기|화신|패왕|마왕|전설의)/u,
     sensitive: /(?:조울증|양극성|조현병|정신분열|자폐|발달장애|우울증|우울한|사이코패스|소시오패스|자기애성|불안장애|강박장애|공황장애|동성애|게이|레즈비언|양성애|트랜스젠더|성소수자|이성애|무슬림|이슬람교|기독교인|천주교|개신교|유대인|무신론자|수니파|시아파|쿠르드|아르메니아|장애인|암 환자|당뇨|트라우마)/u,
     foreign: /[A-Za-z\u00c0-\u024f\uff21-\uff3a\uff41-\uff5a\u0600-\u06ff\u3040-\u30ff\u4e00-\u9fff]/u
+  },
+  // Chinese is written without spaces, so these match as substrings. Han is the script itself;
+  // only Latin, Arabic, kana and hangul mixing is rejected.
+  zh: {
+    forced: /(?:機器|機械|工廠|引擎|發電機|雷達|消防員|戰士|獵人|魔法師|法師|磁鐵|單位|發言人|絲絨|烤麵包機|小黃瓜|馬鈴薯|觀光客|更新|宇宙級|銀河|巨龍|獨角獸|機器人|製造機|化身|霸王|魔王|勇者|傳說中的)/u,
+    sensitive: /(?:躁鬱|雙極性|思覺失調|精神分裂|自閉|亞斯伯格|過動|憂鬱症|憂鬱的|反社會|心理變態|自戀型|焦慮症|強迫症|恐慌症|同性戀|男同志|女同志|雙性戀|跨性別|異性戀|穆斯林|伊斯蘭教|基督徒|天主教|猶太人|無神論者|遜尼派|什葉派|庫德|亞美尼亞|身心障礙|殘障|癌症|糖尿病|創傷)/u,
+    foreign: /[A-Za-z\u00c0-\u024f\uff21-\uff3a\uff41-\uff5a\u0600-\u06ff\u3040-\u30ff\uac00-\ud7af]/u
   }
 };
 const UNNATURAL_ALIAS_PHRASES: Record<Locale, string[]> = {
@@ -369,7 +378,8 @@ const UNNATURAL_ALIAS_PHRASES: Record<Locale, string[]> = {
   de:["lila gedanke","satzakrobat","ironiechef","raum aktualisierung","samtige logik"],
   it:["logica di velluto","aggiornamento della stanza","turista della timeline","acrobata delle frasi","direttore dell'ironia","cucchiaio quantico","pensiero viola"],
   ja:["ベルベット論理","部屋アップデート","タイムライン観光客","文章アクロバット","皮肉部長","量子スプーン","紫の思考"],
-  ko:["벨벳 논리","보라색 생각","양자 숟가락","타임라인 관광객","문장 곡예사","아이러니 부장","방 업데이트"]
+  ko:["벨벳 논리","보라색 생각","양자 숟가락","타임라인 관광객","문장 곡예사","아이러니 부장","방 업데이트"],
+  zh:["絲絨邏輯","紫色思考","量子湯匙","時間軸觀光客","句子特技演員","反諷部長","房間更新"]
 };
 function aliasValid(v: unknown, locale: Locale) {
   if (typeof v !== "string" || !isRealLocale(locale)) return false;
@@ -426,7 +436,7 @@ function validateMetrics(raw:any, keys:readonly string[], min:number, max:number
   return raw;
 }
 function validCopy(v:any, max=700) {
-  if (typeof v!=="string" || !v.trim() || v.length>max || /[<>]|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei]|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*|analys(?:é|e)\w*|analysiert\w*|analizzat\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|[\d０-９][\d０-９\s]*[件本]?の?(?:投稿|ツイート|ポスト)|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}[\d０-９]|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}分析|分析[^。！？!?]{0,20}(?:投稿|ツイート|ポスト)|\d[\d\s]*개?의?\s*(?:게시글|게시물|트윗|포스트)|(?:게시글|게시물|트윗|포스트)[^.!?]{0,20}\d|(?:게시글|게시물|트윗|포스트)[^.!?]{0,20}분석|분석[^.!?]{0,20}(?:게시글|게시물|트윗|포스트)/iu.test(v)) throw new Error("ai_bad_copy");
+  if (typeof v!=="string" || !v.trim() || v.length>max || /[<>]|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei]|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*|analys(?:é|e)\w*|analysiert\w*|analizzat\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|[\d０-９][\d０-９\s]*[件本]?の?(?:投稿|ツイート|ポスト)|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}[\d０-９]|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}分析|分析[^。！？!?]{0,20}(?:投稿|ツイート|ポスト)|\d[\d\s]*개?의?\s*(?:게시글|게시물|트윗|포스트)|(?:게시글|게시물|트윗|포스트)[^.!?]{0,20}\d|(?:게시글|게시물|트윗|포스트)[^.!?]{0,20}분석|분석[^.!?]{0,20}(?:게시글|게시물|트윗|포스트)|[\d０-９][\d０-９\s]*[則篇條]?(?:貼文|推文|發文)|(?:貼文|推文|發文)[^。！？!?]{0,20}[\d０-９]|(?:貼文|推文|發文)[^。！？!?]{0,20}分析|分析[^。！？!?]{0,20}(?:貼文|推文|發文)/iu.test(v)) throw new Error("ai_bad_copy");
   return v.trim();
 }
 function validateCopy(raw:any, profile=false) {

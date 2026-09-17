@@ -955,6 +955,11 @@ var FUN_PERSONAS = [
         "nickname": "은근한 장난꾼",
         "tagline": "차분해 보이지만 속에는 장난기가 있어요.",
         "comment": "다들 같은 말을 하고 있을 때 흐름을 바꾸는 질문을 슬쩍 던져요. 너무 태연하게 말해서 진담인지 농담인지 아무도 확신하지 못하죠. 제일 즐거운 순간은 눈치챈 사람과 눈이 마주쳐 함께 웃을 때예요."
+      },
+      "zh": {
+        "nickname": "安靜的搗蛋鬼",
+        "tagline": "看起來很溫和，其實藏著一點調皮。",
+        "comment": "大家意見一致的時候，你會輕輕丟出一個讓話題轉彎的問題。語氣太平靜了，沒有人分得出你是認真還是在開玩笑。最開心的一刻，是跟第一個聽懂的人對上眼一起笑出來。"
       }
     }
   },
@@ -1017,6 +1022,11 @@ var FUN_PERSONAS = [
         "nickname": "촌철살인",
         "tagline": "표정 하나 안 바꾸고 마지막 한마디로 뒤집어요.",
         "comment": "거창한 이야기를 들으면 그 안의 모순이 먼저 눈에 들어와요. 길게 반박하는 대신 짧고 가볍게 비트는 한마디를 고르죠. 무슨 뜻인지 굳이 설명하지는 않아요. 알아들은 사람이 피식 웃으면 그걸로 충분하니까요."
+      },
+      "zh": {
+        "nickname": "一句話收尾",
+        "tagline": "面不改色，最後一句直接翻盤。",
+        "comment": "聽到誇張的說法時，你第一眼看到的是裡面的矛盾。比起長篇反駁，你更習慣挑一句輕輕帶過的話。你不會解釋笑點在哪裡。聽懂的人笑一下，這樣就夠了。"
       }
     }
   },
@@ -1079,6 +1089,11 @@ var FUN_PERSONAS = [
         "nickname": "호기심 대장",
         "tagline": "한 이야기가 끝나기도 전에 다음 주제가 궁금해져요.",
         "comment": "모르는 이야기가 나오면 가만히 있기보다 질문부터 하게 돼요. 재미있는 답이 하나 돌아오면 곧바로 다음 궁금증이 생기죠. 조금이라도 더 알고 돌아가는 날은 그것만으로 괜찮은 하루가 됩니다."
+      },
+      "zh": {
+        "nickname": "什麼都想問",
+        "tagline": "一個話題還沒結束，你已經好奇下一個了。",
+        "comment": "遇到不熟的話題，比起安靜聽著，你更想直接開口問。只要得到一個有趣的答案，下一個疑問馬上就冒出來。哪天能多知道一點什麼，那天就算過得不錯。"
       }
     }
   },
@@ -1141,6 +1156,11 @@ var FUN_PERSONAS = [
         "nickname": "무표정 개그",
         "tagline": "웃을 타이밍은 당신이 정하는 대로 찾아와요.",
         "comment": "말도 안 되는 이야기를 커피 주문하듯 담담하게 꺼내요. 주변이 알아챌 때까지 표정은 전혀 흔들리지 않죠. 웃음이 늦게 터져도 굳이 설명하지 않아요. 그 잠깐의 정적까지가 농담의 일부니까요."
+      },
+      "zh": {
+        "nickname": "正經講笑話",
+        "tagline": "笑點什麼時候來，完全由你決定。",
+        "comment": "再離譜的話，你都能用點咖啡的語氣講出來。在別人反應過來之前，表情完全沒有變化。就算笑聲來得慢，你也不會多做解釋。中間那段安靜，本來就是笑話的一部分。"
       }
     }
   },
@@ -1203,6 +1223,11 @@ var FUN_PERSONAS = [
         "nickname": "자칭 철학자",
         "tagline": "가벼운 잡담이 어느새 깊은 이야기가 돼요.",
         "comment": "별생각 없이 던진 질문이 어느새 인생에 대한 의외의 지론으로 바뀝니다. 커피가 식어도 생각을 한 번 더 굴려보기 전에는 이야기를 끝내지 않아요. 누군가 반박해 주면 오히려 그때부터 더 재미있어집니다."
+      },
+      "zh": {
+        "nickname": "自封哲學家",
+        "tagline": "隨口閒聊，不知不覺就聊到很深。",
+        "comment": "一個隨口的問題，常常變成一套關於人生的奇怪見解。咖啡涼了也沒關係，想法沒有再翻一次，你是不會收尾的。要是有人願意反駁，反而從那裡開始更有意思。"
       }
     }
   },
@@ -1265,6 +1290,11 @@ var FUN_PERSONAS = [
         "nickname": "눈치 백단",
         "tagline": "무엇을 말하는지만큼 언제 말하는지를 중요하게 생각해요.",
         "comment": "대화에서는 오가는 말뿐 아니라 아직 말하지 못한 사람도 함께 살펴요. 질문을 건네거나 화제를 돌리며 그 자리에 맞게 움직이죠. 누구나 부담 없이 말할 수 있는 분위기가 되면 스스로도 가장 즐거워집니다."
+      },
+      "zh": {
+        "nickname": "很會看氣氛",
+        "tagline": "說什麼重要，什麼時候說也一樣重要。",
+        "comment": "聊天的時候，你注意的不只是說出口的話，還有那個一直沒開口的人。你會遞一個問題，或把話題帶開，看場合調整。當每個人都能自在說話，你自己也最放鬆。"
       }
     }
   },
@@ -1327,6 +1357,11 @@ var FUN_PERSONAS = [
         "nickname": "중재 담당",
         "tagline": "의견이 달라도 싸움으로는 가지 않아요.",
         "comment": "논쟁이 뜨거워지면 진짜 쟁점과 그 자리의 짜증을 먼저 갈라놓아요. 어느 한쪽 편을 들지 않아도 말이 되는 의견은 제대로 인정해 주죠. 마지막에 모두가 조금이라도 서로를 이해하게 되면 그게 가장 좋은 결말입니다."
+      },
+      "zh": {
+        "nickname": "負責打圓場",
+        "tagline": "意見不同，也不會真的吵起來。",
+        "comment": "討論一熱起來，你會先把真正的爭點跟當下的情緒分開。不站任何一邊，也能好好承認講得有道理的那句話。最後大家能多懂彼此一點，就是最好的結局。"
       }
     }
   },
@@ -1389,6 +1424,11 @@ var FUN_PERSONAS = [
         "nickname": "다시 읽는 사람",
         "tagline": "짧은 답장도 보내기 전에 한 번 더 확인해요.",
         "comment": "아주 짧은 메시지에도 마침표는 너무 차가운가 느낌표는 너무 들뜬가를 고민하게 돼요. 보내기 전에 상대가 어떻게 읽을지를 몇 번이나 그려봅니다. 결국 맨 처음 쓴 문장을 보내고 혼자 고민한 게 웃겨서 피식 웃어요."
+      },
+      "zh": {
+        "nickname": "送出前再看一次",
+        "tagline": "再短的回覆，送出前都要再確認一次。",
+        "comment": "就算只是一句短訊息，你也會想句號會不會太冷、驚嘆號會不會太興奮。送出之前，你在腦中排練過對方會怎麼讀。最後還是送出最早寫好的那一句，然後笑自己想太多。"
       }
     }
   },
@@ -1451,6 +1491,11 @@ var FUN_PERSONAS = [
         "nickname": "조용한 존재감",
         "tagline": "가장 목소리가 크지 않아도 기억에는 남아요.",
         "comment": "침묵을 전부 말로 채우지 않아도 괜찮아요. 입을 열 때는 짧아도 마음에 남는 한마디를 고릅니다. 모임이 끝난 뒤 누군가 그 한마디를 기억해 주면 그걸로 기쁘죠."
+      },
+      "zh": {
+        "nickname": "安靜的存在感",
+        "tagline": "聲音不是最大的，卻讓人記得住。",
+        "comment": "你不需要把每一段沉默都用話填滿。真的開口時，就算只有一句，也會留在別人心裡。聚會散場以後，有人還記得那句話，你就覺得值得了。"
       }
     }
   },
@@ -1513,6 +1558,11 @@ var FUN_PERSONAS = [
         "nickname": "흥 담당",
         "tagline": "당신이 있으면 사람들 사이에 끼기가 쉬워져요.",
         "comment": "자리가 조용해지면 다 같이 할 수 있는 이야기나 놀이를 꺼내요. 누구도 어색하지 않게 자연스럽게 대화로 끌어들이는 데 익숙하죠. 계획이 몇 번 바뀌어도 아무도 지루하지 않으면 그걸로 충분합니다."
+      },
+      "zh": {
+        "nickname": "炒熱氣氛的人",
+        "tagline": "有你在，大家比較容易加入話題。",
+        "comment": "場面一安靜下來，你就會拿出大家都能一起玩的話題或遊戲。你很會把人自然帶進對話，又不會讓誰覺得尷尬。就算計畫改了好幾次，只要沒有人無聊，那就夠了。"
       }
     }
   },
@@ -1575,6 +1625,11 @@ var FUN_PERSONAS = [
         "nickname": "잘 듣는 사람",
         "tagline": "사소한 이야기도 당신과 하면 길어져요.",
         "comment": "오늘 어땠냐고 물을 때 정말로 그 대답이 궁금해서 물어요. 작은 이야기에도 관심이 생겨서 ‘그래서요?’ 하고 다음을 듣게 되죠. 그래서 당신과의 짧은 차 한잔은 대개 긴 수다가 됩니다."
+      },
+      "zh": {
+        "nickname": "很會聽人說話",
+        "tagline": "再小的事，跟你講都會變成長篇。",
+        "comment": "你問別人今天過得怎麼樣的時候，是真的想聽那個答案。一件小事也能讓你有興趣，接著問一句「然後呢？」。所以跟你喝杯茶，通常都會變成一場長談。"
       }
     }
   },
@@ -1637,6 +1692,11 @@ var FUN_PERSONAS = [
         "nickname": "이야기꾼",
         "tagline": "어디서 풀어야 재미있는지 정확히 알아요.",
         "comment": "가장 재미있는 부분은 끝까지 아껴 두고 꺼낼 타이밍을 압니다. 흔한 실패담도 단어 하나만 바꾸면 몇 번이고 다시 듣고 싶은 이야기가 되죠. 나중에 누군가 당신의 ‘그 대사’를 따라 하고 있다면 그게 최고의 칭찬이에요."
+      },
+      "zh": {
+        "nickname": "很會說故事",
+        "tagline": "哪裡講出來最好笑，你抓得很準。",
+        "comment": "最有趣的部分你會留到最後，也知道什麼時候丟出來。再普通的糗事，換個說法就變成想再聽一次的故事。哪天有人開始學你的那句台詞，那就是最高的稱讚。"
       }
     }
   }
@@ -1681,8 +1741,8 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
   var comment = {
-    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de"), it: funModeComment(card, "mirror", "it"), ja: funModeComment(card, "mirror", "ja"), ko: funModeComment(card, "mirror", "ko") },
-    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de"), it: funModeComment(card, "stalk", "it"), ja: funModeComment(card, "stalk", "ja"), ko: funModeComment(card, "stalk", "ko") }
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de"), it: funModeComment(card, "mirror", "it"), ja: funModeComment(card, "mirror", "ja"), ko: funModeComment(card, "mirror", "ko"), zh: funModeComment(card, "mirror", "zh") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de"), it: funModeComment(card, "stalk", "it"), ja: funModeComment(card, "stalk", "ja"), ko: funModeComment(card, "stalk", "ko"), zh: funModeComment(card, "stalk", "zh") }
   };
   return {
     mode: actualMode,
@@ -1696,7 +1756,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     profile_emoji: card.emoji,
     comment: comment,
     card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it], ja:[comment[actualMode].ja], ko:[comment[actualMode].ko] } },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it], ja:[comment[actualMode].ja], ko:[comment[actualMode].ko], zh:[comment[actualMode].zh] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
@@ -1782,6 +1842,14 @@ var FUN_MATCH_COMMENTS = {
     "같은 자리에 앉으면 전설의 콤비가 되거나 한쪽이 알림을 끄거나 둘 중 하나예요.",
     "XORA는 이 조합을 믿습니다. 그 자신감이 어디서 왔는지는 아무도 모르지만요.",
     "과학은 이 건을 반려했어요. 그래도 퍼센트는 내드렸습니다."
+  ],
+  zh: [
+    "XORA 那間完全不科學的實驗室判定，這兩個人是個意外有趣的組合。",
+    "這個百分比證明不了什麼。不過拿去群組聊天炒氣氛已經夠用了。",
+    "卡片只是玩玩，偏偏百分比看起來特別認真。",
+    "坐在同一桌，不是變成傳說中的搭檔，就是有一方把通知關掉。",
+    "XORA 相信這個組合。至於這份自信從哪裡來，沒有人知道。",
+    "科學那邊把案子退回來了。百分比我們還是算給你了。"
   ]
 };
 
@@ -1805,7 +1873,7 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
     overall: overall,
     ci: commentIndex,
     source: "fun",
-    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex], de:FUN_MATCH_COMMENTS.de[commentIndex], it:FUN_MATCH_COMMENTS.it[commentIndex], ja:FUN_MATCH_COMMENTS.ja[commentIndex], ko:FUN_MATCH_COMMENTS.ko[commentIndex] },
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex], de:FUN_MATCH_COMMENTS.de[commentIndex], it:FUN_MATCH_COMMENTS.it[commentIndex], ja:FUN_MATCH_COMMENTS.ja[commentIndex], ko:FUN_MATCH_COMMENTS.ko[commentIndex], zh:FUN_MATCH_COMMENTS.zh[commentIndex] },
     meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
   };
 }
@@ -1813,9 +1881,9 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
-    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA", de: "XORA-Profil", it: "Profilo XORA", ja: "XORAプロフィール", ko: "XORA 프로필" },
-    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée.", de: "Analyse abgeschlossen.", it: "Analisi completata.", ja: "分析が完了しました。", ko: "분석이 끝났습니다." },
-    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""], de: [""], it: [""], ja: [""], ko: [""] }
+    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA", de: "XORA-Profil", it: "Profilo XORA", ja: "XORAプロフィール", ko: "XORA 프로필", zh: "XORA 檔案" },
+    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée.", de: "Analyse abgeschlossen.", it: "Analisi completata.", ja: "分析が完了しました。", ko: "분석이 끝났습니다.", zh: "分析完成了。" },
+    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""], de: [""], it: [""], ja: [""], ko: [""], zh: [""] }
   };
 }
 
@@ -1909,6 +1977,14 @@ var MATCH_COMMENTS = {
     "{a}와 {b}는 서로를 확인하면서도 팔로우는 하지 않아요. 용기도 소심함도 아니고 그냥 혼돈입니다.",
     "{a}는 하트를 보내고 {b}는 불을 보내요. 둘 다 자기가 뭘 원하는지 모르지만 합은 확실히 좋습니다.",
     "{a}가 계획을 세우면 {b}가 뒤엎어요. 이 둘은 그대로 로맨틱 코미디가 됩니다."
+  ],
+  zh: [
+    "{a} 傳了訊息，{b} 已讀不回。可是兩個人都在凌晨三點看對方的個人檔案。很常見的故事。",
+    "這兩個帳號的戀愛會從一個讚開始，用一齣戲收尾。XORA 的爆米花已經準備好了。",
+    "{a} 認真打字，{b} 用玩笑回。這種張力不是變成戀愛，就是以封鎖收場。",
+    "{a} 和 {b} 互相看對方的動態，卻沒有真的追蹤對方。不是勇敢也不是膽小，就是純粹的混亂。",
+    "{a} 傳愛心，{b} 傳火。兩個人都不知道自己想要什麼，但頻率確實很合。",
+    "{a} 訂好計畫，{b} 全部推翻。這兩個人根本可以直接拍成愛情喜劇。"
   ]
 };
 
@@ -2039,6 +2115,14 @@ var THINKING = {
       "모순되는 부분을 적어두고 있어요...",
       "반복해서 나타나는 신호를 분석 중...",
       "XORA는 가끔 너무 솔직해요. 마음의 준비를 하세요."
+    ],
+    zh: [
+      "正在撥開時間軸上的灰塵…",
+      "凌晨三點的貼文我本來想當作沒看到…結果沒辦法。",
+      "掃描行為模式中…",
+      "把你的矛盾記下來…",
+      "分析一直重複出現的訊號…",
+      "XORA 有時候太誠實了。做好心理準備。"
     ]
   },
   stalk: {
@@ -2121,6 +2205,14 @@ var THINKING = {
       "저한테 들었다고 하면 안 돼요...",
       "팔로우하는 계정도 봤어요. 꽤 많은 게 보이네요.",
       "찾아낸 건 당신에게만 알려드릴게요."
+    ],
+    zh: [
+      "悄悄進入個人檔案…",
+      "不會留下足跡，放心。",
+      "嗯。按讚的紀錄很有意思。",
+      "這件事不要說是我講的…",
+      "我也看了他追蹤的帳號。看得出不少東西。",
+      "找到的東西，我只告訴你。"
     ]
   },
   match: {
@@ -2203,6 +2295,14 @@ var THINKING = {
       "답글 기록에서 긴장감이 감지됐어요.",
       "궁합 계산 중. 가운도 챙겨 입었습니다.",
       "결과에 둘 중 하나는 실망할 수도 있어요. 발표합니다."
+    ],
+    zh: [
+      "把兩條時間軸並排放好…",
+      "正在找重疊的讚…有意思。",
+      "一個白天出沒，一個晚上出沒。記下來了。",
+      "在回覆紀錄裡偵測到張力。",
+      "計算速配中。白袍已經穿上。",
+      "結果可能會讓其中一個人失望。公布了。"
     ]
   }
 };

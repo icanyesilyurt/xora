@@ -126,7 +126,7 @@ function buildIdentityCardV3(res) {
   var mode = res.mode || "mirror";
   var quoteLabel = mode === "stalk"
     ? "XORA Stalk"
-    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "Miroir XORA" : lang === "de" ? "XORA Spiegel" : lang === "it" ? "Specchio XORA" : lang === "ja" ? "XORAミラー" : lang === "ko" ? "XORA 미러" : "XORA Mirror");
+    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "Miroir XORA" : lang === "de" ? "XORA Spiegel" : lang === "it" ? "Specchio XORA" : lang === "ja" ? "XORAミラー" : lang === "ko" ? "XORA 미러" : lang === "zh" ? "XORA 鏡子" : "XORA Mirror");
 
   var chips = "";
   var top = res.top_behaviors || [];
@@ -395,7 +395,8 @@ function copyDirection(lang) {
 // system fonts of that script before the generic family.
 var LOCALE_FONT_FALLBACK = {
   ja: '"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,Meiryo,"Noto Sans JP","Noto Sans CJK JP"',
-  ko: '"Apple SD Gothic Neo","Malgun Gothic","Nanum Gothic","Noto Sans KR","Noto Sans CJK KR"'
+  ko: '"Apple SD Gothic Neo","Malgun Gothic","Nanum Gothic","Noto Sans KR","Noto Sans CJK KR"',
+  zh: '"PingFang TC","Microsoft JhengHei","Noto Sans TC","Noto Sans CJK TC"'
 };
 
 function applyLocaleFont(ctx, lang) {
@@ -553,7 +554,7 @@ function renderIdentityPNGV3(res) {
   var emoji = res.profile_emoji || "🪞";
   var tagline = res.tagline ? (res.tagline[lang] || res.tagline.tr) : "";
   var mode = res.mode || "mirror";
-  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "MIROIR XORA" : lang === "de" ? "XORA SPIEGEL" : lang === "it" ? "SPECCHIO XORA" : lang === "ja" ? "XORAミラー" : lang === "ko" ? "XORA 미러" : "XORA MIRROR");
+  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "MIROIR XORA" : lang === "de" ? "XORA SPIEGEL" : lang === "it" ? "SPECCHIO XORA" : lang === "ja" ? "XORAミラー" : lang === "ko" ? "XORA 미러" : lang === "zh" ? "XORA 鏡子" : "XORA MIRROR");
   var b = baseCanvas();
   var ctx = b.ctx;
 
@@ -879,6 +880,7 @@ function shareIdentityText(res) {
     if (lang === "it") return 'XORA REAL mi ha letto: «' + name + '» · ' + rarity + ' 👀 E di te cosa direbbe? → ' + getPublicSiteUrl();
     if (lang === "ja") return 'XORA REALに読まれた結果：「' + name + '」 · ' + rarity + ' 👀 あなたはどう出る？ → ' + getPublicSiteUrl();
     if (lang === "ko") return 'XORA REAL이 읽어낸 나: ‘' + name + '’ · ' + rarity + ' 👀 당신은 어떻게 나올까요? → ' + getPublicSiteUrl();
+    if (lang === "zh") return 'XORA REAL 讀出來的我：「' + name + '」 · ' + rarity + ' 👀 你會是什麼樣子？ → ' + getPublicSiteUrl();
     return 'XORA REAL read me: "' + name + '" · ' + rarity + ' 👀 What would yours say? → ' + getPublicSiteUrl();
   }
   if (lang === "tr") return 'XORA FUN kartım: "' + name + '" 😅 Seninkini çek → ' + getPublicSiteUrl();
@@ -890,6 +892,7 @@ function shareIdentityText(res) {
   if (lang === "it") return 'La mia carta XORA FUN: «' + name + '» 😅 Pesca la tua → ' + getPublicSiteUrl();
   if (lang === "ja") return 'XORA FUNのカード：「' + name + '」😅 あなたも引いてみて → ' + getPublicSiteUrl();
   if (lang === "ko") return '내 XORA FUN 카드: ‘' + name + '’ 😅 당신도 뽑아 보세요 → ' + getPublicSiteUrl();
+  if (lang === "zh") return '我的 XORA FUN 卡片：「' + name + '」😅 你也來抽一張 → ' + getPublicSiteUrl();
   return 'My XORA FUN card: "' + name + '" 😅 Draw yours → ' + getPublicSiteUrl();
 }
 
@@ -906,6 +909,7 @@ function shareMatchText(m) {
     if (lang === "it") return "XORA REAL: @" + m.a + " × @" + m.b + " affinità " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "ja") return "XORA REAL：@" + m.a + " × @" + m.b + " の相性 " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "ko") return "XORA REAL: @" + m.a + " × @" + m.b + " 궁합 " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
+    if (lang === "zh") return "XORA REAL：@" + m.a + " × @" + m.b + " 速配 " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     return "XORA REAL: @" + m.a + " × @" + m.b + " match " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
   }
   if (lang === "tr") return "XORA FUN: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " 😅 Siz kaç çıkarsınız? → " + getPublicSiteUrl();
@@ -917,6 +921,7 @@ function shareMatchText(m) {
   if (lang === "it") return "XORA FUN: @" + m.a + " × @" + m.b + " affinità " + m.overall + "% 😅 E voi quanto fate? → " + getPublicSiteUrl();
   if (lang === "ja") return "XORA FUN：@" + m.a + " × @" + m.b + " の相性 " + m.overall + "% 😅 あなたたちは何%？ → " + getPublicSiteUrl();
   if (lang === "ko") return "XORA FUN: @" + m.a + " × @" + m.b + " 궁합 " + m.overall + "% 😅 두 분은 몇 %일까요? → " + getPublicSiteUrl();
+  if (lang === "zh") return "XORA FUN：@" + m.a + " × @" + m.b + " 速配 " + m.overall + "% 😅 你們呢？ → " + getPublicSiteUrl();
   return "XORA FUN: @" + m.a + " × @" + m.b + " match " + m.overall + "% 😅 Try yours → " + getPublicSiteUrl();
 }
 
@@ -925,7 +930,7 @@ function shareMatchText(m) {
 function cardPresentationCopy(value, key) {
   if (key === "meta") return value;
   if (typeof value === "string") {
-    var keep = function (sentence) { return !/[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|[\d０-９][\d０-９\s]*[件本]?の?(?:投稿|ツイート|ポスト)|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}[\d０-９]|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}分析|分析[^。！？!?]{0,20}(?:投稿|ツイート|ポスト)|\d[\d\s]*개?의?\s*(?:게시글|게시물|트윗|포스트)|(?:게시글|게시물|트윗|포스트)[^.!?]{0,20}\d|(?:게시글|게시물|트윗|포스트)[^.!?]{0,20}분석|분석[^.!?]{0,20}(?:게시글|게시물|트윗|포스트)|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei]|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*|analys(?:é|e)\w*|analysiert\w*|analizzat\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])/iu.test(sentence); };
+    var keep = function (sentence) { return !/[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|[\d０-９][\d０-９\s]*[件本]?の?(?:投稿|ツイート|ポスト)|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}[\d０-９]|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}分析|分析[^。！？!?]{0,20}(?:投稿|ツイート|ポスト)|\d[\d\s]*개?의?\s*(?:게시글|게시물|트윗|포스트)|(?:게시글|게시물|트윗|포스트)[^.!?]{0,20}\d|(?:게시글|게시물|트윗|포스트)[^.!?]{0,20}분석|분석[^.!?]{0,20}(?:게시글|게시물|트윗|포스트)|[\d０-９][\d０-９\s]*[則篇條]?(?:貼文|推文|發文)|(?:貼文|推文|發文)[^。！？!?]{0,20}[\d０-９]|(?:貼文|推文|發文)[^。！？!?]{0,20}分析|分析[^。！？!?]{0,20}(?:貼文|推文|發文)|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei]|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*|analys(?:é|e)\w*|analysiert\w*|analizzat\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])/iu.test(sentence); };
     // Japanese sentences end without a trailing space: split on the sentence mark itself and rejoin unchanged.
     if (CJK_TEXT.test(value)) return value.split(/(?<=[。！？])/).filter(keep).join("");
     return value.split(/(?<=[.!?؟])\s+/).filter(keep).join(" ");

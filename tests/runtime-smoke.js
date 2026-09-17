@@ -60,7 +60,7 @@ if (!matchHtml.includes("XORA FUN")) throw new Error("Fun match failed");
 if (!ctx.shareIdentityText(real).includes("https://example.test/xora/")) throw new Error("Share URL failed");
 
 // Every supported locale must render FUN identity and match cards, HTML and PNG, from its own copy.
-const locales = ["tr", "en", "es", "pt", "ar", "fr", "de", "it", "ja", "ko"];
+const locales = ["tr", "en", "es", "pt", "ar", "fr", "de", "it", "ja", "ko", "zh"];
 const persona = ctx.FUN_PERSONAS.find((p) => p.id === fun.persona_id);
 for (const code of locales) {
   lang = code;
@@ -72,7 +72,7 @@ for (const code of locales) {
 
   painted.length = 0;
   ctx.renderIdentityPNG(fun);
-  const drawn = painted.filter((p) => p.x === 500 && p.y > 500 && p.y < 1090).map((p) => p.v).join(code === "ja" ? "" : " ");
+  const drawn = painted.filter((p) => p.x === 500 && p.y > 500 && p.y < 1090).map((p) => p.v).join((code === "ja" || code === "zh") ? "" : " ");
   if (!drawn.includes(copy.nickname)) throw new Error("PNG missing " + code + " nickname");
   if (!drawn.includes(copy.comment)) throw new Error("PNG missing " + code + " comment");
   ctx.renderMatchPNG(match);
@@ -89,6 +89,9 @@ const jaCopy = ctx.FUN_PERSONAS.map((p) => p.locales.ja.comment).join("");
 for (const [script, re] of [["kanji", /[\u4e00-\u9fff]/], ["hiragana", /[\u3040-\u309f]/], ["katakana", /[\u30a0-\u30ff]/]]) if (!re.test(jaCopy)) throw new Error("Japanese " + script + " missing");
 const koCopy = ctx.FUN_PERSONAS.map((p) => p.locales.ko.comment).join("");
 if (!/[\uac00-\ud7af]/.test(koCopy) || /[A-Za-z\u3040-\u30ff\u4e00-\u9fff]/.test(koCopy)) throw new Error("Korean copy must be hangul only");
+const zhCopy = ctx.FUN_PERSONAS.map((p) => p.locales.zh.comment).join("");
+if (!/[\u4e00-\u9fff]/.test(zhCopy) || /[A-Za-z\u3040-\u30ff\uac00-\ud7af]/.test(zhCopy)) throw new Error("Chinese copy must be Han only");
+if (/[这个们说见会时样为么过还来对点问让给长风话网无没当发]/.test(zhCopy)) throw new Error("Chinese copy must be Traditional");
 if (!ctx.FUN_PERSONAS.every((p) => /^[\u0600-\u06FF\s.،؛؟!]+$/.test(p.locales.ar.nickname + p.locales.ar.tagline))) throw new Error("Arabic copy must be Arabic script");
 
-console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall, locales, es_nickname: persona.locales.es.nickname, pt_nickname: persona.locales.pt.nickname, ar_nickname: persona.locales.ar.nickname, fr_nickname: persona.locales.fr.nickname, de_nickname: persona.locales.de.nickname, it_nickname: persona.locales.it.nickname, ja_nickname: persona.locales.ja.nickname, ko_nickname: persona.locales.ko.nickname }));
+console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall, locales, es_nickname: persona.locales.es.nickname, pt_nickname: persona.locales.pt.nickname, ar_nickname: persona.locales.ar.nickname, fr_nickname: persona.locales.fr.nickname, de_nickname: persona.locales.de.nickname, it_nickname: persona.locales.it.nickname, ja_nickname: persona.locales.ja.nickname, ko_nickname: persona.locales.ko.nickname, zh_nickname: persona.locales.zh.nickname }));
