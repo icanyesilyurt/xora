@@ -126,7 +126,7 @@ function buildIdentityCardV3(res) {
   var mode = res.mode || "mirror";
   var quoteLabel = mode === "stalk"
     ? "XORA Stalk"
-    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "Miroir XORA" : lang === "de" ? "XORA Spiegel" : lang === "it" ? "Specchio XORA" : "XORA Mirror");
+    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "Miroir XORA" : lang === "de" ? "XORA Spiegel" : lang === "it" ? "Specchio XORA" : lang === "ja" ? "XORAミラー" : "XORA Mirror");
 
   var chips = "";
   var top = res.top_behaviors || [];
@@ -315,7 +315,50 @@ function buildMatchCardBase(m) {
    PNG ÜRETİMİ (canvas) — 1000 x 1250
    ============================================================ */
 
+// Japanese and other CJK copy is written without spaces, so it has to wrap on character
+// boundaries. Kinsoku basics: closing punctuation never starts a line and an opening bracket
+// never ends one. Text without CJK characters keeps the original space-based wrapping.
+var CJK_TEXT = /[\u3000-\u303f\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff00-\uffef]/;
+var CJK_NO_LINE_START = "、。，．・：；？！‼⁇゛゜ゝゞ々ーぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ）］｝」』】〕〉》”’…!),.:;?]}";
+var CJK_NO_LINE_END = "（［｛「『【〔〈《“‘([{";
+
+function cjkUnits(text) {
+  var units = [];
+  var tokens = String(text).match(/[A-Za-z0-9@#_%+'’.-]+|\s+|[\s\S]/gu) || [];
+  for (var i = 0; i < tokens.length; i++) {
+    var token = tokens[i];
+    var last = units.length ? units[units.length - 1] : "";
+    var glued = units.length && (/^\s+$/.test(token) || CJK_NO_LINE_START.indexOf(token) >= 0 || CJK_NO_LINE_END.indexOf(last.slice(-1)) >= 0);
+    if (glued) units[units.length - 1] = last + token;
+    else units.push(token);
+  }
+  return units;
+}
+
+function wrapCjkLines(ctx, text, maxW) {
+  var lines = [];
+  var line = "";
+  cjkUnits(text).forEach(function (unit) {
+    if (line && ctx.measureText(line + unit).width > maxW) {
+      lines.push(line.replace(/\s+$/, ""));
+      line = /^\s+$/.test(unit) ? "" : unit;
+    } else {
+      line += unit;
+    }
+  });
+  if (line.trim()) lines.push(line.replace(/\s+$/, ""));
+  return lines.length ? lines : [""];
+}
+
 function wrapText(ctx, text, x, y, maxW, lineH) {
+  if (CJK_TEXT.test(text)) {
+    var lines = wrapCjkLines(ctx, text, maxW);
+    for (var i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], x, y);
+      if (i < lines.length - 1) y += lineH;
+    }
+    return y;
+  }
   var words = text.split(" ");
   var line = "";
   for (var n = 0; n < words.length; n++) {
@@ -347,11 +390,28 @@ function copyDirection(lang) {
   return isRtlLang(lang) ? "rtl" : "ltr";
 }
 
+// Canvas resolves missing glyphs through the browser locale, which can draw Japanese kanji with
+// Chinese glyph shapes. For ja only, name Japanese system fonts before the generic family.
+var JA_FONT_FALLBACK = '"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,Meiryo,"Noto Sans JP","Noto Sans CJK JP"';
+
+function applyLocaleFont(ctx, lang) {
+  if (lang !== "ja") return ctx;
+  var descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(ctx) || {}, "font");
+  if (!descriptor || !descriptor.set || !descriptor.get) return ctx;
+  Object.defineProperty(ctx, "font", {
+    configurable: true,
+    get: function () { return descriptor.get.call(ctx); },
+    set: function (value) { descriptor.set.call(ctx, String(value).replace(/,\s*(sans-serif|serif|monospace)\s*$/, "," + JA_FONT_FALLBACK + ",$1")); }
+  });
+  return ctx;
+}
+
 function baseCanvas() {
   var cv = document.createElement("canvas");
   cv.width = 1000;
   cv.height = 1250;
   var ctx = cv.getContext("2d");
+  applyLocaleFont(ctx, (typeof getLang === "function") ? getLang() : "tr");
   ctx.textAlign = "center";
   ctx.direction = "ltr";
 
@@ -460,7 +520,8 @@ function renderFunIdentityPNG(res) {
   ctx.fillStyle="#5C6270"; ctx.font="600 28px Nunito, Arial, sans-serif"; var y=wrapText(ctx,desc,500,yNick+70,700,34)+42;
   ctx.font="700 26px Nunito, Arial, sans-serif";
   var commentLines=1, line="";
-  comment.split(" ").forEach(function(word) {
+  if (CJK_TEXT.test(comment)) commentLines=wrapCjkLines(ctx,comment,660).length;
+  else comment.split(" ").forEach(function(word) {
     if (line && ctx.measureText(line+word+" ").width>660) { commentLines++; line=""; }
     line+=word+" ";
   });
@@ -487,7 +548,7 @@ function renderIdentityPNGV3(res) {
   var emoji = res.profile_emoji || "🪞";
   var tagline = res.tagline ? (res.tagline[lang] || res.tagline.tr) : "";
   var mode = res.mode || "mirror";
-  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "MIROIR XORA" : lang === "de" ? "XORA SPIEGEL" : lang === "it" ? "SPECCHIO XORA" : "XORA MIRROR");
+  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "MIROIR XORA" : lang === "de" ? "XORA SPIEGEL" : lang === "it" ? "SPECCHIO XORA" : lang === "ja" ? "XORAミラー" : "XORA MIRROR");
   var b = baseCanvas();
   var ctx = b.ctx;
 
@@ -811,6 +872,7 @@ function shareIdentityText(res) {
     if (lang === "fr") return 'Mon analyse XORA REAL\u00a0: «\u00a0' + name + '\u00a0» · ' + rarity + ' 👀 Et la tienne\u00a0? → ' + getPublicSiteUrl();
     if (lang === "de") return 'XORA REAL hat mich gelesen: „' + name + '“ · ' + rarity + ' 👀 Und was sagt es über dich? → ' + getPublicSiteUrl();
     if (lang === "it") return 'XORA REAL mi ha letto: «' + name + '» · ' + rarity + ' 👀 E di te cosa direbbe? → ' + getPublicSiteUrl();
+    if (lang === "ja") return 'XORA REALに読まれた結果：「' + name + '」 · ' + rarity + ' 👀 あなたはどう出る？ → ' + getPublicSiteUrl();
     return 'XORA REAL read me: "' + name + '" · ' + rarity + ' 👀 What would yours say? → ' + getPublicSiteUrl();
   }
   if (lang === "tr") return 'XORA FUN kartım: "' + name + '" 😅 Seninkini çek → ' + getPublicSiteUrl();
@@ -820,6 +882,7 @@ function shareIdentityText(res) {
   if (lang === "fr") return 'Ma carte XORA FUN\u00a0: «\u00a0' + name + '\u00a0» 😅 Tire la tienne → ' + getPublicSiteUrl();
   if (lang === "de") return 'Meine XORA FUN-Karte: „' + name + '“ 😅 Zieh deine eigene → ' + getPublicSiteUrl();
   if (lang === "it") return 'La mia carta XORA FUN: «' + name + '» 😅 Pesca la tua → ' + getPublicSiteUrl();
+  if (lang === "ja") return 'XORA FUNのカード：「' + name + '」😅 あなたも引いてみて → ' + getPublicSiteUrl();
   return 'My XORA FUN card: "' + name + '" 😅 Draw yours → ' + getPublicSiteUrl();
 }
 
@@ -834,6 +897,7 @@ function shareMatchText(m) {
     if (lang === "fr") return "XORA REAL\u00a0: @" + m.a + " × @" + m.b + " compatibilité " + m.overall + "\u00a0% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "de") return "XORA REAL: @" + m.a + " × @" + m.b + " Übereinstimmung " + m.overall + "\u00a0% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "it") return "XORA REAL: @" + m.a + " × @" + m.b + " affinità " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
+    if (lang === "ja") return "XORA REAL：@" + m.a + " × @" + m.b + " の相性 " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     return "XORA REAL: @" + m.a + " × @" + m.b + " match " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
   }
   if (lang === "tr") return "XORA FUN: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " 😅 Siz kaç çıkarsınız? → " + getPublicSiteUrl();
@@ -843,6 +907,7 @@ function shareMatchText(m) {
   if (lang === "fr") return "XORA FUN\u00a0: @" + m.a + " × @" + m.b + " compatibilité " + m.overall + "\u00a0% 😅 Et vous, combien\u00a0? → " + getPublicSiteUrl();
   if (lang === "de") return "XORA FUN: @" + m.a + " × @" + m.b + " Übereinstimmung " + m.overall + "\u00a0% 😅 Und wie viel habt ihr? → " + getPublicSiteUrl();
   if (lang === "it") return "XORA FUN: @" + m.a + " × @" + m.b + " affinità " + m.overall + "% 😅 E voi quanto fate? → " + getPublicSiteUrl();
+  if (lang === "ja") return "XORA FUN：@" + m.a + " × @" + m.b + " の相性 " + m.overall + "% 😅 あなたたちは何%？ → " + getPublicSiteUrl();
   return "XORA FUN: @" + m.a + " × @" + m.b + " match " + m.overall + "% 😅 Try yours → " + getPublicSiteUrl();
 }
 
@@ -851,9 +916,10 @@ function shareMatchText(m) {
 function cardPresentationCopy(value, key) {
   if (key === "meta") return value;
   if (typeof value === "string") {
-    return value.split(/(?<=[.!?؟])\s+/).filter(function(sentence) {
-      return !/[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei]|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*|analys(?:é|e)\w*|analysiert\w*|analizzat\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])/iu.test(sentence);
-    }).join(" ");
+    var keep = function (sentence) { return !/[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|[\d０-９][\d０-９\s]*[件本]?の?(?:投稿|ツイート|ポスト)|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}[\d０-９]|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}分析|分析[^。！？!?]{0,20}(?:投稿|ツイート|ポスト)|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei]|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*|analys(?:é|e)\w*|analysiert\w*|analizzat\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])/iu.test(sentence); };
+    // Japanese sentences end without a trailing space: split on the sentence mark itself and rejoin unchanged.
+    if (CJK_TEXT.test(value)) return value.split(/(?<=[。！？])/).filter(keep).join("");
+    return value.split(/(?<=[.!?؟])s+/).filter(keep).join(" ");
   }
   if (Array.isArray(value)) return value.map(function(v){return cardPresentationCopy(v);});
   if (value && typeof value === "object") {

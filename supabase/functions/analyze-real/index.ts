@@ -5,8 +5,8 @@ type Mode = "mirror" | "stalk" | "match";
 // once it has an entry in REAL_LOCALES plus nickname quality rules and fallback aliases below.
 const PLANNED_LOCALES = ["tr","en","es","pt","it","fr","de","ru","ja","ko","zh","ar"] as const;
 type PlannedLocale = typeof PLANNED_LOCALES[number];
-type Locale = Extract<PlannedLocale, "tr" | "en" | "es" | "pt" | "ar" | "fr" | "de" | "it">;
-const REAL_LOCALES: Record<Locale, {language:string; bcp47:string}> = {
+type Locale = Extract<PlannedLocale, "tr" | "en" | "es" | "pt" | "ar" | "fr" | "de" | "it" | "ja">;
+const REAL_LOCALES: Record<Locale, {language:string; bcp47:string; unspaced?:boolean}> = {
   tr: {language:"Turkish", bcp47:"tr-TR"},
   en: {language:"English", bcp47:"en-US"},
   es: {language:"neutral international Spanish (no regional slang, no English loanwords)", bcp47:"es-ES"},
@@ -15,6 +15,7 @@ const REAL_LOCALES: Record<Locale, {language:string; bcp47:string}> = {
   fr: {language:"natural, modern and neutral French readable in France, Belgium, Switzerland and Canada (no heavy slang, no English words)", bcp47:"fr-FR"},
   de: {language:"natural, modern and neutral German readable in Germany, Austria and Switzerland (no youth slang, no English words, no overly long artificial compounds)", bcp47:"de-DE"},
   it: {language:"natural, modern Italian as spoken in Italy (no heavy regional slang, no English words, not overly formal or literary)", bcp47:"it-IT"},
+  ja: {language:"natural, modern Japanese for a general web audience (no heavy keigo, no anime or internet slang, no unnecessary Latin-script words; nicknames are 3-12 characters with no spaces)", bcp47:"ja-JP", unspaced:true},
 };
 function isRealLocale(v: unknown): v is Locale {
   return typeof v === "string" && Object.hasOwn(REAL_LOCALES, v);
@@ -259,18 +260,18 @@ async function callAI(input: unknown) {
 // and cite a deterministic behavioral signal that is actually active for this dataset.
 // This keeps names personal without allowing random word salad or sensitive-trait labels.
 const ALIASES: Array<{names:Record<Locale,string>; key:string; test:(s:any)=>boolean}> = [
-  {names:{tr:"Sohbeti Seven", en:"Always Up for Conversation", es:"Siempre de Charla", pt:"Bom de Conversa", ar:"يحب الحوار", fr:"Aime Échanger", de:"Immer im Gespräch", it:"Ama Chiacchierare"}, key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
-  {names:{tr:"Uzun Uzun Anlatan", en:"Detailed Storyteller", es:"Narrador Detallista", pt:"Conta Tudo em Detalhes", ar:"يروي بالتفاصيل", fr:"Raconte en Détail", de:"Erzählt gern ausführlich", it:"Racconta nei Dettagli"}, key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
-  {names:{tr:"Renkli Anlatıcı", en:"Expressive Soul", es:"Alma Expresiva", pt:"Cheio de Expressão", ar:"معبر بطبعه", fr:"Très Expressif", de:"Sehr ausdrucksstark", it:"Molto Espressivo"}, key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
-  {names:{tr:"Meraklı Biri", en:"Curious Mind", es:"Mente Curiosa", pt:"Curioso por Natureza", ar:"كثير السؤال", fr:"Toujours une Question", de:"Fragt gern nach", it:"Fa Tante Domande"}, key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
-  {names:{tr:"Sözü Kuvvetli", en:"Way with Words", es:"Buena Pluma", pt:"Bom com as Palavras", ar:"يحسن التعبير", fr:"Le Mot Juste", de:"Hat das richtige Wort", it:"Lessico Ricco"}, key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
-  {names:{tr:"Özgün Anlatıcı", en:"Original Voice", es:"Voz Propia", pt:"Estilo Próprio", ar:"له أسلوبه الخاص", fr:"Une Voix à Part", de:"Ganz eigener Stil", it:"Stile Tutto Suo"}, key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
-  {names:{tr:"Alıntı Seven", en:"Thoughtful Reader", es:"Lector Atento", pt:"Bom Leitor", ar:"قارئ متأمل", fr:"Lecteur Attentif", de:"Liest aufmerksam", it:"Legge con Attenzione"}, key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
-  {names:{tr:"Paylaşmayı Seven", en:"Keen Sharer", es:"Le Encanta Compartir", pt:"Adora Compartilhar", ar:"يحب المشاركة", fr:"Aime Partager", de:"Teilt gern", it:"Ama Condividere"}, key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
-  {names:{tr:"Coşkulu Anlatıcı", en:"Full of Enthusiasm", es:"Puro Entusiasmo", pt:"Sempre Empolgado", ar:"مليء بالحماس", fr:"Plein d'Enthousiasme", de:"Voller Begeisterung", it:"Sempre Entusiasta"}, key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
-  {names:{tr:"X Yazarı", en:"X Contributor", es:"Autor en X", pt:"Autor no X", ar:"كاتب نشيط", fr:"Plume Active", de:"Schreibt fleißig", it:"Scrive Spesso"}, key:"own_posts", test:(s:any)=>s.own_posts >= 6}
+  {names:{tr:"Sohbeti Seven", en:"Always Up for Conversation", es:"Siempre de Charla", pt:"Bom de Conversa", ar:"يحب الحوار", fr:"Aime Échanger", de:"Immer im Gespräch", it:"Ama Chiacchierare", ja:"おしゃべり好き"}, key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
+  {names:{tr:"Uzun Uzun Anlatan", en:"Detailed Storyteller", es:"Narrador Detallista", pt:"Conta Tudo em Detalhes", ar:"يروي بالتفاصيل", fr:"Raconte en Détail", de:"Erzählt gern ausführlich", it:"Racconta nei Dettagli", ja:"じっくり語る人"}, key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
+  {names:{tr:"Renkli Anlatıcı", en:"Expressive Soul", es:"Alma Expresiva", pt:"Cheio de Expressão", ar:"معبر بطبعه", fr:"Très Expressif", de:"Sehr ausdrucksstark", it:"Molto Espressivo", ja:"表現豊か"}, key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
+  {names:{tr:"Meraklı Biri", en:"Curious Mind", es:"Mente Curiosa", pt:"Curioso por Natureza", ar:"كثير السؤال", fr:"Toujours une Question", de:"Fragt gern nach", it:"Fa Tante Domande", ja:"質問好き"}, key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
+  {names:{tr:"Sözü Kuvvetli", en:"Way with Words", es:"Buena Pluma", pt:"Bom com as Palavras", ar:"يحسن التعبير", fr:"Le Mot Juste", de:"Hat das richtige Wort", it:"Lessico Ricco", ja:"言葉選び上手"}, key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
+  {names:{tr:"Özgün Anlatıcı", en:"Original Voice", es:"Voz Propia", pt:"Estilo Próprio", ar:"له أسلوبه الخاص", fr:"Une Voix à Part", de:"Ganz eigener Stil", it:"Stile Tutto Suo", ja:"自分の言葉派"}, key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
+  {names:{tr:"Alıntı Seven", en:"Thoughtful Reader", es:"Lector Atento", pt:"Bom Leitor", ar:"قارئ متأمل", fr:"Lecteur Attentif", de:"Liest aufmerksam", it:"Legge con Attenzione", ja:"読み込み派"}, key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
+  {names:{tr:"Paylaşmayı Seven", en:"Keen Sharer", es:"Le Encanta Compartir", pt:"Adora Compartilhar", ar:"يحب المشاركة", fr:"Aime Partager", de:"Teilt gern", it:"Ama Condividere", ja:"シェア好き"}, key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
+  {names:{tr:"Coşkulu Anlatıcı", en:"Full of Enthusiasm", es:"Puro Entusiasmo", pt:"Sempre Empolgado", ar:"مليء بالحماس", fr:"Plein d'Enthousiasme", de:"Voller Begeisterung", it:"Sempre Entusiasta", ja:"テンション高め"}, key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
+  {names:{tr:"X Yazarı", en:"X Contributor", es:"Autor en X", pt:"Autor no X", ar:"كاتب نشيط", fr:"Plume Active", de:"Schreibt fleißig", it:"Scrive Spesso", ja:"よく書く人"}, key:"own_posts", test:(s:any)=>s.own_posts >= 6}
 ];
-const DEFAULT_ALIAS: Record<Locale,string> = {tr:"Sade Gözlemci", en:"Quiet Observer", es:"Observador Sereno", pt:"Observador Tranquilo", ar:"مراقب هادئ", fr:"Observateur Discret", de:"Beobachtet in Ruhe", it:"Osserva in Silenzio"};
+const DEFAULT_ALIAS: Record<Locale,string> = {tr:"Sade Gözlemci", en:"Quiet Observer", es:"Observador Sereno", pt:"Observador Tranquilo", ar:"مراقب هادئ", fr:"Observateur Discret", de:"Beobachtet in Ruhe", it:"Osserva in Silenzio", ja:"静かな観察者"};
 const NICKNAME_STYLE_EXAMPLES: Record<Locale,string[]> = {
   tr: ["Sessiz Gözlemci","Sohbeti Seven","Meraklı Biri","Uzun Uzun Anlatan","İnce Alaycı"],
   en: ["Quiet Observer","Always Up for Conversation","Curious Mind","Detailed Storyteller","Tongue in Cheek"],
@@ -280,6 +281,7 @@ const NICKNAME_STYLE_EXAMPLES: Record<Locale,string[]> = {
   fr: ["Observateur Discret","Aime Échanger","Toujours une Question","Raconte en Détail","Second Degré"],
   de: ["Beobachtet in Ruhe","Immer im Gespräch","Fragt gern nach","Erzählt gern ausführlich","Mit Augenzwinkern"],
   it: ["Osserva in Silenzio","Ama Chiacchierare","Fa Tante Domande","Racconta nei Dettagli","Ironia Sottile"],
+  ja: ["静かな観察者","おしゃべり好き","質問好き","じっくり語る人","ツッコミ上手"],
 };
 const ALIAS_EVIDENCE = ALIASES.map(a=>({key:a.key,test:a.test}));
 const BANNED_ALIAS_TERMS = [
@@ -340,6 +342,13 @@ const ALIAS_LOCALE_RULES: Record<Locale, {forced:RegExp;sensitive:RegExp;foreign
     forced: /(?<!\p{L})(?:macchin[ae]|fabbric(?:a|he)|motor[ei]|generator[ei]|radar|pompier[ei]|guerrier[oaei]|cacciator[ei]|cacciatrice|mag(?:o|a|hi|he)|calamit[ae]|magnet[ei]|unità|portavoce|velluto|tostapane|cetriol[oi]|patat[ae]|turist[aei]|aggiornament[oi]|cosmic[oa]|cosmic[ih]e?|galattic[oa]|galattic[ih]e?|unicorn[oi]|robot)(?!\p{L})/u,
     sensitive: /(?<!\p{L})(?:bipolar[ei]|schizofrenic\p{L}*|schizo|autistic\p{L}*|autism[oi]|adhd|depress\p{L}*|psicopatic\p{L}*|psicopat[aei]|sociopat\p{L}*|narcisist\p{L}*|ansios[oaei]|gay|lesbic\p{L}*|omosessual\p{L}*|eterosessual\p{L}*|bisessual\p{L}*|transgender|transessual\p{L}*|musulman[oaei]|cristian[oaei]|ebre[oaei]|ebrea|ate[oaie]|sunnit[aei]|sciit[aei]|curd[oaei]|armen[oaei]|disabil\p{L}*|handicappat\p{L}*|cancro|tumore|diabetic\p{L}*|traumatizzat\p{L}*|trauma)(?!\p{L})/u,
     foreign: /[ğıöşñãõçäüßœ\u0600-\u06FF]|(?<!\p{L})(?:the|and|of|you|quiet|mind|reply|warrior|room|update|wit|words|deluxe|sessiz|merakli|soru|mizah|koltuk|charla|siempre|fiesta|muy|hasta|você|papo|bom|très|avec|toujours|mit|und|der|immer)(?!\p{L})/u
+  },
+  // Japanese is written without spaces, so these match as substrings. Katakana is normal Japanese and is
+  // allowed; only Latin-script mixing is rejected.
+  ja: {
+    forced: /(?:マシーン|マシン|機械|工場|エンジン|発電機|レーダー|消防士|戦士|ハンター|狩人|魔法使い|魔術師|磁石|ユニット|代弁者|ベルベット|トースター|きゅうり|キュウリ|じゃがいも|ジャガイモ|ポテト|観光客|アップデート|宇宙的|銀河|ドラゴン|ユニコーン|ロボット|製造機|化身|覇王|魔王|勇者|伝説の)/u,
+    sensitive: /(?:双極性|躁うつ|統合失調|自閉症|自閉スペクトラム|発達障害|うつ病|鬱|サイコパス|ソシオパス|自己愛性|不安障害|強迫性障害|同性愛|ゲイの|レズビアン|バイセクシャル|トランスジェンダー|異性愛|イスラム教徒|ムスリム|キリスト教徒|クリスチャン|ユダヤ|無神論者|スンニ派|シーア派|クルド|アルメニア|障害者|障がい者|がん患者|癌|糖尿病|トラウマ)/u,
+    foreign: /[A-Za-z\u00c0-\u024f\uff21-\uff3a\uff41-\uff5a\u0600-\u06ff\uac00-\ud7af]/u
   }
 };
 const UNNATURAL_ALIAS_PHRASES: Record<Locale, string[]> = {
@@ -350,17 +359,26 @@ const UNNATURAL_ALIAS_PHRASES: Record<Locale, string[]> = {
   ar:["منطق مخملي","مدير السخرية","ملعقة كمومية","فكر بنفسجي","بهلوان الجمل","سائح الخط الزمني"],
   fr:["logique de velours","mise à jour de la pièce","touriste de la timeline","acrobate des phrases","directeur de l'ironie","cuillère quantique","pensée violette"],
   de:["lila gedanke","satzakrobat","ironiechef","raum aktualisierung","samtige logik"],
-  it:["logica di velluto","aggiornamento della stanza","turista della timeline","acrobata delle frasi","direttore dell'ironia","cucchiaio quantico","pensiero viola"]
+  it:["logica di velluto","aggiornamento della stanza","turista della timeline","acrobata delle frasi","direttore dell'ironia","cucchiaio quantico","pensiero viola"],
+  ja:["ベルベット論理","部屋アップデート","タイムライン観光客","文章アクロバット","皮肉部長","量子スプーン","紫の思考"]
 };
 function aliasValid(v: unknown, locale: Locale) {
   if (typeof v !== "string" || !isRealLocale(locale)) return false;
   const text=v.normalize("NFKC").trim();
-  if (text.length < 4 || text.length > 38 || !/^[\p{L}][\p{L}'’ -]*$/u.test(text)) return false;
-  const words=text.split(/\s+/).filter(Boolean);
-  if (words.length < 2 || words.length > 4) return false;
+  if (!/^[\p{L}][\p{L}'’ -]*$/u.test(text)) return false;
+  const chars=[...text];
+  const unspaced=REAL_LOCALES[locale].unspaced === true;
+  if (unspaced) {
+    // Japanese has no word spacing, so bound the alias by characters and reject a doubled phrase.
+    if (/\s/.test(text) || chars.length < 3 || chars.length > 12 || /^(.+)\1$/u.test(text)) return false;
+  } else {
+    if (chars.length < 4 || chars.length > 38) return false;
+    const words=text.split(/\s+/).filter(Boolean);
+    if (words.length < 2 || words.length > 4) return false;
+  }
   const normalized=text.toLocaleLowerCase(REAL_LOCALES[locale].bcp47);
   const tokens=normalized.split(/[\s'’-]+/);
-  if (new Set(tokens).size===1 || /--|''|’’/.test(text)) return false;
+  if ((!unspaced && new Set(tokens).size===1) || /--|''|’’/.test(text)) return false;
   if (["x profili","x profile"].includes(normalized)) return false;
   if (BANNED_ALIAS_TERMS.some(term=>normalized.includes(term))) return false;
   const rules=ALIAS_LOCALE_RULES[locale];
@@ -398,7 +416,7 @@ function validateMetrics(raw:any, keys:readonly string[], min:number, max:number
   return raw;
 }
 function validCopy(v:any, max=700) {
-  if (typeof v!=="string" || !v.trim() || v.length>max || /[<>]|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei]|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*|analys(?:é|e)\w*|analysiert\w*|analizzat\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)/iu.test(v)) throw new Error("ai_bad_copy");
+  if (typeof v!=="string" || !v.trim() || v.length>max || /[<>]|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei]|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*|analys(?:é|e)\w*|analysiert\w*|analizzat\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|beitr(?:ag|age|agen|äge|ägen)|pubblicazion[ei])|[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|[\d０-９][\d０-９\s]*[件本]?の?(?:投稿|ツイート|ポスト)|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}[\d０-９]|(?:投稿|ツイート|ポスト)[^。！？!?]{0,20}分析|分析[^。！？!?]{0,20}(?:投稿|ツイート|ポスト)/iu.test(v)) throw new Error("ai_bad_copy");
   return v.trim();
 }
 function validateCopy(raw:any, profile=false) {

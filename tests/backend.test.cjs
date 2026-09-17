@@ -3,9 +3,9 @@ const {edge,profileAI,matchAI,AI_COPY}=require('./helpers.cjs');
 test('strict request validation before billing',()=>{
  const e=edge();const base={mode:'mirror',locale:'tr',handle:'@Alice',request_id:'request-123'};
  assert.equal(e.validateRequest(base).handles[0],'alice');
- for(const locale of ['tr','en','es','pt','ar','fr','de','it']) assert.equal(e.validateRequest({...base,locale}).locale,locale);
+ for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja']) assert.equal(e.validateRequest({...base,locale}).locale,locale);
  // Planned but not yet served locales are rejected before billing until they have REAL language rules.
- for(const patch of [{mode:'fun'},{mode:'oops'},{locale:'ja'},{locale:'ru'},{locale:'ko'},{locale:'IT'},{locale:'it-IT'},{locale:'FR'},{locale:'fr-FR'},{locale:'DE'},{locale:'de-DE'},{locale:'ES'},{locale:'es-ES'},{locale:'PT'},{locale:'pt-BR'},{locale:'AR'},{locale:'ar-SA'},{handle:'abc!'},{handle:'a b'},{handle:'a'.repeat(16)},{handle:32},{request_id:'../id'},{mode:'match',handles:['Alice','@alice']}]) assert.throws(()=>e.validateRequest({...base,...patch}),/bad_request/);
+ for(const patch of [{mode:'fun'},{mode:'oops'},{locale:'zh'},{locale:'ru'},{locale:'ko'},{locale:'JA'},{locale:'ja-JP'},{locale:'IT'},{locale:'it-IT'},{locale:'FR'},{locale:'fr-FR'},{locale:'DE'},{locale:'de-DE'},{locale:'ES'},{locale:'es-ES'},{locale:'PT'},{locale:'pt-BR'},{locale:'AR'},{locale:'ar-SA'},{handle:'abc!'},{handle:'a b'},{handle:'a'.repeat(16)},{handle:32},{request_id:'../id'},{mode:'match',handles:['Alice','@alice']}]) assert.throws(()=>e.validateRequest({...base,...patch}),/bad_request/);
 });
 test('X upstream diagnostics are phase-specific and sanitized',()=>{
  const e=edge();
@@ -25,10 +25,10 @@ test('REAL shape, rarity, nickname evidence and safe deterministic fallback',()=
  raw.nickname_candidates[0].evidence='question_ratio';assert.equal(e.pickAlias(raw,{own_posts:8,question_ratio:0},'tr').source,'fallback');
  const novel={nickname_candidates:[{text:'Meraklı Muhabbetçi',evidence:'question_ratio'}]};assert.equal(e.pickAlias(novel,{own_posts:8,question_ratio:.8},'tr').source,'ai_generated_validated');
 });
-test('REAL AI output is generated for the request locale only (tr, en, es, pt, ar, fr, de, it)',()=>{
+test('REAL AI output is generated for the request locale only (tr, en, es, pt, ar, fr, de, it, ja)',()=>{
  const e=edge();const sig={question_ratio:.8,own_posts:8};
  const otherKeys=/(?:_tr|_en|_es)$/;
- for(const locale of ['tr','en','es','pt','ar','fr','de','it']){
+ for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja']){
   const copy=AI_COPY[locale];
   // The model output carries no per-locale field names and no other language.
   const raw=profileAI(locale);
@@ -47,7 +47,7 @@ test('REAL AI output is generated for the request locale only (tr, en, es, pt, a
   const match=e.normalizeMatchAI(matchAI(locale),'a','b',{},{},locale);
   assert.equal(match.meta.locale,locale);assert.deepEqual(Object.keys(match.ai_comment),[locale]);assert.equal(match.ai_comment[locale],copy.match);
   // A missing or unsafe field in the request locale is rejected, never filled from another language.
-  for(const mutation of [r=>delete r.comment,r=>r.comment='',r=>r.tagline='Se analizaron 25 publicaciones.',r=>r.summary='Foram analisadas 25 publicações.',r=>r.comment='تم تحليل 25 منشورًا.',r=>r.tagline='حللنا ٢٥ تغريدة.',r=>r.summary='Après 25 publications, ce compte pose beaucoup de questions.',r=>r.comment='Publications analysées : 25 au total.',r=>r.tagline='25 Beiträge ausgewertet.',r=>r.summary='Nach 25 analysierten Beiträgen wirkt das Konto neugierig.',r=>r.tagline='Dopo 25 pubblicazioni sembra un account curioso.',r=>r.comment='Analizzati tutti i post recenti, emerge molta curiosità.',r=>delete r.summary,r=>delete r.metrics[0].label]){
+  for(const mutation of [r=>delete r.comment,r=>r.comment='',r=>r.tagline='Se analizaron 25 publicaciones.',r=>r.summary='Foram analisadas 25 publicações.',r=>r.comment='تم تحليل 25 منشورًا.',r=>r.tagline='حللنا ٢٥ تغريدة.',r=>r.summary='Après 25 publications, ce compte pose beaucoup de questions.',r=>r.comment='Publications analysées : 25 au total.',r=>r.tagline='25 Beiträge ausgewertet.',r=>r.summary='Nach 25 analysierten Beiträgen wirkt das Konto neugierig.',r=>r.tagline='Dopo 25 pubblicazioni sembra un account curioso.',r=>r.comment='Analizzati tutti i post recenti, emerge molta curiosità.',r=>r.tagline='25件の投稿を分析しました。',r=>r.summary='投稿を分析したところ、好奇心が強いようです。',r=>delete r.summary,r=>delete r.metrics[0].label]){
    const bad=profileAI(locale);mutation(bad);assert.throws(()=>e.normalizeAIProfile(bad,'alice','mirror',sig,locale),/ai_bad/);
   }
   const badMatch=matchAI(locale);delete badMatch.comment;assert.throws(()=>e.normalizeMatchAI(badMatch,'a','b',{},{},locale),/ai_bad_copy/);
@@ -66,7 +66,7 @@ test('REAL schema asks for one set of user-facing strings, independent of locale
   if(!isMatch){for(const n of ['tagline','summary','label','text','nickname_candidates'])assert.ok(names.includes(n),n);}
  }
  assert.deepEqual([...e.PLANNED_LOCALES],['tr','en','es','pt','it','fr','de','ru','ja','ko','zh','ar']);
- assert.deepEqual(Object.keys(e.REAL_LOCALES),['tr','en','es','pt','ar','fr','de','it']);
+ assert.deepEqual(Object.keys(e.REAL_LOCALES),['tr','en','es','pt','ar','fr','de','it','ja']);
 });
 test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=>{
  const e=edge();

@@ -945,6 +945,11 @@ var FUN_PERSONAS = [
         "nickname": "Il Sornione",
         "tagline": "Dietro la tua calma c'è sempre un pizzico di malizia.",
         "comment": "Quando tutti sono d'accordo, butti lì una domanda che cambia il corso della conversazione. Lo dici con una calma tale che nessuno capisce se scherzi o fai sul serio. La parte migliore è il sorriso complice con chi se n'è accorto per primo."
+      },
+      "ja": {
+        "nickname": "さりげない策士",
+        "tagline": "穏やかに見えて、ちょっとしたいたずら心がある。",
+        "comment": "みんなの意見がそろったところで、話の流れを変える質問をさらっと投げかける。あまりに落ち着いて言うので、本気なのか冗談なのか誰にもわからない。いちばん楽しいのは、最初に気づいた人と目を合わせて笑う瞬間だ。"
       }
     }
   },
@@ -997,6 +1002,11 @@ var FUN_PERSONAS = [
         "nickname": "Ironia Sottile",
         "tagline": "Il tono è serio, fino all'ultima parola.",
         "comment": "Basta un annuncio un po' troppo solenne e tu noti subito la contraddizione nascosta. Invece di lunghe discussioni, preferisci una risposta breve con un filo d'ironia. Non spieghi mai la battuta: ti basta il sorriso di chi l'ha capita."
+      },
+      "ja": {
+        "nickname": "ツッコミ上手",
+        "tagline": "真顔のまま、最後のひと言でひっくり返す。",
+        "comment": "大げさな発表を聞くと、その中の矛盾にすぐ気づいてしまう。長々と反論するより、軽く皮肉を効かせた短いひと言を選ぶ。ネタの説明はしない。わかった人がくすっと笑えば、それで十分だ。"
       }
     }
   },
@@ -1049,6 +1059,11 @@ var FUN_PERSONAS = [
         "nickname": "Mille Domande",
         "tagline": "Un argomento non è ancora finito e pensi già al prossimo.",
         "comment": "Quando un tema ti è nuovo, non resti in silenzio: fai domande. Ogni risposta interessante ne porta un'altra, e la chiacchierata si allunga senza che te ne accorga. Tornare a casa sapendo qualcosa in più ti basta per una bella giornata."
+      },
+      "ja": {
+        "nickname": "知りたがり",
+        "tagline": "ひとつの話が終わる前に、もう次の話題が気になっている。",
+        "comment": "知らない話題が出ると、黙っているより質問したくなる。面白い答えがひとつ返ってくると、また次の疑問がわいてくる。少しでも詳しくなって帰れたら、それだけでいい一日になる。"
       }
     }
   },
@@ -1101,6 +1116,11 @@ var FUN_PERSONAS = [
         "nickname": "Faccia Impassibile",
         "tagline": "Nessuno capisce la battuta finché non lo decidi tu.",
         "comment": "Dici la frase più assurda con lo stesso tono con cui ordineresti un caffè. Dalla tua faccia non trapela niente, finché gli altri non ci arrivano da soli. Se la risata tarda, non spieghi nulla: quella piccola pausa fa parte della battuta."
+      },
+      "ja": {
+        "nickname": "真顔でボケる人",
+        "tagline": "笑いどころは、あなたが決めたときにやってくる。",
+        "comment": "とんでもないことを、コーヒーを注文するのと同じ調子でさらっと言う。周りが気づくまで、表情にはまったく出さない。笑いが遅れても説明はしない。その少しの間も、笑いの一部だからだ。"
       }
     }
   },
@@ -1153,6 +1173,11 @@ var FUN_PERSONAS = [
         "nickname": "Filosofo da Bar",
         "tagline": "Con te una chiacchierata leggera non resta leggera a lungo.",
         "comment": "Con te, una domanda qualsiasi può trasformarsi in una teoria inaspettata sulla vita. Anche se il caffè si raffredda, non molli l'argomento prima di aver girato l'idea un'altra volta. E se qualcuno non è d'accordo, tanto meglio: è lì che diventa interessante."
+      },
+      "ja": {
+        "nickname": "自称哲学者",
+        "tagline": "気軽な雑談が、いつの間にか深い話になっている。",
+        "comment": "何気ない質問が、いつの間にか人生についての意外な持論に変わる。コーヒーが冷めても、もう一度考えを転がしてみるまで話を終わらせない。誰かが反論してくれたら、むしろ面白くなるのはそこからだ。"
       }
     }
   },
@@ -1205,6 +1230,11 @@ var FUN_PERSONAS = [
         "nickname": "Tempismo Perfetto",
         "tagline": "Sai quando parlare, non solo cosa dire.",
         "comment": "In una conversazione noti non solo quello che si dice, ma anche chi non è ancora riuscito a parlare. A volte fai una domanda, a volte cambi argomento, a seconda dell'atmosfera del momento. Ti diverti di più quando nessuno deve lottare per farsi ascoltare."
+      },
+      "ja": {
+        "nickname": "空気が読める人",
+        "tagline": "何を言うかと同じくらい、いつ言うかを大事にしている。",
+        "comment": "会話では、話している内容だけでなく、まだ話せていない人にも目を向けている。質問を振ったり話題を変えたり、その場に合わせて動ける。誰もが無理せず話せる空気になると、自分もいちばん楽しめる。"
       }
     }
   },
@@ -1257,6 +1287,11 @@ var FUN_PERSONAS = [
         "nickname": "Mette Tutti d'Accordo",
         "tagline": "Puoi non essere d'accordo senza farne una questione personale.",
         "comment": "Quando la discussione si scalda, separi l'argomento vero dal nervosismo del momento. Sai riconoscere un buon punto senza dover per forza schierarti su tutto. Per te il finale migliore è quando ognuno se ne va capendo un po' meglio gli altri."
+      },
+      "ja": {
+        "nickname": "まとめ役",
+        "tagline": "意見が違っても、けんかにはしない。",
+        "comment": "議論が熱くなってきたら、本当の論点とその場の苛立ちを切り分ける。どちらかの味方をしなくても、筋の通った意見はちゃんと認められる。最後にみんなが少しでもわかり合えたら、それがいちばんの結末だ。"
       }
     }
   },
@@ -1309,6 +1344,11 @@ var FUN_PERSONAS = [
         "nickname": "Rilegge Sempre",
         "tagline": "Nessun messaggio parte senza un'ultima occhiata.",
         "comment": "Scrivi un messaggio brevissimo e all'improvviso il punto ti sembra troppo freddo e il punto esclamativo troppo entusiasta. Prima di inviarlo immagini più volte come lo leggerà l'altra persona. Alla fine mandi la prima versione e ridi un po' della tua indecisione."
+      },
+      "ja": {
+        "nickname": "読み返し派",
+        "tagline": "短い返事でも、送る前にもう一度見直す。",
+        "comment": "ほんの短いメッセージでも、句点は冷たすぎるかな、ビックリマークは元気すぎるかなと考えてしまう。送る前に、相手がどう読むかを何度も想像する。結局いちばん最初の文を送って、自分の迷いにちょっと笑ってしまう。"
       }
     }
   },
@@ -1361,6 +1401,11 @@ var FUN_PERSONAS = [
         "nickname": "Presenza Discreta",
         "tagline": "Non serve essere la voce più forte della stanza.",
         "comment": "Non senti il bisogno di riempire ogni silenzio. Quando parli, preferisci una frase breve che resta in testa. Ti fa piacere quando, dopo la serata, qualcuno si ricorda proprio quella tua battuta."
+      },
+      "ja": {
+        "nickname": "静かな存在感",
+        "tagline": "いちばん声が大きくなくても、ちゃんと印象に残る。",
+        "comment": "沈黙をすべて言葉で埋めなくても平気だ。話すときは、短くても心に残るひと言を選ぶ。集まりが終わったあと、誰かがそのひと言を覚えていてくれるとうれしい。"
       }
     }
   },
@@ -1413,6 +1458,11 @@ var FUN_PERSONAS = [
         "nickname": "Porta il Buonumore",
         "tagline": "Con te unirsi al gruppo diventa facilissimo.",
         "comment": "Quando l'atmosfera si spegne, proponi un gioco o un argomento in cui tutti possono dire la loro. Ti piace coinvolgere le persone senza mettere nessuno in imbarazzo. Il programma può cambiare mille volte, purché nessuno si annoi."
+      },
+      "ja": {
+        "nickname": "盛り上げ役",
+        "tagline": "あなたがいると、輪に入るのが簡単になる。",
+        "comment": "場が静かになってきたら、みんなが参加できるゲームや話題を持ち出す。誰かに気まずい思いをさせずに、自然と会話に巻き込むのが得意だ。予定が何度変わっても、誰も退屈していなければそれでいい。"
       }
     }
   },
@@ -1465,6 +1515,11 @@ var FUN_PERSONAS = [
         "nickname": "Sempre Tutt'Orecchi",
         "tagline": "Con te anche un piccolo dettaglio diventa una bella chiacchierata.",
         "comment": "Quando chiedi a qualcuno com'è andata la giornata, vuoi davvero sentire la risposta. Un piccolo dettaglio attira la tua attenzione e chiedi di raccontarti il resto. Per questo un caffè veloce con te spesso diventa una lunga chiacchierata."
+      },
+      "ja": {
+        "nickname": "聞き上手",
+        "tagline": "小さな話も、あなたと話すと長い会話になる。",
+        "comment": "誰かに今日どうだったかを聞くとき、本当にその答えを聞きたいと思っている。ちょっとした話に興味を引かれて、「それで？」と続きを聞いてしまう。だから、あなたとのちょっとしたお茶は、たいてい長話になる。"
       }
     }
   },
@@ -1517,6 +1572,11 @@ var FUN_PERSONAS = [
         "nickname": "Sa Raccontarla",
         "tagline": "Sai quale dettaglio rende divertente una storia.",
         "comment": "Tieni il dettaglio più divertente per la fine e sai esattamente quando tirarlo fuori. Con le parole giuste, un piccolo inconveniente diventa una storia che tutti vogliono risentire. Il bello è sentire qualcuno ripetere la tua battuta migliore la sera dopo."
+      },
+      "ja": {
+        "nickname": "オチ担当",
+        "tagline": "どこを話せば面白くなるか、ちゃんとわかっている。",
+        "comment": "いちばん面白いところは最後まで取っておき、出すタイミングを心得ている。ありふれた失敗談も、言葉選びひとつで何度でも聞きたい話になる。あとで誰かがあなたの『決めゼリフ』をまねしていたら、それが最高のほめ言葉だ。"
       }
     }
   }
@@ -1561,8 +1621,8 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
   var comment = {
-    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de"), it: funModeComment(card, "mirror", "it") },
-    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de"), it: funModeComment(card, "stalk", "it") }
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de"), it: funModeComment(card, "mirror", "it"), ja: funModeComment(card, "mirror", "ja") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de"), it: funModeComment(card, "stalk", "it"), ja: funModeComment(card, "stalk", "ja") }
   };
   return {
     mode: actualMode,
@@ -1576,7 +1636,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     profile_emoji: card.emoji,
     comment: comment,
     card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it] } },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it], ja:[comment[actualMode].ja] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
@@ -1646,6 +1706,14 @@ var FUN_MATCH_COMMENTS = {
     "Allo stesso tavolo, o diventano una coppia leggendaria o qualcuno silenzia la chat.",
     "XORA crede in questa coppia. Nessuno sa da dove le venga tutta questa sicurezza.",
     "La scienza ha respinto il caso. Noi una percentuale l'abbiamo data lo stesso."
+  ],
+  ja: [
+    "XORAのまったく科学的じゃない研究所は、この2人をやけに面白い組み合わせだと判定しました。",
+    "このパーセンテージは何の証明にもなりません。それでもグループチャットを盛り上げるには十分です。",
+    "カードは遊びです。なのにパーセンテージだけは妙に本格的に見えます。",
+    "同じテーブルに座れば、伝説のコンビになるか、どちらかが通知を切るかのどちらかです。",
+    "XORAはこの組み合わせを信じています。その自信がどこから来るのかは誰にもわかりません。",
+    "科学には相手にされませんでした。それでもパーセンテージは出しておきました。"
   ]
 };
 
@@ -1669,7 +1737,7 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
     overall: overall,
     ci: commentIndex,
     source: "fun",
-    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex], de:FUN_MATCH_COMMENTS.de[commentIndex], it:FUN_MATCH_COMMENTS.it[commentIndex] },
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex], de:FUN_MATCH_COMMENTS.de[commentIndex], it:FUN_MATCH_COMMENTS.it[commentIndex], ja:FUN_MATCH_COMMENTS.ja[commentIndex] },
     meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
   };
 }
@@ -1677,9 +1745,9 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
-    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA", de: "XORA-Profil", it: "Profilo XORA" },
-    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée.", de: "Analyse abgeschlossen.", it: "Analisi completata." },
-    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""], de: [""], it: [""] }
+    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA", de: "XORA-Profil", it: "Profilo XORA", ja: "XORAプロフィール" },
+    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée.", de: "Analyse abgeschlossen.", it: "Analisi completata.", ja: "分析が完了しました。" },
+    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""], de: [""], it: [""], ja: [""] }
   };
 }
 
@@ -1757,6 +1825,14 @@ var MATCH_COMMENTS = {
     "{a} e {b} si osservano ma non si seguono. Né coraggio né codardia: solo caos allo stato puro.",
     "{a} manda cuori, {b} manda fuoco. Nessuno dei due sa cosa vuole, ma la chimica è innegabile.",
     "{a} fa piani, {b} li manda all'aria. Questi due sono una commedia romantica già scritta."
+  ],
+  ja: [
+    "{a}がメッセージを送り、{b}は既読のまま。なのに2人とも深夜3時にお互いのプロフィールを見ている。よくある話。",
+    "このふたつのアカウントの恋は、いいねで始まってドラマで終わる。XORAはもうポップコーンを用意済み。",
+    "{a}は気持ちを込めて書き、{b}は皮肉で返す。この緊張感は、恋に変わるかブロックで終わるかのどちらか。",
+    "{a}と{b}はお互いをチェックしているのに、フォローはしていない。勇気も臆病さもなく、ただのカオス。",
+    "{a}はハートを送り、{b}は炎を送る。どちらも自分が何をしたいのかわかっていないけれど、相性は抜群。",
+    "{a}が計画を立て、{b}がそれをひっくり返す。この2人はそのままラブコメになる。"
   ]
 };
 
@@ -1871,6 +1947,14 @@ var THINKING = {
       "Prendo nota delle tue contraddizioni...",
       "Analizzo i segnali che si ripetono...",
       "XORA a volte è un po' troppo sincera. Preparati."
+    ],
+    ja: [
+      "タイムラインのほこりを払っています...",
+      "深夜3時の投稿は見なかったことに...できませんでした。",
+      "行動パターンをスキャン中...",
+      "矛盾点をメモしています...",
+      "くり返し出てくるサインを分析中...",
+      "XORAはちょっと正直すぎることがあります。心の準備を。"
     ]
   },
   stalk: {
@@ -1937,6 +2021,14 @@ var THINKING = {
       "Non l'hai sentito da me...",
       "Ho guardato anche chi segue questo account. Dice molto.",
       "Quello che trovo lo dico solo a te."
+    ],
+    ja: [
+      "こっそりプロフィールに入ります...",
+      "足あとは残しません。ご安心を。",
+      "ふむ。いいねの履歴が興味深いですね。",
+      "これは私から聞いたって言わないでくださいね...",
+      "フォローしている相手も見ました。いろいろわかります。",
+      "見つけたことは、あなたにだけ教えます。"
     ]
   },
   match: {
@@ -2003,6 +2095,14 @@ var THINKING = {
       "Rilevata tensione nella cronologia delle risposte.",
       "Calcolo della chimica in corso. Camice da laboratorio indossato.",
       "Il risultato potrebbe dispiacere a uno di voi. Eccolo."
+    ],
+    ja: [
+      "2つのタイムラインを並べています...",
+      "共通のいいねを探しています...興味深い。",
+      "片方は昼型、もう片方は夜型。メモしました。",
+      "リプライ履歴に緊張感を検出。",
+      "相性を計算中。白衣を着ました。",
+      "結果にどちらかががっかりするかも。発表します。"
     ]
   }
 };
