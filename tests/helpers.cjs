@@ -23,7 +23,8 @@ const AI_COPY={
  tr:{nickname:'Meraklı Biri',tagline:'Sorularla ilerliyor.',summary:'Açık sorular soruyor.',comment:'Sorularla konuşmayı açıyorsun.',label:'Yorum',observation:'Soru soruyor.',match:'İki hesap da soru soruyor.'},
  en:{nickname:'Curious Mind',tagline:'Questions lead the way.',summary:'Asks open questions.',comment:'You open conversations with questions.',label:'Comment',observation:'Uses questions.',match:'Both accounts ask questions.'},
  es:{nickname:'Mente Curiosa',tagline:'Avanza a base de preguntas.',summary:'Hace preguntas abiertas.',comment:'Abres las conversaciones con preguntas.',label:'Comentario',observation:'Hace preguntas.',match:'Las dos cuentas hacen preguntas.'},
- pt:{nickname:'Curioso por Natureza',tagline:'Segue em frente puxando perguntas.',summary:'Faz perguntas abertas.',comment:'Você abre as conversas com perguntas.',label:'Comentário',observation:'Costuma perguntar.',match:'As duas contas fazem perguntas.'}
+ pt:{nickname:'Curioso por Natureza',tagline:'Segue em frente puxando perguntas.',summary:'Faz perguntas abertas.',comment:'Você abre as conversas com perguntas.',label:'Comentário',observation:'Costuma perguntar.',match:'As duas contas fazem perguntas.'},
+ ar:{nickname:'كثير السؤال',tagline:'يمضي في الحديث بالأسئلة.',summary:'يطرح أسئلة مفتوحة.',comment:'تفتح الأحاديث بالأسئلة.',label:'تعليق',observation:'يكثر من الأسئلة.',match:'الحسابان يطرحان الأسئلة.'}
 };
 const profileAI=(locale='en')=>{const c=AI_COPY[locale];return {nickname_candidates:[{text:c.nickname,evidence:'question_ratio'}],metrics:['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label:c.label,value:70})),tagline:c.tagline,summary:c.summary,comment:c.comment,observations:[c.observation],emoji:'🪞'};};
 const matchAI=(locale='en')=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment:AI_COPY[locale].match});

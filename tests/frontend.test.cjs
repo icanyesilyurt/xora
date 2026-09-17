@@ -1,13 +1,13 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const vm=require('node:vm');const fs=require('node:fs');const {browser}=require('./helpers.cjs');
 test('every FUN persona has distinct localized character copy in generated, saved HTML and PNG results',()=>{
  const c=browser();
- const forbidden=/tamamen eğlencesine|çektin|çekti\b|bilimsel değeri yok|XORA['’]nın kanıtı yok|paylaşmalık değeri var|ücretsiz|\bfree\b|X verilerini analiz etmez|purely for fun|you drew|this account drew|no evidence|scientifically useless|socially shareable|solo por diversión|puramente divertid|sin valor científico|no tiene evidencia|sin evidencia|\bgratis\b|para compartir|esta cuenta sacó|no analiza datos de X|só por diversão|apenas por diversão|por pura diversão|não é científic|sem valor científico|sem evidência|sem provas|grátis|gratuito|para compartilhar|compartilhável|esta conta tirou|você tirou|não analisa dados do X/i;
+ const forbidden=/tamamen eğlencesine|çektin|çekti\b|bilimsel değeri yok|XORA['’]nın kanıtı yok|paylaşmalık değeri var|ücretsiz|\bfree\b|X verilerini analiz etmez|purely for fun|you drew|this account drew|no evidence|scientifically useless|socially shareable|solo por diversión|puramente divertid|sin valor científico|no tiene evidencia|sin evidencia|\bgratis\b|para compartir|esta cuenta sacó|no analiza datos de X|só por diversão|apenas por diversão|por pura diversão|não é científic|sem valor científico|sem evidência|sem provas|grátis|gratuito|para compartilhar|compartilhável|esta conta tirou|você tirou|não analisa dados do X|للتسلية فقط|مجرد تسلية|من باب التسلية|للترفيه فقط|ليس علمي|غير علمي|بلا دليل|لا دليل|دون دليل|قابل للمشاركة|يستحق المشاركة|للمشاركة|مجان|هذا الحساب سحب|سحب هذا الحساب|سحبت بطاقة|لا تحلل بيانات|لا يحلل بيانات/i;
  const seen=new Map();
  for(let nonce=0;nonce<1000 && seen.size<c.FUN_CARD_POOL.length;nonce++){
   const result=c.analyzeFunHandle('alice','mirror',nonce);seen.set(result.nickname.tr,result);
  }
  assert.equal(seen.size,c.FUN_CARD_POOL.length);
- for(const lang of ['tr','en','es','pt']){
+ for(const lang of ['tr','en','es','pt','ar']){
   c.getLang=()=>lang;
   const unique=new Set();
   for(const [name,result] of seen){
@@ -59,7 +59,7 @@ test('FUN product button paths execute without auth, credits or REAL network',as
  }
 });
 test('production direct REAL URLs stay on a disabled input view without auth or API errors',async()=>{
- for(const name of ['mirror','stalk','match'])for(const lang of ['tr','en','es','pt']){
+ for(const name of ['mirror','stalk','match'])for(const lang of ['tr','en','es','pt','ar']){
   const c=browser(),nodes=new Map();c.location.hostname='icanyesilyurt.github.io';c.location.search='?tier=real';c.getLang=()=>lang;
   function node(id){if(!nodes.has(id))nodes.set(id,{value:'',hidden:false,textContent:'',innerHTML:'',classList:{toggle(){}},addEventListener(ev,fn){this[ev]=fn;},focus(){}});return nodes.get(id);}
   c.document.getElementById=node;
@@ -124,39 +124,48 @@ test('ambiguous REAL failure retains request ID and successful retry uses server
 });
 test('every I18N locale exposes the complete key set with non-empty strings; missing keys fail',()=>{
  const c=browser();
- assert.deepEqual(Object.keys(c.I18N).sort(),['en','es','pt','tr']);
+ assert.deepEqual(Object.keys(c.I18N).sort(),['ar','en','es','pt','tr']);
  const keys=Object.keys(c.I18N.tr).sort();
- for(const lang of ['en','es','pt']) assert.deepEqual(Object.keys(c.I18N[lang]).sort(),keys,lang+' must cover every tr key');
- for(const lang of ['tr','en','es','pt'])for(const key of keys){
+ for(const lang of ['en','es','pt','ar']) assert.deepEqual(Object.keys(c.I18N[lang]).sort(),keys,lang+' must cover every tr key');
+ for(const lang of ['tr','en','es','pt','ar'])for(const key of keys){
   const value=c.I18N[lang][key];
   assert.ok(typeof value==='string' && value.trim().length>0,lang+'.'+key+' must be a non-empty string');
  }
  // t() must never fall back to another language for a supported locale.
- for(const lang of ['es','pt']){
+ for(const lang of ['es','pt','ar']){
   c.localStorage.setItem(c.LS.lang,lang);
   for(const key of keys) assert.equal(c.t(key),c.I18N[lang][key]);
+ }
+ // Arabic copy is Arabic script; Latin appears only for product names, X, iyzico, API or Supabase.
+ for(const key of keys){
+  const latin=(c.I18N.ar[key].replace(/\{\w+\}/g,'').match(/[A-Za-z]+/g)||[]).filter(w=>!/^(?:XORA|X|FUN|FREE|REAL|Fun|Real|Mirror|Stalk|Match|iyzico|Supabase)$/.test(w));
+  assert.deepEqual(latin,[],'ar.'+key+' has no stray Latin words');
+  assert.match(c.I18N.ar[key],/[\u0600-\u06FF]|^(?:X Mirror|X Stalk|X Match|XORA Fun|XORA Real|XORA REAL|XORA FUN · FREE|FREE|REAL)$/,'ar.'+key+' is Arabic');
  }
  // Special characters render in the dictionary (encoding regression guard).
  assert.match(JSON.stringify(c.I18N.es),/[ñáéíóú¿¡]/);
  const ptCopy=JSON.stringify(c.I18N.pt)+JSON.stringify(c.FUN_PERSONAS.map(p=>p.locales.pt));
  for(const ch of ['ã','õ','ç','á','é','í','ó','ú','â','ê']) assert.ok(ptCopy.includes(ch),'Portuguese copy contains '+ch);
 });
-test('language selector cycles tr→en→es→pt→tr, ES/PT persist, unknown stored values fall back to tr',()=>{
+test('language selector cycles tr→en→es→pt→ar→tr, ES/PT/AR persist, unknown stored values fall back to tr',()=>{
  const c=browser();
  assert.equal(c.getLang(),'tr');
- assert.equal(c.nextLang('tr'),'en');assert.equal(c.nextLang('en'),'es');assert.equal(c.nextLang('es'),'pt');assert.equal(c.nextLang('pt'),'tr');
- assert.equal(c.LANG_NAMES.pt,'Português');
+ assert.equal(c.nextLang('tr'),'en');assert.equal(c.nextLang('en'),'es');assert.equal(c.nextLang('es'),'pt');assert.equal(c.nextLang('pt'),'ar');assert.equal(c.nextLang('ar'),'tr');
+ assert.equal(c.LANG_NAMES.pt,'Português');assert.equal(c.LANG_NAMES.ar,'العربية');
  c.localStorage.setItem(c.LS.lang,'es');assert.equal(c.getLang(),'es');
  assert.equal(c.t('nav_profile'),'Perfil');
  assert.equal(c.realComingSoonText(),'El análisis real llegará pronto');
  c.localStorage.setItem(c.LS.lang,'pt');assert.equal(c.getLang(),'pt');
  assert.equal(c.t('nav_login'),'Entrar');
  assert.equal(c.realComingSoonText(),'A análise real chega em breve');
+ c.localStorage.setItem(c.LS.lang,'ar');assert.equal(c.getLang(),'ar');
+ assert.equal(c.t('nav_login'),'تسجيل الدخول');
+ assert.equal(c.realComingSoonText(),'التحليل الحقيقي قادم قريبًا');
  c.localStorage.setItem(c.LS.lang,'de');assert.equal(c.getLang(),'tr');
 });
-for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/Compatibilidad General/,/compatibilidad/],['pt',/Meu cartão XORA FUN/,/Compatibilidade Geral/,/compatibilidade/]]) test(lang.toUpperCase()+' FUN cards, PNG, share and match render natively without fallback to other locales',()=>{
+for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/Compatibilidad General/,/compatibilidad/],['pt',/Meu cartão XORA FUN/,/Compatibilidade Geral/,/compatibilidade/],['ar',/بطاقتي في XORA FUN/,/التوافق العام/,/توافق/]]) test(lang.toUpperCase()+' FUN cards, PNG, share and match render natively without fallback to other locales',()=>{
  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
- const others=['tr','en','es','pt'].filter(l=>l!==lang);
+ const others=['tr','en','es','pt','ar'].filter(l=>l!==lang);
  for(let nonce=0;nonce<24;nonce++){
   const r=c.analyzeFunHandle('alice','mirror',nonce);
   const persona=c.FUN_PERSONAS.find(p=>p.id===r.persona_id);
@@ -181,24 +190,30 @@ for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/Co
  assert.match(c.matchComment({a:'alice',b:'bob',ci:0},lang),/@alice/);
  for(const mode of ['mirror','stalk','match']) assert.ok(c.THINKING[mode][lang].length===6);
 });
-test('every PT persona renders nickname, tagline and comment intact in HTML and PNG without overflow',()=>{
- const c=browser();c.localStorage.setItem(c.LS.lang,'pt');
+for(const lang of ['pt','ar']) test('every '+lang.toUpperCase()+' persona renders nickname, tagline and comment intact in HTML and PNG without overflow',()=>{
+ const c=browser();c.localStorage.setItem(c.LS.lang,lang);
  const seen=new Map();
  for(let nonce=0;nonce<1000 && seen.size<12;nonce++){const r=c.analyzeFunHandle('alice','mirror',nonce);seen.set(r.persona_id,r);}
  assert.equal(seen.size,12);
  for(const [id,r] of seen){
-  const copy=c.FUN_PERSONAS.find(p=>p.id===id).locales.pt;
+  const copy=c.FUN_PERSONAS.find(p=>p.id===id).locales[lang];
   const text=[];let box;
-  const ctx=new Proxy({measureText:v=>({width:String(v).length*13}),fillText:(v,x,y)=>text.push({v:String(v),x,y}),createLinearGradient:()=>({addColorStop(){}})},{get:(o,k)=>k in o?o[k]:()=>{}});
+  const target={direction:'inherit',measureText:v=>({width:String(v).length*13}),fillText:(v,x,y)=>text.push({v:String(v),x,y,dir:target.direction}),createLinearGradient:()=>({addColorStop(){}})};
+  const ctx=new Proxy(target,{get:(o,k)=>k in o?o[k]:()=>{}});
   const originalRect=c.roundRect;c.roundRect=(ctx,x,y,w,h,rr)=>{if(x===130)box={y,h};originalRect(ctx,x,y,w,h,rr);};
   c.document.createElement=()=>({getContext:()=>ctx});c.renderIdentityPNG(r);c.roundRect=originalRect;
   const drawn=text.filter(p=>p.x===500 && p.y>500 && p.y<1090).map(p=>p.v).join(' ');
   for(const field of ['nickname','tagline','comment']) assert.ok(drawn.includes(copy[field]),id+' PNG '+field+' intact: '+copy[field]);
+  // Localized copy follows the language direction; handle and footer brand text stay LTR.
+  const copyDir=lang==='ar'?'rtl':'ltr';
+  for(const p of text.filter(p=>p.x===500 && p.y>560 && p.y<1090)) assert.equal(p.dir,copyDir,id+' copy direction: '+p.v);
+  assert.equal(text.find(p=>p.v==='@alice').dir,'ltr','handle stays LTR');
+  for(const v of ['XORA','xora.app','XORA FUN · FREE']) assert.equal(text.find(p=>p.v===v).dir,'ltr',v+' stays LTR');
   assert.ok(box.y+box.h<1090,id+' comment box stays above footer');
   assert.ok(text.filter(p=>p.x===500 && p.y>=box.y && p.y<1090).every(p=>p.y<box.y+box.h-15),id+' text fits inside comment box');
  }
 });
-for(const [lang,funBtn,funNote] of [['es','Saca tu Tarjeta Gratis','Esta tarjeta es de entretenimiento; no analiza datos de X.'],['pt','Tirar Cartão Grátis','Este cartão é de entretenimento; não analisa dados do X.']]) test('Mirror/Stalk/Match screens are '+lang.toUpperCase()+' from first paint, before any session call',async()=>{
+for(const [lang,funBtn,funNote] of [['es','Saca tu Tarjeta Gratis','Esta tarjeta es de entretenimiento; no analiza datos de X.'],['pt','Tirar Cartão Grátis','Este cartão é de entretenimento; não analisa dados do X.'],['ar','اسحب بطاقة مجانية','هذه بطاقة ترفيهية؛ ولا تحلل بيانات X.']]) test('Mirror/Stalk/Match screens are '+lang.toUpperCase()+' from first paint, before any session call',async()=>{
  for(const name of ['mirror','stalk','match']) {
   const c=browser(),nodes=new Map();c.localStorage.setItem(c.LS.lang,lang);
   let sessionResolved=false;
@@ -217,17 +232,18 @@ for(const [lang,funBtn,funNote] of [['es','Saca tu Tarjeta Gratis','Esta tarjeta
   assert.equal(node('tierNote').textContent,funNote);
   await node('goBtn').click();
   assert.equal(c.document.documentElement.lang,lang);
+  assert.equal(c.document.documentElement.dir,lang==='ar'?'rtl':'ltr');
   assert.equal(node('langBtn').textContent,c.nextLang(lang).toUpperCase());
   const card=node('cardHolder').innerHTML;
   assert.match(card,/XORA FUN/);
-  assert.doesNotMatch(card,/Ücretsiz|Eğlence|Draw Free Card|Fun Card|Tarjeta Fun|Cartão Fun/);
+  assert.doesNotMatch(card,/Ücretsiz|Eğlence|Draw Free Card|Fun Card|Tarjeta Fun|Cartão Fun|بطاقة Fun/);
   if(name==='match') assert.ok(card.includes(c.esc(c.t('match_overall'))),lang+' match card labels');
  }
 });
-test('static FUN personas keep TR/EN/ES/PT copy and are untouched by the single-locale REAL view',()=>{
+test('static FUN personas keep TR/EN/ES/PT/AR copy and are untouched by the single-locale REAL view',()=>{
  const c=browser();
- for(const p of c.FUN_PERSONAS) assert.deepEqual(Object.keys(p.locales).sort(),['en','es','pt','tr']);
- for(const lang of ['tr','en','es','pt']){
+ for(const p of c.FUN_PERSONAS) assert.deepEqual(Object.keys(p.locales).sort(),['ar','en','es','pt','tr']);
+ for(const lang of ['tr','en','es','pt','ar']){
   c.localStorage.setItem(c.LS.lang,lang);
   for(let nonce=0;nonce<12;nonce++){
    const fun=c.analyzeFunHandle('alice',nonce%2?'stalk':'mirror',nonce);
@@ -235,11 +251,11 @@ test('static FUN personas keep TR/EN/ES/PT copy and are untouched by the single-
    const copy=c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[lang];
    const html=c.buildIdentityCard(fun);
    assert.ok(html.includes(c.esc(copy.nickname)) && html.includes(c.esc(copy.tagline)) && html.includes(c.esc(copy.comment)),lang+' '+fun.persona_id);
-   for(const other of ['tr','en','es','pt'].filter(l=>l!==lang)) assert.ok(!html.includes(c.esc(c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[other].comment)));
+   for(const other of ['tr','en','es','pt','ar'].filter(l=>l!==lang)) assert.ok(!html.includes(c.esc(c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[other].comment)));
   }
   const m=c.matchFunHandles('alice','bob',3);
   assert.equal(c.realCopyForActiveLang(m),m);
-  assert.deepEqual(Object.keys(m.fun_comment).sort(),['en','es','pt','tr']);
+  assert.deepEqual(Object.keys(m.fun_comment).sort(),['ar','en','es','pt','tr']);
   assert.ok(c.buildMatchCard(m).includes(c.esc(m.fun_comment[lang])));
  }
 });
@@ -256,4 +272,49 @@ test('legacy multi-locale REAL results render unchanged; the view only fills a m
  const es=c.realCopyForActiveLang(legacy);
  assert.equal(es.nickname.es,'Meraklı Biri','falls back to the generated locale, not an invented translation');
  assert.deepEqual(Object.keys(legacy.nickname),['tr','en'],'stored result is not mutated');
+});
+test('RTL applies only to Arabic: page direction, scoped CSS and LTR technical inputs',()=>{
+ const c=browser();c.document.documentElement={};
+ for(const [lang,dir] of [['tr','ltr'],['en','ltr'],['es','ltr'],['pt','ltr'],['ar','rtl'],['tr','ltr']]){
+  c.localStorage.setItem(c.LS.lang,lang);c.applyI18n();
+  assert.equal(c.document.documentElement.lang,lang);assert.equal(c.document.documentElement.dir,dir,lang);
+ }
+ const css=fs.readFileSync('style.css','utf8').replace(/\r\n/g,'\n');
+ const rtl=css.slice(css.indexOf('/* ============ RTL (Arapça) ============ */'));
+ const rules=rtl.replace(/\/\*[\s\S]*?\*\//g,'').split('}').map(r=>r.trim()).filter(Boolean);
+ assert.ok(rules.length>0);
+ // Every RTL rule is scoped to dir=rtl, so TR/EN/ES/PT styling is unaffected.
+ for(const rule of rules){const selectors=rule.slice(0,rule.indexOf('{')).split(',');for(const sel of selectors)assert.match(sel.trim(),/^\[dir="rtl"\] /,sel);}
+ assert.ok(css.indexOf('[dir="rtl"]')>=css.indexOf('/* ============ RTL (Arapça) ============ */'),'no RTL rules outside the RTL section');
+ assert.match(rtl,/\[dir="rtl"\] \.handle-input\{direction:ltr\}/);
+ assert.match(rtl,/\.handle-input:placeholder-shown\{direction:rtl\}/);
+ assert.match(rtl,/\[dir="rtl"\] \*\{letter-spacing:0!important\}/);
+ for(const cls of ['.idcard-handle','.credits-pill','.mini-mode','.history-tier','.card-status span','.balance-big'])assert.ok(rtl.includes('[dir="rtl"] '+cls),cls+' isolated LTR');
+ // Handle inputs across pages keep the class that receives the LTR rule.
+ for(const [page,ids] of [['mirror.html',['mirrorHandleInput']],['stalk.html',['handleInput']],['match.html',['handleA','handleB']],['auth.html',['xora_auth_email','xora_auth_password','xora_auth_username']]])for(const id of ids)assert.match(fs.readFileSync(page,'utf8'),new RegExp('id="'+id+'"[^>]*class="handle-input"'),page+' '+id);
+});
+test('Arabic mixed-direction content keeps handles, URL, percentages and brand names in LTR order',()=>{
+ const c=browser();const LRI='\u2066',PDI='\u2069';
+ const fun=c.analyzeFunHandle('alice','mirror',2),m=c.matchFunHandles('alice','bob',1);
+ for(const lang of ['tr','en','es','pt']){
+  c.localStorage.setItem(c.LS.lang,lang);
+  for(const text of [c.shareIdentityText(fun),c.shareMatchText(m),c.matchComment({a:'alice',b:'bob',ci:0},lang)])assert.ok(!text.includes(LRI)&&!text.includes(PDI),lang+' output has no bidi controls');
+ }
+ c.localStorage.setItem(c.LS.lang,'ar');
+ const share=c.shareIdentityText(fun);
+ assert.match(share,/^بطاقتي في XORA FUN: «.+» 😅 اسحب بطاقتك ← \u2066https:\/\/example\.test\/.*\u2069$/);
+ const matchShare=c.shareMatchText(m);
+ assert.ok(matchShare.startsWith('توافق '+LRI+'@alice × @bob'+PDI+' في XORA FUN: '+LRI+m.overall+'%'+PDI),matchShare);
+ const real={...structuredClone(m),meta:{tier:'real',locale:'ar'},rarity:{name:'rare'}};
+ assert.ok(c.shareMatchText(real).includes('XORA REAL: '+LRI+real.overall+'%'+PDI+' · نادرة'));
+ // Legacy Arabic match copy isolates every handle; no Arabic letter is glued to a Latin handle.
+ for(let ci=0;ci<c.MATCH_COMMENTS.ar.length;ci++){
+  const text=c.matchComment({a:'alice',b:'bob',ci},'ar');
+  for(const [slot,h] of [['{a}','alice'],['{b}','bob']]) if(c.MATCH_COMMENTS.ar[ci].includes(slot)) assert.ok(text.includes(LRI+'@'+h+PDI),ci+': '+text);
+  assert.doesNotMatch(text.replace(/⁦@\w+⁩/g,''),/@/,ci+': no unisolated handle');
+  assert.doesNotMatch(c.MATCH_COMMENTS.ar[ci],/[\u0600-\u06FF]\{[ab]\}/,'handle placeholder not attached to an Arabic letter');
+ }
+ const html=c.buildIdentityCard(fun);
+ assert.ok(html.includes('<p class="idcard-handle">@alice</p>'),'handle markup unchanged; isolation is CSS-only');
+ assert.match(fs.readFileSync('profile.html','utf8'),/main = "<bdi>" \+ target \+ second \+ "<\/bdi> — "/);
 });

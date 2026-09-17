@@ -1,6 +1,6 @@
 /* ============================================================
    XORA — app.js
-   Ortak mantık: depolama, krediler, dil (TR/EN/ES/PT), üst bar, toast
+   Ortak mantık: depolama, krediler, dil (TR/EN/ES/PT/AR), üst bar, toast
    ============================================================ */
 
 var LS = {
@@ -1380,15 +1380,175 @@ var I18N = {
     profile_card_expired: "Seu cartão Mirror expirou.",
     profile_card_renew: "Tire um novo Mirror",
     card_load_failed: "Não foi possível carregar o cartão"
+  },
+  ar: {
+    nav_profile: "الملف الشخصي",
+    nav_login: "تسجيل الدخول",
+    home_hi: "مرحبًا، أنا XORA.",
+    home_sub: "تعال من أجل المرح وابقَ من أجل التحليل الحقيقي. XORA تتكلم كثيرًا في الحالتين.",
+    card_mirror_t: "X Mirror",
+    card_mirror_d: "اكتشف شخصيتك على X. انظر في المرآة.",
+    card_stalk_t: "X Stalk",
+    card_stalk_d: "حلل الحساب الذي يثير فضولك. لن نخبر أحدًا.",
+    card_match_t: "X Match",
+    card_match_d: "قارن بين حسابين. توأم روح أم كارثة؟",
+    badge_free: "مجانًا",
+    tier_fun: "بطاقة Fun",
+    tier_real: "تحليل حقيقي",
+    tier_fun_short: "FREE",
+    tier_real_short: "REAL",
+    tier_free_note: "مجانًا · لا يقرأ بيانات X",
+    tier_real_note: "يعتمد على بيانات X · يستخدم الرصيد",
+    home_diff_h: "هناك نسختان من XORA. وكلتاهما فضولية بالقدر نفسه.",
+    home_fun_h: "XORA Fun",
+    home_fun_d: "مجانية. لا تقرأ بياناتك على X، بل تنشئ بطاقة ترفيهية فورًا. يمكنك سحب بطاقة جديدة متى شئت.",
+    home_real_h: "XORA Real",
+    home_real_d: "تحلل بيانات حقيقية من X. واجهة X البرمجية والتحليل يكلفاننا أيضًا، لذلك يستخدم Real الرصيد.",
+    home_real_joke: "ومع ذلك، لسنا رأسماليين إلى حد حرمانك من المرح.",
+    badge_c5: "5 أرصدة",
+    badge_c10: "10 أرصدة",
+    mirror_h1: "X Mirror",
+    mirror_sub: "اكتب اسم مستخدمك على X لترى شخصيتك على X.",
+    mirror_ph: "@اسم_المستخدم",
+    mirror_btn: "انظر في المرآة",
+    fun_btn: "اسحب بطاقة مجانية",
+    real_btn_5: "تحليل حقيقي · 5 أرصدة",
+    real_btn_10: "تحليل حقيقي · 10 أرصدة",
+    reroll_btn: "اسحب بطاقة أخرى",
+    real_label: "XORA REAL",
+    fun_label: "XORA FUN · FREE",
+    real_explainer: "تعتمد هذه البطاقة على بيانات حقيقية من X. وتستخدم الرصيد بسبب تكلفة الواجهة البرمجية والتحليل.",
+    fun_explainer: "هذه بطاقة ترفيهية؛ ولا تحلل بيانات X.",
+    mirror_connect_cta: "اربط حسابك على X وحلله",
+    mirror_login_note: "يتطلب Mirror ربط حسابك على X.",
+    mirror_profile_h: "أكمل ملفك الشخصي",
+    mirror_profile_sub: "راجع بياناتك قبل إنشاء بطاقتك.",
+    mirror_display_name: "الاسم الظاهر",
+    mirror_country: "الدولة",
+    mirror_city: "المدينة",
+    mirror_bio: "نبذة قصيرة",
+    mirror_website: "الموقع الإلكتروني",
+    mirror_avatar_url: "رابط صورة الملف الشخصي",
+    mirror_save: "حفظ",
+    mirror_skip: "تخطَّ الآن",
+    auth_title: "سجل الدخول إلى XORA",
+    auth_sub: "سجل الدخول إلى حسابك في XORA لحفظ تحليلاتك.",
+    auth_login_tab: "تسجيل الدخول",
+    auth_signup_tab: "إنشاء حساب",
+    auth_email: "البريد الإلكتروني",
+    auth_username: "اسم المستخدم",
+    auth_password: "كلمة المرور",
+    auth_password_confirm: "أعد كتابة كلمة المرور",
+    auth_login_btn: "تسجيل الدخول",
+    auth_signup_btn: "إنشاء حساب",
+    auth_have_account: "لديك حساب؟ سجل الدخول.",
+    auth_need_account: "ليس لديك حساب؟ أنشئ حسابًا.",
+    auth_success: "تم تسجيل الدخول",
+    auth_signup_check_email: "تم إنشاء الحساب. إذا كان تأكيد البريد مطلوبًا، فتحقق من صندوق الوارد.",
+    auth_username_required: "اسم المستخدم مطلوب.",
+    auth_email_required: "البريد الإلكتروني مطلوب.",
+    auth_password_required: "كلمة المرور مطلوبة.",
+    auth_password_min: "يجب ألا تقل كلمة المرور عن 6 أحرف.",
+    auth_password_mismatch: "كلمتا المرور غير متطابقتين.",
+    auth_config_missing: "إعدادات الدخول غير مكتملة.",
+    auth_connection_failed: "تعذر الاتصال بـ Supabase",
+    auth_signup_failed: "تعذر إنشاء الحساب",
+    auth_signin_failed: "تعذر تسجيل الدخول",
+    stalk_h1: "X Stalk",
+    stalk_sub: "اكتب اسم مستخدم وستلقي XORA نظرة بهدوء. هذا يبقى بيننا.",
+    stalk_ph: "@الحساب",
+    stalk_btn: "حلل بهدوء",
+    stalk_note: "يستخدم هذا التحليل 5 من أرصدة الفضول.",
+    match_h1: "X Match",
+    match_sub: "ضع حسابين جنبًا إلى جنب، وستخبرك XORA إن كان بينهما انسجام.",
+    match_ph1: "@الحساب_الأول",
+    match_ph2: "@الحساب_الثاني",
+    match_btn: "احسب التوافق",
+    match_note: "تستخدم هذه المقارنة 10 من أرصدة الفضول.",
+    btn_download: "تنزيل البطاقة",
+    btn_share: "شارك على X",
+    btn_again: "حاول مجددًا",
+    upsell_mirror: "والآن... ماذا عن ذلك الشخص؟ 👀",
+    upsell_mirror_btn: "ألقِ نظرة عبر X Stalk",
+    says: "XORA تقول",
+    match_overall: "التوافق العام",
+    match_flirt: "احتمال الإعجاب",
+    match_vibe: "الانسجام",
+    match_humor: "حس الدعابة المشترك",
+    match_chaos: "خطر الفوضى",
+    match_romance: "التوافق العاطفي",
+    sc_viral: "قابلية الانتشار",
+    sc_kaos: "مستوى الفوضى",
+    sc_mizah: "جرعة الدعابة",
+    sc_gece: "النشاط الليلي",
+    profile_h1: "الملف الشخصي",
+    profile_balance: "أرصدة الفضول",
+    profile_last: "بطاقتك الأخيرة",
+    profile_history: "التحليلات السابقة",
+    profile_logout: "تسجيل الخروج",
+    profile_nouser: "سجل الدخول للمتابعة.",
+    profile_gomirror: "تسجيل الدخول",
+    profile_empty: "لا تملك بطاقة هوية على X بعد.",
+    profile_empty_sub: "ابدأ تحليلك الأول.",
+    profile_actions: "ابدأ التحليل",
+    logout_confirm: "هل تريد تسجيل الخروج؟",
+    logout_done: "تم تسجيل الخروج",
+    credits_h1: "أرصدة الفضول",
+    credits_sub: "Fun مجاني. أما Real فيستخدم الرصيد لأنه يقرأ بيانات X فعلًا.",
+    credits_balance: "رصيدك",
+    credits_buy: "شراء",
+    credits_note: "سيتم ربط الدفع عبر iyzico. أزرار الشراء معطلة في هذا الإصدار.",
+    pkg1_n: "تحليلان حقيقيان",
+    pkg2_n: "4 تحليلات حقيقية",
+    pkg3_n: "10 تحليلات حقيقية",
+    toast_loaded: "تمت إضافة الرصيد ⚡",
+    payment_soon: "سنربط iyzico في الخطوة التالية.",
+    real_err_credit: "رصيدك لا يكفي لهذا التحليل.",
+    real_err_protected: "هذا الحساب محمي. حتى XORA لها حدود.",
+    real_err_not_found: "لم أجد هذا الحساب على X.",
+    real_err_posts: "لا توجد منشورات كافية لتحليل حقيقي.",
+    real_err_rate: "X مزدحمة الآن. حاول مجددًا بعد قليل.",
+    real_err_auth: "سجل الدخول إلى حسابك في XORA لإجراء التحليل الحقيقي.",
+    real_err_unavailable: "تعذر إكمال التحليل. تحقق من رصيدك وسجلك قبل إعادة المحاولة.",
+    real_err_refund: "الاسترداد قيد المعالجة. تم الاحتفاظ بمعرف طلبك؛ تحقق مرة أخرى لاحقًا.",
+    real_coming_soon: "التحليل الحقيقي قادم قريبًا",
+    rarity_common: "عادية",
+    rarity_rare: "نادرة",
+    rarity_epic: "ملحمية",
+    rarity_legendary: "أسطورية",
+    toast_handle: "اكتب اسم مستخدم أولًا",
+    toast_two: "اسما المستخدمين مطلوبان",
+    toast_same: "اكتب حسابين مختلفين 🙂",
+    toast_nocredit: "الرصيد غير كافٍ، جارٍ تحويلك…",
+    toast_saved: "تم تنزيل البطاقة",
+    cost_info: "رصيد مستخدم",
+    date_today: "اليوم",
+    mirror_cooldown: "بطاقة هويتك على X ما زالت سارية. عد بعد {days} يومًا للحصول على بطاقة جديدة.",
+    view_card: "عرض البطاقة",
+    close: "إغلاق",
+    history_select: "تحديد",
+    history_cancel: "إلغاء",
+    history_delete: "حذف المحدد",
+    history_none_selected: "حدد التحليلات التي تريد حذفها.",
+    history_deleted: "تمت إزالة التحليلات المحددة من سجلك.",
+    history_not_found: "لا توجد سجلات للحذف.",
+    profile_card_expired: "انتهت صلاحية بطاقة Mirror الخاصة بك.",
+    profile_card_renew: "اسحب Mirror جديدة",
+    card_load_failed: "تعذر تحميل البطاقة"
   }
 };
 
-var LANGS = ["tr", "en", "es", "pt"];
-var LANG_NAMES = { tr: "Türkçe", en: "English", es: "Español", pt: "Português" };
+var LANGS = ["tr", "en", "es", "pt", "ar"];
+var RTL_LANGS = ["ar"];
+var LANG_NAMES = { tr: "Türkçe", en: "English", es: "Español", pt: "Português", ar: "العربية" };
 
 function getLang() {
   var lang = localStorage.getItem(LS.lang) || "tr";
   return LANGS.indexOf(lang) >= 0 ? lang : "tr";
+}
+
+function langDir(lang) {
+  return RTL_LANGS.indexOf(lang) >= 0 ? "rtl" : "ltr";
 }
 
 function nextLang(current) {
@@ -1411,6 +1571,7 @@ function t(key) {
 
 function applyI18n() {
   document.documentElement.lang = getLang();
+  document.documentElement.dir = langDir(getLang());
   var nodes = document.querySelectorAll("[data-i18n]");
   for (var i = 0; i < nodes.length; i++) {
     nodes[i].textContent = t(nodes[i].getAttribute("data-i18n"));

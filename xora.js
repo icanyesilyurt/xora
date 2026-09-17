@@ -925,6 +925,11 @@ var FUN_PERSONAS = [
         "nickname": "Arteiro de Mansinho",
         "tagline": "Por trás da calma, sempre tem uma travessura guardada.",
         "comment": "Quando todo mundo concorda, você solta uma pergunta que muda o rumo da conversa. Fala com tanta calma que ninguém sabe se é sério ou brincadeira. O melhor é a risadinha cúmplice com quem percebeu primeiro."
+      },
+      "ar": {
+        "nickname": "المشاغب الهادئ",
+        "tagline": "وراء هدوئك شقاوة صغيرة لا تهدأ.",
+        "comment": "حين يتفق الجميع، تطرح سؤالًا صغيرًا يغير اتجاه الحديث كله. تقوله بهدوء شديد حتى لا يعرف أحد إن كنت جادًا أو تمزح. وأجمل ما في الأمر تلك الابتسامة المتبادلة مع أول من فهم قصدك."
       }
     }
   },
@@ -957,6 +962,11 @@ var FUN_PERSONAS = [
         "nickname": "Ironia Fina",
         "tagline": "Você muda o sentido da frase sem perder a pose.",
         "comment": "Basta alguém fazer um anúncio solene demais para você notar a contradição escondida nele. Em vez de discutir, prefere uma resposta curta e levemente irônica. Explicar a piada nunca é opção; o sorriso de quem entendeu já basta."
+      },
+      "ar": {
+        "nickname": "سخرية لطيفة",
+        "tagline": "تقول الجملة بجدية، ثم تقلب معناها في آخر كلمة.",
+        "comment": "يكفي أن يعلن أحدهم شيئًا بثقة مبالغ فيها حتى تلتقط التناقض المختبئ فيه. بدل الجدال الطويل، تفضل ردًا قصيرًا بنبرة ساخرة خفيفة. ولا تشرح النكتة أبدًا؛ تكفيك ابتسامة من فهمها."
       }
     }
   },
@@ -989,6 +999,11 @@ var FUN_PERSONAS = [
         "nickname": "Curioso de Carteirinha",
         "tagline": "Mal termina um assunto, já quer saber do próximo.",
         "comment": "Quando surge um tema que você não conhece, em vez de ficar quieto, você pergunta. Uma resposta interessante puxa outra pergunta, e assim a conversa vai longe. Sair sabendo um pouco mais do que antes já faz o dia valer a pena."
+      },
+      "ar": {
+        "nickname": "يسأل عن كل شيء",
+        "tagline": "لا ينتهي موضوع حتى يبدأ فضولك بالموضوع التالي.",
+        "comment": "إذا طرح أحدهم موضوعًا لا تعرفه، لا تصمت بل تسأل. كل إجابة مثيرة تفتح لك سؤالًا جديدًا، فيطول الحديث دون أن تشعر. يكفيك أن تخرج من الجلسة وأنت تعرف أكثر مما كنت تعرف."
       }
     }
   },
@@ -1021,6 +1036,11 @@ var FUN_PERSONAS = [
         "nickname": "Cara de Paisagem",
         "tagline": "Ninguém percebe a piada até você deixar.",
         "comment": "Você conta a observação mais absurda com a maior naturalidade do mundo. Ninguém acha uma pista no seu rosto até a ficha cair. Se a risada demora, você nem se mexe; a pausa deixa tudo ainda mais engraçado."
+      },
+      "ar": {
+        "nickname": "مزاح بوجه جاد",
+        "tagline": "لا أحد يكتشف النكتة إلا حين تسمح له.",
+        "comment": "تقول أغرب ملاحظة بالنبرة نفسها التي تطلب بها فنجان قهوة. لا يظهر على وجهك أي تلميح حتى يفهم الآخرون المقصود. وإذا تأخرت الضحكة لا تشرح شيئًا؛ فذلك الصمت القصير جزء من الطرافة."
       }
     }
   },
@@ -1053,6 +1073,11 @@ var FUN_PERSONAS = [
         "nickname": "Filósofo de Boteco",
         "tagline": "Uma conversa à toa nunca fica à toa por muito tempo.",
         "comment": "Com você, uma pergunta qualquer pode virar uma teoria inesperada sobre a vida. Mesmo com o café esfriando, você não encerra o assunto sem dar mais uma volta na ideia. Se alguém discorda, melhor ainda: é aí que a conversa fica boa."
+      },
+      "ar": {
+        "nickname": "فيلسوف المقهى",
+        "tagline": "الحديث العابر معك لا يبقى عابرًا طويلًا.",
+        "comment": "قد يتحول معك سؤال عادي إلى نظرية غير متوقعة عن الحياة. حتى لو بردت القهوة، لا تغلق الموضوع قبل أن تقلب الفكرة مرة أخرى. وإن اعترض أحدهم فهذا أفضل؛ فهنا يبدأ النقاش الممتع."
       }
     }
   },
@@ -1085,6 +1110,11 @@ var FUN_PERSONAS = [
         "nickname": "Sente o Clima",
         "tagline": "Você sabe a hora certa de mudar de assunto.",
         "comment": "Numa conversa, você repara não só no que é dito, mas em quem ainda não conseguiu falar. Às vezes faz uma pergunta, às vezes muda de assunto, conforme o momento pede. Você aproveita mais quando ninguém precisa disputar espaço para ser ouvido."
+      },
+      "ar": {
+        "nickname": "يعرف متى يتكلم",
+        "tagline": "يهمك متى تقول الشيء بقدر ما يهمك ماذا تقول.",
+        "comment": "في أي حديث لا تنتبه لما يقال فقط، بل لمن لم يجد فرصة ليتكلم. أحيانًا تطرح سؤالًا، وأحيانًا تغير الموضوع، بحسب ما تحتاجه اللحظة. وتستمتع أكثر حين لا يضطر أحد إلى المنافسة ليسمعه الآخرون."
       }
     }
   },
@@ -1117,6 +1147,11 @@ var FUN_PERSONAS = [
         "nickname": "Bom Senso em Pessoa",
         "tagline": "Dá para discordar sem levar para o lado pessoal.",
         "comment": "Quando a discussão esquenta, você separa o argumento de verdade da irritação do momento. Consegue reconhecer um bom ponto sem precisar escolher um lado em tudo. Para você, o melhor final é todo mundo saindo se entendendo um pouco melhor."
+      },
+      "ar": {
+        "nickname": "حكيم المجلس",
+        "tagline": "تختلف مع الآخرين دون أن تجعل الأمر شخصيًا.",
+        "comment": "حين يحتد النقاش، تفصل الفكرة الحقيقية عن الانفعال اللحظي. تستطيع أن تعترف بالرأي الصائب دون أن تنحاز لطرف في كل شيء. وأفضل نهاية عندك أن يخرج الجميع وقد فهموا بعضهم أكثر."
       }
     }
   },
@@ -1149,6 +1184,11 @@ var FUN_PERSONAS = [
         "nickname": "Relê Antes de Mandar",
         "tagline": "Toda mensagem passa por uma revisão antes de sair.",
         "comment": "Você escreve uma mensagem curta e acha que o ponto final ficou sério demais e a exclamação animada demais. Antes de enviar, imagina várias vezes como a outra pessoa vai ler. No fim, quando manda a primeira versão, acaba rindo da própria indecisão."
+      },
+      "ar": {
+        "nickname": "يقرأ رسالته مرتين",
+        "tagline": "حتى الرد القصير يستحق مراجعة أخيرة.",
+        "comment": "تكتب رسالة قصيرة ثم تشعر أن النقطة جادة أكثر من اللازم وعلامة التعجب متحمسة أكثر من اللازم. قبل الإرسال تتخيل مرات عدة كيف سيقرؤها الطرف الآخر. وفي النهاية ترسل النسخة الأولى وتضحك قليلًا من ترددك."
       }
     }
   },
@@ -1181,6 +1221,11 @@ var FUN_PERSONAS = [
         "nickname": "De Poucas Palavras",
         "tagline": "Você não precisa ser a voz mais alta da sala.",
         "comment": "Você não sente necessidade de preencher cada silêncio. Quando fala, prefere dizer algo curto que fica na cabeça das pessoas. Gosta quando, depois do encontro, alguém lembra justamente aquela sua frase."
+      },
+      "ar": {
+        "nickname": "حضور بلا ضجيج",
+        "tagline": "لا تحتاج أن تكون الصوت الأعلى في المكان.",
+        "comment": "لا تشعر بحاجة إلى ملء كل لحظة صمت بالكلام. وحين تتحدث، تفضل جملة قصيرة تبقى في ذاكرة الآخرين. ويسعدك أن يتذكر أحدهم عبارتك تلك بعد انتهاء اللقاء."
       }
     }
   },
@@ -1213,6 +1258,11 @@ var FUN_PERSONAS = [
         "nickname": "Anima Qualquer Roda",
         "tagline": "Com você, entrar na brincadeira fica fácil.",
         "comment": "Quando o encontro esfria, você sugere um jogo ou um assunto em que todo mundo pode entrar. Gosta de incluir as pessoas na conversa sem deixar ninguém sem graça. O plano pode mudar mil vezes, desde que ninguém fique entediado."
+      },
+      "ar": {
+        "nickname": "روح الجلسة",
+        "tagline": "معك يصبح الانضمام إلى المرح سهلًا.",
+        "comment": "إذا فترت الجلسة، تقترح لعبة أو موضوعًا يستطيع الجميع أن يشاركوا فيه. تحب أن تدخل الناس في الحديث دون أن تحرج أحدًا. وقد تتغير الخطة ألف مرة، المهم ألا يشعر أحد بالملل."
       }
     }
   },
@@ -1245,6 +1295,11 @@ var FUN_PERSONAS = [
         "nickname": "Escuta de Verdade",
         "tagline": "Com você, até um detalhe pequeno vira conversa.",
         "comment": "Quando pergunta como foi o dia de alguém, você quer mesmo ouvir a resposta. Um detalhe pequeno chama sua atenção e você pede para contarem mais. Por isso um cafezinho rápido com você quase sempre vira uma conversa longa."
+      },
+      "ar": {
+        "nickname": "أذن صاغية",
+        "tagline": "التفاصيل الصغيرة تتحول معك إلى حديث طويل.",
+        "comment": "حين تسأل أحدهم عن يومه، فأنت تريد فعلًا أن تسمع الجواب. تلفت انتباهك تفصيلة صغيرة فتطلب أن يحكي لك المزيد. لهذا يتحول فنجان قهوة سريع معك غالبًا إلى حديث طويل."
       }
     }
   },
@@ -1277,6 +1332,11 @@ var FUN_PERSONAS = [
         "nickname": "Bom de Papo",
         "tagline": "Você sabe qual detalhe faz a história funcionar.",
         "comment": "Você guarda o detalhe mais engraçado para o final e sabe exatamente quando soltá-lo. Um contratempo qualquer vira uma história que todo mundo quer ouvir de novo. O melhor é quando alguém repete sua frase na conversa seguinte."
+      },
+      "ar": {
+        "nickname": "يجيد رواية القصص",
+        "tagline": "تعرف أي تفصيل يجعل القصة ممتعة.",
+        "comment": "تحتفظ بأطرف تفصيلة للنهاية وتعرف تمامًا متى تكشفها. موقف عادي يتحول معك إلى قصة يريد الجميع سماعها مرة أخرى. وأجمل ما في الأمر أن تسمع أحدهم يكرر جملتك في جلسة أخرى."
       }
     }
   }
@@ -1321,8 +1381,8 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
   var comment = {
-    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt") },
-    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt") }
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar") }
   };
   return {
     mode: actualMode,
@@ -1336,7 +1396,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     profile_emoji: card.emoji,
     comment: comment,
     card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt] } },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
@@ -1374,6 +1434,14 @@ var FUN_MATCH_COMMENTS = {
     "Na mesma mesa, ou viram uma dupla lendária ou alguém silencia o grupo.",
     "A XORA acredita nessa dupla. Ninguém sabe de onde vem tanta confiança.",
     "A ciência recusou o caso. A gente deu uma porcentagem mesmo assim."
+  ],
+  ar: [
+    "مختبر XORA البعيد تمامًا عن العلم وجد هذا الثنائي ممتعًا على نحو مريب.",
+    "هذه النسبة لا تثبت شيئًا على الإطلاق. لكنها تكفي لإشعال نقاش في مجموعة الأصدقاء.",
+    "البطاقة للمرح. أما النسبة فتبدو رسمية أكثر من اللازم.",
+    "على الطاولة نفسها، إما أن يصبحا ثنائيًا أسطوريًا أو يكتم أحدهما المحادثة.",
+    "XORA واثقة من هذا الثنائي. ولا أحد يعرف مصدر هذه الثقة.",
+    "رفض العلم هذه القضية. ومع ذلك أعطيناها نسبة."
   ]
 };
 
@@ -1397,7 +1465,7 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
     overall: overall,
     ci: commentIndex,
     source: "fun",
-    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex] },
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex] },
     meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
   };
 }
@@ -1405,9 +1473,9 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
-    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA" },
-    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída." },
-    comments: { tr: [""], en: [""], es: [""], pt: [""] }
+    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA" },
+    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل." },
+    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""] }
   };
 }
 
@@ -1453,6 +1521,14 @@ var MATCH_COMMENTS = {
     "{a} e {b} se vigiam, mas não se seguem. Aqui não tem coragem nem covardia: é caos puro.",
     "{a} manda corações, {b} manda fogo. Nenhuma das duas contas sabe o que quer, mas a química é inegável.",
     "{a} faz planos, {b} explode todos eles. Esses dois dariam um roteiro de comédia romântica."
+  ],
+  ar: [
+    "{a} يرسل الرسالة، بينما يتركها {b} دون رد. لكن الحسابين يتفقدان بعضهما في الثالثة فجرًا. مشهد مألوف.",
+    "الإعجاب بين هذين الحسابين يبدأ بنقرة إعجاب وينتهي بدراما. XORA جهزت الفشار.",
+    "{a} يكتب بعاطفة، بينما يرد {b} بسخرية. هذا التوتر ينتهي إما بالحب أو بالحظر.",
+    "{a} يراقب {b} بصمت، والعكس صحيح، دون أي متابعة. لا شجاعة هنا ولا تردد، بل فوضى خالصة.",
+    "{a} يرسل القلوب، بينما يرسل {b} النار. لا أحد منهما يعرف ما يريد، لكن الانسجام واضح.",
+    "{a} يخطط، ثم يأتي {b} ليقلب الخطط رأسًا على عقب. هذان الاثنان قصة كوميديا رومانسية جاهزة."
   ]
 };
 
@@ -1484,12 +1560,18 @@ function matchHandles(rawA, rawB, seedKey) {
   };
 }
 
+function isRtlLang(lang) {
+  return typeof langDir === "function" ? langDir(lang) === "rtl" : lang === "ar";
+}
+
 function matchComment(m, lang) {
   if (m && m.fun_comment && m.fun_comment[lang]) return m.fun_comment[lang];
   if (m && m.ai_comment && m.ai_comment[lang]) return m.ai_comment[lang];
+  // Inside RTL sentences a bare "@name" is reordered to "name@"; isolate handles as LTR.
+  function handle(h) { return isRtlLang(lang) ? "\u2066@" + h + "\u2069" : "@" + h; }
   return MATCH_COMMENTS[lang][m.ci]
-    .replace(/\{a\}/g, "@" + m.a)
-    .replace(/\{b\}/g, "@" + m.b);
+    .replace(/\{a\}/g, handle(m.a))
+    .replace(/\{b\}/g, handle(m.b));
 }
 
 /* ============================================================
@@ -1529,6 +1611,14 @@ var THINKING = {
       "Anotando suas contradições...",
       "Analisando sinais que se repetem...",
       "A XORA às vezes é sincera demais. Prepare-se."
+    ],
+    ar: [
+      "أنفض الغبار عن خطك الزمني...",
+      "أحاول تجاهل منشوراتك في الثالثة فجرًا... لا أستطيع.",
+      "أحلل أنماط السلوك...",
+      "أدون تناقضاتك...",
+      "أحلل الإشارات المتكررة...",
+      "XORA صريحة أكثر من اللازم أحيانًا. استعد."
     ]
   },
   stalk: {
@@ -1563,6 +1653,14 @@ var THINKING = {
       "Você não ouviu isso de mim...",
       "Também olhei quem essa conta segue. Diz muita coisa.",
       "O que eu encontrar, conto só para você."
+    ],
+    ar: [
+      "أدخل الحساب بهدوء...",
+      "لا أترك أثرًا، اطمئن.",
+      "همم. سجل إعجابات مثير للاهتمام.",
+      "لم تسمع هذا مني...",
+      "نظرت أيضًا إلى من يتابعهم هذا الحساب. الأمر يقول الكثير.",
+      "ما أجده سأخبرك به وحدك."
     ]
   },
   match: {
@@ -1597,6 +1695,14 @@ var THINKING = {
       "Tensão detectada no histórico de respostas.",
       "Calculando a química. Jaleco vestido.",
       "O resultado pode chatear um de vocês. Lá vai."
+    ],
+    ar: [
+      "أضع الخطين الزمنيين جنبًا إلى جنب...",
+      "أبحث عن الإعجابات المشتركة... مثير للاهتمام.",
+      "حساب نهاري وآخر ليلي. تم التدوين.",
+      "رصدت توترًا في سجل الردود.",
+      "أحسب درجة الانسجام. ارتديت معطف المختبر.",
+      "قد تزعج النتيجة أحدكما. ها هي."
     ]
   }
 };

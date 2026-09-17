@@ -715,3 +715,16 @@ body::before{
 .history-tier.tier-fun{background:var(--teal-soft)}
 .history-tier.tier-real{background:var(--orange-soft)}
 .idcard[data-tier="real"] .idcard-band{padding-top:44px}
+
+/* ============ RTL (Arapça) ============ */
+/* Arabic letters must stay joined: letter-spacing breaks cursive shaping. */
+[dir="rtl"] *{letter-spacing:0!important}
+[dir="rtl"] .choice,[dir="rtl"] .panel,[dir="rtl"] .score-name,[dir="rtl"] .v3-topic-label,[dir="rtl"] .xora-difference,[dir="rtl"] .history-main{text-align:right}
+[dir="rtl"] .score-val,[dir="rtl"] .v3-topic-val{text-align:left}
+[dir="rtl"] .choice-badge{right:auto;left:16px}
+/* Handles, emails and passwords are Latin technical input; Arabic placeholders still read RTL. */
+[dir="rtl"] .handle-input{direction:ltr}
+[dir="rtl"] .handle-input:placeholder-shown{direction:rtl}
+/* Latin handles, brand/tier chips and credit values keep their LTR order inside RTL pages. */
+[dir="rtl"] .logo,[dir="rtl"] .credits-pill,[dir="rtl"] .idcard-handle,[dir="rtl"] .barcode,[dir="rtl"] .card-status span,[dir="rtl"] .card-status b,[dir="rtl"] .history-type,[dir="rtl"] .history-tier,[dir="rtl"] .mini-mode,[dir="rtl"] .profile-mode-row>b,[dir="rtl"] .balance-big,[dir="rtl"] .pack-amount,[dir="rtl"] .pack-price{direction:ltr;unicode-bidi:isolate}
+[dir="rtl"] #pHandle{direction:ltr;unicode-bidi:isolate;text-align:right}

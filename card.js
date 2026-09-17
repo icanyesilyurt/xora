@@ -126,7 +126,7 @@ function buildIdentityCardV3(res) {
   var mode = res.mode || "mirror";
   var quoteLabel = mode === "stalk"
     ? "XORA Stalk"
-    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : "XORA Mirror");
+    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : lang === "ar" ? "مرآة XORA" : "XORA Mirror");
 
   var chips = "";
   var top = res.top_behaviors || [];
@@ -342,12 +342,18 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+// Handles, brand names and footers are always drawn LTR; only localized copy follows the language direction.
+function copyDirection(lang) {
+  return isRtlLang(lang) ? "rtl" : "ltr";
+}
+
 function baseCanvas() {
   var cv = document.createElement("canvas");
   cv.width = 1000;
   cv.height = 1250;
   var ctx = cv.getContext("2d");
   ctx.textAlign = "center";
+  ctx.direction = "ltr";
 
   ctx.fillStyle = "#FFF6E9";
   ctx.fillRect(0, 0, 1000, 1250);
@@ -384,6 +390,7 @@ function drawCardFrame(ctx, accent) {
 }
 
 function drawCardFooter(ctx, h) {
+  ctx.direction = "ltr";
   ctx.fillStyle = "#1E2330";
   roundRect(ctx, 70, 1090, 860, 80, 0);
   ctx.save();
@@ -448,6 +455,7 @@ function renderFunIdentityPNG(res) {
   ctx.beginPath(); ctx.arc(500, 355, 118, 0, 7); ctx.fillStyle="#FFFFFF"; ctx.fill(); ctx.lineWidth=6; ctx.strokeStyle="#1E2330"; ctx.stroke();
   ctx.font = "126px 'Segoe UI Emoji','Apple Color Emoji',sans-serif"; ctx.fillText(emoji,500,402);
   ctx.fillStyle="#8A8F9C"; ctx.font="700 30px Nunito, Arial, sans-serif"; ctx.fillText("@"+res.handle,500,540);
+  ctx.direction = copyDirection(lang);
   ctx.fillStyle="#1E2330"; ctx.font="900 56px Nunito, Arial, sans-serif"; var yNick=wrapText(ctx,nick,500,615,720,62);
   ctx.fillStyle="#5C6270"; ctx.font="600 28px Nunito, Arial, sans-serif"; var y=wrapText(ctx,desc,500,yNick+70,700,34)+42;
   ctx.font="700 26px Nunito, Arial, sans-serif";
@@ -479,7 +487,7 @@ function renderIdentityPNGV3(res) {
   var emoji = res.profile_emoji || "🪞";
   var tagline = res.tagline ? (res.tagline[lang] || res.tagline.tr) : "";
   var mode = res.mode || "mirror";
-  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : "XORA MIRROR");
+  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : lang === "ar" ? "مرآة XORA" : "XORA MIRROR");
   var b = baseCanvas();
   var ctx = b.ctx;
 
@@ -494,6 +502,7 @@ function renderIdentityPNGV3(res) {
   ctx.fillStyle = "#FFFFFF";
   ctx.font = "700 34px Nunito, Arial, sans-serif";
   ctx.fillText("@" + res.handle, 500, 250);
+  ctx.direction = copyDirection(lang);
 
   var curNickY = 530;
   if (nick) {
@@ -574,6 +583,7 @@ function renderIdentityPNGV2(res) {
   ctx.fillStyle = "#8A8F9C";
   ctx.font = "700 30px Nunito, Arial, sans-serif";
   ctx.fillText("@" + res.handle, 500, 560);
+  ctx.direction = copyDirection(lang);
 
   ctx.fillStyle = "#1E2330";
   ctx.font = "900 56px Nunito, Arial, sans-serif";
@@ -654,6 +664,7 @@ function renderIdentityPNGV1(res) {
   ctx.fillStyle = "#8A8F9C";
   ctx.font = "700 30px Nunito, Arial, sans-serif";
   ctx.fillText("@" + res.handle, 500, 560);
+  ctx.direction = copyDirection(lang);
 
   ctx.fillStyle = "#1E2330";
   ctx.font = "900 62px Nunito, Arial, sans-serif";
@@ -724,6 +735,7 @@ function renderMatchPNGBase(m) {
   ctx.fillStyle = "#1E2330";
   ctx.font = "900 110px Nunito, Arial, sans-serif";
   ctx.fillText("%" + m.overall, 500, 680);
+  ctx.direction = copyDirection(lang);
 
   ctx.fillStyle = "#5C6270";
   ctx.font = "700 30px Nunito, Arial, sans-serif";
@@ -770,6 +782,10 @@ function downloadCanvas(cv, filename) {
   toast(t("toast_saved"));
 }
 
+function ltrIsolate(text) {
+  return "\u2066" + text + "\u2069";
+}
+
 function shareOnX(text) {
   var url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text);
   window.open(url, "_blank", "noopener");
@@ -791,11 +807,13 @@ function shareIdentityText(res) {
     if (lang === "tr") return 'XORA REAL beni okudu: "' + name + '" · ' + rarity + ' 👀 Sen ne çıkarsın? → ' + getPublicSiteUrl();
     if (lang === "es") return 'XORA REAL me leyó: "' + name + '" · ' + rarity + ' 👀 ¿Qué diría el tuyo? → ' + getPublicSiteUrl();
     if (lang === "pt") return 'A XORA REAL me leu: "' + name + '" · ' + rarity + ' 👀 E o seu, o que diria? → ' + getPublicSiteUrl();
+    if (lang === "ar") return 'قرأتني XORA REAL: «' + name + '» · ' + rarity + ' 👀 وماذا ستقول عنك؟ ← ' + ltrIsolate(getPublicSiteUrl());
     return 'XORA REAL read me: "' + name + '" · ' + rarity + ' 👀 What would yours say? → ' + getPublicSiteUrl();
   }
   if (lang === "tr") return 'XORA FUN kartım: "' + name + '" 😅 Seninkini çek → ' + getPublicSiteUrl();
   if (lang === "es") return 'Mi tarjeta XORA FUN: "' + name + '" 😅 Saca la tuya → ' + getPublicSiteUrl();
   if (lang === "pt") return 'Meu cartão XORA FUN: "' + name + '" 😅 Tire o seu → ' + getPublicSiteUrl();
+  if (lang === "ar") return 'بطاقتي في XORA FUN: «' + name + '» 😅 اسحب بطاقتك ← ' + ltrIsolate(getPublicSiteUrl());
   return 'My XORA FUN card: "' + name + '" 😅 Draw yours → ' + getPublicSiteUrl();
 }
 
@@ -806,11 +824,13 @@ function shareMatchText(m) {
     if (lang === "tr") return "XORA REAL: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "es") return "XORA REAL: @" + m.a + " × @" + m.b + " compatibilidad " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "pt") return "XORA REAL: @" + m.a + " × @" + m.b + " compatibilidade " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
+    if (lang === "ar") return "توافق " + ltrIsolate("@" + m.a + " × @" + m.b) + " في XORA REAL: " + ltrIsolate(m.overall + "%") + " · " + rarity + " 🔥 ← " + ltrIsolate(getPublicSiteUrl());
     return "XORA REAL: @" + m.a + " × @" + m.b + " match " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
   }
   if (lang === "tr") return "XORA FUN: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " 😅 Siz kaç çıkarsınız? → " + getPublicSiteUrl();
   if (lang === "es") return "XORA FUN: @" + m.a + " × @" + m.b + " compatibilidad " + m.overall + "% 😅 ¿Cuánto sacarían ustedes? → " + getPublicSiteUrl();
   if (lang === "pt") return "XORA FUN: @" + m.a + " × @" + m.b + " compatibilidade " + m.overall + "% 😅 E vocês, quanto dariam? → " + getPublicSiteUrl();
+  if (lang === "ar") return "توافق " + ltrIsolate("@" + m.a + " × @" + m.b) + " في XORA FUN: " + ltrIsolate(m.overall + "%") + " 😅 وأنتم، كم ستكون نسبتكم؟ ← " + ltrIsolate(getPublicSiteUrl());
   return "XORA FUN: @" + m.a + " × @" + m.b + " match " + m.overall + "% 😅 Try yours → " + getPublicSiteUrl();
 }
 
@@ -819,8 +839,8 @@ function shareMatchText(m) {
 function cardPresentationCopy(value, key) {
   if (key === "meta") return value;
   if (typeof value === "string") {
-    return value.split(/(?<=[.!?])\s+/).filter(function(sentence) {
-      return !/\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes))|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes))/iu.test(sentence);
+    return value.split(/(?<=[.!?؟])\s+/).filter(function(sentence) {
+      return !/[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes))|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes))/iu.test(sentence);
     }).join(" ");
   }
   if (Array.isArray(value)) return value.map(function(v){return cardPresentationCopy(v);});

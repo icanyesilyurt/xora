@@ -108,7 +108,7 @@
     var d = new Date(ts);
     var today = new Date();
     if (d.toDateString() === today.toDateString()) return t("date_today");
-    return d.toLocaleDateString(getLang() === "tr" ? "tr-TR" : getLang() === "es" ? "es-ES" : getLang() === "pt" ? "pt-BR" : "en-US",
+    return d.toLocaleDateString(getLang() === "tr" ? "tr-TR" : getLang() === "es" ? "es-ES" : getLang() === "pt" ? "pt-BR" : getLang() === "ar" ? "ar-u-nu-latn" : "en-US",
                                 { day: "numeric", month: "short" });
   }
 
@@ -199,11 +199,11 @@
       if (hh.resultTitle) {
         var target = hh.handles[0] ? "@" + esc(hh.handles[0]) : "";
         var second = hh.handles[1] ? " × @" + esc(hh.handles[1]) : "";
-        main = target + second + " — " + esc(hh.resultTitle);
+        main = "<bdi>" + target + second + "</bdi> — " + esc(hh.resultTitle);
       } else if (hh.type === "match" && hh.handles[0] && hh.handles[1]) {
-        main = "@" + esc(hh.handles[0]) + " × @" + esc(hh.handles[1]);
+        main = "<bdi>@" + esc(hh.handles[0]) + " × @" + esc(hh.handles[1]) + "</bdi>";
       } else if (hh.handles[0]) {
-        main = "@" + esc(hh.handles[0]);
+        main = "<bdi>@" + esc(hh.handles[0]) + "</bdi>";
       } else {
         main = esc(hh.type);
       }
