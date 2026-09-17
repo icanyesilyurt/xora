@@ -28,7 +28,8 @@ const AI_COPY={
  fr:{nickname:'Toujours une Question',tagline:'Avance à coups de questions.',summary:'Pose des questions ouvertes.',comment:'Tu ouvres les conversations avec des questions.',label:'Commentaire',observation:'Pose souvent des questions.',match:'Les deux comptes posent des questions.'},
  de:{nickname:'Fragt gern nach',tagline:'Kommt mit Fragen voran.',summary:'Stellt offene Fragen.',comment:'Du eröffnest Gespräche mit Fragen.',label:'Kommentar',observation:'Stellt oft Fragen.',match:'Beide Konten stellen Fragen.'},
  it:{nickname:'Fa Tante Domande',tagline:'Va avanti a colpi di domande.',summary:'Fa domande aperte.',comment:'Apri ogni conversazione con una domanda.',label:'Commento',observation:'Fa spesso domande.',match:'Entrambi gli account fanno domande.'},
- ja:{nickname:'質問好き',tagline:'質問しながら話を進めるタイプ。',summary:'オープンな質問をよくする。',comment:'質問から会話を始めるのが得意。',label:'コメント',observation:'よく質問している。',match:'どちらのアカウントもよく質問する。'}
+ ja:{nickname:'質問好き',tagline:'質問しながら話を進めるタイプ。',summary:'オープンな質問をよくする。',comment:'質問から会話を始めるのが得意。',label:'コメント',observation:'よく質問している。',match:'どちらのアカウントもよく質問する。'},
+ ko:{nickname:'질문이 많은 사람',tagline:'질문으로 대화를 이어가요.',summary:'열린 질문을 자주 합니다.',comment:'질문으로 대화를 여는 편이에요.',label:'코멘트',observation:'질문을 자주 합니다.',match:'두 계정 모두 질문이 많아요.'}
 };
 const profileAI=(locale='en')=>{const c=AI_COPY[locale];return {nickname_candidates:[{text:c.nickname,evidence:'question_ratio'}],metrics:['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label:c.label,value:70})),tagline:c.tagline,summary:c.summary,comment:c.comment,observations:[c.observation],emoji:'🪞'};};
 const matchAI=(locale='en')=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment:AI_COPY[locale].match});

@@ -60,7 +60,7 @@ if (!matchHtml.includes("XORA FUN")) throw new Error("Fun match failed");
 if (!ctx.shareIdentityText(real).includes("https://example.test/xora/")) throw new Error("Share URL failed");
 
 // Every supported locale must render FUN identity and match cards, HTML and PNG, from its own copy.
-const locales = ["tr", "en", "es", "pt", "ar", "fr", "de", "it", "ja"];
+const locales = ["tr", "en", "es", "pt", "ar", "fr", "de", "it", "ja", "ko"];
 const persona = ctx.FUN_PERSONAS.find((p) => p.id === fun.persona_id);
 for (const code of locales) {
   lang = code;
@@ -87,6 +87,8 @@ if (!/[äöüß]/.test(ctx.FUN_PERSONAS.map((p) => p.locales.de.comment).join(" 
 if (!/[àèéìòù]/.test(ctx.FUN_PERSONAS.map((p) => p.locales.it.comment).join(" "))) throw new Error("Italian accents missing");
 const jaCopy = ctx.FUN_PERSONAS.map((p) => p.locales.ja.comment).join("");
 for (const [script, re] of [["kanji", /[\u4e00-\u9fff]/], ["hiragana", /[\u3040-\u309f]/], ["katakana", /[\u30a0-\u30ff]/]]) if (!re.test(jaCopy)) throw new Error("Japanese " + script + " missing");
+const koCopy = ctx.FUN_PERSONAS.map((p) => p.locales.ko.comment).join("");
+if (!/[\uac00-\ud7af]/.test(koCopy) || /[A-Za-z\u3040-\u30ff\u4e00-\u9fff]/.test(koCopy)) throw new Error("Korean copy must be hangul only");
 if (!ctx.FUN_PERSONAS.every((p) => /^[\u0600-\u06FF\s.،؛؟!]+$/.test(p.locales.ar.nickname + p.locales.ar.tagline))) throw new Error("Arabic copy must be Arabic script");
 
-console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall, locales, es_nickname: persona.locales.es.nickname, pt_nickname: persona.locales.pt.nickname, ar_nickname: persona.locales.ar.nickname, fr_nickname: persona.locales.fr.nickname, de_nickname: persona.locales.de.nickname, it_nickname: persona.locales.it.nickname, ja_nickname: persona.locales.ja.nickname }));
+console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall, locales, es_nickname: persona.locales.es.nickname, pt_nickname: persona.locales.pt.nickname, ar_nickname: persona.locales.ar.nickname, fr_nickname: persona.locales.fr.nickname, de_nickname: persona.locales.de.nickname, it_nickname: persona.locales.it.nickname, ja_nickname: persona.locales.ja.nickname, ko_nickname: persona.locales.ko.nickname }));

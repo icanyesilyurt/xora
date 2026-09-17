@@ -950,6 +950,11 @@ var FUN_PERSONAS = [
         "nickname": "さりげない策士",
         "tagline": "穏やかに見えて、ちょっとしたいたずら心がある。",
         "comment": "みんなの意見がそろったところで、話の流れを変える質問をさらっと投げかける。あまりに落ち着いて言うので、本気なのか冗談なのか誰にもわからない。いちばん楽しいのは、最初に気づいた人と目を合わせて笑う瞬間だ。"
+      },
+      "ko": {
+        "nickname": "은근한 장난꾼",
+        "tagline": "차분해 보이지만 속에는 장난기가 있어요.",
+        "comment": "다들 같은 말을 하고 있을 때 흐름을 바꾸는 질문을 슬쩍 던져요. 너무 태연하게 말해서 진담인지 농담인지 아무도 확신하지 못하죠. 제일 즐거운 순간은 눈치챈 사람과 눈이 마주쳐 함께 웃을 때예요."
       }
     }
   },
@@ -1007,6 +1012,11 @@ var FUN_PERSONAS = [
         "nickname": "ツッコミ上手",
         "tagline": "真顔のまま、最後のひと言でひっくり返す。",
         "comment": "大げさな発表を聞くと、その中の矛盾にすぐ気づいてしまう。長々と反論するより、軽く皮肉を効かせた短いひと言を選ぶ。ネタの説明はしない。わかった人がくすっと笑えば、それで十分だ。"
+      },
+      "ko": {
+        "nickname": "촌철살인",
+        "tagline": "표정 하나 안 바꾸고 마지막 한마디로 뒤집어요.",
+        "comment": "거창한 이야기를 들으면 그 안의 모순이 먼저 눈에 들어와요. 길게 반박하는 대신 짧고 가볍게 비트는 한마디를 고르죠. 무슨 뜻인지 굳이 설명하지는 않아요. 알아들은 사람이 피식 웃으면 그걸로 충분하니까요."
       }
     }
   },
@@ -1064,6 +1074,11 @@ var FUN_PERSONAS = [
         "nickname": "知りたがり",
         "tagline": "ひとつの話が終わる前に、もう次の話題が気になっている。",
         "comment": "知らない話題が出ると、黙っているより質問したくなる。面白い答えがひとつ返ってくると、また次の疑問がわいてくる。少しでも詳しくなって帰れたら、それだけでいい一日になる。"
+      },
+      "ko": {
+        "nickname": "호기심 대장",
+        "tagline": "한 이야기가 끝나기도 전에 다음 주제가 궁금해져요.",
+        "comment": "모르는 이야기가 나오면 가만히 있기보다 질문부터 하게 돼요. 재미있는 답이 하나 돌아오면 곧바로 다음 궁금증이 생기죠. 조금이라도 더 알고 돌아가는 날은 그것만으로 괜찮은 하루가 됩니다."
       }
     }
   },
@@ -1121,6 +1136,11 @@ var FUN_PERSONAS = [
         "nickname": "真顔でボケる人",
         "tagline": "笑いどころは、あなたが決めたときにやってくる。",
         "comment": "とんでもないことを、コーヒーを注文するのと同じ調子でさらっと言う。周りが気づくまで、表情にはまったく出さない。笑いが遅れても説明はしない。その少しの間も、笑いの一部だからだ。"
+      },
+      "ko": {
+        "nickname": "무표정 개그",
+        "tagline": "웃을 타이밍은 당신이 정하는 대로 찾아와요.",
+        "comment": "말도 안 되는 이야기를 커피 주문하듯 담담하게 꺼내요. 주변이 알아챌 때까지 표정은 전혀 흔들리지 않죠. 웃음이 늦게 터져도 굳이 설명하지 않아요. 그 잠깐의 정적까지가 농담의 일부니까요."
       }
     }
   },
@@ -1178,6 +1198,11 @@ var FUN_PERSONAS = [
         "nickname": "自称哲学者",
         "tagline": "気軽な雑談が、いつの間にか深い話になっている。",
         "comment": "何気ない質問が、いつの間にか人生についての意外な持論に変わる。コーヒーが冷めても、もう一度考えを転がしてみるまで話を終わらせない。誰かが反論してくれたら、むしろ面白くなるのはそこからだ。"
+      },
+      "ko": {
+        "nickname": "자칭 철학자",
+        "tagline": "가벼운 잡담이 어느새 깊은 이야기가 돼요.",
+        "comment": "별생각 없이 던진 질문이 어느새 인생에 대한 의외의 지론으로 바뀝니다. 커피가 식어도 생각을 한 번 더 굴려보기 전에는 이야기를 끝내지 않아요. 누군가 반박해 주면 오히려 그때부터 더 재미있어집니다."
       }
     }
   },
@@ -1235,6 +1260,11 @@ var FUN_PERSONAS = [
         "nickname": "空気が読める人",
         "tagline": "何を言うかと同じくらい、いつ言うかを大事にしている。",
         "comment": "会話では、話している内容だけでなく、まだ話せていない人にも目を向けている。質問を振ったり話題を変えたり、その場に合わせて動ける。誰もが無理せず話せる空気になると、自分もいちばん楽しめる。"
+      },
+      "ko": {
+        "nickname": "눈치 백단",
+        "tagline": "무엇을 말하는지만큼 언제 말하는지를 중요하게 생각해요.",
+        "comment": "대화에서는 오가는 말뿐 아니라 아직 말하지 못한 사람도 함께 살펴요. 질문을 건네거나 화제를 돌리며 그 자리에 맞게 움직이죠. 누구나 부담 없이 말할 수 있는 분위기가 되면 스스로도 가장 즐거워집니다."
       }
     }
   },
@@ -1292,6 +1322,11 @@ var FUN_PERSONAS = [
         "nickname": "まとめ役",
         "tagline": "意見が違っても、けんかにはしない。",
         "comment": "議論が熱くなってきたら、本当の論点とその場の苛立ちを切り分ける。どちらかの味方をしなくても、筋の通った意見はちゃんと認められる。最後にみんなが少しでもわかり合えたら、それがいちばんの結末だ。"
+      },
+      "ko": {
+        "nickname": "중재 담당",
+        "tagline": "의견이 달라도 싸움으로는 가지 않아요.",
+        "comment": "논쟁이 뜨거워지면 진짜 쟁점과 그 자리의 짜증을 먼저 갈라놓아요. 어느 한쪽 편을 들지 않아도 말이 되는 의견은 제대로 인정해 주죠. 마지막에 모두가 조금이라도 서로를 이해하게 되면 그게 가장 좋은 결말입니다."
       }
     }
   },
@@ -1349,6 +1384,11 @@ var FUN_PERSONAS = [
         "nickname": "読み返し派",
         "tagline": "短い返事でも、送る前にもう一度見直す。",
         "comment": "ほんの短いメッセージでも、句点は冷たすぎるかな、ビックリマークは元気すぎるかなと考えてしまう。送る前に、相手がどう読むかを何度も想像する。結局いちばん最初の文を送って、自分の迷いにちょっと笑ってしまう。"
+      },
+      "ko": {
+        "nickname": "다시 읽는 사람",
+        "tagline": "짧은 답장도 보내기 전에 한 번 더 확인해요.",
+        "comment": "아주 짧은 메시지에도 마침표는 너무 차가운가 느낌표는 너무 들뜬가를 고민하게 돼요. 보내기 전에 상대가 어떻게 읽을지를 몇 번이나 그려봅니다. 결국 맨 처음 쓴 문장을 보내고 혼자 고민한 게 웃겨서 피식 웃어요."
       }
     }
   },
@@ -1406,6 +1446,11 @@ var FUN_PERSONAS = [
         "nickname": "静かな存在感",
         "tagline": "いちばん声が大きくなくても、ちゃんと印象に残る。",
         "comment": "沈黙をすべて言葉で埋めなくても平気だ。話すときは、短くても心に残るひと言を選ぶ。集まりが終わったあと、誰かがそのひと言を覚えていてくれるとうれしい。"
+      },
+      "ko": {
+        "nickname": "조용한 존재감",
+        "tagline": "가장 목소리가 크지 않아도 기억에는 남아요.",
+        "comment": "침묵을 전부 말로 채우지 않아도 괜찮아요. 입을 열 때는 짧아도 마음에 남는 한마디를 고릅니다. 모임이 끝난 뒤 누군가 그 한마디를 기억해 주면 그걸로 기쁘죠."
       }
     }
   },
@@ -1463,6 +1508,11 @@ var FUN_PERSONAS = [
         "nickname": "盛り上げ役",
         "tagline": "あなたがいると、輪に入るのが簡単になる。",
         "comment": "場が静かになってきたら、みんなが参加できるゲームや話題を持ち出す。誰かに気まずい思いをさせずに、自然と会話に巻き込むのが得意だ。予定が何度変わっても、誰も退屈していなければそれでいい。"
+      },
+      "ko": {
+        "nickname": "흥 담당",
+        "tagline": "당신이 있으면 사람들 사이에 끼기가 쉬워져요.",
+        "comment": "자리가 조용해지면 다 같이 할 수 있는 이야기나 놀이를 꺼내요. 누구도 어색하지 않게 자연스럽게 대화로 끌어들이는 데 익숙하죠. 계획이 몇 번 바뀌어도 아무도 지루하지 않으면 그걸로 충분합니다."
       }
     }
   },
@@ -1520,6 +1570,11 @@ var FUN_PERSONAS = [
         "nickname": "聞き上手",
         "tagline": "小さな話も、あなたと話すと長い会話になる。",
         "comment": "誰かに今日どうだったかを聞くとき、本当にその答えを聞きたいと思っている。ちょっとした話に興味を引かれて、「それで？」と続きを聞いてしまう。だから、あなたとのちょっとしたお茶は、たいてい長話になる。"
+      },
+      "ko": {
+        "nickname": "잘 듣는 사람",
+        "tagline": "사소한 이야기도 당신과 하면 길어져요.",
+        "comment": "오늘 어땠냐고 물을 때 정말로 그 대답이 궁금해서 물어요. 작은 이야기에도 관심이 생겨서 ‘그래서요?’ 하고 다음을 듣게 되죠. 그래서 당신과의 짧은 차 한잔은 대개 긴 수다가 됩니다."
       }
     }
   },
@@ -1577,6 +1632,11 @@ var FUN_PERSONAS = [
         "nickname": "オチ担当",
         "tagline": "どこを話せば面白くなるか、ちゃんとわかっている。",
         "comment": "いちばん面白いところは最後まで取っておき、出すタイミングを心得ている。ありふれた失敗談も、言葉選びひとつで何度でも聞きたい話になる。あとで誰かがあなたの『決めゼリフ』をまねしていたら、それが最高のほめ言葉だ。"
+      },
+      "ko": {
+        "nickname": "이야기꾼",
+        "tagline": "어디서 풀어야 재미있는지 정확히 알아요.",
+        "comment": "가장 재미있는 부분은 끝까지 아껴 두고 꺼낼 타이밍을 압니다. 흔한 실패담도 단어 하나만 바꾸면 몇 번이고 다시 듣고 싶은 이야기가 되죠. 나중에 누군가 당신의 ‘그 대사’를 따라 하고 있다면 그게 최고의 칭찬이에요."
       }
     }
   }
@@ -1621,8 +1681,8 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
   var comment = {
-    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de"), it: funModeComment(card, "mirror", "it"), ja: funModeComment(card, "mirror", "ja") },
-    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de"), it: funModeComment(card, "stalk", "it"), ja: funModeComment(card, "stalk", "ja") }
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de"), it: funModeComment(card, "mirror", "it"), ja: funModeComment(card, "mirror", "ja"), ko: funModeComment(card, "mirror", "ko") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de"), it: funModeComment(card, "stalk", "it"), ja: funModeComment(card, "stalk", "ja"), ko: funModeComment(card, "stalk", "ko") }
   };
   return {
     mode: actualMode,
@@ -1636,7 +1696,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     profile_emoji: card.emoji,
     comment: comment,
     card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it], ja:[comment[actualMode].ja] } },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it], ja:[comment[actualMode].ja], ko:[comment[actualMode].ko] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
@@ -1714,6 +1774,14 @@ var FUN_MATCH_COMMENTS = {
     "同じテーブルに座れば、伝説のコンビになるか、どちらかが通知を切るかのどちらかです。",
     "XORAはこの組み合わせを信じています。その自信がどこから来るのかは誰にもわかりません。",
     "科学には相手にされませんでした。それでもパーセンテージは出しておきました。"
+  ],
+  ko: [
+    "XORA의 전혀 과학적이지 않은 연구소는 이 두 사람을 유난히 재미있는 조합으로 판정했습니다.",
+    "이 수치는 아무것도 증명하지 못해요. 그래도 단체 대화방을 달구기에는 충분합니다.",
+    "카드는 장난인데 퍼센트만 이상하게 진지해 보이네요.",
+    "같은 자리에 앉으면 전설의 콤비가 되거나 한쪽이 알림을 끄거나 둘 중 하나예요.",
+    "XORA는 이 조합을 믿습니다. 그 자신감이 어디서 왔는지는 아무도 모르지만요.",
+    "과학은 이 건을 반려했어요. 그래도 퍼센트는 내드렸습니다."
   ]
 };
 
@@ -1737,7 +1805,7 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
     overall: overall,
     ci: commentIndex,
     source: "fun",
-    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex], de:FUN_MATCH_COMMENTS.de[commentIndex], it:FUN_MATCH_COMMENTS.it[commentIndex], ja:FUN_MATCH_COMMENTS.ja[commentIndex] },
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex], de:FUN_MATCH_COMMENTS.de[commentIndex], it:FUN_MATCH_COMMENTS.it[commentIndex], ja:FUN_MATCH_COMMENTS.ja[commentIndex], ko:FUN_MATCH_COMMENTS.ko[commentIndex] },
     meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
   };
 }
@@ -1745,9 +1813,9 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
-    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA", de: "XORA-Profil", it: "Profilo XORA", ja: "XORAプロフィール" },
-    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée.", de: "Analyse abgeschlossen.", it: "Analisi completata.", ja: "分析が完了しました。" },
-    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""], de: [""], it: [""], ja: [""] }
+    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA", de: "XORA-Profil", it: "Profilo XORA", ja: "XORAプロフィール", ko: "XORA 프로필" },
+    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée.", de: "Analyse abgeschlossen.", it: "Analisi completata.", ja: "分析が完了しました。", ko: "분석이 끝났습니다." },
+    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""], de: [""], it: [""], ja: [""], ko: [""] }
   };
 }
 
@@ -1833,6 +1901,14 @@ var MATCH_COMMENTS = {
     "{a}と{b}はお互いをチェックしているのに、フォローはしていない。勇気も臆病さもなく、ただのカオス。",
     "{a}はハートを送り、{b}は炎を送る。どちらも自分が何をしたいのかわかっていないけれど、相性は抜群。",
     "{a}が計画を立て、{b}がそれをひっくり返す。この2人はそのままラブコメになる。"
+  ],
+  ko: [
+    "{a}가 메시지를 보내고 {b}는 읽고도 답이 없어요. 그런데 둘 다 새벽 3시에 서로의 프로필을 보고 있죠. 흔한 이야기입니다.",
+    "이 두 계정의 연애는 좋아요로 시작해서 드라마로 끝나요. XORA는 이미 팝콘을 준비했습니다.",
+    "{a}는 진심을 담아 쓰고 {b}는 농담으로 받아쳐요. 이 긴장감은 연애가 되거나 차단으로 끝나거나 둘 중 하나입니다.",
+    "{a}와 {b}는 서로를 확인하면서도 팔로우는 하지 않아요. 용기도 소심함도 아니고 그냥 혼돈입니다.",
+    "{a}는 하트를 보내고 {b}는 불을 보내요. 둘 다 자기가 뭘 원하는지 모르지만 합은 확실히 좋습니다.",
+    "{a}가 계획을 세우면 {b}가 뒤엎어요. 이 둘은 그대로 로맨틱 코미디가 됩니다."
   ]
 };
 
@@ -1955,6 +2031,14 @@ var THINKING = {
       "矛盾点をメモしています...",
       "くり返し出てくるサインを分析中...",
       "XORAはちょっと正直すぎることがあります。心の準備を。"
+    ],
+    ko: [
+      "타임라인의 먼지를 털고 있어요...",
+      "새벽 3시 게시글은 못 본 척하려고 했는데... 실패했어요.",
+      "행동 패턴을 살펴보는 중...",
+      "모순되는 부분을 적어두고 있어요...",
+      "반복해서 나타나는 신호를 분석 중...",
+      "XORA는 가끔 너무 솔직해요. 마음의 준비를 하세요."
     ]
   },
   stalk: {
@@ -2029,6 +2113,14 @@ var THINKING = {
       "これは私から聞いたって言わないでくださいね...",
       "フォローしている相手も見ました。いろいろわかります。",
       "見つけたことは、あなたにだけ教えます。"
+    ],
+    ko: [
+      "조용히 프로필에 들어갑니다...",
+      "발자국은 남기지 않아요. 안심하세요.",
+      "음. 좋아요 기록이 흥미롭네요.",
+      "저한테 들었다고 하면 안 돼요...",
+      "팔로우하는 계정도 봤어요. 꽤 많은 게 보이네요.",
+      "찾아낸 건 당신에게만 알려드릴게요."
     ]
   },
   match: {
@@ -2103,6 +2195,14 @@ var THINKING = {
       "リプライ履歴に緊張感を検出。",
       "相性を計算中。白衣を着ました。",
       "結果にどちらかががっかりするかも。発表します。"
+    ],
+    ko: [
+      "두 타임라인을 나란히 놓는 중...",
+      "겹치는 좋아요를 찾고 있어요... 흥미롭네요.",
+      "한쪽은 낮형, 다른 쪽은 밤형. 적어뒀습니다.",
+      "답글 기록에서 긴장감이 감지됐어요.",
+      "궁합 계산 중. 가운도 챙겨 입었습니다.",
+      "결과에 둘 중 하나는 실망할 수도 있어요. 발표합니다."
     ]
   }
 };
