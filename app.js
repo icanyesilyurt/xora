@@ -572,7 +572,7 @@ function saveAnalysisLocalOnly(type, handles, result) {
     id: "analysis_local_" + Date.now(),
     userId: user.id,
     type: type,
-    title: result && result.nickname ? (result.nickname[getLang()] || result.nickname.tr || null) : null,
+    title: result && result.nickname ? (result.nickname[getLang()] || (result.meta && result.nickname[result.meta.locale]) || result.nickname.tr || null) : null,
     handles: handles || [],
     result: result,
     createdAt: new Date().toISOString()

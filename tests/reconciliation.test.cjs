@@ -21,7 +21,7 @@ async function setup(){
  grant usage,select on all sequences in schema public to anon,authenticated,service_role;
  grant execute on function public.xora_begin_paid_attempt(uuid,text,text,integer,text,jsonb),public.xora_complete_paid_attempt(uuid,text),public.xora_refund_paid_attempt(uuid,text,text) to anon,authenticated;
  insert into auth.users values('${A}'),('${B}'),('00000000-0000-4000-8000-000000000003');insert into public.users(id,username,credit_balance) values('${A}','alice',100),('${B}','bob',100);insert into public.analyses(user_id,analysis_type,title,result) values('${B}','mirror','Bob old','{"meta":{"tier":"fun"}}');insert into public.x_cache(x_user_id,username,expires_at) values('x1','alice',now()+interval '1 day');`);
- await db.exec(MIG);await db.exec(fs.readFileSync('supabase/migrations/20260914195000_xora_real_validation_fix.sql','utf8'));await db.exec(fs.readFileSync('supabase/migrations/20260914201000_xora_claim_referral_compat.sql','utf8'));await db.exec(fs.readFileSync('supabase/migrations/20260916120000_xora_real_locale_es.sql','utf8'));return db;
+ await db.exec(MIG);await db.exec(fs.readFileSync('supabase/migrations/20260914195000_xora_real_validation_fix.sql','utf8'));await db.exec(fs.readFileSync('supabase/migrations/20260914201000_xora_claim_referral_compat.sql','utf8'));await db.exec(fs.readFileSync('supabase/migrations/20260916120000_xora_real_planned_locales.sql','utf8'));return db;
 }
 const q=(db,sql,args=[])=>db.query(sql,args).then(x=>x.rows);
 async function role(db,name,user){await db.exec('reset role');await db.exec(`set role ${name}`);if(user) await db.exec(`select set_config('request.user_id','${user}',false)`);}
@@ -104,21 +104,29 @@ test('Task 04C exact Mirror ledger and strict rarity across all modes',async()=>
  }finally{await db.close();}
 });
 
-test('locale contract accepts tr/en/es and still rejects anything else',async()=>{
+test('planned locale DB contract accepts all 12 locales once and still rejects anything else',async()=>{
+ const planned=['tr','en','es','pt','it','fr','de','ru','ja','ko','zh','ar'];
  const db=await setup();try{
+  const constraint=(await q(db,`select pg_get_constraintdef(oid) as def from pg_constraint where conname='real_requests_locale_check'`))[0].def;
+  for(const locale of planned) assert.match(constraint,new RegExp(`'${locale}'`),locale+' in table constraint');
+  assert.equal((constraint.match(/'[a-z]{2}'/g)||[]).length,planned.length,'constraint lists exactly the planned locales');
   await role(db,'service_role',A);
-  for(const locale of ['tr','en','es']){
+  for(const locale of planned){
    const ref=`ref-locale-${locale}`;
-   assert.equal((await q(db,'select public.xora_begin_real($1,$2,$3,$4,$5) as v',[A,ref,'mirror',locale,'["alice"]']))[0].v.status,'claimed');
+   assert.equal((await q(db,'select public.xora_begin_real($1,$2,$3,$4,$5) as v',[A,ref,'mirror',locale,'["alice"]']))[0].v.status,'claimed',locale);
    assert.equal((await q(db,'select locale from public.real_requests where reference=$1',[ref]))[0].locale,locale);
-   // Spanish results title the saved analysis from the Spanish nickname, like the other locales.
-   const result=JSON.stringify({meta:{tier:'real',locale},rarity:{name:'rare'},nickname:{tr:'Meraklı Biri',en:'Curious Mind',es:'Mente Curiosa'}});
+   // REAL results carry copy only for their own locale; the saved title reads that locale's nickname.
+   const result=JSON.stringify({meta:{tier:'real',locale},rarity:{name:'rare'},nickname:{[locale]:`Nick ${locale}`}});
    assert.equal((await q(db,'select public.xora_complete_real($1,$2,$3) as v',[A,ref,result]))[0].v.status,'succeeded');
+   assert.equal((await q(db,`select title from public.analyses where result->'meta'->>'locale'=$1`,[locale]))[0].title,`Nick ${locale}`);
   }
-  assert.equal((await q(db,`select title from public.analyses where result->'meta'->>'locale'='es'`))[0].title,'Mente Curiosa');
-  for(const bad of ['fr','ES','es-ES','de']) await assert.rejects(q(db,'select public.xora_begin_real($1,$2,$3,$4,$5)',[A,'ref-bad-locale',  'mirror',bad,'["alice"]']),/bad_request/);
-  // The table constraint rejects an unsupported locale even on a direct service insert.
-  await assert.rejects(db.exec(`insert into public.real_requests(user_id,reference,mode,locale,handles,cost,status) values('${A}','ref-direct-1','mirror','fr','["alice"]',5,'pending')`));
+  // Pricing is unchanged by locale: 12 mirror claims debit 5 each.
+  assert.equal(Number((await q(db,`select credit_balance from public.users where id='${A}'`))[0].credit_balance),100-planned.length*5);
+  for(const bad of ['xx','ES','es-ES','pt-BR','zh-Hans','',' tr']) await assert.rejects(q(db,'select public.xora_begin_real($1,$2,$3,$4,$5)',[A,'ref-bad-locale','mirror',bad,'["alice"]']),/bad_request/,JSON.stringify(bad));
+  // The table constraint rejects an unplanned locale even on a direct service insert.
+  await assert.rejects(db.exec(`insert into public.real_requests(user_id,reference,mode,locale,handles,cost,status) values('${A}','ref-direct-1','mirror','xx','["alice"]',5,'pending')`));
+  // A replay with a different locale is still a conflict, not a second debit.
+  await assert.rejects(q(db,'select public.xora_begin_real($1,$2,$3,$4,$5)',[A,'ref-locale-es','mirror','pt','["alice"]']),/request_conflict/);
  } finally {await db.close();}
 });
 

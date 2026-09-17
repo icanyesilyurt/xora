@@ -1,14 +1,19 @@
--- Spanish REAL support: widen the locale contract from tr/en to tr/en/es.
--- No behavior, pricing or credit changes; only the accepted locale values.
+-- REAL locale contract: accept every planned locale once, so adding a language later
+-- needs no further migration. Only the accepted locale values change; pricing, credits,
+-- idempotency and result validation are untouched.
+-- Planned: tr, en, es, pt, it, fr, de, ru, ja, ko, zh, ar.
+-- The edge function still decides which of these are actually served.
 
 alter table public.real_requests drop constraint if exists real_requests_locale_check;
-alter table public.real_requests add constraint real_requests_locale_check check (locale in ('tr','en','es'));
+alter table public.real_requests add constraint real_requests_locale_check
+  check (locale in ('tr','en','es','pt','it','fr','de','ru','ja','ko','zh','ar'));
 
 create or replace function public.xora_begin_real(p_user_id uuid,p_reference text,p_mode text,p_locale text,p_handles jsonb)
 returns jsonb language plpgsql security definer set search_path=public as $$
 declare v real_requests%rowtype; v_cost integer; v_balance integer;
 begin
-  if p_reference is null or p_reference !~ '^[a-zA-Z0-9_-]{8,80}$' or p_mode not in ('mirror','stalk','match') or p_locale not in ('tr','en','es') then raise exception 'bad_request'; end if;
+  if p_reference is null or p_reference !~ '^[a-zA-Z0-9_-]{8,80}$' or p_mode not in ('mirror','stalk','match')
+     or p_locale not in ('tr','en','es','pt','it','fr','de','ru','ja','ko','zh','ar') then raise exception 'bad_request'; end if;
   if p_handles is null or jsonb_typeof(p_handles)<>'array' or jsonb_array_length(p_handles)<>(case when p_mode='match' then 2 else 1 end) then raise exception 'bad_request'; end if;
   if exists(select 1 from jsonb_array_elements_text(p_handles) h where h !~ '^[a-z0-9_]{1,15}$') then raise exception 'bad_request'; end if;
   if p_mode='match' and p_handles->>0=p_handles->>1 then raise exception 'bad_request'; end if;

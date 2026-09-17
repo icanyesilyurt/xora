@@ -1,6 +1,6 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {edge,profileAI,matchAI,browser}=require('./helpers.cjs');
+const {edge,profileAI,matchAI,browser,AI_COPY}=require('./helpers.cjs');
 
 const envFor=provider=>({SUPABASE_URL:'http://local.test',SUPABASE_ANON_KEY:'test-anon',SUPABASE_SERVICE_ROLE_KEY:'test-service',AI_PROVIDER:provider,AI_MODEL:'mock-model',AI_API_KEY:'mock-generic-key',OPENAI_API_KEY:'mock-openai-key',ANTHROPIC_API_KEY:'mock-anthropic-key'});
 const envelope=(provider,raw)=>provider==='openai'
@@ -13,7 +13,7 @@ function fixture(provider,{mutate,wrap,responseStatus=200,env={}}={}) {
   async rpc(name,args){rpcCalls.push({name,args});if(name==='xora_begin_real')return {data:{status:'claimed'}};if(name==='xora_claim_referral')return {data:null};if(name==='xora_complete_real')return {data:{result:args.p_result,balance:15}};if(name==='xora_fail_real')return {data:{status:'failed',balance:20}};throw Error('Unexpected RPC');}
  };
  const e=edge({Deno:{env:{get:k=>config[k]}},console:{warn:(...v)=>logs.push(v),error:(...v)=>logs.push(v),log:(...v)=>logs.push(v)},createClient:(_url,key)=>key==='test-anon'?{auth:{getUser:async()=>({data:{user:{id:'test-user'}}})}}:service,
-  fetch:async(url,options)=>{requests.push({url,options});const body=JSON.parse(options.body);const data=JSON.parse(provider==='openai'?body.input[0].content:body.messages[0].content);const raw=data.profile_a?matchAI():profileAI();if(mutate)mutate(raw);return Response.json(wrap?wrap(raw):envelope(provider,raw),{status:responseStatus});}
+  fetch:async(url,options)=>{requests.push({url,options});const body=JSON.parse(options.body);const data=JSON.parse(provider==='openai'?body.input[0].content:body.messages[0].content);const raw=data.profile_a?matchAI(data.locale):profileAI(data.locale);if(mutate)mutate(raw);return Response.json(wrap?wrap(raw):envelope(provider,raw),{status:responseStatus});}
  });
  return {e,requests,rpcCalls,logs};
 }
@@ -36,24 +36,24 @@ for(const provider of ['openai','anthropic']) {
   }
  });
  test(`${provider}: malformed metrics, sample-count copy and shape errors refund without retry`,async()=>{
-  for(const mode of ['mirror','stalk','match']) for(const mutate of [raw=>raw.metrics[0].key='not_allowed',raw=>raw.metrics[0].value=101,raw=>raw.metrics[0].value='70',raw=>raw.metrics[1].key=raw.metrics[0].key,raw=>raw.comment_en='25 posts analyzed.',raw=>raw.comment_tr='20 paylaşım incelendi.',raw=>raw.comment_es='Se analizaron 25 publicaciones.',raw=>delete raw.comment_en,raw=>delete raw.comment_es]) {
+  for(const mode of ['mirror','stalk','match']) for(const mutate of [raw=>raw.metrics[0].key='not_allowed',raw=>raw.metrics[0].value=101,raw=>raw.metrics[0].value='70',raw=>raw.metrics[1].key=raw.metrics[0].key,raw=>raw.comment='25 posts analyzed.',raw=>raw.comment='20 paylaşım incelendi.',raw=>raw.comment='Se analizaron 25 publicaciones.',raw=>delete raw.comment]) {
    const f=fixture(provider,{mutate});assert.equal((await f.e.main(req(mode))).status,500);assert.equal(f.requests.length,1);assert.equal(f.rpcCalls.filter(v=>v.name==='xora_complete_real').length,0);assert.equal(f.rpcCalls.filter(v=>v.name==='xora_fail_real').length,1);
    assert.doesNotMatch(JSON.stringify(f.logs),/mock-(?:openai|anthropic|generic)-key|UNTRUSTED_DATA_MARKER/);
   }
  });
  test(`${provider}: aliases allow novel natural phrases only with active evidence`,async()=>{
   const rejected=[
-   [{tr:'Kozmik Salatalık',en:'Cosmic Cucumber',es:'Pepino Cósmico',evidence:'question_ratio'}],
-   [{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',es:'Conversador Atento',evidence:'invented'}],
-   [{tr:'Reply Avcısı',en:'Reply Hunter',es:'Cazador de Respuestas',evidence:'reply_ratio'}],
-   [{tr:'Çok Fazla Uzun Kelimeli İsim',en:'Far Too Many Alias Words',es:'Demasiadas Palabras Para Un Apodo',evidence:'question_ratio'}],
-   [{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',es:'Máquina de Preguntas',evidence:'question_ratio'}]
+   [{text:'Cosmic Cucumber',evidence:'question_ratio'}],
+   [{text:'Thoughtful Conversationalist',evidence:'invented'}],
+   [{text:'Reply Hunter',evidence:'reply_ratio'}],
+   [{text:'Far Too Many Alias Words',evidence:'question_ratio'}],
+   [{text:'Soru Makinesi',evidence:'question_ratio'}]
   ];
   for(const candidates of rejected) {
-   const f=fixture(provider,{mutate:raw=>{raw.nickname_candidates=candidates;}});const response=await f.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'fallback');assert.equal(result.nickname.en,'Curious Mind');assert.equal(result.nickname.es,'Mente Curiosa');assert.match(JSON.stringify(f.logs),/nickname_fallback/);
+   const f=fixture(provider,{mutate:raw=>{raw.nickname_candidates=candidates;}});const response=await f.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'fallback');assert.deepEqual(Object.keys(result.nickname),['en']);assert.equal(result.nickname.en,'Curious Mind');assert.match(JSON.stringify(f.logs),/nickname_fallback/);
   }
-  const accepted=fixture(provider,{mutate:raw=>{raw.nickname_candidates=[{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',es:'Conversador Atento',evidence:'question_ratio'}];}});
-  const response=await accepted.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'ai_generated_validated');assert.equal(result.nickname.tr,'Meraklı Muhabbetçi');assert.equal(result.nickname.en,'Thoughtful Conversationalist');assert.equal(result.nickname.es,'Conversador Atento');
+  const accepted=fixture(provider,{mutate:raw=>{raw.nickname_candidates=[{text:'Thoughtful Conversationalist',evidence:'question_ratio'}];}});
+  const response=await accepted.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'ai_generated_validated');assert.deepEqual(Object.keys(result.nickname),['en']);assert.equal(result.nickname.en,'Thoughtful Conversationalist');
  });
  test(`${provider}: HTTP failure, refusal/truncation and malformed JSON use existing refund`,async()=>{
   const cases=provider==='openai'
@@ -74,32 +74,61 @@ test('missing/unsupported provider and missing key/model fail before debit, X or
   }
  }
 });
-test('REAL accepts the es locale end to end and renders Spanish cards without TR/EN fallback',async()=>{
- for(const mode of ['mirror','stalk','match']){
-  const f=fixture('anthropic');const response=await f.e.main(req(mode,'es'));
-  assert.equal(response.status,200);
+test('REAL requests produce copy only for their own locale (tr, en, es) through both providers',async()=>{
+ for(const provider of ['openai','anthropic'])for(const locale of ['tr','en','es'])for(const mode of ['mirror','stalk','match']){
+  const f=fixture(provider);const response=await f.e.main(req(mode,locale));
+  assert.equal(response.status,200,provider+' '+locale+' '+mode);
   const {result}=await response.json();
-  assert.equal(result.meta.locale,'es');
-  assert.equal(f.rpcCalls.find(v=>v.name==='xora_begin_real').args.p_locale,'es');
-  // The model is asked for native Spanish, not a translation of the English field.
-  const instruction=JSON.parse(JSON.parse(f.requests[0].options.body).messages[0].content);
-  assert.equal(instruction.locale,'es');
-  if(mode!=='match') assert.ok(instruction.rules.some(rule=>/neutral international Spanish/.test(rule)));
-  const c=browser();c.localStorage.setItem(c.LS.lang,'es');
+  assert.equal(result.meta.locale,locale);
+  assert.equal(f.rpcCalls.find(v=>v.name==='xora_begin_real').args.p_locale,locale);
+  const body=JSON.parse(f.requests[0].options.body);
+  const instruction=JSON.parse(provider==='openai'?body.input[0].content:body.messages[0].content);
+  assert.equal(instruction.locale,locale);
+  assert.equal(instruction.output_language,f.e.REAL_LOCALES[locale].language);
+  // The output contract names one comment/tagline/summary, never one per language.
+  assert.doesNotMatch(JSON.stringify(instruction.output_schema),/_(?:tr|en|es)"|"(?:tr|en|es)":/);
+  const system=provider==='openai'?body.instructions:body.system;
+  assert.match(system,/only in output_language; never add other languages/);
+  const copy=AI_COPY[locale];
+  const otherCopies=Object.entries(AI_COPY).filter(([k])=>k!==locale).map(([,v])=>v);
+  const serialized=JSON.stringify(result);
+  for(const other of otherCopies) for(const text of [other.nickname,other.comment,other.tagline,other.match]) assert.equal(serialized.includes(text),false,'result must not carry another locale: '+text);
+  if(mode==='match'){assert.deepEqual(Object.keys(result.ai_comment),[locale]);assert.equal(result.ai_comment[locale],copy.match);assert.deepEqual(Object.keys(result.resA.nickname),[locale]);}
+  else {
+   assert.deepEqual(Object.keys(result.nickname),[locale]);assert.deepEqual(Object.keys(result.comment.mirror),[locale]);
+   if(locale==='es') assert.ok(instruction.nickname_style_examples.includes('Mente Curiosa'));
+  }
+  // The card renders from the active-locale copy alone.
+  const c=browser();c.localStorage.setItem(c.LS.lang,locale);
   const html=mode==='match'?c.buildMatchCard(result):c.buildIdentityCard(result);
   assert.match(html,/XORA REAL/);
-  if(mode==='match') assert.ok(html.includes(c.esc('Las dos cuentas hacen preguntas.')));
-  else {
-   assert.ok(html.includes(c.esc('Mente Curiosa')));
-   assert.ok(html.includes(c.esc('Abres las conversaciones con preguntas.')));
-   assert.ok(!html.includes(c.esc('You open conversations with questions.')),'no EN fallback in ES REAL card');
-   assert.ok(!html.includes(c.esc('Sorularla konuşmayı açıyorsun.')),'no TR fallback in ES REAL card');
-  }
+  if(mode==='match') assert.ok(html.includes(c.esc(copy.match)));
+  else {assert.ok(html.includes(c.esc(copy.nickname)));assert.ok(html.includes(c.esc(copy.comment)));assert.ok(html.includes(c.esc(copy.tagline)));assert.ok(html.includes(c.esc(copy.label)));}
+  assert.match(mode==='match'?c.shareMatchText(result):c.shareIdentityText(result),/XORA REAL/);
+  if(mode!=='match') assert.ok(c.shareIdentityText(result).includes(copy.nickname));
  }
- // An unsupported locale is still rejected before any billing or provider call.
- const rejected=fixture('anthropic');
- assert.equal((await rejected.e.main(req('mirror','fr'))).status,400);
- assert.equal(rejected.requests.length,0);assert.equal(rejected.rpcCalls.length,0);
+ // Unsupported and planned-but-unserved locales are rejected before any billing or provider call.
+ for(const locale of ['fr','pt','ar','xx']){
+  const rejected=fixture('anthropic');
+  assert.equal((await rejected.e.main(req('mirror',locale))).status,400);
+  assert.equal(rejected.requests.length,0);assert.equal(rejected.rpcCalls.length,0);
+ }
+});
+test('single-locale REAL cards stay readable when the UI language differs, without inventing translations',async()=>{
+ const f=fixture('anthropic');const {result}=await (await f.e.main(req('mirror','es'))).json();
+ const m=fixture('anthropic');const {result:match}=await (await m.e.main(req('match','es'))).json();
+ for(const lang of ['tr','en']){
+  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
+  const html=c.buildIdentityCard(result);
+  assert.ok(html.includes(c.esc(AI_COPY.es.nickname)) && html.includes(c.esc(AI_COPY.es.comment)),'generated Spanish copy shown instead of blanks');
+  assert.ok(!html.includes(c.esc(AI_COPY[lang].comment)),'no translated copy invented');
+  assert.ok(html.includes(c.esc(c.t('real_label'))));
+  assert.ok(c.buildMatchCard(match).includes(c.esc(AI_COPY.es.match)));
+  const text=[];const ctx=new Proxy({measureText:v=>({width:String(v).length*10}),fillText:v=>text.push(String(v)),createLinearGradient:()=>({addColorStop(){}})},{get:(o,k)=>k in o?o[k]:()=>{}});c.document.createElement=()=>({getContext:()=>ctx});
+  c.renderIdentityPNG(result);assert.ok(text.join(' ').includes(AI_COPY.es.nickname),'PNG export renders generated copy');
+  // Stored result is not mutated by the render-time view.
+  assert.deepEqual(Object.keys(result.nickname),['es']);
+ }
 });
 test('OpenAI parses structured output and Anthropic retains fenced JSON support',async()=>{
  const raw=profileAI();for(const provider of ['openai','anthropic']){const f=fixture(provider);assert.deepEqual(JSON.parse(JSON.stringify(f.e.parseProviderResult(envelope(provider,raw),provider))),raw);}

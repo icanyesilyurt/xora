@@ -825,7 +825,25 @@ function cardPresentationCopy(value, key) {
   }
   return value;
 }
+// REAL AI copy is generated only in the request locale ({es: "..."}). Renderers read copy[activeLang],
+// so project the generated text onto the active language instead of rendering blanks.
+// UI chrome (buttons, labels, rarity) still follows the active language.
+var PLANNED_LOCALES = ["tr","en","es","pt","it","fr","de","ru","ja","ko","zh","ar"];
+function realLocaleView(value, lang, source) {
+  if (Array.isArray(value)) return value.map(function(v){return realLocaleView(v,lang,source);});
+  if (!value || typeof value !== "object") return value;
+  var keys=Object.keys(value), copy={};
+  keys.forEach(function(k){copy[k]=realLocaleView(value[k],lang,source);});
+  var localizedCopy=keys.length>0 && keys.every(function(k){return PLANNED_LOCALES.indexOf(k)>=0;});
+  if (localizedCopy && copy[lang]===undefined) copy[lang]=copy[copy[source]!==undefined ? source : keys[0]];
+  return copy;
+}
+function realCopyForActiveLang(result) {
+  if (resultTier(result) !== "real") return result;
+  var lang=(typeof getLang === "function") ? getLang() : "tr";
+  return realLocaleView(result, lang, result.meta && result.meta.locale);
+}
 ["buildIdentityCard","buildMatchCard","renderIdentityPNG","renderMatchPNG","shareIdentityText","shareMatchText"].forEach(function(name){
   var original=window[name];
-  window[name]=function(result){return original(cardPresentationCopy(result));};
+  window[name]=function(result){return original(cardPresentationCopy(realCopyForActiveLang(result)));};
 });

@@ -192,3 +192,36 @@ test('Mirror/Stalk/Match screens are Spanish from first paint, before any sessio
   if(name==='match') assert.ok(card.includes(c.esc(c.t('match_overall'))),'ES match card labels');
  }
 });
+test('static FUN personas keep TR/EN/ES copy and are untouched by the single-locale REAL view',()=>{
+ const c=browser();
+ for(const p of c.FUN_PERSONAS) assert.deepEqual(Object.keys(p.locales).sort(),['en','es','tr']);
+ for(const lang of ['tr','en','es']){
+  c.localStorage.setItem(c.LS.lang,lang);
+  for(let nonce=0;nonce<12;nonce++){
+   const fun=c.analyzeFunHandle('alice',nonce%2?'stalk':'mirror',nonce);
+   assert.equal(c.realCopyForActiveLang(fun),fun,'FUN results are passed through unchanged');
+   const copy=c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[lang];
+   const html=c.buildIdentityCard(fun);
+   assert.ok(html.includes(c.esc(copy.nickname)) && html.includes(c.esc(copy.tagline)) && html.includes(c.esc(copy.comment)),lang+' '+fun.persona_id);
+   for(const other of ['tr','en','es'].filter(l=>l!==lang)) assert.ok(!html.includes(c.esc(c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[other].comment)));
+  }
+  const m=c.matchFunHandles('alice','bob',3);
+  assert.equal(c.realCopyForActiveLang(m),m);
+  assert.deepEqual(Object.keys(m.fun_comment).sort(),['en','es','tr']);
+  assert.ok(c.buildMatchCard(m).includes(c.esc(m.fun_comment[lang])));
+ }
+});
+test('legacy multi-locale REAL results render unchanged; the view only fills a missing active locale',()=>{
+ const c=browser();
+ const legacy={meta:{tier:'real',locale:'tr'},rarity:{name:'rare'},handle:'alice',hash:1,nickname:{tr:'Meraklı Biri',en:'Curious Mind'},tagline:{tr:'Sorularla ilerliyor.',en:'Questions lead the way.'},comment:{mirror:{tr:'Sorularla konuşmayı açıyorsun.',en:'You open conversations with questions.'}},card:{nickname:{tr:'Meraklı Biri',en:'Curious Mind'},desc:{tr:'Sorularla ilerliyor.',en:'Questions lead the way.'},emoji:'🪞',color:'#0FAFAF',top_behaviors:[{key:'merak',label:{tr:'Merak',en:'Curiosity'},value:80}]}};
+ for(const [lang,nick,label] of [['tr','Meraklı Biri','Merak'],['en','Curious Mind','Curiosity']]){
+  c.localStorage.setItem(c.LS.lang,lang);
+  const view=c.realCopyForActiveLang(legacy);
+  assert.equal(JSON.stringify(view),JSON.stringify(legacy),lang+' view is identical when the locale exists');
+  const html=c.buildIdentityCard(legacy);assert.ok(html.includes(c.esc(nick)) && html.includes(c.esc(label)));
+ }
+ c.localStorage.setItem(c.LS.lang,'es');
+ const es=c.realCopyForActiveLang(legacy);
+ assert.equal(es.nickname.es,'Meraklı Biri','falls back to the generated locale, not an invented translation');
+ assert.deepEqual(Object.keys(legacy.nickname),['tr','en'],'stored result is not mutated');
+});

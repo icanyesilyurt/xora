@@ -62,16 +62,22 @@ test('nickname guard rejects forced compounds and sensitive labels in every loca
 test('REAL fallback is safe, deterministic and signal based without another AI call',()=>{
  const e=edge({console:{warn(){}}});
  const cases=[{}, {reply_ratio:.5},{avg_text_length:180},{emoji_per_post:2},{question_ratio:.5},{vocabulary_diversity:.8},{original_ratio:.8},{quote_ratio:.2},{repost_ratio:.5},{exclamation_ratio:.3},{own_posts:10}];
- for(const signals of cases){
-  const a=e.pickAliasPair({nickname_candidates:[]},signals);
-  const b=e.pickAliasPair({nickname_candidates:[{tr:'Soru Makinesi',en:'Question Machine',es:'Máquina de Preguntas',evidence:'question_ratio'}]},signals);
+ const unnatural={tr:'Soru Makinesi',en:'Question Machine',es:'Máquina de Preguntas'};
+ for(const signals of cases)for(const locale of ['tr','en','es']){
+  const a=e.pickAlias({nickname_candidates:[]},signals,locale);
+  const b=e.pickAlias({nickname_candidates:[{text:unnatural[locale],evidence:'question_ratio'}]},signals,locale);
   assert.equal(a.source,'fallback');assert.equal(JSON.stringify(a),JSON.stringify(b));
-  for(const lang of ['tr','en','es'])assert.equal(e.aliasValid(a[lang],lang),true,a[lang]);
+  assert.equal(e.aliasValid(a.text,locale),true,a.text);
  }
  const signals={question_ratio:.7};
- // One unnatural or missing locale sinks the whole candidate, Spanish included.
- for(const candidate of [{tr:'Meraklı Biri',en:'Question Machine',es:'Mente Curiosa'},{tr:'Soru Makinesi',en:'Curious Mind',es:'Mente Curiosa'},{tr:'Meraklı Biri',en:'Curious Mind',es:'Máquina de Preguntas'},{tr:'Meraklı Biri',en:'Curious Mind'}]){
-  assert.equal(e.pickAliasPair({nickname_candidates:[{...candidate,evidence:'question_ratio'}]},signals).source,'fallback');
+ // Candidates are judged only by the request locale's quality gate; a wrong-language name is rejected.
+ for(const [locale,text] of [['tr','Question Machine'],['tr','Soru Makinesi'],['en','Soru Makinesi'],['en','Question Machine'],['es','Curious Mind'],['es','Máquina de Preguntas'],['es','']]){
+  assert.equal(e.pickAlias({nickname_candidates:[{text,evidence:'question_ratio'}]},signals,locale).source,'fallback',locale+': '+text);
  }
- assert.equal(e.pickAliasPair({nickname_candidates:[{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',es:'Conversador Atento',evidence:'question_ratio'}]},signals).source,'ai_generated_validated');
+ for(const [locale,text] of [['tr','Meraklı Muhabbetçi'],['en','Thoughtful Conversationalist'],['es','Conversador Atento']]){
+  const picked=e.pickAlias({nickname_candidates:[{text,evidence:'question_ratio'}]},signals,locale);
+  assert.equal(picked.source,'ai_generated_validated');assert.equal(picked.text,text);
+ }
+ // A candidate no longer needs names in other locales to be accepted.
+ assert.equal(e.pickAlias({nickname_candidates:[{text:'Conversador Atento',evidence:'question_ratio'}]},signals,'es').source,'ai_generated_validated');
 });

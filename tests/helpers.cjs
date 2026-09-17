@@ -18,7 +18,12 @@ function browser() {
  context.esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
  return context;
 }
-const metrics=['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label_tr:'Yorum',label_en:'Comment',label_es:'Comentario',value:70}));
-const profileAI=()=>({nickname_candidates:[{tr:'Meraklı Biri',en:'Curious Mind',es:'Mente Curiosa',evidence:'question_ratio'}],metrics:structuredClone(metrics),tagline_tr:'Sorularla ilerliyor.',tagline_en:'Questions lead the way.',tagline_es:'Avanza a base de preguntas.',summary_tr:'Açık sorular soruyor.',summary_en:'Asks open questions.',summary_es:'Hace preguntas abiertas.',comment_tr:'Sorularla konuşmayı açıyorsun.',comment_en:'You open conversations with questions.',comment_es:'Abres las conversaciones con preguntas.',observations:['Uses questions.'],emoji:'🪞'});
-const matchAI=()=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment_tr:'İki hesap da soru soruyor.',comment_en:'Both accounts ask questions.',comment_es:'Las dos cuentas hacen preguntas.'});
-module.exports={edge,browser,profileAI,matchAI};
+// AI fixtures return user-facing copy in exactly one locale, like the real provider contract.
+const AI_COPY={
+ tr:{nickname:'Meraklı Biri',tagline:'Sorularla ilerliyor.',summary:'Açık sorular soruyor.',comment:'Sorularla konuşmayı açıyorsun.',label:'Yorum',observation:'Soru soruyor.',match:'İki hesap da soru soruyor.'},
+ en:{nickname:'Curious Mind',tagline:'Questions lead the way.',summary:'Asks open questions.',comment:'You open conversations with questions.',label:'Comment',observation:'Uses questions.',match:'Both accounts ask questions.'},
+ es:{nickname:'Mente Curiosa',tagline:'Avanza a base de preguntas.',summary:'Hace preguntas abiertas.',comment:'Abres las conversaciones con preguntas.',label:'Comentario',observation:'Hace preguntas.',match:'Las dos cuentas hacen preguntas.'}
+};
+const profileAI=(locale='en')=>{const c=AI_COPY[locale];return {nickname_candidates:[{text:c.nickname,evidence:'question_ratio'}],metrics:['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label:c.label,value:70})),tagline:c.tagline,summary:c.summary,comment:c.comment,observations:[c.observation],emoji:'🪞'};};
+const matchAI=(locale='en')=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment:AI_COPY[locale].match});
+module.exports={edge,browser,profileAI,matchAI,AI_COPY};
