@@ -343,3 +343,24 @@ test('German copy has no word too long for the card: nickname, tagline and comme
  assert.ok(line('de').length<=64,line('de'));
  assert.ok(['match_chaos','match_romance'].map(k=>c.I18N.de[k]+' %73').join('  •  ').length<=64);
 });
+test('Match PNG score rows fit the card frame in every Latin-script locale, including ES and FR',()=>{
+ const c=browser();
+ // renderMatchPNGBase draws both rows unwrapped at 700 24px Nunito inside an 860px frame (850px inside the border).
+ // Browser measurements with worst-case %99 values ranged 11.8-12.1px per character; 12.5px is a conservative bound
+ // and 830px keeps a margin inside the frame. Arabic uses different glyph widths and is measured separately (603px).
+ const pxPerChar=12.5,maxWidth=830;
+ const rows=L=>[L.match_flirt+' %99  •  '+L.match_vibe+' %99  •  '+L.match_humor+' %99',L.match_chaos+' %99  •  '+L.match_romance+' %99'];
+ for(const lang of ['tr','en','es','pt','fr','de'])for(const row of rows(c.I18N[lang])) assert.ok(row.length*pxPerChar<=maxWidth,lang+' score row too wide ('+row.length+' chars): '+row);
+ // The previous ES/FR labels measured 901px and 917px in the browser and must stay out.
+ assert.notEqual(c.I18N.es.match_vibe,'Conexión de Vibra');assert.notEqual(c.I18N.fr.match_vibe,"Même longueur d'onde");
+ assert.equal(c.I18N.es.match_vibe,'Sintonía');assert.equal(c.I18N.fr.match_vibe,'Complicité');
+ // Rendering path: the actual PNG draws exactly these rows.
+ const text=[];const ctx=new Proxy({measureText:v=>({width:String(v).length*12}),fillText:(v,x,y)=>text.push({v:String(v),y}),createLinearGradient:()=>({addColorStop(){}})},{get:(o,k)=>k in o?o[k]:()=>{}});
+ c.document.createElement=()=>({getContext:()=>ctx});
+ for(const lang of ['es','fr']){
+  c.localStorage.setItem(c.LS.lang,lang);text.length=0;
+  const m=c.matchFunHandles('alice','bob',1);Object.assign(m,{flirt:99,vibe:99,humor:99,chaos:99,romance:99});
+  c.renderMatchPNG(m);
+  assert.deepEqual(text.filter(p=>p.y===780||p.y===812).map(p=>p.v),rows(c.I18N[lang]),lang+' PNG score rows');
+ }
+});
