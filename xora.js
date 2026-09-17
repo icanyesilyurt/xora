@@ -935,6 +935,11 @@ var FUN_PERSONAS = [
         "nickname": "L'Air de Rien",
         "tagline": "Sous ton calme se cache toujours une petite malice.",
         "comment": "Quand tout le monde est d'accord, tu glisses une question qui change le cours de la conversation. Tu le fais avec un tel calme qu'on ne sait jamais si tu plaisantes. Le meilleur moment, c'est le sourire complice avec la première personne qui a compris."
+      },
+      "de": {
+        "nickname": "Auf leisen Sohlen",
+        "tagline": "Hinter deiner Ruhe steckt immer ein kleiner Schalk.",
+        "comment": "Wenn sich alle einig sind, wirfst du eine Frage ein, die das ganze Gespräch dreht. Das sagst du so gelassen, dass niemand weiß, ob du es ernst meinst. Das Beste daran ist das verschmitzte Grinsen mit der Person, die es zuerst gemerkt hat."
       }
     }
   },
@@ -977,6 +982,11 @@ var FUN_PERSONAS = [
         "nickname": "Second Degré",
         "tagline": "Tu dis les choses sérieusement… enfin, presque.",
         "comment": "Il suffit d'une annonce un peu trop solennelle pour que tu repères la contradiction cachée dedans. Plutôt qu'un long débat, tu préfères une réponse courte, faussement naïve et volontairement ambiguë. Expliquer la blague ? Jamais : le sourire de ceux qui ont compris suffit."
+      },
+      "de": {
+        "nickname": "Mit Augenzwinkern",
+        "tagline": "Du meinst es fast ernst – bis zum letzten Wort.",
+        "comment": "Eine zu feierliche Ankündigung reicht, und schon fällt dir der Widerspruch darin auf. Statt lange zu diskutieren, antwortest du lieber kurz und mit einem leisen Seitenhieb. Den Witz erklärst du nie; das Lächeln der anderen genügt dir."
       }
     }
   },
@@ -1019,6 +1029,11 @@ var FUN_PERSONAS = [
         "nickname": "Curieux de Tout",
         "tagline": "Un sujet se termine à peine que tu penses déjà au suivant.",
         "comment": "Quand un sujet t'est inconnu, tu ne te tais pas : tu poses des questions. Chaque réponse intéressante en appelle une autre et, tôt ou tard, la discussion va très loin. Repartir en en sachant un peu plus qu'avant suffit à rendre la journée réussie."
+      },
+      "de": {
+        "nickname": "Will alles wissen",
+        "tagline": "Kaum ist ein Thema durch, interessiert dich schon das nächste.",
+        "comment": "Wenn ein Thema neu für dich ist, schweigst du nicht, sondern fragst nach. Jede spannende Antwort bringt dich auf die nächste Frage, und das Gespräch wird immer länger. Ein bisschen schlauer nach Hause zu gehen, reicht dir für einen guten Tag."
       }
     }
   },
@@ -1061,6 +1076,11 @@ var FUN_PERSONAS = [
         "nickname": "Humour Pince-sans-rire",
         "tagline": "Personne ne voit venir la blague avant que tu le décides.",
         "comment": "Tu lâches la remarque la plus absurde sur le ton de quelqu'un qui commande un café. Ton visage ne trahit rien jusqu'à ce que les autres comprennent enfin. Si le rire tarde, tu n'expliques rien : ce petit silence fait partie du numéro."
+      },
+      "de": {
+        "nickname": "Staubtrockener Humor",
+        "tagline": "Den Witz merkt man erst, wenn du es zulässt.",
+        "comment": "Du sagst die absurdeste Bemerkung im selben Ton, in dem du einen Kaffee bestellst. Dein Gesicht verrät nichts, bis die anderen endlich verstehen. Kommt das Lachen spät, erklärst du nichts; die kleine Pause gehört zur Pointe."
       }
     }
   },
@@ -1103,6 +1123,11 @@ var FUN_PERSONAS = [
         "nickname": "Philosophe du Dimanche",
         "tagline": "Avec toi, une discussion légère ne le reste jamais très longtemps.",
         "comment": "Avec toi, une question anodine peut vite devenir une théorie inattendue sur la vie. Même quand le café refroidit, tu ne lâches pas le sujet avant d'avoir retourné l'idée une dernière fois. Et si quelqu'un n'est pas d'accord, tant mieux : c'est là que ça devient intéressant."
+      },
+      "de": {
+        "nickname": "Philosoph am Küchentisch",
+        "tagline": "Ein lockeres Gespräch bleibt bei dir selten locker.",
+        "comment": "Aus einer beiläufigen Frage wird bei dir schnell eine überraschende Theorie über das Leben. Selbst wenn der Kaffee kalt wird, lässt du das Thema nicht los, bevor du den Gedanken noch einmal gewendet hast. Widerspricht jemand, umso besser: Genau dann wird es spannend."
       }
     }
   },
@@ -1145,6 +1170,11 @@ var FUN_PERSONAS = [
         "nickname": "Parle au Bon Moment",
         "tagline": "Savoir quand parler compte autant que savoir quoi dire.",
         "comment": "Dans une conversation, tu remarques non seulement ce qui se dit, mais aussi qui n'a pas encore pu parler. Parfois tu poses une question, parfois tu changes de sujet, selon ce que le moment demande. Tu t'amuses davantage quand personne n'a besoin de se battre pour être entendu."
+      },
+      "de": {
+        "nickname": "Gespür für den Moment",
+        "tagline": "Wann du etwas sagst, ist dir so wichtig wie das Was.",
+        "comment": "Im Gespräch achtest du nicht nur darauf, was gesagt wird, sondern auch darauf, wer noch nicht zu Wort gekommen ist. Mal stellst du eine Frage, mal wechselst du das Thema, je nachdem, was der Moment braucht. Am meisten Spaß hast du, wenn niemand um Aufmerksamkeit kämpfen muss."
       }
     }
   },
@@ -1187,6 +1217,11 @@ var FUN_PERSONAS = [
         "nickname": "Garde la Tête Froide",
         "tagline": "Tu peux être en désaccord sans en faire une affaire personnelle.",
         "comment": "Quand le ton monte, tu sépares le vrai argument de l'agacement du moment. Tu sais reconnaître un bon point sans devoir choisir un camp sur tout. Pour toi, la meilleure fin, c'est quand chacun repart en se comprenant un peu mieux."
+      },
+      "de": {
+        "nickname": "Ruhepol der Runde",
+        "tagline": "Du kannst widersprechen, ohne es persönlich zu machen.",
+        "comment": "Wenn eine Diskussion hitzig wird, trennst du das eigentliche Argument vom Ärger des Moments. Du erkennst einen guten Punkt an, ohne dich überall auf eine Seite schlagen zu müssen. Am liebsten ist es dir, wenn am Ende alle einander ein bisschen besser verstehen."
       }
     }
   },
@@ -1229,6 +1264,11 @@ var FUN_PERSONAS = [
         "nickname": "Jamais Sans Relire",
         "tagline": "Aucun message ne part sans un dernier coup d'œil.",
         "comment": "Tu écris un message tout court, puis tu trouves le point trop sec et le point d'exclamation trop enthousiaste. Avant d'envoyer, tu imagines plusieurs fois comment l'autre va le lire. Au final, tu envoies la première version et tu ris un peu de ton hésitation."
+      },
+      "de": {
+        "nickname": "Liest lieber nochmal",
+        "tagline": "Keine Nachricht geht raus ohne einen letzten Blick.",
+        "comment": "Du schreibst eine ganz kurze Nachricht und findest den Punkt plötzlich zu streng und das Ausrufezeichen zu begeistert. Vor dem Absenden stellst du dir mehrmals vor, wie die andere Person sie liest. Am Ende schickst du doch die erste Version und musst ein bisschen über dich selbst lachen."
       }
     }
   },
@@ -1271,6 +1311,11 @@ var FUN_PERSONAS = [
         "nickname": "Discret mais Marquant",
         "tagline": "Pas besoin d'être la voix la plus forte de la pièce.",
         "comment": "Tu n'éprouves pas le besoin de remplir chaque silence. Quand tu prends la parole, tu préfères une phrase courte qui reste en tête. Ça te plaît quand, après la soirée, quelqu'un se souvient justement de ta remarque."
+      },
+      "de": {
+        "nickname": "Leise und einprägsam",
+        "tagline": "Du musst nicht die lauteste Stimme im Raum sein.",
+        "comment": "Du hast nicht das Bedürfnis, jede Stille mit Worten zu füllen. Wenn du etwas sagst, dann lieber einen kurzen Satz, der hängen bleibt. Es freut dich, wenn sich nach dem Treffen jemand genau an diese Bemerkung erinnert."
       }
     }
   },
@@ -1313,6 +1358,11 @@ var FUN_PERSONAS = [
         "nickname": "Vrai Boute-en-train",
         "tagline": "Avec toi, rejoindre le mouvement devient facile.",
         "comment": "Quand l'ambiance retombe, tu proposes un jeu ou un sujet où tout le monde peut participer. Tu aimes inclure les gens dans la conversation sans mettre personne mal à l'aise. Le programme peut changer mille fois, tant que personne ne s'ennuie."
+      },
+      "de": {
+        "nickname": "Sorgt für Stimmung",
+        "tagline": "Überall, wo du auftauchst, kommt Stimmung auf.",
+        "comment": "Wenn die Stimmung abflacht, schlägst du ein Spiel oder ein Thema vor, bei dem alle mitreden können. Du holst Leute ins Gespräch, ohne jemanden in Verlegenheit zu bringen. Der Plan darf sich tausendmal ändern, solange sich niemand langweilt."
       }
     }
   },
@@ -1355,6 +1405,11 @@ var FUN_PERSONAS = [
         "nickname": "Toujours à l'Écoute",
         "tagline": "Avec toi, le moindre détail devient une vraie conversation.",
         "comment": "Quand tu demandes à quelqu'un comment s'est passée sa journée, tu veux vraiment entendre la réponse. Un petit détail attire ton attention et tu demandes à en savoir plus. C'est pour ça qu'un café rapide avec toi finit souvent en longue discussion."
+      },
+      "de": {
+        "nickname": "Ganz Ohr",
+        "tagline": "Öfter als gedacht wird aus einer Kleinigkeit ein langes Gespräch.",
+        "comment": "Wenn du jemanden fragst, wie der Tag war, willst du die Antwort wirklich hören. Ein kleines Detail weckt dein Interesse, und du bittest darum, mehr zu erzählen. Deshalb wird aus einem schnellen Kaffee mit dir oft ein ausgedehnter Plausch."
       }
     }
   },
@@ -1397,6 +1452,11 @@ var FUN_PERSONAS = [
         "nickname": "Sens de la Formule",
         "tagline": "Tu sais quel détail rend une histoire vraiment drôle.",
         "comment": "Tu gardes le détail le plus drôle pour la fin et tu sais exactement quand le sortir. Avec ton goût pour les mots justes, une mésaventure banale devient une histoire qu'on redemande. Le meilleur, c'est d'entendre quelqu'un répéter ta phrase à la soirée suivante."
+      },
+      "de": {
+        "nickname": "Erzählt mit Pointe",
+        "tagline": "Du weißt, welches Detail eine Geschichte lustig macht.",
+        "comment": "Das lustigste Detail hebst du dir für den Schluss auf und weißt genau, wann du es bringst. Mit den richtigen Worten wird aus einem kleinen Missgeschick eine Geschichte, die alle noch einmal hören wollen. Am schönsten ist es, wenn später jemand deinen besten Satz wiederholt."
       }
     }
   }
@@ -1441,8 +1501,8 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
   var comment = {
-    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr") },
-    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr") }
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de") }
   };
   return {
     mode: actualMode,
@@ -1456,7 +1516,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     profile_emoji: card.emoji,
     comment: comment,
     card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr] } },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
@@ -1510,6 +1570,14 @@ var FUN_MATCH_COMMENTS = {
     "À la même table, soit ils forment un duo culte, soit quelqu'un coupe les notifications.",
     "XORA croit en ce duo. Personne ne sait d'où lui vient une telle assurance.",
     "La science a refusé le dossier. On a quand même donné un pourcentage."
+  ],
+  de: [
+    "Das völlig unwissenschaftliche Labor von XORA findet dieses Duo verdächtig unterhaltsam.",
+    "Dieser Prozentwert beweist absolut nichts. Für eine Diskussion im Gruppenchat reicht er trotzdem.",
+    "Die Karte ist nur zum Spaß. Der Prozentwert sieht dagegen viel zu offiziell aus.",
+    "Am selben Tisch sind die beiden entweder ein legendäres Duo, oder jemand schaltet den Chat stumm.",
+    "XORA glaubt an dieses Duo. Niemand weiß, woher XORA so viel Selbstvertrauen nimmt.",
+    "Die Wissenschaft hat den Fall abgelehnt. Wir haben trotzdem einen Prozentwert vergeben."
   ]
 };
 
@@ -1533,7 +1601,7 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
     overall: overall,
     ci: commentIndex,
     source: "fun",
-    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex] },
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex], de:FUN_MATCH_COMMENTS.de[commentIndex] },
     meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
   };
 }
@@ -1541,9 +1609,9 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
-    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA" },
-    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée." },
-    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""] }
+    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA", de: "XORA-Profil" },
+    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée.", de: "Analyse abgeschlossen." },
+    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""], de: [""] }
   };
 }
 
@@ -1605,6 +1673,14 @@ var MATCH_COMMENTS = {
     "{a} et {b} s'observent sans jamais se suivre. Ni courage ni lâcheté ici\u00a0: du chaos à l'état pur.",
     "{a} envoie des cœurs, {b} envoie du feu. Aucun des deux ne sait ce qu'il veut, mais l'alchimie est évidente.",
     "{a} fait des plans, {b} les fait voler en éclats. Ces deux-là, c'est une comédie romantique toute prête."
+  ],
+  de: [
+    "{a} schreibt die Nachricht, {b} lässt sie ungelesen liegen. Trotzdem schauen sich diese beiden Profile um 3 Uhr nachts gegenseitig an. Ein Klassiker.",
+    "Der Flirt zwischen diesen beiden Konten beginnt mit einem Herz und endet im Drama. XORA hat das Popcorn schon bereit.",
+    "{a} schreibt mit Gefühl, {b} antwortet mit Ironie. Diese Spannung endet entweder in Liebe oder in einer Blockierung.",
+    "{a} und {b} beobachten sich, folgen sich aber nicht. Hier gibt es weder Mut noch Feigheit, nur reines Chaos.",
+    "{a} schickt Herzen, {b} schickt Feuer. Keiner von beiden weiß, was er will, aber die Chemie ist unübersehbar.",
+    "{a} macht Pläne, {b} wirft sie über den Haufen. Die zwei sind eine fertige romantische Komödie."
   ]
 };
 
@@ -1703,6 +1779,14 @@ var THINKING = {
       "Je note tes contradictions...",
       "Analyse des signaux qui se répètent...",
       "XORA est parfois un peu trop franche. Prépare-toi."
+    ],
+    de: [
+      "Ich sehe mir deine Beiträge an...",
+      "Ich versuche, deine Beiträge von 3 Uhr nachts zu ignorieren... klappt nicht.",
+      "Ich scanne Verhaltensmuster...",
+      "Ich notiere deine Widersprüche...",
+      "Ich analysiere wiederkehrende Signale...",
+      "XORA ist manchmal etwas zu ehrlich. Mach dich bereit."
     ]
   },
   stalk: {
@@ -1753,6 +1837,14 @@ var THINKING = {
       "Tu ne tiens pas ça de moi...",
       "J'ai aussi regardé qui ce compte suit. Ça en dit long.",
       "Ce que je trouve, je ne le dis qu'à toi."
+    ],
+    de: [
+      "Ich betrete das Profil ganz leise...",
+      "Ich hinterlasse keine Spuren, keine Sorge.",
+      "Hmm. Interessant, was hier alles mit Herzen markiert wurde.",
+      "Das hast du nicht von mir...",
+      "Ich habe mir auch angesehen, wem dieses Konto folgt. Das sagt viel.",
+      "Was ich finde, erzähle ich nur dir."
     ]
   },
   match: {
@@ -1803,6 +1895,14 @@ var THINKING = {
       "Tension détectée dans l'historique des réponses.",
       "Calcul de l'alchimie en cours. Blouse de labo enfilée.",
       "Le résultat pourrait vexer l'un de vous. C'est parti."
+    ],
+    de: [
+      "Ich lege die beiden Profile nebeneinander...",
+      "Ich suche nach gemeinsamen Herzen... interessant.",
+      "Ein Konto ist tagsüber aktiv, das andere nachts. Notiert.",
+      "Spannung im Antwortverlauf entdeckt.",
+      "Ich berechne die Chemie. Laborkittel ist an.",
+      "Das Ergebnis könnte einen von euch ärgern. Jetzt kommt es."
     ]
   }
 };
