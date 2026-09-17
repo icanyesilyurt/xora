@@ -36,7 +36,7 @@ for(const provider of ['openai','anthropic']) {
   }
  });
  test(`${provider}: malformed metrics, sample-count copy and shape errors refund without retry`,async()=>{
-  for(const mode of ['mirror','stalk','match']) for(const mutate of [raw=>raw.metrics[0].key='not_allowed',raw=>raw.metrics[0].value=101,raw=>raw.metrics[0].value='70',raw=>raw.metrics[1].key=raw.metrics[0].key,raw=>raw.comment='25 posts analyzed.',raw=>raw.comment='20 paylaşım incelendi.',raw=>raw.comment='Se analizaron 25 publicaciones.',raw=>raw.comment='25 publicações analisadas.',raw=>raw.comment='بعد قراءة 25 منشورًا يبدو الحساب فضوليًا.',raw=>delete raw.comment]) {
+  for(const mode of ['mirror','stalk','match']) for(const mutate of [raw=>raw.metrics[0].key='not_allowed',raw=>raw.metrics[0].value=101,raw=>raw.metrics[0].value='70',raw=>raw.metrics[1].key=raw.metrics[0].key,raw=>raw.comment='25 posts analyzed.',raw=>raw.comment='20 paylaşım incelendi.',raw=>raw.comment='Se analizaron 25 publicaciones.',raw=>raw.comment='25 publicações analisadas.',raw=>raw.comment='بعد قراءة 25 منشورًا يبدو الحساب فضوليًا.',raw=>raw.comment='25 publications analysées montrent un compte curieux.',raw=>delete raw.comment]) {
    const f=fixture(provider,{mutate});assert.equal((await f.e.main(req(mode))).status,500);assert.equal(f.requests.length,1);assert.equal(f.rpcCalls.filter(v=>v.name==='xora_complete_real').length,0);assert.equal(f.rpcCalls.filter(v=>v.name==='xora_fail_real').length,1);
    assert.doesNotMatch(JSON.stringify(f.logs),/mock-(?:openai|anthropic|generic)-key|UNTRUSTED_DATA_MARKER/);
   }
@@ -74,8 +74,8 @@ test('missing/unsupported provider and missing key/model fail before debit, X or
   }
  }
 });
-test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar) through both providers',async()=>{
- for(const provider of ['openai','anthropic'])for(const locale of ['tr','en','es','pt','ar'])for(const mode of ['mirror','stalk','match']){
+test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, fr) through both providers',async()=>{
+ for(const provider of ['openai','anthropic'])for(const locale of ['tr','en','es','pt','ar','fr'])for(const mode of ['mirror','stalk','match']){
   const f=fixture(provider);const response=await f.e.main(req(mode,locale));
   assert.equal(response.status,200,provider+' '+locale+' '+mode);
   const {result}=await response.json();
@@ -98,6 +98,7 @@ test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar) 
    assert.deepEqual(Object.keys(result.nickname),[locale]);assert.deepEqual(Object.keys(result.comment.mirror),[locale]);
    if(locale==='es') assert.ok(instruction.nickname_style_examples.includes('Mente Curiosa'));
    if(locale==='pt') {assert.ok(instruction.nickname_style_examples.includes('Curioso por Natureza'));assert.match(instruction.output_language,/Brazilian Portuguese/);}
+   if(locale==='fr') {assert.ok(instruction.nickname_style_examples.includes('Toujours une Question'));assert.match(instruction.output_language,/French/);}
    if(locale==='ar') {assert.ok(instruction.nickname_style_examples.includes('كثير السؤال'));assert.match(instruction.output_language,/Modern Standard Arabic/);const arCopy=mode==='match'?[result.ai_comment.ar]:[result.nickname.ar,result.tagline.ar,result.comment.mirror.ar,...result.top_behaviors.map(x=>x.label.ar)];assert.doesNotMatch(arCopy.join(' '),/[A-Za-z]/);}
   }
   // The card renders from the active-locale copy alone.
@@ -110,7 +111,7 @@ test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar) 
   if(mode!=='match') assert.ok(c.shareIdentityText(result).includes(copy.nickname));
  }
  // Unsupported and planned-but-unserved locales are rejected before any billing or provider call.
- for(const locale of ['fr','it','de','xx','pt-BR','ar-SA']){
+ for(const locale of ['ja','it','de','xx','pt-BR','ar-SA','fr-FR']){
   const rejected=fixture('anthropic');
   assert.equal((await rejected.e.main(req('mirror',locale))).status,400);
   assert.equal(rejected.requests.length,0);assert.equal(rejected.rpcCalls.length,0);

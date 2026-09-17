@@ -930,6 +930,11 @@ var FUN_PERSONAS = [
         "nickname": "المشاغب الهادئ",
         "tagline": "وراء هدوئك شقاوة صغيرة لا تهدأ.",
         "comment": "حين يتفق الجميع، تطرح سؤالًا صغيرًا يغير اتجاه الحديث كله. تقوله بهدوء شديد حتى لا يعرف أحد إن كنت جادًا أو تمزح. وأجمل ما في الأمر تلك الابتسامة المتبادلة مع أول من فهم قصدك."
+      },
+      "fr": {
+        "nickname": "L'Air de Rien",
+        "tagline": "Sous ton calme se cache toujours une petite malice.",
+        "comment": "Quand tout le monde est d'accord, tu glisses une question qui change le cours de la conversation. Tu le fais avec un tel calme qu'on ne sait jamais si tu plaisantes. Le meilleur moment, c'est le sourire complice avec la première personne qui a compris."
       }
     }
   },
@@ -967,6 +972,11 @@ var FUN_PERSONAS = [
         "nickname": "سخرية لطيفة",
         "tagline": "تقول الجملة بجدية، ثم تقلب معناها في آخر كلمة.",
         "comment": "يكفي أن يعلن أحدهم شيئًا بثقة مبالغ فيها حتى تلتقط التناقض المختبئ فيه. بدل الجدال الطويل، تفضل ردًا قصيرًا بنبرة ساخرة خفيفة. ولا تشرح النكتة أبدًا؛ تكفيك ابتسامة من فهمها."
+      },
+      "fr": {
+        "nickname": "Second Degré",
+        "tagline": "Tu dis les choses sérieusement… enfin, presque.",
+        "comment": "Il suffit d'une annonce un peu trop solennelle pour que tu repères la contradiction cachée dedans. Plutôt qu'un long débat, tu préfères une réponse courte, faussement naïve et volontairement ambiguë. Expliquer la blague ? Jamais : le sourire de ceux qui ont compris suffit."
       }
     }
   },
@@ -1004,6 +1014,11 @@ var FUN_PERSONAS = [
         "nickname": "يسأل عن كل شيء",
         "tagline": "لا ينتهي موضوع حتى يبدأ فضولك بالموضوع التالي.",
         "comment": "إذا طرح أحدهم موضوعًا لا تعرفه، لا تصمت بل تسأل. كل إجابة مثيرة تفتح لك سؤالًا جديدًا، فيطول الحديث دون أن تشعر. يكفيك أن تخرج من الجلسة وأنت تعرف أكثر مما كنت تعرف."
+      },
+      "fr": {
+        "nickname": "Curieux de Tout",
+        "tagline": "Un sujet se termine à peine que tu penses déjà au suivant.",
+        "comment": "Quand un sujet t'est inconnu, tu ne te tais pas : tu poses des questions. Chaque réponse intéressante en appelle une autre et, tôt ou tard, la discussion va très loin. Repartir en en sachant un peu plus qu'avant suffit à rendre la journée réussie."
       }
     }
   },
@@ -1041,6 +1056,11 @@ var FUN_PERSONAS = [
         "nickname": "مزاح بوجه جاد",
         "tagline": "لا أحد يكتشف النكتة إلا حين تسمح له.",
         "comment": "تقول أغرب ملاحظة بالنبرة نفسها التي تطلب بها فنجان قهوة. لا يظهر على وجهك أي تلميح حتى يفهم الآخرون المقصود. وإذا تأخرت الضحكة لا تشرح شيئًا؛ فذلك الصمت القصير جزء من الطرافة."
+      },
+      "fr": {
+        "nickname": "Humour Pince-sans-rire",
+        "tagline": "Personne ne voit venir la blague avant que tu le décides.",
+        "comment": "Tu lâches la remarque la plus absurde sur le ton de quelqu'un qui commande un café. Ton visage ne trahit rien jusqu'à ce que les autres comprennent enfin. Si le rire tarde, tu n'expliques rien : ce petit silence fait partie du numéro."
       }
     }
   },
@@ -1078,6 +1098,11 @@ var FUN_PERSONAS = [
         "nickname": "فيلسوف المقهى",
         "tagline": "الحديث العابر معك لا يبقى عابرًا طويلًا.",
         "comment": "قد يتحول معك سؤال عادي إلى نظرية غير متوقعة عن الحياة. حتى لو بردت القهوة، لا تغلق الموضوع قبل أن تقلب الفكرة مرة أخرى. وإن اعترض أحدهم فهذا أفضل؛ فهنا يبدأ النقاش الممتع."
+      },
+      "fr": {
+        "nickname": "Philosophe du Dimanche",
+        "tagline": "Avec toi, une discussion légère ne le reste jamais très longtemps.",
+        "comment": "Avec toi, une question anodine peut vite devenir une théorie inattendue sur la vie. Même quand le café refroidit, tu ne lâches pas le sujet avant d'avoir retourné l'idée une dernière fois. Et si quelqu'un n'est pas d'accord, tant mieux : c'est là que ça devient intéressant."
       }
     }
   },
@@ -1115,6 +1140,11 @@ var FUN_PERSONAS = [
         "nickname": "يعرف متى يتكلم",
         "tagline": "يهمك متى تقول الشيء بقدر ما يهمك ماذا تقول.",
         "comment": "في أي حديث لا تنتبه لما يقال فقط، بل لمن لم يجد فرصة ليتكلم. أحيانًا تطرح سؤالًا، وأحيانًا تغير الموضوع، بحسب ما تحتاجه اللحظة. وتستمتع أكثر حين لا يضطر أحد إلى المنافسة ليسمعه الآخرون."
+      },
+      "fr": {
+        "nickname": "Parle au Bon Moment",
+        "tagline": "Savoir quand parler compte autant que savoir quoi dire.",
+        "comment": "Dans une conversation, tu remarques non seulement ce qui se dit, mais aussi qui n'a pas encore pu parler. Parfois tu poses une question, parfois tu changes de sujet, selon ce que le moment demande. Tu t'amuses davantage quand personne n'a besoin de se battre pour être entendu."
       }
     }
   },
@@ -1152,6 +1182,11 @@ var FUN_PERSONAS = [
         "nickname": "حكيم المجلس",
         "tagline": "تختلف مع الآخرين دون أن تجعل الأمر شخصيًا.",
         "comment": "حين يحتد النقاش، تفصل الفكرة الحقيقية عن الانفعال اللحظي. تستطيع أن تعترف بالرأي الصائب دون أن تنحاز لطرف في كل شيء. وأفضل نهاية عندك أن يخرج الجميع وقد فهموا بعضهم أكثر."
+      },
+      "fr": {
+        "nickname": "Garde la Tête Froide",
+        "tagline": "Tu peux être en désaccord sans en faire une affaire personnelle.",
+        "comment": "Quand le ton monte, tu sépares le vrai argument de l'agacement du moment. Tu sais reconnaître un bon point sans devoir choisir un camp sur tout. Pour toi, la meilleure fin, c'est quand chacun repart en se comprenant un peu mieux."
       }
     }
   },
@@ -1189,6 +1224,11 @@ var FUN_PERSONAS = [
         "nickname": "يقرأ رسالته مرتين",
         "tagline": "حتى الرد القصير يستحق مراجعة أخيرة.",
         "comment": "تكتب رسالة قصيرة ثم تشعر أن النقطة جادة أكثر من اللازم وعلامة التعجب متحمسة أكثر من اللازم. قبل الإرسال تتخيل مرات عدة كيف سيقرؤها الطرف الآخر. وفي النهاية ترسل النسخة الأولى وتضحك قليلًا من ترددك."
+      },
+      "fr": {
+        "nickname": "Jamais Sans Relire",
+        "tagline": "Aucun message ne part sans un dernier coup d'œil.",
+        "comment": "Tu écris un message tout court, puis tu trouves le point trop sec et le point d'exclamation trop enthousiaste. Avant d'envoyer, tu imagines plusieurs fois comment l'autre va le lire. Au final, tu envoies la première version et tu ris un peu de ton hésitation."
       }
     }
   },
@@ -1226,6 +1266,11 @@ var FUN_PERSONAS = [
         "nickname": "حضور بلا ضجيج",
         "tagline": "لا تحتاج أن تكون الصوت الأعلى في المكان.",
         "comment": "لا تشعر بحاجة إلى ملء كل لحظة صمت بالكلام. وحين تتحدث، تفضل جملة قصيرة تبقى في ذاكرة الآخرين. ويسعدك أن يتذكر أحدهم عبارتك تلك بعد انتهاء اللقاء."
+      },
+      "fr": {
+        "nickname": "Discret mais Marquant",
+        "tagline": "Pas besoin d'être la voix la plus forte de la pièce.",
+        "comment": "Tu n'éprouves pas le besoin de remplir chaque silence. Quand tu prends la parole, tu préfères une phrase courte qui reste en tête. Ça te plaît quand, après la soirée, quelqu'un se souvient justement de ta remarque."
       }
     }
   },
@@ -1263,6 +1308,11 @@ var FUN_PERSONAS = [
         "nickname": "روح الجلسة",
         "tagline": "معك يصبح الانضمام إلى المرح سهلًا.",
         "comment": "إذا فترت الجلسة، تقترح لعبة أو موضوعًا يستطيع الجميع أن يشاركوا فيه. تحب أن تدخل الناس في الحديث دون أن تحرج أحدًا. وقد تتغير الخطة ألف مرة، المهم ألا يشعر أحد بالملل."
+      },
+      "fr": {
+        "nickname": "Vrai Boute-en-train",
+        "tagline": "Avec toi, rejoindre le mouvement devient facile.",
+        "comment": "Quand l'ambiance retombe, tu proposes un jeu ou un sujet où tout le monde peut participer. Tu aimes inclure les gens dans la conversation sans mettre personne mal à l'aise. Le programme peut changer mille fois, tant que personne ne s'ennuie."
       }
     }
   },
@@ -1300,6 +1350,11 @@ var FUN_PERSONAS = [
         "nickname": "أذن صاغية",
         "tagline": "التفاصيل الصغيرة تتحول معك إلى حديث طويل.",
         "comment": "حين تسأل أحدهم عن يومه، فأنت تريد فعلًا أن تسمع الجواب. تلفت انتباهك تفصيلة صغيرة فتطلب أن يحكي لك المزيد. لهذا يتحول فنجان قهوة سريع معك غالبًا إلى حديث طويل."
+      },
+      "fr": {
+        "nickname": "Toujours à l'Écoute",
+        "tagline": "Avec toi, le moindre détail devient une vraie conversation.",
+        "comment": "Quand tu demandes à quelqu'un comment s'est passée sa journée, tu veux vraiment entendre la réponse. Un petit détail attire ton attention et tu demandes à en savoir plus. C'est pour ça qu'un café rapide avec toi finit souvent en longue discussion."
       }
     }
   },
@@ -1337,6 +1392,11 @@ var FUN_PERSONAS = [
         "nickname": "يجيد رواية القصص",
         "tagline": "تعرف أي تفصيل يجعل القصة ممتعة.",
         "comment": "تحتفظ بأطرف تفصيلة للنهاية وتعرف تمامًا متى تكشفها. موقف عادي يتحول معك إلى قصة يريد الجميع سماعها مرة أخرى. وأجمل ما في الأمر أن تسمع أحدهم يكرر جملتك في جلسة أخرى."
+      },
+      "fr": {
+        "nickname": "Sens de la Formule",
+        "tagline": "Tu sais quel détail rend une histoire vraiment drôle.",
+        "comment": "Tu gardes le détail le plus drôle pour la fin et tu sais exactement quand le sortir. Avec ton goût pour les mots justes, une mésaventure banale devient une histoire qu'on redemande. Le meilleur, c'est d'entendre quelqu'un répéter ta phrase à la soirée suivante."
       }
     }
   }
@@ -1381,8 +1441,8 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
   var comment = {
-    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar") },
-    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar") }
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr") }
   };
   return {
     mode: actualMode,
@@ -1396,7 +1456,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     profile_emoji: card.emoji,
     comment: comment,
     card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar] } },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
@@ -1442,6 +1502,14 @@ var FUN_MATCH_COMMENTS = {
     "على الطاولة نفسها، إما أن يصبحا ثنائيًا أسطوريًا أو يكتم أحدهما المحادثة.",
     "XORA واثقة من هذا الثنائي. ولا أحد يعرف مصدر هذه الثقة.",
     "رفض العلم هذه القضية. ومع ذلك أعطيناها نسبة."
+  ],
+  fr: [
+    "Le laboratoire pas du tout scientifique de XORA trouve ce duo étrangement divertissant.",
+    "Ce pourcentage ne prouve absolument rien. Il suffit quand même à lancer un débat dans le groupe.",
+    "La carte, c'est pour rire. Le pourcentage, lui, a l'air beaucoup trop officiel.",
+    "À la même table, soit ils forment un duo culte, soit quelqu'un coupe les notifications.",
+    "XORA croit en ce duo. Personne ne sait d'où lui vient une telle assurance.",
+    "La science a refusé le dossier. On a quand même donné un pourcentage."
   ]
 };
 
@@ -1465,7 +1533,7 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
     overall: overall,
     ci: commentIndex,
     source: "fun",
-    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex] },
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex] },
     meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
   };
 }
@@ -1473,9 +1541,9 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
-    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA" },
-    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل." },
-    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""] }
+    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA" },
+    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée." },
+    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""] }
   };
 }
 
@@ -1529,6 +1597,14 @@ var MATCH_COMMENTS = {
     "{a} يراقب {b} بصمت، والعكس صحيح، دون أي متابعة. لا شجاعة هنا ولا تردد، بل فوضى خالصة.",
     "{a} يرسل القلوب، بينما يرسل {b} النار. لا أحد منهما يعرف ما يريد، لكن الانسجام واضح.",
     "{a} يخطط، ثم يأتي {b} ليقلب الخطط رأسًا على عقب. هذان الاثنان قصة كوميديا رومانسية جاهزة."
+  ],
+  fr: [
+    "{a} envoie le message, {b} le laisse en vu. Pourtant, ces deux profils se regardent à 3 h du matin. Un classique.",
+    "Le flirt entre ces deux comptes commence par un cœur et finit en drame. XORA a déjà sorti le pop-corn.",
+    "{a} écrit avec le cœur, {b} répond avec ironie. Cette tension finira en histoire d'amour ou en blocage.",
+    "{a} et {b} s'observent sans jamais se suivre. Ni courage ni lâcheté ici\u00a0: du chaos à l'état pur.",
+    "{a} envoie des cœurs, {b} envoie du feu. Aucun des deux ne sait ce qu'il veut, mais l'alchimie est évidente.",
+    "{a} fait des plans, {b} les fait voler en éclats. Ces deux-là, c'est une comédie romantique toute prête."
   ]
 };
 
@@ -1619,6 +1695,14 @@ var THINKING = {
       "أدون تناقضاتك...",
       "أحلل الإشارات المتكررة...",
       "XORA صريحة أكثر من اللازم أحيانًا. استعد."
+    ],
+    fr: [
+      "Je dépoussière ton fil d'actualité...",
+      "J'essaie d'ignorer tes publications de 3 h du matin... impossible.",
+      "Analyse des schémas de comportement...",
+      "Je note tes contradictions...",
+      "Analyse des signaux qui se répètent...",
+      "XORA est parfois un peu trop franche. Prépare-toi."
     ]
   },
   stalk: {
@@ -1661,6 +1745,14 @@ var THINKING = {
       "لم تسمع هذا مني...",
       "نظرت أيضًا إلى من يتابعهم هذا الحساب. الأمر يقول الكثير.",
       "ما أجده سأخبرك به وحدك."
+    ],
+    fr: [
+      "J'entre discrètement sur le profil...",
+      "Je ne laisse aucune trace, ne t'inquiète pas.",
+      "Hmm. Un historique de j'aime intéressant.",
+      "Tu ne tiens pas ça de moi...",
+      "J'ai aussi regardé qui ce compte suit. Ça en dit long.",
+      "Ce que je trouve, je ne le dis qu'à toi."
     ]
   },
   match: {
@@ -1703,6 +1795,14 @@ var THINKING = {
       "رصدت توترًا في سجل الردود.",
       "أحسب درجة الانسجام. ارتديت معطف المختبر.",
       "قد تزعج النتيجة أحدكما. ها هي."
+    ],
+    fr: [
+      "Je place les deux fils côte à côte...",
+      "Recherche des j'aime en commun... intéressant.",
+      "Un compte vit le jour, l'autre la nuit. C'est noté.",
+      "Tension détectée dans l'historique des réponses.",
+      "Calcul de l'alchimie en cours. Blouse de labo enfilée.",
+      "Le résultat pourrait vexer l'un de vous. C'est parti."
     ]
   }
 };

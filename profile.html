@@ -108,7 +108,7 @@
     var d = new Date(ts);
     var today = new Date();
     if (d.toDateString() === today.toDateString()) return t("date_today");
-    return d.toLocaleDateString(getLang() === "tr" ? "tr-TR" : getLang() === "es" ? "es-ES" : getLang() === "pt" ? "pt-BR" : getLang() === "ar" ? "ar-u-nu-latn" : "en-US",
+    return d.toLocaleDateString(getLang() === "tr" ? "tr-TR" : getLang() === "es" ? "es-ES" : getLang() === "pt" ? "pt-BR" : getLang() === "ar" ? "ar-u-nu-latn" : getLang() === "fr" ? "fr-FR" : "en-US",
                                 { day: "numeric", month: "short" });
   }
 

@@ -126,7 +126,7 @@ function buildIdentityCardV3(res) {
   var mode = res.mode || "mirror";
   var quoteLabel = mode === "stalk"
     ? "XORA Stalk"
-    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : lang === "ar" ? "مرآة XORA" : "XORA Mirror");
+    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "Miroir XORA" : "XORA Mirror");
 
   var chips = "";
   var top = res.top_behaviors || [];
@@ -487,7 +487,7 @@ function renderIdentityPNGV3(res) {
   var emoji = res.profile_emoji || "🪞";
   var tagline = res.tagline ? (res.tagline[lang] || res.tagline.tr) : "";
   var mode = res.mode || "mirror";
-  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : lang === "ar" ? "مرآة XORA" : "XORA MIRROR");
+  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "MIROIR XORA" : "XORA MIRROR");
   var b = baseCanvas();
   var ctx = b.ctx;
 
@@ -808,12 +808,14 @@ function shareIdentityText(res) {
     if (lang === "es") return 'XORA REAL me leyó: "' + name + '" · ' + rarity + ' 👀 ¿Qué diría el tuyo? → ' + getPublicSiteUrl();
     if (lang === "pt") return 'A XORA REAL me leu: "' + name + '" · ' + rarity + ' 👀 E o seu, o que diria? → ' + getPublicSiteUrl();
     if (lang === "ar") return 'قرأتني XORA REAL: «' + name + '» · ' + rarity + ' 👀 وماذا ستقول عنك؟ ← ' + ltrIsolate(getPublicSiteUrl());
+    if (lang === "fr") return 'Mon analyse XORA REAL\u00a0: «\u00a0' + name + '\u00a0» · ' + rarity + ' 👀 Et la tienne\u00a0? → ' + getPublicSiteUrl();
     return 'XORA REAL read me: "' + name + '" · ' + rarity + ' 👀 What would yours say? → ' + getPublicSiteUrl();
   }
   if (lang === "tr") return 'XORA FUN kartım: "' + name + '" 😅 Seninkini çek → ' + getPublicSiteUrl();
   if (lang === "es") return 'Mi tarjeta XORA FUN: "' + name + '" 😅 Saca la tuya → ' + getPublicSiteUrl();
   if (lang === "pt") return 'Meu cartão XORA FUN: "' + name + '" 😅 Tire o seu → ' + getPublicSiteUrl();
   if (lang === "ar") return 'بطاقتي في XORA FUN: «' + name + '» 😅 اسحب بطاقتك ← ' + ltrIsolate(getPublicSiteUrl());
+  if (lang === "fr") return 'Ma carte XORA FUN\u00a0: «\u00a0' + name + '\u00a0» 😅 Tire la tienne → ' + getPublicSiteUrl();
   return 'My XORA FUN card: "' + name + '" 😅 Draw yours → ' + getPublicSiteUrl();
 }
 
@@ -825,12 +827,14 @@ function shareMatchText(m) {
     if (lang === "es") return "XORA REAL: @" + m.a + " × @" + m.b + " compatibilidad " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "pt") return "XORA REAL: @" + m.a + " × @" + m.b + " compatibilidade " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "ar") return "توافق " + ltrIsolate("@" + m.a + " × @" + m.b) + " في XORA REAL: " + ltrIsolate(m.overall + "%") + " · " + rarity + " 🔥 ← " + ltrIsolate(getPublicSiteUrl());
+    if (lang === "fr") return "XORA REAL\u00a0: @" + m.a + " × @" + m.b + " compatibilité " + m.overall + "\u00a0% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     return "XORA REAL: @" + m.a + " × @" + m.b + " match " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
   }
   if (lang === "tr") return "XORA FUN: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " 😅 Siz kaç çıkarsınız? → " + getPublicSiteUrl();
   if (lang === "es") return "XORA FUN: @" + m.a + " × @" + m.b + " compatibilidad " + m.overall + "% 😅 ¿Cuánto sacarían ustedes? → " + getPublicSiteUrl();
   if (lang === "pt") return "XORA FUN: @" + m.a + " × @" + m.b + " compatibilidade " + m.overall + "% 😅 E vocês, quanto dariam? → " + getPublicSiteUrl();
   if (lang === "ar") return "توافق " + ltrIsolate("@" + m.a + " × @" + m.b) + " في XORA FUN: " + ltrIsolate(m.overall + "%") + " 😅 وأنتم، كم ستكون نسبتكم؟ ← " + ltrIsolate(getPublicSiteUrl());
+  if (lang === "fr") return "XORA FUN\u00a0: @" + m.a + " × @" + m.b + " compatibilité " + m.overall + "\u00a0% 😅 Et vous, combien\u00a0? → " + getPublicSiteUrl();
   return "XORA FUN: @" + m.a + " × @" + m.b + " match " + m.overall + "% 😅 Try yours → " + getPublicSiteUrl();
 }
 
@@ -840,7 +844,7 @@ function cardPresentationCopy(value, key) {
   if (key === "meta") return value;
   if (typeof value === "string") {
     return value.split(/(?<=[.!?؟])\s+/).filter(function(sentence) {
-      return !/[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes))|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes))/iu.test(sentence);
+      return !/[\d٠-٩][\d٠-٩\s/.,%'-]*(?:منشور|تغريد)|(?:منشور|تغريد)[^.!?؟]{0,35}[\d٠-٩]|(?:تم تحليل|حللت|حللنا)[^.!?؟]{0,35}(?:منشور|تغريد)|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?)|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*|analys(?:é|e)\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|publications?)/iu.test(sentence);
     }).join(" ");
   }
   if (Array.isArray(value)) return value.map(function(v){return cardPresentationCopy(v);});
