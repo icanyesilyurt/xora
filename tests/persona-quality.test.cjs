@@ -5,7 +5,7 @@ const {browser,edge}=require('./helpers.cjs');
 test('canonical FUN personas cover every supported locale with reviewed independent copy',()=>{
  const c=browser(),e=edge();
  const locales=Object.keys(c.I18N).sort();
- assert.deepEqual(locales,['en','es','tr']);
+ assert.deepEqual(locales,['en','es','pt','tr']);
  assert.equal(c.FUN_PERSONAS.length,12);
  assert.equal(new Set(c.FUN_PERSONAS.map(p=>p.id)).size,12);
  for(const p of c.FUN_PERSONAS){
@@ -33,8 +33,8 @@ test('canonical FUN personas cover every supported locale with reviewed independ
   // Locale copy stays independently curated: no field reused verbatim across languages.
   const copies=locales.map(lang=>p.locales[lang]);
   for(const field of ['nickname','tagline','comment']) assert.equal(new Set(copies.map(copy=>copy[field])).size,locales.length,p.id+' '+field+' must differ per locale');
-  // Spanish copy must not be an English word-mix.
-  assert.doesNotMatch(p.locales.es.nickname,/\b(?:the|of|and|you|room|mind|quiet|update)\b/i,p.id);
+  // Spanish and Portuguese copy must not be an English word-mix.
+  for(const lang of ['es','pt']) assert.doesNotMatch(p.locales[lang].nickname,/\b(?:the|of|and|you|room|mind|quiet|update)\b/i,lang+' '+p.id);
  }
  // Locale copy changes cannot alter identity or seeded selection.
  const before=c.analyzeFunHandle('alice','mirror',0);
@@ -49,10 +49,11 @@ test('nickname guard rejects forced compounds and sensitive labels in every loca
  const bad={
   tr:['Drama İtfaiyesi','Soru Makinesi','İroni Müdürü','Vibe Radarı','Konu Mıknatısı','Gündem Turisti','Ortam Güncellemesi','Kadife Mantık','Cümle Tostçusu','Bipolar Dahi','Otistik Yazar','Müslüman Anlatıcı','Gay Anlatıcı','Kürt Yazar','Depresif Şair','Soru Question','Meraklı Meraklı'],
   en:['Drama Firefighter','Question Machine','Vibe Radar','Reply Hunter','Dry Wit Operator','Room Update','Velvet Logic','Quantum Spoon','Bipolar Genius','Autistic Writer','Muslim Storyteller','Gay Thinker','Kurdish Writer','Depressed Poet','Soru Sorucu','Curious Curious'],
-  es:['Máquina de Preguntas','Bombero del Drama','Radar de Vibras','Cazador de Respuestas','Turista del Timeline','Lógica de Terciopelo','Cuchara Cuántica','Genio Bipolar','Escritor Autista','Narrador Musulmán','Pensador Gay','Escritora Kurda','Poeta Depresivo','Curious Mind','Mente Quiet','Curiosa Curiosa']
+  es:['Máquina de Preguntas','Bombero del Drama','Radar de Vibras','Cazador de Respuestas','Turista del Timeline','Lógica de Terciopelo','Cuchara Cuántica','Genio Bipolar','Escritor Autista','Narrador Musulmán','Pensador Gay','Escritora Kurda','Poeta Depresivo','Curious Mind','Mente Quiet','Curiosa Curiosa'],
+  pt:['Máquina de Perguntas','Bombeiro do Drama','Radar de Vibes','Caçador de Respostas','Turista da Timeline','Lógica de Veludo','Colher Quântica','Gênio Bipolar','Escritor Autista','Narrador Muçulmano','Pensador Gay','Escritor Curdo','Poeta Deprimido','Curious Mind','Mente Quiet','Curioso Curioso','Siempre de Charla']
  };
- for(const lang of ['tr','en','es'])for(const text of bad[lang])assert.equal(e.aliasValid(text,lang),false,lang+': '+text);
- for(const [lang,text] of [['tr','Meraklı Muhabbetçi'],['en','Thoughtful Conversationalist'],['tr','Koltuk Filozofu'],['en','Armchair Philosopher'],['en','Social Butterfly'],['en','INQUISITIVE MIND'],['es','Mente Curiosa'],['es','Narrador Detallista'],['es','Casi en Serio'],['es','Filósofo de Sofá']]){
+ for(const lang of ['tr','en','es','pt'])for(const text of bad[lang])assert.equal(e.aliasValid(text,lang),false,lang+': '+text);
+ for(const [lang,text] of [['tr','Meraklı Muhabbetçi'],['en','Thoughtful Conversationalist'],['tr','Koltuk Filozofu'],['en','Armchair Philosopher'],['en','Social Butterfly'],['en','INQUISITIVE MIND'],['es','Mente Curiosa'],['es','Narrador Detallista'],['es','Casi en Serio'],['es','Filósofo de Sofá'],['pt','Curioso por Natureza'],['pt','Filósofo de Boteco'],['pt','Cara de Paisagem'],['pt','Relê Antes de Mandar'],['pt','Bom de Papo']]){
   assert.equal(e.aliasValid(text,lang),true,text);
  }
  assert.equal(e.aliasValid('Curious Mind','fr'),false);
@@ -62,8 +63,8 @@ test('nickname guard rejects forced compounds and sensitive labels in every loca
 test('REAL fallback is safe, deterministic and signal based without another AI call',()=>{
  const e=edge({console:{warn(){}}});
  const cases=[{}, {reply_ratio:.5},{avg_text_length:180},{emoji_per_post:2},{question_ratio:.5},{vocabulary_diversity:.8},{original_ratio:.8},{quote_ratio:.2},{repost_ratio:.5},{exclamation_ratio:.3},{own_posts:10}];
- const unnatural={tr:'Soru Makinesi',en:'Question Machine',es:'Máquina de Preguntas'};
- for(const signals of cases)for(const locale of ['tr','en','es']){
+ const unnatural={tr:'Soru Makinesi',en:'Question Machine',es:'Máquina de Preguntas',pt:'Máquina de Perguntas'};
+ for(const signals of cases)for(const locale of ['tr','en','es','pt']){
   const a=e.pickAlias({nickname_candidates:[]},signals,locale);
   const b=e.pickAlias({nickname_candidates:[{text:unnatural[locale],evidence:'question_ratio'}]},signals,locale);
   assert.equal(a.source,'fallback');assert.equal(JSON.stringify(a),JSON.stringify(b));
@@ -71,10 +72,10 @@ test('REAL fallback is safe, deterministic and signal based without another AI c
  }
  const signals={question_ratio:.7};
  // Candidates are judged only by the request locale's quality gate; a wrong-language name is rejected.
- for(const [locale,text] of [['tr','Question Machine'],['tr','Soru Makinesi'],['en','Soru Makinesi'],['en','Question Machine'],['es','Curious Mind'],['es','Máquina de Preguntas'],['es','']]){
+ for(const [locale,text] of [['tr','Question Machine'],['tr','Soru Makinesi'],['en','Soru Makinesi'],['en','Question Machine'],['es','Curious Mind'],['es','Máquina de Preguntas'],['es',''],['pt','Curious Mind'],['pt','Máquina de Perguntas'],['pt','Siempre de Charla']]){
   assert.equal(e.pickAlias({nickname_candidates:[{text,evidence:'question_ratio'}]},signals,locale).source,'fallback',locale+': '+text);
  }
- for(const [locale,text] of [['tr','Meraklı Muhabbetçi'],['en','Thoughtful Conversationalist'],['es','Conversador Atento']]){
+ for(const [locale,text] of [['tr','Meraklı Muhabbetçi'],['en','Thoughtful Conversationalist'],['es','Conversador Atento'],['pt','Ouvinte Atento']]){
   const picked=e.pickAlias({nickname_candidates:[{text,evidence:'question_ratio'}]},signals,locale);
   assert.equal(picked.source,'ai_generated_validated');assert.equal(picked.text,text);
  }

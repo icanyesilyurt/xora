@@ -5,11 +5,12 @@ type Mode = "mirror" | "stalk" | "match";
 // once it has an entry in REAL_LOCALES plus nickname quality rules and fallback aliases below.
 const PLANNED_LOCALES = ["tr","en","es","pt","it","fr","de","ru","ja","ko","zh","ar"] as const;
 type PlannedLocale = typeof PLANNED_LOCALES[number];
-type Locale = Extract<PlannedLocale, "tr" | "en" | "es">;
+type Locale = Extract<PlannedLocale, "tr" | "en" | "es" | "pt">;
 const REAL_LOCALES: Record<Locale, {language:string; bcp47:string}> = {
   tr: {language:"Turkish", bcp47:"tr-TR"},
   en: {language:"English", bcp47:"en-US"},
   es: {language:"neutral international Spanish (no regional slang, no English loanwords)", bcp47:"es-ES"},
+  pt: {language:"natural Brazilian Portuguese (no heavy regional slang, no English loanwords)", bcp47:"pt-BR"},
 };
 function isRealLocale(v: unknown): v is Locale {
   return typeof v === "string" && Object.hasOwn(REAL_LOCALES, v);
@@ -254,22 +255,23 @@ async function callAI(input: unknown) {
 // and cite a deterministic behavioral signal that is actually active for this dataset.
 // This keeps names personal without allowing random word salad or sensitive-trait labels.
 const ALIASES: Array<{names:Record<Locale,string>; key:string; test:(s:any)=>boolean}> = [
-  {names:{tr:"Sohbeti Seven", en:"Always Up for Conversation", es:"Siempre de Charla"}, key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
-  {names:{tr:"Uzun Uzun Anlatan", en:"Detailed Storyteller", es:"Narrador Detallista"}, key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
-  {names:{tr:"Renkli Anlatıcı", en:"Expressive Soul", es:"Alma Expresiva"}, key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
-  {names:{tr:"Meraklı Biri", en:"Curious Mind", es:"Mente Curiosa"}, key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
-  {names:{tr:"Sözü Kuvvetli", en:"Way with Words", es:"Buena Pluma"}, key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
-  {names:{tr:"Özgün Anlatıcı", en:"Original Voice", es:"Voz Propia"}, key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
-  {names:{tr:"Alıntı Seven", en:"Thoughtful Reader", es:"Lector Atento"}, key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
-  {names:{tr:"Paylaşmayı Seven", en:"Keen Sharer", es:"Le Encanta Compartir"}, key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
-  {names:{tr:"Coşkulu Anlatıcı", en:"Full of Enthusiasm", es:"Puro Entusiasmo"}, key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
-  {names:{tr:"X Yazarı", en:"X Contributor", es:"Autor en X"}, key:"own_posts", test:(s:any)=>s.own_posts >= 6}
+  {names:{tr:"Sohbeti Seven", en:"Always Up for Conversation", es:"Siempre de Charla", pt:"Bom de Conversa"}, key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
+  {names:{tr:"Uzun Uzun Anlatan", en:"Detailed Storyteller", es:"Narrador Detallista", pt:"Conta Tudo em Detalhes"}, key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
+  {names:{tr:"Renkli Anlatıcı", en:"Expressive Soul", es:"Alma Expresiva", pt:"Cheio de Expressão"}, key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
+  {names:{tr:"Meraklı Biri", en:"Curious Mind", es:"Mente Curiosa", pt:"Curioso por Natureza"}, key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
+  {names:{tr:"Sözü Kuvvetli", en:"Way with Words", es:"Buena Pluma", pt:"Bom com as Palavras"}, key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
+  {names:{tr:"Özgün Anlatıcı", en:"Original Voice", es:"Voz Propia", pt:"Estilo Próprio"}, key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
+  {names:{tr:"Alıntı Seven", en:"Thoughtful Reader", es:"Lector Atento", pt:"Bom Leitor"}, key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
+  {names:{tr:"Paylaşmayı Seven", en:"Keen Sharer", es:"Le Encanta Compartir", pt:"Adora Compartilhar"}, key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
+  {names:{tr:"Coşkulu Anlatıcı", en:"Full of Enthusiasm", es:"Puro Entusiasmo", pt:"Sempre Empolgado"}, key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
+  {names:{tr:"X Yazarı", en:"X Contributor", es:"Autor en X", pt:"Autor no X"}, key:"own_posts", test:(s:any)=>s.own_posts >= 6}
 ];
-const DEFAULT_ALIAS: Record<Locale,string> = {tr:"Sade Gözlemci", en:"Quiet Observer", es:"Observador Sereno"};
+const DEFAULT_ALIAS: Record<Locale,string> = {tr:"Sade Gözlemci", en:"Quiet Observer", es:"Observador Sereno", pt:"Observador Tranquilo"};
 const NICKNAME_STYLE_EXAMPLES: Record<Locale,string[]> = {
   tr: ["Sessiz Gözlemci","Sohbeti Seven","Meraklı Biri","Uzun Uzun Anlatan","İnce Alaycı"],
   en: ["Quiet Observer","Always Up for Conversation","Curious Mind","Detailed Storyteller","Tongue in Cheek"],
   es: ["Observador Sereno","Siempre de Charla","Mente Curiosa","Narrador Detallista","Casi en Serio"],
+  pt: ["Observador Tranquilo","Bom de Conversa","Curioso por Natureza","Conta Tudo em Detalhes","Ironia Fina"],
 };
 const ALIAS_EVIDENCE = ALIASES.map(a=>({key:a.key,test:a.test}));
 const BANNED_ALIAS_TERMS = [
@@ -278,7 +280,8 @@ const BANNED_ALIAS_TERMS = [
   "cósmico","cosmico","galáctico","galactico","hechicero","dragón","unicornio",
   "bipolar","schizo","schizophren","autistic","autism","adhd","depressed","depression","psychopath","sociopath",
   "şizofren","sizofren","otistik","otizm","depresif","depresyon","psikopat","sosyopat",
-  "esquizofren","autista","autismo","tdah","psicópata","psicopata","sociópata","sociopata"
+  "esquizofren","autista","autismo","tdah","psicópata","psicopata","sociópata","sociopata",
+  "feiticeiro","dragão","dragao","unicórnio","esquizofrên","deprimid"
 ];
 function activeAliasEvidence(signals:any) {
   const active:string[]=[];
@@ -302,12 +305,18 @@ const ALIAS_LOCALE_RULES: Record<Locale, {forced:RegExp;sensitive:RegExp;foreign
     forced: /\b(?:máquinas?|maquinas?|motores?|fábricas?|fabricas?|generador\w*|radar\w*|bomber[oa]s?|guerrer[oa]s?|cazador\w*|mag[oa]s?|imán|iman(?:es)?|unidad(?:es)?|portavoz|portavoces|terciopelo|tostador\w*|pepinos?|patatas?|papas?|turist\w*|actualizaci\w*)\b/u,
     sensitive: /\b(?:bipolar|esquizofren\w*|autis\w*|tdah|depres\w*|psicópat\w*|psicopat\w*|sociópat\w*|sociopat\w*|narcis\w*|ansiedad|toc|gay|lesbian\w*|heterosexual\w*|bisexual\w*|transexual\w*|transgénero|musulm\w*|cristian\w*|judí[oa]s?|judi[oa]s?|ate[oa]s?|kurd[oa]s?|armeni[oa]s?|discapacit\w*|cáncer|cancer|diabét\w*|diabet\w*|trauma\w*)\b/u,
     foreign: /[çğıöş]|\b(?:quiet|mind|observer|charmer|reply|question|machine|warrior|room|update|wit|words|sessiz|merakli|soru|mizah|koltuk|filozofu)\b/u
+  },
+  pt: {
+    forced: /\b(?:máquinas?|maquinas?|motor(?:es)?|fábricas?|fabricas?|gerador(?:es|as?)?|radar(?:es)?|bombeir[oa]s?|guerreir[oa]s?|caçador(?:es|as?)?|cacador(?:es|as?)?|mag[oa]s?|ímãs?|imãs?|unidades?|porta-voz(?:es)?|veludo|torradeiras?|pepinos?|batatas?|turistas?|atualizaç\w*|atualizac\w*)\b/u,
+    sensitive: /\b(?:bipolar(?:es)?|esquizofr\w*|autis\w*|tdah|depress\w*|deprimid\w*|psicopat\w*|sociopat\w*|narcis\w*|ansiedade|toc|gay|lésbica\w*|lesbica\w*|heterossexua\w*|bissexua\w*|transexua\w*|transgênero|transgenero|muçulman\w*|muculman\w*|cristão|cristãos|cristao|cristaos|judeu\w*|judia\w*|ateu|ateus|ateia|ateias|curd[oa]s?|armêni[oa]s?|armeni[oa]s?|deficient\w*|câncer|cancer|diabét\w*|diabet\w*|trauma\w*)\b/u,
+    foreign: /[ğıöşñ]|\b(?:the|and|quiet|mind|observer|charmer|reply|question|machine|warrior|room|update|wit|words|sessiz|merakli|soru|mizah|koltuk|filozofu|charla|siempre|fiesta|muy|hasta|lector|sensata)\b/u
   }
 };
 const UNNATURAL_ALIAS_PHRASES: Record<Locale, string[]> = {
   tr:["kadife mantık","mor düşünce","cümle tostçusu","emoji sözcüsü"],
   en:["head of irony","dry wit operator","room update","timeline tourist","sentence acrobat","drama fire crew","velvet logic","purple thought","quantum spoon"],
-  es:["lógica de terciopelo","actualización de la sala","turista del timeline","acróbata de frases","jefe de ironía","cuchara cuántica","pensamiento morado"]
+  es:["lógica de terciopelo","actualización de la sala","turista del timeline","acróbata de frases","jefe de ironía","cuchara cuántica","pensamiento morado"],
+  pt:["lógica de veludo","atualização da sala","turista da timeline","acrobata de frases","chefe da ironia","colher quântica","pensamento roxo"]
 };
 function aliasValid(v: unknown, locale: Locale) {
   if (typeof v !== "string" || !isRealLocale(locale)) return false;
@@ -355,7 +364,7 @@ function validateMetrics(raw:any, keys:readonly string[], min:number, max:number
   return raw;
 }
 function validCopy(v:any, max=700) {
-  if (typeof v!=="string" || !v.trim() || v.length>max || /[<>]|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?)|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?)/iu.test(v)) throw new Error("ai_bad_copy");
+  if (typeof v!=="string" || !v.trim() || v.length>max || /[<>]|\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?|publica(?:ção|ções|cao|coes))|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes)|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*|analisad\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|publica(?:ção|ções|cao|coes))/iu.test(v)) throw new Error("ai_bad_copy");
   return v.trim();
 }
 function validateCopy(raw:any, profile=false) {

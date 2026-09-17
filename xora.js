@@ -920,6 +920,11 @@ var FUN_PERSONAS = [
         "nickname": "Travieso Discreto",
         "tagline": "Bajo esa calma se esconde una pizca de travesura.",
         "comment": "Cuando todos están de acuerdo, sueltas una pregunta que cambia la conversación entera. Lo dices con tanta calma que nadie sabe si hablas en serio o en broma. Tu parte favorita es esa sonrisa cómplice con quien lo notó primero."
+      },
+      "pt": {
+        "nickname": "Arteiro de Mansinho",
+        "tagline": "Por trás da calma, sempre tem uma travessura guardada.",
+        "comment": "Quando todo mundo concorda, você solta uma pergunta que muda o rumo da conversa. Fala com tanta calma que ninguém sabe se é sério ou brincadeira. O melhor é a risadinha cúmplice com quem percebeu primeiro."
       }
     }
   },
@@ -947,6 +952,11 @@ var FUN_PERSONAS = [
         "nickname": "Casi en Serio",
         "tagline": "Suenas serio, pero solo hasta la última palabra.",
         "comment": "Te gusta decir algo casi con sinceridad y dejar que el final de la frase te delate. Un anuncio demasiado solemne es, para ti, una invitación a una broma suave. Prefieres ganarte una sonrisa cómplice antes que explicar el chiste."
+      },
+      "pt": {
+        "nickname": "Ironia Fina",
+        "tagline": "Você muda o sentido da frase sem perder a pose.",
+        "comment": "Basta alguém fazer um anúncio solene demais para você notar a contradição escondida nele. Em vez de discutir, prefere uma resposta curta e levemente irônica. Explicar a piada nunca é opção; o sorriso de quem entendeu já basta."
       }
     }
   },
@@ -974,6 +984,11 @@ var FUN_PERSONAS = [
         "nickname": "Curiosidad Infinita",
         "tagline": "Siempre hay algo más que vale la pena preguntar.",
         "comment": "No te da vergüenza ser quien pregunta cómo funciona algo. Una respuesta interesante te lleva a otra pregunta, aunque el tema sea completamente nuevo para ti. Saber un poco más que hace una hora ya te parece una buena tarde."
+      },
+      "pt": {
+        "nickname": "Curioso de Carteirinha",
+        "tagline": "Mal termina um assunto, já quer saber do próximo.",
+        "comment": "Quando surge um tema que você não conhece, em vez de ficar quieto, você pergunta. Uma resposta interessante puxa outra pergunta, e assim a conversa vai longe. Sair sabendo um pouco mais do que antes já faz o dia valer a pena."
       }
     }
   },
@@ -1001,6 +1016,11 @@ var FUN_PERSONAS = [
         "nickname": "Cara de Póker",
         "tagline": "La cara seria es parte del chiste.",
         "comment": "Dices la frase más absurda con el mismo tono con el que pedirías un café. Nadie encuentra en tu cara una sola pista hasta que cae en la broma. Si la risa tarda, no explicas nada; ese pequeño silencio también es parte del chiste."
+      },
+      "pt": {
+        "nickname": "Cara de Paisagem",
+        "tagline": "Ninguém percebe a piada até você deixar.",
+        "comment": "Você conta a observação mais absurda com a maior naturalidade do mundo. Ninguém acha uma pista no seu rosto até a ficha cair. Se a risada demora, você nem se mexe; a pausa deixa tudo ainda mais engraçado."
       }
     }
   },
@@ -1028,6 +1048,11 @@ var FUN_PERSONAS = [
         "nickname": "Filósofo de Sofá",
         "tagline": "Una charla casual nunca se queda casual mucho rato.",
         "comment": "Puedes convertir una pregunta cualquiera en una teoría inesperada sobre la vida. Aunque el café se enfríe, no cierras el tema sin darle una vuelta más. Que alguien te lleve la contraria no te molesta; justo ahí empieza lo bueno."
+      },
+      "pt": {
+        "nickname": "Filósofo de Boteco",
+        "tagline": "Uma conversa à toa nunca fica à toa por muito tempo.",
+        "comment": "Com você, uma pergunta qualquer pode virar uma teoria inesperada sobre a vida. Mesmo com o café esfriando, você não encerra o assunto sem dar mais uma volta na ideia. Se alguém discorda, melhor ainda: é aí que a conversa fica boa."
       }
     }
   },
@@ -1055,6 +1080,11 @@ var FUN_PERSONAS = [
         "nickname": "Lector del Ambiente",
         "tagline": "Sabes cuándo un cambio de tema le hace bien a todos.",
         "comment": "En una conversación no solo escuchas lo que se dice: también notas quién no ha podido hablar. A veces haces una pregunta y a veces cambias de tema, según lo que pida el momento. Disfrutas más cuando nadie tiene que pelear por ser escuchado."
+      },
+      "pt": {
+        "nickname": "Sente o Clima",
+        "tagline": "Você sabe a hora certa de mudar de assunto.",
+        "comment": "Numa conversa, você repara não só no que é dito, mas em quem ainda não conseguiu falar. Às vezes faz uma pergunta, às vezes muda de assunto, conforme o momento pede. Você aproveita mais quando ninguém precisa disputar espaço para ser ouvido."
       }
     }
   },
@@ -1082,6 +1112,11 @@ var FUN_PERSONAS = [
         "nickname": "La Voz Sensata",
         "tagline": "Puedes estar en desacuerdo sin convertirlo en algo personal.",
         "comment": "Cuando una discusión se calienta, separas el argumento real del enfado. Puedes reconocer un buen punto sin casarte con ningún bando. Para ti, el mejor final es que todos se vayan entendiéndose un poco mejor."
+      },
+      "pt": {
+        "nickname": "Bom Senso em Pessoa",
+        "tagline": "Dá para discordar sem levar para o lado pessoal.",
+        "comment": "Quando a discussão esquenta, você separa o argumento de verdade da irritação do momento. Consegue reconhecer um bom ponto sem precisar escolher um lado em tudo. Para você, o melhor final é todo mundo saindo se entendendo um pouco melhor."
       }
     }
   },
@@ -1109,6 +1144,11 @@ var FUN_PERSONAS = [
         "nickname": "Lo Piensa Dos Veces",
         "tagline": "Hasta una respuesta corta merece otra lectura.",
         "comment": "Escribes un mensaje corto y decides que el punto suena demasiado serio y el signo de exclamación demasiado entusiasta. Antes de enviarlo, imaginas varias veces cómo lo leerá la otra persona. Cuando al final eliges tu primera versión, te ríes un poco de ti."
+      },
+      "pt": {
+        "nickname": "Relê Antes de Mandar",
+        "tagline": "Toda mensagem passa por uma revisão antes de sair.",
+        "comment": "Você escreve uma mensagem curta e acha que o ponto final ficou sério demais e a exclamação animada demais. Antes de enviar, imagina várias vezes como a outra pessoa vai ler. No fim, quando manda a primeira versão, acaba rindo da própria indecisão."
       }
     }
   },
@@ -1136,6 +1176,11 @@ var FUN_PERSONAS = [
         "nickname": "Encanto Discreto",
         "tagline": "No necesitas ser la persona más ruidosa del lugar.",
         "comment": "No sientes la necesidad de llenar cada silencio con palabras. Cuando hablas, prefieres decir algo corto que se quede en la memoria. Te gusta que, al terminar la reunión, alguien recuerde justo esa frase tuya."
+      },
+      "pt": {
+        "nickname": "De Poucas Palavras",
+        "tagline": "Você não precisa ser a voz mais alta da sala.",
+        "comment": "Você não sente necessidade de preencher cada silêncio. Quando fala, prefere dizer algo curto que fica na cabeça das pessoas. Gosta quando, depois do encontro, alguém lembra justamente aquela sua frase."
       }
     }
   },
@@ -1163,6 +1208,11 @@ var FUN_PERSONAS = [
         "nickname": "Alma de la Fiesta",
         "tagline": "Haces que unirse al plan sea fácil.",
         "comment": "Cuando la reunión se apaga, propones un juego o un tema en el que todos pueden entrar. Te gusta sumar a la gente a la conversación sin poner a nadie en aprietos. El plan puede cambiar mil veces mientras nadie se aburra."
+      },
+      "pt": {
+        "nickname": "Anima Qualquer Roda",
+        "tagline": "Com você, entrar na brincadeira fica fácil.",
+        "comment": "Quando o encontro esfria, você sugere um jogo ou um assunto em que todo mundo pode entrar. Gosta de incluir as pessoas na conversa sem deixar ninguém sem graça. O plano pode mudar mil vezes, desde que ninguém fique entediado."
       }
     }
   },
@@ -1190,6 +1240,11 @@ var FUN_PERSONAS = [
         "nickname": "Sabe Escuchar",
         "tagline": "Siempre recuerdas preguntar cómo terminó la historia.",
         "comment": "Cuando preguntas cómo le fue el día a alguien, de verdad quieres escuchar la respuesta. Un pequeño detalle te llama la atención y pides que te lo cuenten mejor. Por eso un café corto contigo casi siempre se alarga."
+      },
+      "pt": {
+        "nickname": "Escuta de Verdade",
+        "tagline": "Com você, até um detalhe pequeno vira conversa.",
+        "comment": "Quando pergunta como foi o dia de alguém, você quer mesmo ouvir a resposta. Um detalhe pequeno chama sua atenção e você pede para contarem mais. Por isso um cafezinho rápido com você quase sempre vira uma conversa longa."
       }
     }
   },
@@ -1217,6 +1272,11 @@ var FUN_PERSONAS = [
         "nickname": "Narrador Nato",
         "tagline": "Sabes qué detalle hace buena la historia.",
         "comment": "Sabes cuándo guardarte un detalle y cuándo soltarlo en el momento exacto. Un tropiezo cualquiera se vuelve digno de contar cuando encuentras la frase justa. La mitad del gusto es oír a alguien repetir tu mejor línea después."
+      },
+      "pt": {
+        "nickname": "Bom de Papo",
+        "tagline": "Você sabe qual detalhe faz a história funcionar.",
+        "comment": "Você guarda o detalhe mais engraçado para o final e sabe exatamente quando soltá-lo. Um contratempo qualquer vira uma história que todo mundo quer ouvir de novo. O melhor é quando alguém repete sua frase na conversa seguinte."
       }
     }
   }
@@ -1261,8 +1321,8 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
   var comment = {
-    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es") },
-    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es") }
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt") }
   };
   return {
     mode: actualMode,
@@ -1276,7 +1336,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     profile_emoji: card.emoji,
     comment: comment,
     card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es] } },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
@@ -1306,6 +1366,14 @@ var FUN_MATCH_COMMENTS = {
     "En la misma mesa, o se vuelven un dúo legendario o alguien silencia el chat.",
     "XORA confía en esta pareja. Nadie sabe de dónde saca tanta seguridad.",
     "La ciencia rechazó el caso. Nosotros igual le pusimos un porcentaje."
+  ],
+  pt: [
+    "O laboratório nada científico da XORA achou essa dupla suspeitamente divertida.",
+    "Essa porcentagem não prova absolutamente nada. Mesmo assim, dá para começar uma discussão no grupo.",
+    "O cartão é só brincadeira. Já a porcentagem parece oficial demais.",
+    "Na mesma mesa, ou viram uma dupla lendária ou alguém silencia o grupo.",
+    "A XORA acredita nessa dupla. Ninguém sabe de onde vem tanta confiança.",
+    "A ciência recusou o caso. A gente deu uma porcentagem mesmo assim."
   ]
 };
 
@@ -1329,7 +1397,7 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
     overall: overall,
     ci: commentIndex,
     source: "fun",
-    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex] },
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex] },
     meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
   };
 }
@@ -1337,9 +1405,9 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
-    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA" },
-    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado." },
-    comments: { tr: [""], en: [""], es: [""] }
+    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA" },
+    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída." },
+    comments: { tr: [""], en: [""], es: [""], pt: [""] }
   };
 }
 
@@ -1377,6 +1445,14 @@ var MATCH_COMMENTS = {
     "{a} y {b} se vigilan pero no se siguen. Aquí no hay valentía ni cobardía: caos puro.",
     "{a} manda corazones, {b} manda fuego. Ninguna de las dos cuentas sabe lo que quiere, pero la química es innegable.",
     "{a} hace planes, {b} los vuela por los aires. Estos dos son un guion de comedia romántica."
+  ],
+  pt: [
+    "{a} manda mensagem, {b} deixa no visto. Mas esses dois perfis se espiam às 3 da manhã. Clássico.",
+    "O flerte entre essas duas contas começa com uma curtida e termina em drama. A XORA já preparou a pipoca.",
+    "{a} escreve com o coração, {b} responde com ironia. Essa tensão termina em amor ou em bloqueio.",
+    "{a} e {b} se vigiam, mas não se seguem. Aqui não tem coragem nem covardia: é caos puro.",
+    "{a} manda corações, {b} manda fogo. Nenhuma das duas contas sabe o que quer, mas a química é inegável.",
+    "{a} faz planos, {b} explode todos eles. Esses dois dariam um roteiro de comédia romântica."
   ]
 };
 
@@ -1445,6 +1521,14 @@ var THINKING = {
       "Tomando nota de tus contradicciones...",
       "Analizando señales repetidas...",
       "XORA a veces es demasiado honesto. Prepárate."
+    ],
+    pt: [
+      "Tirando o pó da sua timeline...",
+      "Tentando ignorar seus posts das 3 da manhã... não consigo.",
+      "Analisando padrões de comportamento...",
+      "Anotando suas contradições...",
+      "Analisando sinais que se repetem...",
+      "A XORA às vezes é sincera demais. Prepare-se."
     ]
   },
   stalk: {
@@ -1471,6 +1555,14 @@ var THINKING = {
       "Esto no te lo dije yo...",
       "También revisé a quién sigue. Dice mucho.",
       "Lo que encuentre te lo cuento solo a ti."
+    ],
+    pt: [
+      "Entrando no perfil sem fazer barulho...",
+      "Não deixo rastro, fique tranquilo.",
+      "Hmm. Histórico de curtidas interessante.",
+      "Você não ouviu isso de mim...",
+      "Também olhei quem essa conta segue. Diz muita coisa.",
+      "O que eu encontrar, conto só para você."
     ]
   },
   match: {
@@ -1497,6 +1589,14 @@ var THINKING = {
       "Tensión detectada en el historial de respuestas.",
       "Calculando la química. Bata de laboratorio puesta.",
       "El resultado puede doler a alguno de los dos. Allá voy."
+    ],
+    pt: [
+      "Colocando as duas timelines lado a lado...",
+      "Procurando curtidas em comum... interessante.",
+      "Uma conta é diurna, a outra é noturna. Anotado.",
+      "Tensão detectada no histórico de respostas.",
+      "Calculando a química. Jaleco vestido.",
+      "O resultado pode chatear um de vocês. Lá vai."
     ]
   }
 };

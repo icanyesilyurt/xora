@@ -60,7 +60,7 @@ if (!matchHtml.includes("XORA FUN")) throw new Error("Fun match failed");
 if (!ctx.shareIdentityText(real).includes("https://example.test/xora/")) throw new Error("Share URL failed");
 
 // Every supported locale must render FUN identity and match cards, HTML and PNG, from its own copy.
-const locales = ["tr", "en", "es"];
+const locales = ["tr", "en", "es", "pt"];
 const persona = ctx.FUN_PERSONAS.find((p) => p.id === fun.persona_id);
 for (const code of locales) {
   lang = code;
@@ -81,5 +81,6 @@ lang = "tr";
 
 // Spanish diacritics must survive the persona copy, the card HTML and the PNG text path.
 if (!/[ñáéíóú¿¡]/.test(JSON.stringify(ctx.FUN_PERSONAS.map((p) => p.locales.es)))) throw new Error("Spanish accents missing");
+if (!/[ãõçâê]/.test(JSON.stringify(ctx.FUN_PERSONAS.map((p) => p.locales.pt)))) throw new Error("Portuguese accents missing");
 
-console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall, locales, es_nickname: persona.locales.es.nickname }));
+console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall, locales, es_nickname: persona.locales.es.nickname, pt_nickname: persona.locales.pt.nickname }));
