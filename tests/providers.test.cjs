@@ -74,8 +74,8 @@ test('missing/unsupported provider and missing key/model fail before debit, X or
   }
  }
 });
-test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, fr, de, it, ja, ko, zh) through both providers',async()=>{
- for(const provider of ['openai','anthropic'])for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh'])for(const mode of ['mirror','stalk','match']){
+test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, fr, de, it, ja, ko, zh, ru) through both providers',async()=>{
+ for(const provider of ['openai','anthropic'])for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'])for(const mode of ['mirror','stalk','match']){
   const f=fixture(provider);const response=await f.e.main(req(mode,locale));
   assert.equal(response.status,200,provider+' '+locale+' '+mode);
   const {result}=await response.json();
@@ -99,6 +99,7 @@ test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, 
    if(locale==='es') assert.ok(instruction.nickname_style_examples.includes('Mente Curiosa'));
    if(locale==='pt') {assert.ok(instruction.nickname_style_examples.includes('Curioso por Natureza'));assert.match(instruction.output_language,/Brazilian Portuguese/);}
    if(locale==='ja') {assert.ok(instruction.nickname_style_examples.includes('質問好き'));assert.match(instruction.output_language,/Japanese/);}
+   if(locale==='ru') {assert.ok(instruction.nickname_style_examples.includes('Много спрашивает'));assert.match(instruction.output_language,/Russian/);const ruCopy=[result.nickname.ru,result.tagline.ru,result.comment.mirror.ru,...result.top_behaviors.map(x=>x.label.ru)];assert.match(ruCopy.join(' '),/[\u0400-\u04ff]/);}
    if(locale==='zh') {assert.ok(instruction.nickname_style_examples.includes('問題很多'));assert.match(instruction.output_language,/Traditional Chinese/);const zhCopy=[result.nickname.zh,result.tagline.zh,result.comment.mirror.zh,...result.top_behaviors.map(x=>x.label.zh)];assert.doesNotMatch(zhCopy.join(' '),/[A-Za-z\u3040-\u30ff\uac00-\ud7af]/);assert.match(zhCopy.join(' '),/[\u4e00-\u9fff]/);}
    if(locale==='ko') {assert.ok(instruction.nickname_style_examples.includes('질문이 많은 사람'));assert.match(instruction.output_language,/Korean/);const koCopy=[result.nickname.ko,result.tagline.ko,result.comment.mirror.ko,...result.top_behaviors.map(x=>x.label.ko)];assert.doesNotMatch(koCopy.join(' '),/[A-Za-z]/);assert.match(koCopy.join(' '),/[\uac00-\ud7af]/);}
    if(locale==='it') {assert.ok(instruction.nickname_style_examples.includes('Fa Tante Domande'));assert.match(instruction.output_language,/Italian/);}
@@ -116,7 +117,7 @@ test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, 
   if(mode!=='match') assert.ok(c.shareIdentityText(result).includes(copy.nickname));
  }
  // Unsupported and planned-but-unserved locales are rejected before any billing or provider call.
- for(const locale of ['ru','xx','ko-KR','zh-CN','zh-TW','pt-BR','ar-SA','fr-FR','de-DE','it-IT','ja-JP']){
+ for(const locale of ['xx','ko-KR','zh-CN','zh-TW','ru-RU','pt-BR','ar-SA','fr-FR','de-DE','it-IT','ja-JP']){
   const rejected=fixture('anthropic');
   assert.equal((await rejected.e.main(req('mirror',locale))).status,400);
   assert.equal(rejected.requests.length,0);assert.equal(rejected.rpcCalls.length,0);

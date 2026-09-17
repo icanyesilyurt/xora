@@ -3,9 +3,9 @@ const {edge,profileAI,matchAI,AI_COPY}=require('./helpers.cjs');
 test('strict request validation before billing',()=>{
  const e=edge();const base={mode:'mirror',locale:'tr',handle:'@Alice',request_id:'request-123'};
  assert.equal(e.validateRequest(base).handles[0],'alice');
- for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh']) assert.equal(e.validateRequest({...base,locale}).locale,locale);
+ for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']) assert.equal(e.validateRequest({...base,locale}).locale,locale);
  // Planned but not yet served locales are rejected before billing until they have REAL language rules.
- for(const patch of [{mode:'fun'},{mode:'oops'},{locale:'ru'},{locale:'ZH'},{locale:'zh-TW'},{locale:'KO'},{locale:'ko-KR'},{locale:'JA'},{locale:'ja-JP'},{locale:'IT'},{locale:'it-IT'},{locale:'FR'},{locale:'fr-FR'},{locale:'DE'},{locale:'de-DE'},{locale:'ES'},{locale:'es-ES'},{locale:'PT'},{locale:'pt-BR'},{locale:'AR'},{locale:'ar-SA'},{handle:'abc!'},{handle:'a b'},{handle:'a'.repeat(16)},{handle:32},{request_id:'../id'},{mode:'match',handles:['Alice','@alice']}]) assert.throws(()=>e.validateRequest({...base,...patch}),/bad_request/);
+ for(const patch of [{mode:'fun'},{mode:'oops'},{locale:'RU'},{locale:'ru-RU'},{locale:'ZH'},{locale:'zh-TW'},{locale:'KO'},{locale:'ko-KR'},{locale:'JA'},{locale:'ja-JP'},{locale:'IT'},{locale:'it-IT'},{locale:'FR'},{locale:'fr-FR'},{locale:'DE'},{locale:'de-DE'},{locale:'ES'},{locale:'es-ES'},{locale:'PT'},{locale:'pt-BR'},{locale:'AR'},{locale:'ar-SA'},{handle:'abc!'},{handle:'a b'},{handle:'a'.repeat(16)},{handle:32},{request_id:'../id'},{mode:'match',handles:['Alice','@alice']}]) assert.throws(()=>e.validateRequest({...base,...patch}),/bad_request/);
 });
 test('X upstream diagnostics are phase-specific and sanitized',()=>{
  const e=edge();
@@ -28,7 +28,7 @@ test('REAL shape, rarity, nickname evidence and safe deterministic fallback',()=
 test('REAL AI output is generated for the request locale only (tr, en, es, pt, ar, fr, de, it, ja)',()=>{
  const e=edge();const sig={question_ratio:.8,own_posts:8};
  const otherKeys=/(?:_tr|_en|_es)$/;
- for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh']){
+ for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']){
   const copy=AI_COPY[locale];
   // The model output carries no per-locale field names and no other language.
   const raw=profileAI(locale);
@@ -66,7 +66,7 @@ test('REAL schema asks for one set of user-facing strings, independent of locale
   if(!isMatch){for(const n of ['tagline','summary','label','text','nickname_candidates'])assert.ok(names.includes(n),n);}
  }
  assert.deepEqual([...e.PLANNED_LOCALES],['tr','en','es','pt','it','fr','de','ru','ja','ko','zh','ar']);
- assert.deepEqual(Object.keys(e.REAL_LOCALES),['tr','en','es','pt','ar','fr','de','it','ja','ko','zh']);
+ assert.deepEqual(Object.keys(e.REAL_LOCALES),['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']);
 });
 test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=>{
  const e=edge();

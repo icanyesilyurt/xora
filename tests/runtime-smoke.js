@@ -60,7 +60,7 @@ if (!matchHtml.includes("XORA FUN")) throw new Error("Fun match failed");
 if (!ctx.shareIdentityText(real).includes("https://example.test/xora/")) throw new Error("Share URL failed");
 
 // Every supported locale must render FUN identity and match cards, HTML and PNG, from its own copy.
-const locales = ["tr", "en", "es", "pt", "ar", "fr", "de", "it", "ja", "ko", "zh"];
+const locales = ["tr", "en", "es", "pt", "ar", "fr", "de", "it", "ja", "ko", "zh", "ru"];
 const persona = ctx.FUN_PERSONAS.find((p) => p.id === fun.persona_id);
 for (const code of locales) {
   lang = code;
@@ -92,6 +92,9 @@ if (!/[\uac00-\ud7af]/.test(koCopy) || /[A-Za-z\u3040-\u30ff\u4e00-\u9fff]/.test
 const zhCopy = ctx.FUN_PERSONAS.map((p) => p.locales.zh.comment).join("");
 if (!/[\u4e00-\u9fff]/.test(zhCopy) || /[A-Za-z\u3040-\u30ff\uac00-\ud7af]/.test(zhCopy)) throw new Error("Chinese copy must be Han only");
 if (/[这个们说见会时样为么过还来对点问让给长风话网无没当发]/.test(zhCopy)) throw new Error("Chinese copy must be Traditional");
+const ruCopy = ctx.FUN_PERSONAS.map((p) => p.locales.ru.nickname + p.locales.ru.tagline + p.locales.ru.comment).join(" ");
+if (!/[\u0400-\u04ff]/.test(ruCopy) || /[A-Za-z]/.test(ruCopy)) throw new Error("Russian copy must be Cyrillic only");
+if (!/[ёЁ]/.test(ruCopy)) throw new Error("Russian copy must exercise the yo letter");
 if (!ctx.FUN_PERSONAS.every((p) => /^[\u0600-\u06FF\s.،؛؟!]+$/.test(p.locales.ar.nickname + p.locales.ar.tagline))) throw new Error("Arabic copy must be Arabic script");
 
-console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall, locales, es_nickname: persona.locales.es.nickname, pt_nickname: persona.locales.pt.nickname, ar_nickname: persona.locales.ar.nickname, fr_nickname: persona.locales.fr.nickname, de_nickname: persona.locales.de.nickname, it_nickname: persona.locales.it.nickname, ja_nickname: persona.locales.ja.nickname, ko_nickname: persona.locales.ko.nickname, zh_nickname: persona.locales.zh.nickname }));
+console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall, locales, es_nickname: persona.locales.es.nickname, pt_nickname: persona.locales.pt.nickname, ar_nickname: persona.locales.ar.nickname, fr_nickname: persona.locales.fr.nickname, de_nickname: persona.locales.de.nickname, it_nickname: persona.locales.it.nickname, ja_nickname: persona.locales.ja.nickname, ko_nickname: persona.locales.ko.nickname, zh_nickname: persona.locales.zh.nickname, ru_nickname: persona.locales.ru.nickname }));
