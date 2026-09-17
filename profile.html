@@ -108,7 +108,7 @@
     var d = new Date(ts);
     var today = new Date();
     if (d.toDateString() === today.toDateString()) return t("date_today");
-    return d.toLocaleDateString(getLang() === "tr" ? "tr-TR" : "en-US",
+    return d.toLocaleDateString(getLang() === "tr" ? "tr-TR" : getLang() === "es" ? "es-ES" : "en-US",
                                 { day: "numeric", month: "short" });
   }
 
@@ -153,7 +153,7 @@
       } else if (item.rawResult) {
         inner.innerHTML = buildIdentityCard(item.rawResult);
       }
-    } catch (e) { inner.innerHTML = "<p>Kart yüklenemedi</p>"; }
+    } catch (e) { inner.innerHTML = "<p>" + esc(t("card_load_failed")) + "</p>"; }
 
     var closeBtn = document.createElement("button");
     closeBtn.textContent = t("close");

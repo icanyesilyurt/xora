@@ -18,7 +18,7 @@ function browser() {
  context.esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
  return context;
 }
-const metrics=['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label_tr:'Yorum',label_en:'Comment',value:70}));
-const profileAI=()=>({nickname_candidates:[{tr:'Meraklı Biri',en:'Curious Mind',evidence:'question_ratio'}],metrics:structuredClone(metrics),tagline_tr:'Sorularla ilerliyor.',tagline_en:'Questions lead the way.',summary_tr:'Açık sorular soruyor.',summary_en:'Asks open questions.',comment_tr:'Sorularla konuşmayı açıyorsun.',comment_en:'You open conversations with questions.',observations:['Uses questions.'],emoji:'🪞'});
-const matchAI=()=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment_tr:'İki hesap da soru soruyor.',comment_en:'Both accounts ask questions.'});
+const metrics=['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label_tr:'Yorum',label_en:'Comment',label_es:'Comentario',value:70}));
+const profileAI=()=>({nickname_candidates:[{tr:'Meraklı Biri',en:'Curious Mind',es:'Mente Curiosa',evidence:'question_ratio'}],metrics:structuredClone(metrics),tagline_tr:'Sorularla ilerliyor.',tagline_en:'Questions lead the way.',tagline_es:'Avanza a base de preguntas.',summary_tr:'Açık sorular soruyor.',summary_en:'Asks open questions.',summary_es:'Hace preguntas abiertas.',comment_tr:'Sorularla konuşmayı açıyorsun.',comment_en:'You open conversations with questions.',comment_es:'Abres las conversaciones con preguntas.',observations:['Uses questions.'],emoji:'🪞'});
+const matchAI=()=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment_tr:'İki hesap da soru soruyor.',comment_en:'Both accounts ask questions.',comment_es:'Las dos cuentas hacen preguntas.'});
 module.exports={edge,browser,profileAI,matchAI};

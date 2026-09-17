@@ -125,8 +125,8 @@ function buildIdentityCardV3(res) {
   var mirror = res.comment ? res.comment.mirror[lang] : "";
   var mode = res.mode || "mirror";
   var quoteLabel = mode === "stalk"
-    ? (lang === "tr" ? "XORA Stalk" : "XORA Stalk")
-    : (lang === "tr" ? "XORA Ayna" : "XORA Mirror");
+    ? "XORA Stalk"
+    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : "XORA Mirror");
 
   var chips = "";
   var top = res.top_behaviors || [];
@@ -479,7 +479,7 @@ function renderIdentityPNGV3(res) {
   var emoji = res.profile_emoji || "🪞";
   var tagline = res.tagline ? (res.tagline[lang] || res.tagline.tr) : "";
   var mode = res.mode || "mirror";
-  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : "XORA MIRROR");
+  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : "XORA MIRROR");
   var b = baseCanvas();
   var ctx = b.ctx;
 
@@ -789,9 +789,11 @@ function shareIdentityText(res) {
   if (resultTier(res) === "real") {
     var rarity = rarityText(res);
     if (lang === "tr") return 'XORA REAL beni okudu: "' + name + '" · ' + rarity + ' 👀 Sen ne çıkarsın? → ' + getPublicSiteUrl();
+    if (lang === "es") return 'XORA REAL me leyó: "' + name + '" · ' + rarity + ' 👀 ¿Qué diría el tuyo? → ' + getPublicSiteUrl();
     return 'XORA REAL read me: "' + name + '" · ' + rarity + ' 👀 What would yours say? → ' + getPublicSiteUrl();
   }
   if (lang === "tr") return 'XORA FUN kartım: "' + name + '" 😅 Seninkini çek → ' + getPublicSiteUrl();
+  if (lang === "es") return 'Mi tarjeta XORA FUN: "' + name + '" 😅 Saca la tuya → ' + getPublicSiteUrl();
   return 'My XORA FUN card: "' + name + '" 😅 Draw yours → ' + getPublicSiteUrl();
 }
 
@@ -800,9 +802,11 @@ function shareMatchText(m) {
   if (resultTier(m) === "real") {
     var rarity = rarityText(m);
     if (lang === "tr") return "XORA REAL: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " · " + rarity + " 🔥 → " + getPublicSiteUrl();
+    if (lang === "es") return "XORA REAL: @" + m.a + " × @" + m.b + " compatibilidad " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     return "XORA REAL: @" + m.a + " × @" + m.b + " match " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
   }
   if (lang === "tr") return "XORA FUN: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " 😅 Siz kaç çıkarsınız? → " + getPublicSiteUrl();
+  if (lang === "es") return "XORA FUN: @" + m.a + " × @" + m.b + " compatibilidad " + m.overall + "% 😅 ¿Cuánto sacarían ustedes? → " + getPublicSiteUrl();
   return "XORA FUN: @" + m.a + " × @" + m.b + " match " + m.overall + "% 😅 Try yours → " + getPublicSiteUrl();
 }
 
@@ -812,7 +816,7 @@ function cardPresentationCopy(value, key) {
   if (key === "meta") return value;
   if (typeof value === "string") {
     return value.split(/(?<=[.!?])\s+/).filter(function(sentence) {
-      return !/\d[\d\s/.,%'-]*(?:posts?|tweets?|paylaşım|gönderi|tweet)|(?:posts?|tweets?|paylaşım|gönderi|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen)[^.!?]{0,35}(?:posts?|tweets?|paylaşım|gönderi)/iu.test(sentence);
+      return !/\d[\d\s/.,%'-]*(?:posts?|tweets?|tuits?|paylaşım|gönderi|tweet|publicacion(?:es)?)|(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?|sample)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen|analizad\w*)[^.!?]{0,35}(?:posts?|tweets?|tuits?|paylaşım|gönderi|publicacion(?:es)?)/iu.test(sentence);
     }).join(" ");
   }
   if (Array.isArray(value)) return value.map(function(v){return cardPresentationCopy(v);});

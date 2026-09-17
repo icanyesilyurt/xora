@@ -915,6 +915,11 @@ var FUN_PERSONAS = [
         "nickname": "Quiet Instigator",
         "tagline": "You ask the question everyone else was avoiding.",
         "comment": "You can get a whole table talking with one casually delivered question. You seem perfectly content to listen while everyone works out what they think. The fun is in the tiny grin you share with whoever caught on first."
+      },
+      "es": {
+        "nickname": "Travieso Discreto",
+        "tagline": "Bajo esa calma se esconde una pizca de travesura.",
+        "comment": "Cuando todos están de acuerdo, sueltas una pregunta que cambia la conversación entera. Lo dices con tanta calma que nadie sabe si hablas en serio o en broma. Tu parte favorita es esa sonrisa cómplice con quien lo notó primero."
       }
     }
   },
@@ -937,6 +942,11 @@ var FUN_PERSONAS = [
         "nickname": "Tongue in Cheek",
         "tagline": "Almost serious, but never quite.",
         "comment": "You enjoy saying something almost sincerely and letting the last few words give you away. A grand announcement is usually an invitation for a gentle tease. You would rather earn a knowing smile than explain why you were funny."
+      },
+      "es": {
+        "nickname": "Casi en Serio",
+        "tagline": "Suenas serio, pero solo hasta la última palabra.",
+        "comment": "Te gusta decir algo casi con sinceridad y dejar que el final de la frase te delate. Un anuncio demasiado solemne es, para ti, una invitación a una broma suave. Prefieres ganarte una sonrisa cómplice antes que explicar el chiste."
       }
     }
   },
@@ -959,6 +969,11 @@ var FUN_PERSONAS = [
         "nickname": "Endlessly Curious",
         "tagline": "There is always something else worth asking about.",
         "comment": "You are happy to be the person who asks how something works. One interesting answer tends to lead to another question, even when the subject is completely new to you. Knowing a little more than you did an hour ago feels like a good afternoon."
+      },
+      "es": {
+        "nickname": "Curiosidad Infinita",
+        "tagline": "Siempre hay algo más que vale la pena preguntar.",
+        "comment": "No te da vergüenza ser quien pregunta cómo funciona algo. Una respuesta interesante te lleva a otra pregunta, aunque el tema sea completamente nuevo para ti. Saber un poco más que hace una hora ya te parece una buena tarde."
       }
     }
   },
@@ -981,6 +996,11 @@ var FUN_PERSONAS = [
         "nickname": "Dry Wit",
         "tagline": "The straight face is part of the joke.",
         "comment": "You deliver a ridiculous observation with the same composure as a perfectly ordinary remark. Someone usually has to check whether you meant it. You let them take their time, because the pause makes it better."
+      },
+      "es": {
+        "nickname": "Cara de Póker",
+        "tagline": "La cara seria es parte del chiste.",
+        "comment": "Dices la frase más absurda con el mismo tono con el que pedirías un café. Nadie encuentra en tu cara una sola pista hasta que cae en la broma. Si la risa tarda, no explicas nada; ese pequeño silencio también es parte del chiste."
       }
     }
   },
@@ -1003,6 +1023,11 @@ var FUN_PERSONAS = [
         "nickname": "Armchair Philosopher",
         "tagline": "A casual chat rarely stays casual for long.",
         "comment": "You can turn a passing question into a surprisingly thoughtful conversation. You enjoy trying out an idea before deciding whether you believe it. A good objection is a reason to stay and talk, especially if everyone is comfortable."
+      },
+      "es": {
+        "nickname": "Filósofo de Sofá",
+        "tagline": "Una charla casual nunca se queda casual mucho rato.",
+        "comment": "Puedes convertir una pregunta cualquiera en una teoría inesperada sobre la vida. Aunque el café se enfríe, no cierras el tema sin darle una vuelta más. Que alguien te lleve la contraria no te molesta; justo ahí empieza lo bueno."
       }
     }
   },
@@ -1025,6 +1050,11 @@ var FUN_PERSONAS = [
         "nickname": "Reads the Room",
         "tagline": "You know when a change of subject would help.",
         "comment": "You notice when someone has been trying to join in and make a little space for them. You are just as happy to change the subject when a joke has run its course. A good conversation, to you, is one where nobody has to fight to be heard."
+      },
+      "es": {
+        "nickname": "Lector del Ambiente",
+        "tagline": "Sabes cuándo un cambio de tema le hace bien a todos.",
+        "comment": "En una conversación no solo escuchas lo que se dice: también notas quién no ha podido hablar. A veces haces una pregunta y a veces cambias de tema, según lo que pida el momento. Disfrutas más cuando nadie tiene que pelear por ser escuchado."
       }
     }
   },
@@ -1047,6 +1077,11 @@ var FUN_PERSONAS = [
         "nickname": "Voice of Reason",
         "tagline": "You can disagree without making it personal.",
         "comment": "When a disagreement gets heated, you try to separate the actual point from the irritation. You can acknowledge a fair argument without choosing a side in everything. You are happiest when people leave understanding each other a little better."
+      },
+      "es": {
+        "nickname": "La Voz Sensata",
+        "tagline": "Puedes estar en desacuerdo sin convertirlo en algo personal.",
+        "comment": "Cuando una discusión se calienta, separas el argumento real del enfado. Puedes reconocer un buen punto sin casarte con ningún bando. Para ti, el mejor final es que todos se vayan entendiéndose un poco mejor."
       }
     }
   },
@@ -1069,6 +1104,11 @@ var FUN_PERSONAS = [
         "nickname": "Second Guesser",
         "tagline": "Even a short reply deserves another look.",
         "comment": "You can have a perfectly good reply ready and still wonder whether it sounds right. A different word seems worth considering, then perhaps the original was better. Sending the first version after all that is a familiar little victory."
+      },
+      "es": {
+        "nickname": "Lo Piensa Dos Veces",
+        "tagline": "Hasta una respuesta corta merece otra lectura.",
+        "comment": "Escribes un mensaje corto y decides que el punto suena demasiado serio y el signo de exclamación demasiado entusiasta. Antes de enviarlo, imaginas varias veces cómo lo leerá la otra persona. Cuando al final eliges tu primera versión, te ríes un poco de ti."
       }
     }
   },
@@ -1091,6 +1131,11 @@ var FUN_PERSONAS = [
         "nickname": "Quiet Charmer",
         "tagline": "You do not need to be the loudest person there.",
         "comment": "You are comfortable listening while other people take their turn. When you do speak, a thoughtful remark or a well-timed joke is usually enough. People tend to remember how easy it felt to talk to you."
+      },
+      "es": {
+        "nickname": "Encanto Discreto",
+        "tagline": "No necesitas ser la persona más ruidosa del lugar.",
+        "comment": "No sientes la necesidad de llenar cada silencio con palabras. Cuando hablas, prefieres decir algo corto que se quede en la memoria. Te gusta que, al terminar la reunión, alguien recuerde justo esa frase tuya."
       }
     }
   },
@@ -1113,6 +1158,11 @@ var FUN_PERSONAS = [
         "nickname": "Life of the Party",
         "tagline": "You make joining in feel easy.",
         "comment": "You are often the first to suggest something everyone can join in with. You enjoy getting people laughing together without putting anyone on the spot. The plan can change completely as long as people are having a good time."
+      },
+      "es": {
+        "nickname": "Alma de la Fiesta",
+        "tagline": "Haces que unirse al plan sea fácil.",
+        "comment": "Cuando la reunión se apaga, propones un juego o un tema en el que todos pueden entrar. Te gusta sumar a la gente a la conversación sin poner a nadie en aprietos. El plan puede cambiar mil veces mientras nadie se aburra."
       }
     }
   },
@@ -1135,6 +1185,11 @@ var FUN_PERSONAS = [
         "nickname": "Good Listener",
         "tagline": "You remember to ask what happened next.",
         "comment": "You do not ask a question just to wait for your own turn to speak. A small detail catches your interest and you want to hear the rest. People often find themselves telling you a story they had not planned to share."
+      },
+      "es": {
+        "nickname": "Sabe Escuchar",
+        "tagline": "Siempre recuerdas preguntar cómo terminó la historia.",
+        "comment": "Cuando preguntas cómo le fue el día a alguien, de verdad quieres escuchar la respuesta. Un pequeño detalle te llama la atención y pides que te lo cuenten mejor. Por eso un café corto contigo casi siempre se alarga."
       }
     }
   },
@@ -1157,6 +1212,11 @@ var FUN_PERSONAS = [
         "nickname": "Way with Words",
         "tagline": "You know which detail makes the story.",
         "comment": "You know when to leave a detail out and when to bring it back at exactly the right moment. An ordinary mishap becomes worth retelling once you have found the right phrasing. Half the pleasure is hearing someone repeat your best line later."
+      },
+      "es": {
+        "nickname": "Narrador Nato",
+        "tagline": "Sabes qué detalle hace buena la historia.",
+        "comment": "Sabes cuándo guardarte un detalle y cuándo soltarlo en el momento exacto. Un tropiezo cualquiera se vuelve digno de contar cuando encuentras la frase justa. La mitad del gusto es oír a alguien repetir tu mejor línea después."
       }
     }
   }
@@ -1201,8 +1261,8 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
   var comment = {
-    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en") },
-    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en") }
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es") }
   };
   return {
     mode: actualMode,
@@ -1216,7 +1276,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     profile_emoji: card.emoji,
     comment: comment,
     card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en] } },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
@@ -1238,6 +1298,14 @@ var FUN_MATCH_COMMENTS = {
     "At the same table they are either iconic or somebody mutes the chat.",
     "XORA believes in this match. Nobody knows why XORA is this confident.",
     "Science rejected the case. We gave it a percentage anyway."
+  ],
+  es: [
+    "El laboratorio nada científico de XORA encontró a este dúo sospechosamente entretenido.",
+    "Este porcentaje no demuestra absolutamente nada. Aun así puede encender el chat del grupo.",
+    "La tarjeta es de broma. El porcentaje, en cambio, se ve innecesariamente oficial.",
+    "En la misma mesa, o se vuelven un dúo legendario o alguien silencia el chat.",
+    "XORA confía en esta pareja. Nadie sabe de dónde saca tanta seguridad.",
+    "La ciencia rechazó el caso. Nosotros igual le pusimos un porcentaje."
   ]
 };
 
@@ -1261,7 +1329,7 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
     overall: overall,
     ci: commentIndex,
     source: "fun",
-    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex] },
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex] },
     meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
   };
 }
@@ -1269,9 +1337,9 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
-    name: { tr: "XORA Profil", en: "XORA Profile" },
-    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete." },
-    comments: { tr: [""], en: [""] }
+    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA" },
+    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado." },
+    comments: { tr: [""], en: [""], es: [""] }
   };
 }
 
@@ -1301,6 +1369,14 @@ var MATCH_COMMENTS = {
     "{a} and {b} stalk each other but won't follow. This match has no courage, no cowardice — pure chaos.",
     "{a} sends hearts, {b} sends fire. Neither account knows what it wants, but the chemistry is undeniable.",
     "{a} makes plans, {b} blows them up. These two are a perfect romantic comedy script."
+  ],
+  es: [
+    "{a} manda el mensaje, {b} lo deja en visto. Pero estos dos perfiles se revisan a las 3 de la mañana. Un clásico.",
+    "El coqueteo entre estas dos cuentas empieza con un like y termina en drama. XORA ya tiene las palomitas listas.",
+    "{a} escribe con el corazón, {b} responde con ironía. Esta tensión termina en amor o en bloqueo.",
+    "{a} y {b} se vigilan pero no se siguen. Aquí no hay valentía ni cobardía: caos puro.",
+    "{a} manda corazones, {b} manda fuego. Ninguna de las dos cuentas sabe lo que quiere, pero la química es innegable.",
+    "{a} hace planes, {b} los vuela por los aires. Estos dos son un guion de comedia romántica."
   ]
 };
 
@@ -1361,6 +1437,14 @@ var THINKING = {
       "Noting your contradictions...",
       "Analyzing repeated signals...",
       "XORA can be a little too honest. Brace yourself."
+    ],
+    es: [
+      "Quitándole el polvo a tu timeline...",
+      "Intentando ignorar tus posts de las 3 de la mañana... no puedo.",
+      "Escaneando patrones de comportamiento...",
+      "Tomando nota de tus contradicciones...",
+      "Analizando señales repetidas...",
+      "XORA a veces es demasiado honesto. Prepárate."
     ]
   },
   stalk: {
@@ -1379,6 +1463,14 @@ var THINKING = {
       "You didn't hear this from me...",
       "Checked who they follow too. It says a lot.",
       "I'll tell only you what I found."
+    ],
+    es: [
+      "Entrando al perfil sin hacer ruido...",
+      "No dejo huellas, tranquilo.",
+      "Mmm. Interesante historial de likes.",
+      "Esto no te lo dije yo...",
+      "También revisé a quién sigue. Dice mucho.",
+      "Lo que encuentre te lo cuento solo a ti."
     ]
   },
   match: {
@@ -1397,6 +1489,14 @@ var THINKING = {
       "Tension detected in the reply history.",
       "Calculating chemistry. Lab coat is on.",
       "The result may upset one of you. Revealing now."
+    ],
+    es: [
+      "Poniendo los dos timelines lado a lado...",
+      "Escaneando likes en común... interesante.",
+      "Una cuenta es diurna, la otra nocturna. Anotado.",
+      "Tensión detectada en el historial de respuestas.",
+      "Calculando la química. Bata de laboratorio puesta.",
+      "El resultado puede doler a alguno de los dos. Allá voy."
     ]
   }
 };

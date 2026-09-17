@@ -3,7 +3,8 @@ const vm = require("vm");
 
 const ctx = { console, Math, Date, JSON, setInterval, clearInterval, setTimeout, clearTimeout };
 ctx.window = ctx;
-ctx.getLang = () => "tr";
+let lang = "tr";
+ctx.getLang = () => lang;
 ctx.t = (key) => ({
   real_label: "XORA REAL",
   fun_label: "XORA FUN · ÜCRETSİZ",
@@ -21,7 +22,13 @@ ctx.esc = (s) => String(s ?? "")
   .replace(/"/g, "&quot;");
 ctx.getPublicSiteUrl = () => "https://example.test/xora/";
 ctx.toast = () => {};
-ctx.document = { createElement: () => ({ getContext: () => ({}) }), body: { appendChild() {} } };
+const painted = [];
+const canvas2d = () => new Proxy({
+  measureText: (v) => ({ width: String(v).length * 12 }),
+  fillText: (v, x, y) => painted.push({ v: String(v), x, y }),
+  createLinearGradient: () => ({ addColorStop() {} })
+}, { get: (o, k) => (k in o ? o[k] : () => {}) });
+ctx.document = { createElement: () => ({ getContext: canvas2d }), body: { appendChild() {} } };
 
 vm.createContext(ctx);
 for (const file of ["xora.js", "card.js"]) {
@@ -52,4 +59,27 @@ const matchHtml = ctx.buildMatchCard(match);
 if (!matchHtml.includes("XORA FUN")) throw new Error("Fun match failed");
 if (!ctx.shareIdentityText(real).includes("https://example.test/xora/")) throw new Error("Share URL failed");
 
-console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall }));
+// Every supported locale must render FUN identity and match cards, HTML and PNG, from its own copy.
+const locales = ["tr", "en", "es"];
+const persona = ctx.FUN_PERSONAS.find((p) => p.id === fun.persona_id);
+for (const code of locales) {
+  lang = code;
+  const copy = persona.locales[code];
+  const html = ctx.buildIdentityCard(fun);
+  if (!html.includes(copy.nickname)) throw new Error("Missing " + code + " nickname on card");
+  if (!html.includes(copy.comment)) throw new Error("Missing " + code + " comment on card");
+  if (!ctx.matchComment(match, code)) throw new Error("Missing " + code + " match comment");
+
+  painted.length = 0;
+  ctx.renderIdentityPNG(fun);
+  const drawn = painted.filter((p) => p.x === 500 && p.y > 500 && p.y < 1090).map((p) => p.v).join(" ");
+  if (!drawn.includes(copy.nickname)) throw new Error("PNG missing " + code + " nickname");
+  if (!drawn.includes(copy.comment)) throw new Error("PNG missing " + code + " comment");
+  ctx.renderMatchPNG(match);
+}
+lang = "tr";
+
+// Spanish diacritics must survive the persona copy, the card HTML and the PNG text path.
+if (!/[ñáéíóú¿¡]/.test(JSON.stringify(ctx.FUN_PERSONAS.map((p) => p.locales.es)))) throw new Error("Spanish accents missing");
+
+console.log(JSON.stringify({ ok: true, fun: fun.handle, rarity: real.rarity.name, match: match.overall, locales, es_nickname: persona.locales.es.nickname }));

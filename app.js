@@ -1,6 +1,6 @@
 /* ============================================================
    XORA — app.js
-   Ortak mantık: depolama, krediler, dil (TR/EN), üst bar, toast
+   Ortak mantık: depolama, krediler, dil (TR/EN/ES), üst bar, toast
    ============================================================ */
 
 var LS = {
@@ -200,7 +200,7 @@ async function ensureUserRow(authUser, username) {
 
 async function createLocalUser(username, email, password) {
   var sb = getSupabaseClient();
-  if (!sb) return { success: false, error: "Supabase bağlantısı kurulamadı" };
+  if (!sb) return { success: false, error: t("auth_connection_failed") };
 
   var cleanUsername = String(username || "").replace(/^@+/, "").trim();
   var cleanEmail = String(email || "").trim().toLowerCase();
@@ -214,7 +214,7 @@ async function createLocalUser(username, email, password) {
     });
     console.log("[XORA auth] signUp result", signup);
     if (signup.error) return { success: false, error: signup.error.message };
-    if (!signup.data || !signup.data.user) return { success: false, error: "Üyelik oluşturulamadı" };
+    if (!signup.data || !signup.data.user) return { success: false, error: t("auth_signup_failed") };
 
     var profile = await ensureUserRow(signup.data.user, cleanUsername);
     return { success: true, user: profile, hasSession: !!signup.data.session };
@@ -226,7 +226,7 @@ async function createLocalUser(username, email, password) {
 
 async function loginLocalUser(email, password) {
   var sb = getSupabaseClient();
-  if (!sb) return { success: false, error: "Supabase bağlantısı kurulamadı" };
+  if (!sb) return { success: false, error: t("auth_connection_failed") };
 
   try {
     console.log("[XORA auth] signIn start");
@@ -236,7 +236,7 @@ async function loginLocalUser(email, password) {
     });
     console.log("[XORA auth] signIn result", signin);
     if (signin.error) return { success: false, error: signin.error.message };
-    if (!signin.data || !signin.data.user) return { success: false, error: "Giriş yapılamadı" };
+    if (!signin.data || !signin.data.user) return { success: false, error: t("auth_signin_failed") };
 
     var profile = await ensureUserRow(signin.data.user);
     return { success: true, user: profile };
@@ -447,7 +447,7 @@ async function refreshCreditsFromServer() {
 
 function realErrorMessage(err) {
   var code = String((err && err.message) || err || "internal_error").toLowerCase();
-  if (code.indexOf("refund_pending") >= 0) return getLang() === "tr" ? "İade bekliyor. İstek kimliğin korunuyor; daha sonra tekrar kontrol et." : "Refund pending. Your request ID is retained; check again later.";
+  if (code.indexOf("refund_pending") >= 0) return t("real_err_refund");
   if (code.indexOf("insufficient") >= 0 || code.indexOf("credit") >= 0) return t("real_err_credit");
   if (code.indexOf("protected") >= 0) return t("real_err_protected");
   if (code.indexOf("user_not_found") >= 0 || code.indexOf("not found") >= 0) return t("real_err_not_found");
@@ -479,7 +479,7 @@ function disableProductionRealCtas() {
 }
 
 function realComingSoonText() {
-  return getLang() === "tr" ? "Gerçek analiz yakında aktif" : "Real analysis coming soon";
+  return t("real_coming_soon");
 }
 
 function showProductionRealPause(tier) {
@@ -806,6 +806,9 @@ var I18N = {
     auth_password_min: "Şifre minimum 6 karakter olmalı.",
     auth_password_mismatch: "Şifreler uyuşmuyor.",
     auth_config_missing: "Auth ayarları eksik.",
+    auth_connection_failed: "Supabase bağlantısı kurulamadı",
+    auth_signup_failed: "Üyelik oluşturulamadı",
+    auth_signin_failed: "Giriş yapılamadı",
     /* stalk */
     stalk_h1: "X Stalk",
     stalk_sub: "Bir kullanıcı adı yaz, XORA gizlice baksın. Bu iş aramızda kalır.",
@@ -868,6 +871,8 @@ var I18N = {
     real_err_rate: "X şu an biraz huysuz. Kısa süre sonra tekrar dene.",
     real_err_auth: "Gerçek analiz için XORA hesabına giriş yapmalısın.",
     real_err_unavailable: "Analiz tamamlanamadı. Bakiye ve geçmişini kontrol edip tekrar dene.",
+    real_err_refund: "İade bekliyor. İstek kimliğin korunuyor; daha sonra tekrar kontrol et.",
+    real_coming_soon: "Gerçek analiz yakında aktif",
     rarity_common: "COMMON",
     rarity_rare: "RARE",
     rarity_epic: "EPIC",
@@ -890,7 +895,8 @@ var I18N = {
     history_deleted: "Seçilen analizler geçmişinden kaldırıldı.",
     history_not_found: "Silinecek kayıt bulunamadı.",
     profile_card_expired: "Mirror kartının süresi doldu.",
-    profile_card_renew: "Yeni Mirror çek"
+    profile_card_renew: "Yeni Mirror çek",
+    card_load_failed: "Kart yüklenemedi"
   },
   en: {
     nav_profile: "Profile",
@@ -962,6 +968,9 @@ var I18N = {
     auth_password_min: "Password must be at least 6 characters.",
     auth_password_mismatch: "Passwords do not match.",
     auth_config_missing: "Auth config is missing.",
+    auth_connection_failed: "Could not connect to Supabase",
+    auth_signup_failed: "Account could not be created",
+    auth_signin_failed: "Sign-in failed",
     stalk_h1: "X Stalk",
     stalk_sub: "Type a username, XORA takes a quiet look. This stays between us.",
     stalk_ph: "@thatperson",
@@ -1018,6 +1027,8 @@ var I18N = {
     real_err_rate: "X is being difficult right now. Try again shortly.",
     real_err_auth: "Sign in to your XORA account for Real analysis.",
     real_err_unavailable: "Analysis could not finish. Check your balance and history before retrying.",
+    real_err_refund: "Refund pending. Your request ID is retained; check again later.",
+    real_coming_soon: "Real analysis coming soon",
     rarity_common: "COMMON",
     rarity_rare: "RARE",
     rarity_epic: "EPIC",
@@ -1039,11 +1050,187 @@ var I18N = {
     history_deleted: "Selected analyses removed from history.",
     history_not_found: "No records found to delete.",
     profile_card_expired: "Your Mirror card has expired.",
-    profile_card_renew: "Get a new Mirror"
+    profile_card_renew: "Get a new Mirror",
+    card_load_failed: "Card could not be loaded"
+  },
+  es: {
+    nav_profile: "Perfil",
+    nav_login: "Iniciar Sesión",
+    /* ana sayfa */
+    home_hi: "Hola, soy XORA.",
+    home_sub: "Ven por la broma, quédate por el análisis real. XORA habla de más en los dos casos.",
+    card_mirror_t: "X Mirror",
+    card_mirror_d: "Descubre tu personaje de X. Mírate al espejo.",
+    card_stalk_t: "X Stalk",
+    card_stalk_d: "Analiza esa cuenta que te da curiosidad. No se lo contamos a nadie.",
+    card_match_t: "X Match",
+    card_match_d: "Compara dos cuentas. ¿Almas gemelas o desastre?",
+    badge_free: "Gratis",
+    tier_fun: "Tarjeta Fun",
+    tier_real: "Análisis Real",
+    tier_fun_short: "FREE",
+    tier_real_short: "REAL",
+    tier_free_note: "Gratis · no lee datos de X",
+    tier_real_note: "Basado en datos de X · usa créditos",
+    home_diff_h: "Hay dos XORA. Los dos igual de curiosos.",
+    home_fun_h: "XORA Fun",
+    home_fun_d: "Es gratis. No lee tus datos de X; crea una tarjeta de entretenimiento al instante. Repite las veces que quieras.",
+    home_real_h: "XORA Real",
+    home_real_d: "Analiza datos reales de X. La API de X y el análisis también nos cuestan dinero, por eso Real usa créditos.",
+    home_real_joke: "Aun así, no somos tan capitalistas como para quitarte la diversión.",
+    badge_c5: "5 Créditos",
+    badge_c10: "10 Créditos",
+    /* mirror */
+    mirror_h1: "X Mirror",
+    mirror_sub: "Escribe tu usuario de X para ver tu personaje de X.",
+    mirror_ph: "@tuusuario",
+    mirror_btn: "Mírate al Espejo",
+    fun_btn: "Saca tu Tarjeta Gratis",
+    real_btn_5: "Análisis Real · 5 Créditos",
+    real_btn_10: "Análisis Real · 10 Créditos",
+    reroll_btn: "Sacar Otra",
+    real_label: "XORA REAL",
+    fun_label: "XORA FUN · FREE",
+    real_explainer: "Esta tarjeta se basa en datos reales de X. Usa créditos por el coste de la API y del análisis.",
+    fun_explainer: "Esta tarjeta es de entretenimiento; no analiza datos de X.",
+    mirror_connect_cta: "Conecta tu cuenta de X y analízala",
+    mirror_login_note: "Mirror requiere conectar tu cuenta de X.",
+    mirror_profile_h: "Completa tu Perfil",
+    mirror_profile_sub: "Revisa tus datos antes de crear tu tarjeta.",
+    mirror_display_name: "Nombre visible",
+    mirror_country: "País",
+    mirror_city: "Ciudad",
+    mirror_bio: "Bio corta",
+    mirror_website: "Sitio web",
+    mirror_avatar_url: "URL de la foto de perfil",
+    mirror_save: "Guardar",
+    mirror_skip: "Omitir por ahora",
+    auth_title: "Inicia sesión en XORA",
+    auth_sub: "Inicia sesión en tu cuenta de XORA para guardar tus análisis.",
+    auth_login_tab: "Iniciar Sesión",
+    auth_signup_tab: "Crear Cuenta",
+    auth_email: "Correo electrónico",
+    auth_username: "Nombre de usuario",
+    auth_password: "Contraseña",
+    auth_password_confirm: "Repite la contraseña",
+    auth_login_btn: "Iniciar Sesión",
+    auth_signup_btn: "Crear Cuenta",
+    auth_have_account: "¿Ya tienes cuenta? Inicia sesión.",
+    auth_need_account: "¿No tienes cuenta? Regístrate.",
+    auth_success: "Sesión iniciada",
+    auth_signup_check_email: "Cuenta creada. Si hace falta confirmar el correo, revisa tu bandeja de entrada.",
+    auth_username_required: "El nombre de usuario es obligatorio.",
+    auth_email_required: "El correo electrónico es obligatorio.",
+    auth_password_required: "La contraseña es obligatoria.",
+    auth_password_min: "La contraseña debe tener al menos 6 caracteres.",
+    auth_password_mismatch: "Las contraseñas no coinciden.",
+    auth_config_missing: "Falta la configuración de acceso.",
+    auth_connection_failed: "No se pudo conectar con Supabase",
+    auth_signup_failed: "No se pudo crear la cuenta",
+    auth_signin_failed: "No se pudo iniciar sesión",
+    /* stalk */
+    stalk_h1: "X Stalk",
+    stalk_sub: "Escribe un usuario y XORA le echa un vistazo en silencio. Esto queda entre nosotros.",
+    stalk_ph: "@esapersona",
+    stalk_btn: "Analizar en Silencio",
+    stalk_note: "Este análisis usa 5 Créditos de Curiosidad.",
+    /* match */
+    match_h1: "X Match",
+    match_sub: "Pon dos cuentas frente a frente. XORA dice si hay química.",
+    match_ph1: "@primera",
+    match_ph2: "@segunda",
+    match_btn: "Calcular la Compatibilidad",
+    match_note: "Esta comparación usa 10 Créditos de Curiosidad.",
+    /* sonuç ekranı */
+    btn_download: "Descargar Tarjeta",
+    btn_share: "Compartir en X",
+    btn_again: "Probar de Nuevo",
+    upsell_mirror: "Y ahora... ¿qué hay de esa persona? 👀",
+    upsell_mirror_btn: "Mírala con X Stalk",
+    says: "XORA dice",
+    match_overall: "Compatibilidad General",
+    match_flirt: "Potencial de Coqueteo",
+    match_vibe: "Conexión de Vibra",
+    match_humor: "Humor en Común",
+    match_chaos: "Riesgo de Caos",
+    match_romance: "Compatibilidad Romántica",
+    /* skorlar */
+    sc_viral: "Potencial Viral",
+    sc_kaos: "Nivel de Caos",
+    sc_mizah: "Dosis de Humor",
+    sc_gece: "Actividad Nocturna",
+    /* profil */
+    profile_h1: "Perfil",
+    profile_balance: "Créditos de Curiosidad",
+    profile_last: "Tu Última Tarjeta",
+    profile_history: "Análisis Anteriores",
+    profile_logout: "Cerrar Sesión",
+    profile_nouser: "Inicia sesión para continuar.",
+    profile_gomirror: "Iniciar Sesión",
+    profile_empty: "Todavía no tienes tu tarjeta de identidad de X.",
+    profile_empty_sub: "Empieza tu primer análisis.",
+    profile_actions: "Iniciar Análisis",
+    logout_confirm: "¿Cerrar sesión?",
+    logout_done: "Sesión cerrada",
+    /* krediler */
+    credits_h1: "Créditos de Curiosidad",
+    credits_sub: "Fun es gratis. Real usa créditos porque de verdad lee datos de X.",
+    credits_balance: "Tu saldo",
+    credits_buy: "Comprar",
+    credits_note: "Los pagos se conectarán a través de iyzico. Los botones de compra están desactivados en esta versión.",
+    pkg1_n: "2 Análisis Reales",
+    pkg2_n: "4 Análisis Reales",
+    pkg3_n: "10 Análisis Reales",
+    toast_loaded: "créditos añadidos ⚡",
+    payment_soon: "Conectaremos iyzico en el siguiente paso.",
+    real_err_credit: "No tienes créditos suficientes para este análisis.",
+    real_err_protected: "Esa cuenta es privada. Hasta XORA tiene límites.",
+    real_err_not_found: "No encontré esa cuenta de X.",
+    real_err_posts: "No hay publicaciones suficientes para un análisis real.",
+    real_err_rate: "X está de mal humor ahora mismo. Inténtalo de nuevo en un rato.",
+    real_err_auth: "Inicia sesión en tu cuenta de XORA para el análisis Real.",
+    real_err_unavailable: "El análisis no pudo completarse. Revisa tu saldo y tu historial antes de reintentar.",
+    real_err_refund: "Reembolso en proceso. Tu ID de solicitud se conserva; vuelve a comprobarlo más tarde.",
+    real_coming_soon: "El análisis real llegará pronto",
+    rarity_common: "COMÚN",
+    rarity_rare: "RARA",
+    rarity_epic: "ÉPICA",
+    rarity_legendary: "LEGENDARIA",
+    /* hatalar / bildirimler */
+    toast_handle: "Primero escribe un nombre de usuario",
+    toast_two: "Hacen falta los dos nombres de usuario",
+    toast_same: "Escribe dos cuentas diferentes 🙂",
+    toast_nocredit: "No tienes créditos suficientes, te redirijo…",
+    toast_saved: "Tarjeta descargada",
+    cost_info: "créditos usados",
+    date_today: "hoy",
+    mirror_cooldown: "Tu tarjeta de identidad de X sigue vigente. Vuelve en {days} días para una nueva.",
+    view_card: "Ver Tarjeta",
+    close: "Cerrar",
+    history_select: "Seleccionar",
+    history_cancel: "Cancelar",
+    history_delete: "Eliminar Seleccionados",
+    history_none_selected: "Selecciona los análisis que quieres eliminar.",
+    history_deleted: "Los análisis seleccionados se eliminaron de tu historial.",
+    history_not_found: "No se encontraron registros para eliminar.",
+    profile_card_expired: "Tu tarjeta Mirror ha caducado.",
+    profile_card_renew: "Saca un nuevo Mirror",
+    card_load_failed: "No se pudo cargar la tarjeta"
   }
 };
 
-function getLang() { return localStorage.getItem(LS.lang) || "tr"; }
+var LANGS = ["tr", "en", "es"];
+var LANG_NAMES = { tr: "Türkçe", en: "English", es: "Español" };
+
+function getLang() {
+  var lang = localStorage.getItem(LS.lang) || "tr";
+  return LANGS.indexOf(lang) >= 0 ? lang : "tr";
+}
+
+function nextLang(current) {
+  var idx = LANGS.indexOf(current);
+  return LANGS[(idx + 1) % LANGS.length];
+}
 
 function setLang(l) {
   localStorage.setItem(LS.lang, l);
@@ -1069,7 +1256,12 @@ function applyI18n() {
     phs[j].placeholder = t(phs[j].getAttribute("data-i18n-ph"));
   }
   var lb = document.getElementById("langBtn");
-  if (lb) lb.textContent = getLang() === "tr" ? "EN" : "TR";
+  if (lb) {
+    var target = nextLang(getLang());
+    lb.textContent = target.toUpperCase();
+    lb.title = LANG_NAMES[target];
+    lb.setAttribute("aria-label", LANG_NAMES[target]);
+  }
   refreshAuthUi();
 }
 
@@ -1123,7 +1315,7 @@ function initTopbar() {
   var lb = document.getElementById("langBtn");
   if (lb) {
     lb.addEventListener("click", function () {
-      setLang(getLang() === "tr" ? "en" : "tr");
+      setLang(nextLang(getLang()));
     });
   }
 }

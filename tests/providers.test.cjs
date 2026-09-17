@@ -17,7 +17,7 @@ function fixture(provider,{mutate,wrap,responseStatus=200,env={}}={}) {
  });
  return {e,requests,rpcCalls,logs};
 }
-const req=mode=>new Request('http://local.test',{method:'POST',body:JSON.stringify({mode,locale:'en',handle:'alice',handles:['alice','bob'],request_id:'provider-test-123'})});
+const req=(mode,locale='en')=>new Request('http://local.test',{method:'POST',body:JSON.stringify({mode,locale,handle:'alice',handles:['alice','bob'],request_id:'provider-test-123'})});
 
 for(const provider of ['openai','anthropic']) {
  test(`${provider}: Mirror/Stalk/Match each use one AI request and the shared result contract`,async()=>{
@@ -36,23 +36,24 @@ for(const provider of ['openai','anthropic']) {
   }
  });
  test(`${provider}: malformed metrics, sample-count copy and shape errors refund without retry`,async()=>{
-  for(const mode of ['mirror','stalk','match']) for(const mutate of [raw=>raw.metrics[0].key='not_allowed',raw=>raw.metrics[0].value=101,raw=>raw.metrics[0].value='70',raw=>raw.metrics[1].key=raw.metrics[0].key,raw=>raw.comment_en='25 posts analyzed.',raw=>raw.comment_tr='20 paylaşım incelendi.',raw=>delete raw.comment_en]) {
+  for(const mode of ['mirror','stalk','match']) for(const mutate of [raw=>raw.metrics[0].key='not_allowed',raw=>raw.metrics[0].value=101,raw=>raw.metrics[0].value='70',raw=>raw.metrics[1].key=raw.metrics[0].key,raw=>raw.comment_en='25 posts analyzed.',raw=>raw.comment_tr='20 paylaşım incelendi.',raw=>raw.comment_es='Se analizaron 25 publicaciones.',raw=>delete raw.comment_en,raw=>delete raw.comment_es]) {
    const f=fixture(provider,{mutate});assert.equal((await f.e.main(req(mode))).status,500);assert.equal(f.requests.length,1);assert.equal(f.rpcCalls.filter(v=>v.name==='xora_complete_real').length,0);assert.equal(f.rpcCalls.filter(v=>v.name==='xora_fail_real').length,1);
    assert.doesNotMatch(JSON.stringify(f.logs),/mock-(?:openai|anthropic|generic)-key|UNTRUSTED_DATA_MARKER/);
   }
  });
  test(`${provider}: aliases allow novel natural phrases only with active evidence`,async()=>{
   const rejected=[
-   [{tr:'Kozmik Salatalık',en:'Cosmic Cucumber',evidence:'question_ratio'}],
-   [{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',evidence:'invented'}],
-   [{tr:'Reply Avcısı',en:'Reply Hunter',evidence:'reply_ratio'}],
-   [{tr:'Çok Fazla Uzun Kelimeli İsim',en:'Far Too Many Alias Words',evidence:'question_ratio'}]
+   [{tr:'Kozmik Salatalık',en:'Cosmic Cucumber',es:'Pepino Cósmico',evidence:'question_ratio'}],
+   [{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',es:'Conversador Atento',evidence:'invented'}],
+   [{tr:'Reply Avcısı',en:'Reply Hunter',es:'Cazador de Respuestas',evidence:'reply_ratio'}],
+   [{tr:'Çok Fazla Uzun Kelimeli İsim',en:'Far Too Many Alias Words',es:'Demasiadas Palabras Para Un Apodo',evidence:'question_ratio'}],
+   [{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',es:'Máquina de Preguntas',evidence:'question_ratio'}]
   ];
   for(const candidates of rejected) {
-   const f=fixture(provider,{mutate:raw=>{raw.nickname_candidates=candidates;}});const response=await f.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'fallback');assert.equal(result.nickname.en,'Curious Mind');assert.match(JSON.stringify(f.logs),/nickname_fallback/);
+   const f=fixture(provider,{mutate:raw=>{raw.nickname_candidates=candidates;}});const response=await f.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'fallback');assert.equal(result.nickname.en,'Curious Mind');assert.equal(result.nickname.es,'Mente Curiosa');assert.match(JSON.stringify(f.logs),/nickname_fallback/);
   }
-  const accepted=fixture(provider,{mutate:raw=>{raw.nickname_candidates=[{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',evidence:'question_ratio'}];}});
-  const response=await accepted.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'ai_generated_validated');assert.equal(result.nickname.tr,'Meraklı Muhabbetçi');assert.equal(result.nickname.en,'Thoughtful Conversationalist');
+  const accepted=fixture(provider,{mutate:raw=>{raw.nickname_candidates=[{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',es:'Conversador Atento',evidence:'question_ratio'}];}});
+  const response=await accepted.e.main(req('mirror'));assert.equal(response.status,200);const {result}=await response.json();assert.equal(result.meta.alias_source,'ai_generated_validated');assert.equal(result.nickname.tr,'Meraklı Muhabbetçi');assert.equal(result.nickname.en,'Thoughtful Conversationalist');assert.equal(result.nickname.es,'Conversador Atento');
  });
  test(`${provider}: HTTP failure, refusal/truncation and malformed JSON use existing refund`,async()=>{
   const cases=provider==='openai'
@@ -72,6 +73,33 @@ test('missing/unsupported provider and missing key/model fail before debit, X or
    const f=fixture(provider,{env});const response=await f.e.main(req('mirror'));assert.equal(response.status,500);assert.equal((await response.json()).code,expected);assert.equal(f.requests.length,0);assert.equal(f.rpcCalls.length,0);await assert.rejects(f.e.callAI({}),new RegExp(expected));assert.equal(f.requests.length,0);
   }
  }
+});
+test('REAL accepts the es locale end to end and renders Spanish cards without TR/EN fallback',async()=>{
+ for(const mode of ['mirror','stalk','match']){
+  const f=fixture('anthropic');const response=await f.e.main(req(mode,'es'));
+  assert.equal(response.status,200);
+  const {result}=await response.json();
+  assert.equal(result.meta.locale,'es');
+  assert.equal(f.rpcCalls.find(v=>v.name==='xora_begin_real').args.p_locale,'es');
+  // The model is asked for native Spanish, not a translation of the English field.
+  const instruction=JSON.parse(JSON.parse(f.requests[0].options.body).messages[0].content);
+  assert.equal(instruction.locale,'es');
+  if(mode!=='match') assert.ok(instruction.rules.some(rule=>/neutral international Spanish/.test(rule)));
+  const c=browser();c.localStorage.setItem(c.LS.lang,'es');
+  const html=mode==='match'?c.buildMatchCard(result):c.buildIdentityCard(result);
+  assert.match(html,/XORA REAL/);
+  if(mode==='match') assert.ok(html.includes(c.esc('Las dos cuentas hacen preguntas.')));
+  else {
+   assert.ok(html.includes(c.esc('Mente Curiosa')));
+   assert.ok(html.includes(c.esc('Abres las conversaciones con preguntas.')));
+   assert.ok(!html.includes(c.esc('You open conversations with questions.')),'no EN fallback in ES REAL card');
+   assert.ok(!html.includes(c.esc('Sorularla konuşmayı açıyorsun.')),'no TR fallback in ES REAL card');
+  }
+ }
+ // An unsupported locale is still rejected before any billing or provider call.
+ const rejected=fixture('anthropic');
+ assert.equal((await rejected.e.main(req('mirror','fr'))).status,400);
+ assert.equal(rejected.requests.length,0);assert.equal(rejected.rpcCalls.length,0);
 });
 test('OpenAI parses structured output and Anthropic retains fenced JSON support',async()=>{
  const raw=profileAI();for(const provider of ['openai','anthropic']){const f=fixture(provider);assert.deepEqual(JSON.parse(JSON.stringify(f.e.parseProviderResult(envelope(provider,raw),provider))),raw);}

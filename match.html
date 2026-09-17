@@ -151,7 +151,8 @@
   document.addEventListener("xora:lang", function () { renderTierUi(); if (lastMatch && !stepResult.hidden) showResult(); });
 
   (async function init() {
-    if (showProductionRealPause(tier)) { renderTierUi(); setState("input"); return; }
+    renderTierUi();
+    if (showProductionRealPause(tier)) { setState("input"); return; }
     await initSession();
     renderTierUi();
     if (tier === "real" && !isLoggedIn()) { window.location.href = "auth.html"; return; }

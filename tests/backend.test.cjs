@@ -3,7 +3,8 @@ const {edge,profileAI,matchAI}=require('./helpers.cjs');
 test('strict request validation before billing',()=>{
  const e=edge();const base={mode:'mirror',locale:'tr',handle:'@Alice',request_id:'request-123'};
  assert.equal(e.validateRequest(base).handles[0],'alice');
- for(const patch of [{mode:'fun'},{mode:'oops'},{locale:'fr'},{handle:'abc!'},{handle:'a b'},{handle:'a'.repeat(16)},{handle:32},{request_id:'../id'},{mode:'match',handles:['Alice','@alice']}]) assert.throws(()=>e.validateRequest({...base,...patch}),/bad_request/);
+ for(const locale of ['tr','en','es']) assert.equal(e.validateRequest({...base,locale}).locale,locale);
+ for(const patch of [{mode:'fun'},{mode:'oops'},{locale:'fr'},{locale:'ES'},{locale:'es-ES'},{handle:'abc!'},{handle:'a b'},{handle:'a'.repeat(16)},{handle:32},{request_id:'../id'},{mode:'match',handles:['Alice','@alice']}]) assert.throws(()=>e.validateRequest({...base,...patch}),/bad_request/);
 });
 test('X upstream diagnostics are phase-specific and sanitized',()=>{
  const e=edge();
@@ -21,7 +22,23 @@ test('REAL shape, rarity, nickname evidence and safe deterministic fallback',()=
  for(const [v,lang] of [['Meraklı Biri','tr'],['Sessiz Gözlemci','tr'],['Thoughtful Conversationalist','en'],['Inquisitive Mind','en']]) assert.equal(e.aliasValid(v,lang),true,v);
  raw.nickname_candidates[0].evidence='invented';assert.equal(e.pickAliasPair(raw,sig).source,'fallback');
  raw.nickname_candidates[0].evidence='question_ratio';assert.equal(e.pickAliasPair(raw,{own_posts:8,question_ratio:0}).source,'fallback');
- const novel={nickname_candidates:[{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',evidence:'question_ratio'}]};assert.equal(e.pickAliasPair(novel,{own_posts:8,question_ratio:.8}).source,'ai_generated_validated');
+ const novel={nickname_candidates:[{tr:'Meraklı Muhabbetçi',en:'Thoughtful Conversationalist',es:'Conversador Atento',evidence:'question_ratio'}]};assert.equal(e.pickAliasPair(novel,{own_posts:8,question_ratio:.8}).source,'ai_generated_validated');
+});
+test('REAL Spanish locale produces Spanish copy through the same contract',()=>{
+ const e=edge();const sig={question_ratio:.8,own_posts:8};
+ const result=e.normalizeAIProfile(profileAI(),'alice','mirror',sig,'es');
+ assert.equal(result.meta.locale,'es');
+ assert.equal(result.nickname.es,'Mente Curiosa');
+ assert.equal(result.tagline.es,'Avanza a base de preguntas.');
+ assert.equal(result.comment.mirror.es,'Abres las conversaciones con preguntas.');
+ assert.equal(result.archetype.comments.es[0],result.comment.mirror.es);
+ for(const metric of result.top_behaviors) assert.equal(metric.label.es,'Comentario');
+ // Spanish is required alongside tr/en: a missing or unsafe field is rejected, never auto-filled.
+ for(const mutation of [r=>delete r.comment_es,r=>r.comment_es='',r=>r.tagline_es='Se analizaron 25 publicaciones.',r=>delete r.summary_es,r=>delete r.metrics[0].label_es]){
+  const raw=profileAI();mutation(raw);assert.throws(()=>e.normalizeAIProfile(raw,'alice','mirror',sig,'es'),/ai_bad/);
+ }
+ const match=e.normalizeMatchAI(matchAI(),'a','b',{},{},'es');
+ assert.equal(match.meta.locale,'es');assert.equal(match.ai_comment.es,'Las dos cuentas hacen preguntas.');
 });
 test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=>{
  const e=edge();
