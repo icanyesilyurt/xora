@@ -901,6 +901,7 @@ var FUN_PERSONAS = [
     "semantic": "Quietly challenges expectations with understated mischief.",
     "emoji": "🫥",
     "color": "#19B8B8",
+    "traits": { "humor": "ironic", "reply": "teasing", "timeline": "opens_topics" },
     "legacy_names": [
       "Sessiz Kaos",
       "Quiet Chaos"
@@ -973,6 +974,7 @@ var FUN_PERSONAS = [
     "semantic": "Notices contradictions and expresses them through gentle irony.",
     "emoji": "🎭",
     "color": "#7C4DFF",
+    "traits": { "humor": "dry", "reply": "selective", "timeline": "drops_one_liners" },
     "legacy_names": [
       "İroni Müdürü",
       "Head of Irony"
@@ -1045,6 +1047,7 @@ var FUN_PERSONAS = [
     "semantic": "Enjoys exploring many topics without needing to settle on one.",
     "emoji": "🧃",
     "color": "#FF7A45",
+    "traits": { "humor": "playful", "reply": "curious", "timeline": "opens_topics" },
     "legacy_names": [
       "Gündem Turisti",
       "Timeline Tourist"
@@ -1117,6 +1120,7 @@ var FUN_PERSONAS = [
     "semantic": "Delivers understated humor with a straight face and patient timing.",
     "emoji": "🧊",
     "color": "#2F80ED",
+    "traits": { "humor": "deadpan", "reply": "quick", "timeline": "drops_one_liners" },
     "legacy_names": [
       "Soğuk Mizah",
       "Dry Humor Unit"
@@ -1189,6 +1193,7 @@ var FUN_PERSONAS = [
     "semantic": "Enjoys developing personal theories through relaxed discussion.",
     "emoji": "🛋️",
     "color": "#5C6270",
+    "traits": { "humor": "witty", "reply": "measured", "timeline": "goes_deep" },
     "legacy_names": [
       "Koltuk Filozofu",
       "Sofa Philosopher"
@@ -1261,6 +1266,7 @@ var FUN_PERSONAS = [
     "semantic": "Pays attention to conversational timing and others comfort.",
     "emoji": "📡",
     "color": "#0FAFAF",
+    "traits": { "humor": "warm", "reply": "supportive", "timeline": "gets_everyone_in" },
     "legacy_names": [
       "Vibe Radarı",
       "Vibe Radar"
@@ -1333,6 +1339,7 @@ var FUN_PERSONAS = [
     "semantic": "Helps people understand differing views without escalating disagreement.",
     "emoji": "🧯",
     "color": "#FF6B57",
+    "traits": { "humor": "warm", "reply": "measured", "timeline": "calms_threads" },
     "legacy_names": [
       "Drama İtfaiyesi",
       "Drama Fire Crew"
@@ -1405,6 +1412,7 @@ var FUN_PERSONAS = [
     "semantic": "Reconsiders small choices and rehearses possible interpretations.",
     "emoji": "🧠",
     "color": "#7C4DFF",
+    "traits": { "humor": "dry", "reply": "measured", "timeline": "reads_first" },
     "legacy_names": [
       "Fazla Düşünen",
       "Certified Overthinker"
@@ -1477,6 +1485,7 @@ var FUN_PERSONAS = [
     "semantic": "Leaves a memorable impression without seeking attention.",
     "emoji": "🕶️",
     "color": "#2D3445",
+    "traits": { "humor": "dry", "reply": "selective", "timeline": "reads_first" },
     "legacy_names": [
       "Gizli Başrol",
       "Lowkey Main Character"
@@ -1549,6 +1558,7 @@ var FUN_PERSONAS = [
     "semantic": "Encourages participation and adds energy to social gatherings.",
     "emoji": "🪩",
     "color": "#E75DAA",
+    "traits": { "humor": "playful", "reply": "quick", "timeline": "gets_everyone_in" },
     "legacy_names": [
       "Ortam Güncellemesi",
       "Room Update"
@@ -1621,6 +1631,7 @@ var FUN_PERSONAS = [
     "semantic": "Uses sincere follow-up questions to invite richer conversations.",
     "emoji": "🧲",
     "color": "#FF7A45",
+    "traits": { "humor": "warm", "reply": "curious", "timeline": "goes_deep" },
     "legacy_names": [
       "Konu Mıknatısı",
       "Topic Magnet"
@@ -1693,6 +1704,7 @@ var FUN_PERSONAS = [
     "semantic": "Enjoys expressive storytelling and well-timed wordplay.",
     "emoji": "🪄",
     "color": "#19B8B8",
+    "traits": { "humor": "witty", "reply": "teasing", "timeline": "tells_stories" },
     "legacy_names": [
       "Cümle Cambazı",
       "Sentence Acrobat"

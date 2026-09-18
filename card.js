@@ -52,6 +52,29 @@ function localized(v, lang) {
   return v[lang] || v.tr || v.en || "";
 }
 
+// FUN cards read no X data, so they carry no scores or bars. These chips are the persona's style
+// tags from FUN_PERSONAS (humor / reply / timeline), shown as words only.
+var FUN_TRAIT_DIMENSIONS = ["humor", "reply", "timeline"];
+
+function funTraitChips(res) {
+  // funIdentityPersona returns the derived card; the style tags live on the canonical persona.
+  var card = typeof funIdentityPersona === "function" ? funIdentityPersona(res) : null;
+  var persona = card && typeof FUN_PERSONAS !== "undefined" ? FUN_PERSONAS.find(function (p) { return p.id === card.id; }) : null;
+  var traits = persona && persona.traits;
+  if (!traits) return [];
+  return FUN_TRAIT_DIMENSIONS.filter(function (d) { return traits[d]; }).map(function (d) {
+    return { dimension: d, label: t("trait_" + d), value: t("trait_" + d + "_" + traits[d]) };
+  });
+}
+
+function funTraitChipsHtml(res) {
+  var chips = funTraitChips(res);
+  if (!chips.length) return "";
+  return '<div class="trait-chips">' + chips.map(function (c) {
+    return '<span class="trait-chip" data-trait="' + c.dimension + '"><b>' + esc(c.label) + "</b> " + esc(c.value) + "</span>";
+  }).join("") + "</div>";
+}
+
 function buildFunIdentityCard(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var persona = funIdentityPersona(res);
@@ -69,6 +92,7 @@ function buildFunIdentityCard(res) {
         '<p class="idcard-handle">@' + esc(res.handle) + '</p>' +
         '<h2 class="idcard-type">' + esc(nick) + '</h2>' +
         (desc ? '<p class="idcard-desc">' + esc(desc) + '</p>' : '') +
+        funTraitChipsHtml(res) +
         '<div class="idcard-quote fun-quote"><p>' + esc(comment) + '</p></div>' +
       '</div>' +
       '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(res.hash || 1) + '</span><span>xora.app</span></div>' +
@@ -86,6 +110,85 @@ function buildFunMatchCard(m) {
       '<h2 class="idcard-type match-pct">%' + m.overall + '</h2><p class="idcard-desc">' + esc(t("match_overall")) + '</p>' +
       '<div class="idcard-quote fun-quote"><span class="quote-label">XORA FUN</span><p>' + esc(comment) + '</p></div></div>' +
       '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(xhash(m.a + m.b)) + '</span><span>xora.app</span></div></div>'
+  );
+}
+
+/* ---------------- REAL kart: ölçülen davranış ---------------- */
+
+// REAL metric rows come only from behavior_signals, which analyze-real computes from the fetched
+// posts (computeSignals). Ratios are shown as percentages; the two open-ended values use a fixed
+// reference for the bar (3 emoji per post, 280 characters) while the text shows the measured value.
+var REAL_SIGNAL_ROWS = [
+  { key: "reply_ratio", label: "real_m_reply", kind: "ratio" },
+  { key: "original_ratio", label: "real_m_original", kind: "ratio" },
+  { key: "repost_ratio", label: "real_m_repost", kind: "ratio" },
+  { key: "question_ratio", label: "real_m_question", kind: "ratio" },
+  { key: "emoji_per_post", label: "real_m_emoji", kind: "per_post", full: 3 },
+  { key: "avg_text_length", label: "real_m_length", kind: "chars", full: 280 }
+];
+
+function realMetricRows(res, lang) {
+  var signals = res && res.behavior_signals;
+  var rows = [];
+  if (signals && typeof signals === "object") {
+    REAL_SIGNAL_ROWS.forEach(function (def) {
+      var v = signals[def.key];
+      if (typeof v !== "number" || !isFinite(v) || v < 0) return;
+      var row = { key: def.key, label: t(def.label) };
+      if (def.kind === "ratio") {
+        v = Math.min(v, 1);
+        row.bar = Math.round(v * 100);
+        row.value = formatPercent(v, lang);
+      } else {
+        row.bar = Math.round(Math.min(v / def.full, 1) * 100);
+        row.value = def.kind === "per_post" ? formatDecimal(v, lang) : fillTemplate(t("real_m_chars"), { n: Math.round(v) });
+      }
+      rows.push(row);
+    });
+  }
+  if (rows.length >= 3) return { measured: true, rows: rows };
+  // Results saved before behavior_signals existed only carry the AI-assessed metrics; keep showing those.
+  var legacy = ((res && res.card && res.card.top_behaviors) || []).slice(0, 6).map(function (b) {
+    return { key: b.key, label: b.label ? localized(b.label, lang) : b.key, bar: b.value, value: String(b.value) };
+  });
+  return { measured: false, rows: legacy };
+}
+
+function buildRealIdentityCard(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var c = res.card || {};
+  var color = c.color || "#1E2330";
+  var emoji = c.emoji || res.profile_emoji || "🪞";
+  var nick = localized(res.nickname || c.nickname, lang);
+  var tagline = localized(res.tagline || c.desc, lang);
+  var summary = localized(res.profile_summary, lang);
+  var comment = res.comment ? localized(res.comment.mirror, lang) : "";
+  var metrics = realMetricRows(res, lang);
+  var rows = metrics.rows.map(function (row) {
+    return '<div class="score-chip" data-metric="' + esc(row.key) + '">' +
+      '<span class="score-name">' + esc(row.label) + "</span>" +
+      '<span class="score-bar"><i style="width:' + row.bar + '%"></i></span>' +
+      '<span class="score-val">' + esc(row.value) + "</span>" +
+    "</div>";
+  }).join("");
+  return (
+    '<div class="idcard realcard" style="--ac:' + color + '">' +
+      '<div class="idcard-band"><span class="idcard-avatar">' + emoji + "</span></div>" +
+      '<div class="idcard-body">' +
+        '<p class="idcard-handle">@' + esc(res.handle) + "</p>" +
+        '<h2 class="idcard-type">' + esc(nick) + "</h2>" +
+        (tagline ? '<p class="idcard-desc">' + esc(tagline) + "</p>" : "") +
+        (summary && summary !== tagline ? '<p class="idcard-summary">' + esc(summary) + "</p>" : "") +
+        (rows ? '<div class="real-metrics"' + (metrics.measured ? ' data-source="behavior_signals"' : ' data-source="ai_metrics"') + ">" +
+          (metrics.measured ? '<p class="real-metrics-title">' + esc(t("real_metrics_title")) + "</p>" : "") +
+          '<div class="idcard-scores">' + rows + "</div></div>" : "") +
+        '<div class="idcard-quote">' +
+          '<span class="quote-label">' + esc(t("says")) + "</span>" +
+          "<p>" + esc(comment) + "</p>" +
+        "</div>" +
+      "</div>" +
+      '<div class="idcard-foot"><span>XORA</span><span class="barcode">' + fakeBarcode(res.hash || xhash(String(res.handle || "x"))) + '</span><span>xora.app</span></div>' +
+    "</div>"
   );
 }
 
@@ -108,6 +211,7 @@ function isV2Result(res) {
 
 function buildIdentityCard(res) {
   if (resultTier(res) === "fun") return buildFunIdentityCard(res);
+  if (resultTier(res) === "real") return decorateRealCardHtml(buildRealIdentityCard(res), res);
   var html;
   if (isV3Result(res)) html = buildIdentityCardV3(res);
   else if (isV2Result(res)) html = buildIdentityCardV2(res);
@@ -480,11 +584,98 @@ function drawCardFooter(ctx, h) {
 /* --- kimlik kartı PNG --- */
 function renderIdentityPNG(res) {
   if (resultTier(res) === "fun") return renderFunIdentityPNG(res);
+  if (resultTier(res) === "real") return stampRealCanvas(renderRealIdentityPNG(res), res);
   var cv;
   if (isV3Result(res)) cv = renderIdentityPNGV3(res);
   else if (isV2Result(res)) cv = renderIdentityPNGV2(res);
   else cv = renderIdentityPNGV1(res);
   return resultTier(res) === "real" ? stampRealCanvas(cv, res) : cv;
+}
+
+/* --- REAL PNG: ölçülen davranış satırları --- */
+// Everything is laid out top-down and measured, so the comment box always ends above the footer
+// (y=1090): its font steps down, and only as a last resort the comment is cut with an ellipsis.
+function renderRealIdentityPNG(res) {
+  var lang = (typeof getLang === "function") ? getLang() : "tr";
+  var c = res.card || {};
+  var color = c.color || "#1E2330";
+  var emoji = c.emoji || res.profile_emoji || "🪞";
+  var nick = localized(res.nickname || c.nickname, lang);
+  var tagline = localized(res.tagline || c.desc, lang);
+  var summary = localized(res.profile_summary, lang);
+  var comment = res.comment ? localized(res.comment.mirror, lang) : "";
+  var metrics = realMetricRows(res, lang);
+  var b = baseCanvas(), ctx = b.ctx;
+  drawCardFrame(ctx, color);
+
+  ctx.textAlign = "center";
+  ctx.beginPath(); ctx.arc(500, 300, 76, 0, 7);
+  ctx.fillStyle = "#FFFFFF"; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = "#1E2330"; ctx.stroke();
+  ctx.font = "84px 'Segoe UI Emoji','Apple Color Emoji',sans-serif"; ctx.fillText(emoji, 500, 330);
+  ctx.fillStyle = "#8A8F9C"; ctx.font = "700 28px Nunito, Arial, sans-serif"; ctx.fillText("@" + res.handle, 500, 418);
+  ctx.direction = copyDirection(lang);
+
+  ctx.fillStyle = "#1E2330"; ctx.font = "900 50px Nunito, Arial, sans-serif";
+  var y = wrapText(ctx, nick, 500, 476, 720, 56);
+  if (tagline) { ctx.fillStyle = "#5C6270"; ctx.font = "600 25px Nunito, Arial, sans-serif"; y = wrapText(ctx, tagline, 500, y + 44, 720, 31); }
+  if (summary && summary !== tagline) { ctx.fillStyle = "#8A8F9C"; ctx.font = "600 21px Nunito, Arial, sans-serif"; y = wrapText(ctx, summary, 500, y + 34, 720, 27); }
+
+  if (metrics.rows.length) {
+    y += 26;
+    if (metrics.measured) {
+      ctx.fillStyle = "#8A8F9C"; ctx.font = "900 17px Nunito, Arial, sans-serif";
+      ctx.fillText(t("real_metrics_title").toUpperCase(), 500, y + 14);
+      y += 26;
+    }
+    var labelX = 140, labelW = 250, barX = 410, barW = 330, valueX = 860, rowH = 36;
+    metrics.rows.forEach(function (row, i) {
+      var ry = y + i * rowH;
+      ctx.textAlign = "left";
+      var size = 21;
+      ctx.font = "800 " + size + "px Nunito, Arial, sans-serif";
+      while (size > 15 && ctx.measureText(row.label).width > labelW) { size--; ctx.font = "800 " + size + "px Nunito, Arial, sans-serif"; }
+      ctx.fillStyle = "#5C6270"; ctx.fillText(row.label, labelX, ry + 17);
+      ctx.fillStyle = "#ECEDF0"; roundRect(ctx, barX, ry, barW, 20, 10); ctx.fill();
+      ctx.fillStyle = color; roundRect(ctx, barX, ry, Math.max(Math.round(barW * row.bar / 100), 12), 20, 10); ctx.fill();
+      ctx.textAlign = "right"; ctx.fillStyle = "#1E2330"; ctx.font = "900 21px Nunito, Arial, sans-serif";
+      ctx.fillText(row.value, valueX, ry + 17);
+    });
+    y += metrics.rows.length * rowH;
+  }
+
+  var top = y + 16, limit = 1072;
+  var fonts = [[23, 29], [21, 27], [19, 24], [17, 22]], lines = [], font = fonts[fonts.length - 1];
+  for (var f = 0; f < fonts.length; f++) {
+    ctx.font = "600 " + fonts[f][0] + "px Nunito, Arial, sans-serif";
+    lines = commentLines(ctx, comment, 660);
+    font = fonts[f];
+    if (top + 70 + lines.length * font[1] <= limit) break;
+  }
+  var maxLines = Math.max(1, Math.floor((limit - top - 70) / font[1]));
+  if (lines.length > maxLines) { lines = lines.slice(0, maxLines); lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, "") + "…"; }
+  var boxH = 70 + lines.length * font[1];
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#FFF1E3"; roundRect(ctx, 130, top, 740, boxH, 24); ctx.fill();
+  ctx.strokeStyle = color; ctx.lineWidth = 3; roundRect(ctx, 130, top, 740, boxH, 24); ctx.stroke();
+  ctx.fillStyle = color; ctx.font = "900 20px Nunito, Arial, sans-serif"; ctx.fillText(t("says").toUpperCase(), 500, top + 32);
+  ctx.fillStyle = "#1E2330"; ctx.font = "600 " + font[0] + "px Nunito, Arial, sans-serif";
+  lines.forEach(function (line, i) { ctx.fillText(line, 500, top + 62 + i * font[1]); });
+
+  drawCardFooter(ctx, res.hash || xhash(String(res.handle || "x")));
+  return b.cv;
+}
+
+// Same breaking rules as wrapText (CJK by character, everything else at spaces), returning lines.
+function commentLines(ctx, text, maxW) {
+  if (CJK_TEXT.test(text)) return wrapCjkLines(ctx, text, maxW);
+  var words = String(text).split(" "), lines = [], line = "";
+  for (var n = 0; n < words.length; n++) {
+    var test = line + words[n] + " ";
+    if (ctx.measureText(test).width > maxW && n > 0) { lines.push(line.trim()); line = words[n] + " "; }
+    else line = test;
+  }
+  if (line.trim()) lines.push(line.trim());
+  return lines;
 }
 
 /* --- V3 PNG: profil okuma (sadeleştirilmiş) --- */
@@ -524,6 +715,8 @@ function renderFunIdentityPNG(res) {
   ctx.direction = copyDirection(lang);
   ctx.fillStyle="#1E2330"; ctx.font="900 56px Nunito, Arial, sans-serif"; var yNick=wrapText(ctx,nick,500,615,720,62);
   ctx.fillStyle="#5C6270"; ctx.font="600 28px Nunito, Arial, sans-serif"; var y=wrapText(ctx,desc,500,yNick+70,700,34)+42;
+  var chips=funTraitChips(res);
+  if (chips.length) y=drawTraitChips(ctx,chips,y-16,lang,color)+24;
   ctx.font="700 26px Nunito, Arial, sans-serif";
   var commentLines=1, line="";
   if (CJK_TEXT.test(comment)) commentLines=wrapCjkLines(ctx,comment,660).length;
@@ -538,8 +731,52 @@ function renderFunIdentityPNG(res) {
   return b.cv;
 }
 
+// Chips stay on one row so the comment box keeps its space: the font steps down to fit 740px, and
+// if even the smallest size is too wide the labels are dropped and only the values remain.
+function drawTraitChips(ctx, chips, top, lang, accent) {
+  var rtl = copyDirection(lang) === "rtl";
+  var pad = 16, gap = 10, maxW = 740, sizes = [20, 19, 18, 17, 16];
+  var size = 16, withLabels = false, parts = [];
+  function measure(fontSize, labels) {
+    return chips.map(function (c) {
+      ctx.font = "700 " + fontSize + "px Nunito, Arial, sans-serif";
+      var lw = labels ? ctx.measureText(c.label).width : 0;
+      ctx.font = "900 " + fontSize + "px Nunito, Arial, sans-serif";
+      var vw = ctx.measureText(c.value).width;
+      return { chip: c, lw: lw, vw: vw, w: pad * 2 + vw + (labels ? lw + 8 : 0) };
+    });
+  }
+  function total(list) { return list.reduce(function (a, p) { return a + p.w; }, 0) + gap * (list.length - 1); }
+  for (var i = 0; i < sizes.length && !parts.length; i++) {
+    var trial = measure(sizes[i], true);
+    if (total(trial) <= maxW) { parts = trial; size = sizes[i]; withLabels = true; }
+  }
+  if (!parts.length) { parts = measure(16, false); size = 16; }
+  var h = size + 18;
+  var x = 500 - total(parts) / 2;
+  var order = rtl ? parts.slice().reverse() : parts;
+  ctx.save();
+  ctx.textAlign = "left";
+  order.forEach(function (p) {
+    ctx.fillStyle = "#FFFFFF"; roundRect(ctx, x, top, p.w, h, h / 2); ctx.fill();
+    ctx.strokeStyle = accent || "#1E2330"; ctx.lineWidth = 2; roundRect(ctx, x, top, p.w, h, h / 2); ctx.stroke();
+    var baseline = top + h / 2 + size * 0.36;
+    var first = rtl ? "value" : "label", cursor = x + pad;
+    [first, first === "label" ? "value" : "label"].forEach(function (part) {
+      if (part === "label" && !withLabels) return;
+      ctx.font = (part === "label" ? "700 " : "900 ") + size + "px Nunito, Arial, sans-serif";
+      ctx.fillStyle = part === "label" ? "#8A8F9C" : "#1E2330";
+      ctx.fillText(part === "label" ? p.chip.label : p.chip.value, cursor, baseline);
+      cursor += (part === "label" ? p.lw : p.vw) + 8;
+    });
+    x += p.w + gap;
+  });
+  ctx.restore();
+  return top + h;
+}
+
 function renderFunMatchPNG(m) {
-  var cv = renderMatchPNGBase(m), ctx = cv.getContext("2d");
+  var cv = renderMatchPNGBase(m, { scores: false }), ctx = cv.getContext("2d");
   ctx.save();
   ctx.fillStyle="#1E2330"; roundRect(ctx,48,46,260,54,27); ctx.fill();
   ctx.fillStyle="#fff"; ctx.font="900 24px Nunito, Arial, sans-serif"; ctx.textAlign="left"; ctx.fillText("XORA FUN · FREE",70,81);
@@ -775,7 +1012,8 @@ function renderMatchPNG(m) {
   return resultTier(m) === "real" ? stampRealCanvas(renderMatchPNGBase(m), m) : renderMatchPNGBase(m);
 }
 
-function renderMatchPNGBase(m) {
+function renderMatchPNGBase(m, opts) {
+  var showScores = !(opts && opts.scores === false);
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var b = baseCanvas();
   var ctx = b.ctx;
@@ -815,8 +1053,10 @@ function renderMatchPNGBase(m) {
                t("match_humor") + " %" + m.humor;
   var mLine2 = t("match_chaos") + " %" + m.chaos + "  •  " +
                t("match_romance") + " %" + m.romance;
-  ctx.fillText(mLine1, 500, 780);
-  ctx.fillText(mLine2, 500, 812);
+  if (showScores) {
+    ctx.fillText(mLine1, 500, 780);
+    ctx.fillText(mLine2, 500, 812);
+  }
 
   ctx.fillStyle = "#FFF1E3";
   roundRect(ctx, 130, 830, 740, 215, 24);

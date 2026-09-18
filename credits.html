@@ -31,28 +31,8 @@
     </div>
   </div>
 
-  <div class="packs">
-    <div class="pack">
-      <p class="pack-amount">10 <small>⚡</small></p>
-      <p class="pack-name" data-i18n="pkg1_n">2 Real Analiz</p>
-      <p class="pack-price">$2.99</p>
-      <button type="button" class="btn btn-sm" data-amount="10" data-i18n="credits_buy">Yükle</button>
-    </div>
-
-    <div class="pack hot">
-      <p class="pack-amount">20 <small>⚡</small></p>
-      <p class="pack-name" data-i18n="pkg2_n">4 Real Analiz</p>
-      <p class="pack-price">$4.99</p>
-      <button type="button" class="btn btn-sm btn-orange" data-amount="20" data-i18n="credits_buy">Yükle</button>
-    </div>
-
-    <div class="pack">
-      <p class="pack-amount">50 <small>⚡</small></p>
-      <p class="pack-name" data-i18n="pkg3_n">10 Real Analiz</p>
-      <p class="pack-price">$11.99</p>
-      <button type="button" class="btn btn-sm" data-amount="50" data-i18n="credits_buy">Yükle</button>
-    </div>
-  </div>
+  <p class="launch-offer" id="launchOffer"></p>
+  <div class="packs" id="creditPacks"></div>
 
   <p class="demo-note" data-i18n="credits_note">Ödeme iyzico ile bağlanacak. Bu sürümde satın alma butonları test amaçlı pasiftir.</p>
 </main>
@@ -68,15 +48,20 @@
     document.getElementById("balanceVal").textContent = getCredits();
   }
 
-  var btns = document.querySelectorAll("[data-amount]");
-  for (var i = 0; i < btns.length; i++) {
-    btns[i].addEventListener("click", function () {
-      var n = parseInt(this.getAttribute("data-amount"), 10);
-      toast(t("payment_soon") + " (" + n + "⚡)");
-    });
-  }
+  var packs = document.getElementById("creditPacks");
+  var banner = document.getElementById("launchOffer");
+  function renderPacks() { renderCreditPackages(packs, banner); }
+
+  packs.addEventListener("click", function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest("[data-amount]") : null;
+    if (!btn) return;
+    var n = parseInt(btn.getAttribute("data-amount"), 10);
+    toast(t("payment_soon") + " (" + n + "⚡)");
+  });
 
   document.addEventListener("DOMContentLoaded", renderBalance);
+  document.addEventListener("xora:lang", renderPacks);
+  renderPacks();
   renderBalance();
 })();
 </script>
