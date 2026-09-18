@@ -1,6 +1,6 @@
 /* ============================================================
    XORA — app.js
-   Ortak mantık: depolama, krediler, dil (TR/EN/ES/PT/AR/FR/DE/IT/JA), üst bar, toast
+   Ortak mantık: depolama, krediler, dil (12 locale, seçici + tarayıcı algılama), üst bar, toast
    ============================================================ */
 
 var LS = {
@@ -2627,24 +2627,127 @@ var LANGS = ["tr", "en", "es", "pt", "ar", "fr", "de", "it", "ja", "ko", "zh", "
 var RTL_LANGS = ["ar"];
 var LANG_NAMES = { tr: "Türkçe", en: "English", es: "Español", pt: "Português", ar: "العربية", fr: "Français", de: "Deutsch", it: "Italiano", ja: "日本語", ko: "한국어", zh: "繁體中文", ru: "Русский" };
 
+// Priority: a language the user picked (saved under LS.lang) > the first supported browser
+// language > English. Detection is never written back, so only a manual choice is persisted and
+// a later browser change still applies until the user picks a language themselves.
+function savedLang() {
+  var lang = null;
+  try { lang = localStorage.getItem(LS.lang); } catch (e) { lang = null; }
+  return LANGS.indexOf(lang) >= 0 ? lang : null;
+}
+
+// Matches on the base language, so en-GB -> en, pt-BR -> pt and zh-HK -> zh. Order is the
+// browser's preference order; the first supported entry wins.
+function detectBrowserLang(languages) {
+  for (var i = 0; i < (languages || []).length; i++) {
+    var base = String(languages[i] || "").toLowerCase().split(/[-_]/)[0];
+    if (LANGS.indexOf(base) >= 0) return base;
+  }
+  return null;
+}
+
+function browserLanguages() {
+  if (typeof navigator === "undefined" || !navigator) return [];
+  var list = navigator.languages && navigator.languages.length ? Array.prototype.slice.call(navigator.languages) : [];
+  if (navigator.language) list.push(navigator.language);
+  return list;
+}
+
 function getLang() {
-  var lang = localStorage.getItem(LS.lang) || "tr";
-  return LANGS.indexOf(lang) >= 0 ? lang : "tr";
+  return savedLang() || detectBrowserLang(browserLanguages()) || "en";
 }
 
 function langDir(lang) {
   return RTL_LANGS.indexOf(lang) >= 0 ? "rtl" : "ltr";
 }
 
-function nextLang(current) {
-  var idx = LANGS.indexOf(current);
-  return LANGS[(idx + 1) % LANGS.length];
-}
-
 function setLang(l) {
+  if (LANGS.indexOf(l) < 0) return;
   localStorage.setItem(LS.lang, l);
   applyI18n();
   document.dispatchEvent(new CustomEvent("xora:lang"));
+}
+
+/* ---------------- dil seçici ---------------- */
+
+function renderLangMenu(menu) {
+  var current = getLang();
+  menu.innerHTML = LANGS.map(function (l) {
+    var selected = l === current;
+    return '<button type="button" role="option" class="lang-option' + (selected ? " is-current" : "") +
+      '" data-lang="' + l + '" lang="' + l + '" dir="' + langDir(l) + '" aria-selected="' + selected + '">' +
+      LANG_NAMES[l] + "</button>";
+  }).join("");
+}
+
+function openLangMenu() {
+  var btn = document.getElementById("langBtn");
+  var menu = document.getElementById("langMenu");
+  if (!btn || !menu) return;
+  renderLangMenu(menu);
+  menu.hidden = false;
+  btn.setAttribute("aria-expanded", "true");
+  var current = menu.querySelector && menu.querySelector('[aria-selected="true"]');
+  if (current && current.focus) current.focus();
+}
+
+function closeLangMenu() {
+  var btn = document.getElementById("langBtn");
+  var menu = document.getElementById("langMenu");
+  if (menu) menu.hidden = true;
+  if (btn) btn.setAttribute("aria-expanded", "false");
+}
+
+function chooseLang(l) {
+  closeLangMenu();
+  setLang(l);
+  var btn = document.getElementById("langBtn");
+  if (btn && btn.focus) btn.focus();
+}
+
+// Turns the existing #langBtn pill into a small popover listing every locale. The button stays in
+// place; it is only wrapped so the menu can sit directly under it.
+function initLangPicker() {
+  var btn = document.getElementById("langBtn");
+  if (!btn || !btn.parentNode || btn.getAttribute("aria-haspopup")) return;
+  btn.setAttribute("aria-haspopup", "listbox");
+  btn.setAttribute("aria-expanded", "false");
+  btn.setAttribute("aria-controls", "langMenu");
+
+  var wrap = document.createElement("span");
+  wrap.className = "lang-picker";
+  btn.parentNode.insertBefore(wrap, btn);
+  wrap.appendChild(btn);
+
+  var menu = document.createElement("div");
+  menu.id = "langMenu";
+  menu.className = "lang-menu";
+  menu.setAttribute("role", "listbox");
+  menu.hidden = true;
+  wrap.appendChild(menu);
+
+  btn.addEventListener("click", function (e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (menu.hidden) openLangMenu(); else closeLangMenu();
+  });
+  menu.addEventListener("click", function (e) {
+    var option = e && e.target && e.target.closest ? e.target.closest("[data-lang]") : null;
+    if (option) chooseLang(option.getAttribute("data-lang"));
+  });
+  menu.addEventListener("keydown", function (e) {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    var options = Array.prototype.slice.call(menu.querySelectorAll("[data-lang]"));
+    var at = options.indexOf(document.activeElement);
+    var next = options[(at + (e.key === "ArrowDown" ? 1 : options.length - 1)) % options.length];
+    if (next) next.focus();
+    e.preventDefault();
+  });
+  document.addEventListener("click", function (e) {
+    if (!menu.hidden && !wrap.contains(e.target)) closeLangMenu();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !menu.hidden) { closeLangMenu(); btn.focus(); }
+  });
 }
 
 function t(key) {
@@ -2667,10 +2770,10 @@ function applyI18n() {
   }
   var lb = document.getElementById("langBtn");
   if (lb) {
-    var target = nextLang(getLang());
-    lb.textContent = target.toUpperCase();
-    lb.title = LANG_NAMES[target];
-    lb.setAttribute("aria-label", LANG_NAMES[target]);
+    var current = getLang();
+    lb.textContent = current.toUpperCase();
+    lb.title = LANG_NAMES[current];
+    lb.setAttribute("aria-label", LANG_NAMES[current]);
   }
   refreshAuthUi();
 }
@@ -2722,12 +2825,7 @@ function refreshAuthUi() {
 function initTopbar() {
   refreshTopbar();
   refreshAuthUi();
-  var lb = document.getElementById("langBtn");
-  if (lb) {
-    lb.addEventListener("click", function () {
-      setLang(nextLang(getLang()));
-    });
-  }
+  initLangPicker();
 }
 
 function initAuthGuards() {

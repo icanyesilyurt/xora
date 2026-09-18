@@ -191,10 +191,12 @@ test('every I18N locale exposes the complete key set with non-empty strings; mis
  const ptCopy=JSON.stringify(c.I18N.pt)+JSON.stringify(c.FUN_PERSONAS.map(p=>p.locales.pt));
  for(const ch of ['ã','õ','ç','á','é','í','ó','ú','â','ê']) assert.ok(ptCopy.includes(ch),'Portuguese copy contains '+ch);
 });
-test('language selector cycles tr→en→es→pt→ar→fr→de→it→ja→ko→zh→ru→tr, ES/PT/AR/FR/DE/IT/JA/KO/ZH/RU persist, unknown stored values fall back to tr',()=>{
+test('every saved locale persists and localizes; unknown stored values fall through to detection and then English',()=>{
  const c=browser();
- assert.equal(c.getLang(),'tr');
- assert.equal(c.nextLang('tr'),'en');assert.equal(c.nextLang('en'),'es');assert.equal(c.nextLang('es'),'pt');assert.equal(c.nextLang('pt'),'ar');assert.equal(c.nextLang('ar'),'fr');assert.equal(c.nextLang('fr'),'de');assert.equal(c.nextLang('de'),'it');assert.equal(c.nextLang('it'),'ja');assert.equal(c.nextLang('ja'),'ko');assert.equal(c.nextLang('ko'),'zh');assert.equal(c.nextLang('zh'),'ru');assert.equal(c.nextLang('ru'),'tr');
+ // No saved choice and no browser language: English.
+ assert.equal(c.getLang(),'en');
+ assert.equal(typeof c.nextLang,'undefined','the sequential cycle helper is gone');
+ assert.deepEqual([...c.LANGS],['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']);
  assert.equal(c.LANG_NAMES.pt,'Português');assert.equal(c.LANG_NAMES.ar,'العربية');assert.equal(c.LANG_NAMES.fr,'Français');assert.equal(c.LANG_NAMES.de,'Deutsch');assert.equal(c.LANG_NAMES.it,'Italiano');assert.equal(c.LANG_NAMES.ja,'日本語');assert.equal(c.LANG_NAMES.ko,'한국어');assert.equal(c.LANG_NAMES.zh,'繁體中文');assert.equal(c.LANG_NAMES.ru,'Русский');
  c.localStorage.setItem(c.LS.lang,'es');assert.equal(c.getLang(),'es');
  assert.equal(c.t('nav_profile'),'Perfil');
@@ -226,7 +228,10 @@ test('language selector cycles tr→en→es→pt→ar→fr→de→it→ja→ko�
  c.localStorage.setItem(c.LS.lang,'ru');assert.equal(c.getLang(),'ru');
  assert.equal(c.t('nav_login'),'Войти');
  assert.equal(c.realComingSoonText(),'Настоящий разбор скоро');
- c.localStorage.setItem(c.LS.lang,'xx');assert.equal(c.getLang(),'tr');
+ c.localStorage.setItem(c.LS.lang,'tr');assert.equal(c.getLang(),'tr');
+ assert.equal(c.t('nav_login'),'Giriş Yap');
+ c.localStorage.setItem(c.LS.lang,'xx');assert.equal(c.getLang(),'en');
+ c.navigator={languages:['de-DE']};assert.equal(c.getLang(),'de','an unknown stored value does not block detection');
 });
 for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/Compatibilidad General/,/compatibilidad/],['pt',/Meu cartão XORA FUN/,/Compatibilidade Geral/,/compatibilidade/],['ar',/بطاقتي في XORA FUN/,/التوافق العام/,/توافق/],['fr',/Ma carte XORA FUN/,/Compatibilité globale/,/compatibilité/],['de',/Meine XORA FUN-Karte/,/Gesamtübereinstimmung/,/Übereinstimmung/],['it',/La mia carta XORA FUN/,/Affinità generale/,/affinità/],['ja',/XORA FUNのカード/,/総合相性/,/相性/],['ko',/내 XORA FUN 카드/,/전체 궁합/,/궁합/],['zh',/我的 XORA FUN 卡片/,/整體速配/,/速配/],['ru',/Моя карточка XORA FUN/,/Общая совместимость/,/совместимость/]]) test(lang.toUpperCase()+' FUN cards, PNG, share and match render natively without fallback to other locales',()=>{
  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
@@ -306,7 +311,8 @@ for(const [lang,funBtn,funNote] of [['es','Saca tu Tarjeta Gratis','Esta tarjeta
   await node('goBtn').click();
   assert.equal(c.document.documentElement.lang,lang);
   assert.equal(c.document.documentElement.dir,lang==='ar'?'rtl':'ltr');
-  assert.equal(node('langBtn').textContent,c.nextLang(lang).toUpperCase());
+  assert.equal(node('langBtn').textContent,lang.toUpperCase());
+  assert.equal(node('langBtn').title,c.LANG_NAMES[lang]);
   const card=node('cardHolder').innerHTML;
   assert.match(card,/XORA FUN/);
   assert.doesNotMatch(card,/Ücretsiz|Eğlence|Draw Free Card|Fun Card|Tarjeta Fun|Cartão Fun|بطاقة Fun|Carte Fun|Fun-Karte|Carta Fun|Funカード/);
@@ -506,4 +512,105 @@ test('canvas names Japanese, Korean and Traditional Chinese system fonts only fo
   other.font='900 56px Nunito, Arial, sans-serif';
   assert.equal(other.font,'900 56px Nunito, Arial, sans-serif',lang+' font stack unchanged');
  }
+});
+test('browser language detection maps every supported base language, including regional variants',()=>{
+ const cases=[['tr-TR','tr'],['tr','tr'],['en-US','en'],['en-GB','en'],['en','en'],['es-MX','es'],['es-ES','es'],['es-AR','es'],['pt-BR','pt'],['pt-PT','pt'],
+  ['ar-SA','ar'],['ar-AE','ar'],['ar-QA','ar'],['ar-EG','ar'],['fr-FR','fr'],['fr-CA','fr'],['fr-BE','fr'],['de-DE','de'],['de-AT','de'],['de-CH','de'],
+  ['it-IT','it'],['ja-JP','ja'],['ko-KR','ko'],['zh-TW','zh'],['zh-HK','zh'],['zh-MO','zh'],['zh-CN','zh'],['zh-Hant-TW','zh'],['ru-RU','ru'],['ru-KZ','ru'],['EN_us','en']];
+ for(const [tag,expected] of cases){
+  const c=browser();c.navigator={languages:[tag]};
+  assert.equal(c.detectBrowserLang([tag]),expected,tag);
+  assert.equal(c.getLang(),expected,tag+' via navigator.languages');
+  assert.equal(c.langDir(c.getLang()),expected==='ar'?'rtl':'ltr',tag+' direction');
+ }
+});
+test('detection follows navigator.languages order, skips unsupported entries and falls back to navigator.language, then English',()=>{
+ let c=browser();c.navigator={languages:['nl-NL','de-DE','en-US']};assert.equal(c.getLang(),'de','second entry wins when the first is unsupported');
+ c=browser();c.navigator={languages:['sv-SE','fi-FI','ko-KR']};assert.equal(c.getLang(),'ko','third entry is found');
+ c=browser();c.navigator={languages:['en-US','ja-JP']};assert.equal(c.getLang(),'en','the first supported entry wins, not the last');
+ c=browser();c.navigator={languages:[],language:'pt-BR'};assert.equal(c.getLang(),'pt','navigator.language is the fallback');
+ c=browser();c.navigator={language:'ja-JP'};assert.equal(c.getLang(),'ja','navigator.language alone');
+ for(const unsupported of [['nl-NL'],['sv','fi','pl-PL'],['xx'],[''],[]]){
+  c=browser();c.navigator={languages:unsupported};assert.equal(c.getLang(),'en',JSON.stringify(unsupported)+' falls back to en');
+ }
+ c=browser();assert.equal(c.getLang(),'en','no navigator at all');
+ assert.equal(c.detectBrowserLang(null),null);
+});
+test('a saved language always wins over browser detection, and detection is never persisted',()=>{
+ const c=browser();c.navigator={languages:['ja-JP']};
+ assert.equal(c.getLang(),'ja');
+ assert.equal(c.localStorage.getItem(c.LS.lang),null,'detection does not write a preference');
+ c.localStorage.setItem(c.LS.lang,'es');
+ assert.equal(c.getLang(),'es','saved es beats browser ja');
+ c.navigator={languages:['ar-SA']};assert.equal(c.getLang(),'es','still es when the browser language changes');
+ for(const lang of c.LANGS){c.localStorage.setItem(c.LS.lang,lang);assert.equal(c.getLang(),lang,lang+' saved choice wins');}
+ // Only the existing key is used; no parallel preference store appears.
+ assert.equal(c.LS.lang,'xora_lang');
+});
+test('language selector lists all 12 languages, applies and persists the pick, closes, and flips RTL/LTR',()=>{
+ const c=browser();c.navigator={languages:['ar-SA']};
+ c.CustomEvent=class{constructor(type){this.type=type;}};
+ const registry=[];const docListeners={};
+ const makeEl=()=>{const el={id:'',className:'',hidden:false,innerHTML:'',textContent:'',title:'',attrs:new Map(),children:[],parentNode:null,listeners:{},
+  setAttribute(k,v){this.attrs.set(k,String(v));},getAttribute(k){return this.attrs.has(k)?this.attrs.get(k):null;},
+  addEventListener(t,fn){(this.listeners[t]=this.listeners[t]||[]).push(fn);},
+  appendChild(ch){if(ch.parentNode)ch.parentNode.children=ch.parentNode.children.filter(x=>x!==ch);ch.parentNode=this;this.children.push(ch);return ch;},
+  insertBefore(ch,ref){if(ch.parentNode)ch.parentNode.children=ch.parentNode.children.filter(x=>x!==ch);ch.parentNode=this;const i=this.children.indexOf(ref);this.children.splice(i<0?this.children.length:i,0,ch);return ch;},
+  contains(n){for(let x=n;x;x=x.parentNode)if(x===this)return true;return false;},
+  focus(){c.document.activeElement=this;},querySelector(){return null;},querySelectorAll(){return [];},
+  fire(t,e){(this.listeners[t]||[]).forEach(fn=>fn(Object.assign({stopPropagation(){},preventDefault(){}},e||{})));}};registry.push(el);return el;};
+ const nav=makeEl();const btn=makeEl();btn.id='langBtn';nav.appendChild(btn);
+ c.document.createElement=()=>makeEl();
+ c.document.getElementById=id=>registry.find(el=>el.id===id)||null;
+ c.document.documentElement={};
+ c.document.addEventListener=(t,fn)=>{(docListeners[t]=docListeners[t]||[]).push(fn);};
+ c.document.dispatchEvent=()=>true;
+ const fireDoc=(t,e)=>(docListeners[t]||[]).forEach(fn=>fn(Object.assign({stopPropagation(){},preventDefault(){}},e||{})));
+
+ c.initLangPicker();c.applyI18n();
+ const menu=c.document.getElementById('langMenu');
+ assert.ok(menu,'menu created');
+ assert.equal(btn.parentNode.className,'lang-picker','button is wrapped in place');
+ assert.equal(btn.parentNode.parentNode,nav,'wrapper stays in the header');
+ assert.equal(btn.getAttribute('aria-haspopup'),'listbox');
+ assert.equal(menu.hidden,true,'closed until clicked');
+ // Auto-detected Arabic is applied on first render.
+ assert.equal(c.document.documentElement.lang,'ar');assert.equal(c.document.documentElement.dir,'rtl');
+ assert.equal(btn.textContent,'AR');
+
+ btn.fire('click');
+ assert.equal(menu.hidden,false,'opens on click');assert.equal(btn.getAttribute('aria-expanded'),'true');
+ const options=[...menu.innerHTML.matchAll(/data-lang="(\w+)" lang="\w+" dir="(\w+)" aria-selected="(\w+)">([^<]+)<\/button>/g)].map(m=>({code:m[1],dir:m[2],selected:m[3]==='true',label:m[4]}));
+ assert.deepEqual(options.map(o=>o.code),['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']);
+ assert.deepEqual(options.map(o=>o.label),['Türkçe','English','Español','Português','العربية','Français','Deutsch','Italiano','日本語','한국어','繁體中文','Русский']);
+ assert.deepEqual(options.filter(o=>o.selected).map(o=>o.code),['ar'],'current language is marked');
+ assert.equal(options.find(o=>o.code==='ar').dir,'rtl');assert.ok(options.filter(o=>o.code!=='ar').every(o=>o.dir==='ltr'));
+
+ const pick=code=>menu.fire('click',{target:{closest:()=>({getAttribute:()=>code})}});
+ // Arabic -> English flips the page to LTR.
+ pick('en');
+ assert.equal(menu.hidden,true,'closes after a pick');assert.equal(btn.getAttribute('aria-expanded'),'false');
+ assert.equal(c.localStorage.getItem(c.LS.lang),'en','manual pick is persisted');
+ assert.equal(c.getLang(),'en','saved pick now beats the Arabic browser');
+ assert.equal(c.document.documentElement.dir,'ltr');assert.equal(c.document.documentElement.lang,'en');
+ assert.equal(btn.textContent,'EN');
+
+ // Every option selects its own locale and sets the right direction.
+ for(const code of c.LANGS){
+  btn.fire('click');assert.equal(menu.hidden,false);
+  pick(code);
+  assert.equal(c.localStorage.getItem(c.LS.lang),code);assert.equal(c.getLang(),code);
+  assert.equal(c.document.documentElement.lang,code);
+  assert.equal(c.document.documentElement.dir,code==='ar'?'rtl':'ltr',code+' direction');
+  assert.equal(btn.textContent,code.toUpperCase());assert.equal(menu.hidden,true);
+  assert.equal(c.t('fun_btn'),c.I18N[code].fun_btn,code+' copy applied');
+ }
+
+ // Outside click and Escape close the menu; clicks inside it do not.
+ btn.fire('click');assert.equal(menu.hidden,false);
+ fireDoc('click',{target:menu});assert.equal(menu.hidden,false,'click inside keeps it open');
+ fireDoc('click',{target:makeEl()});assert.equal(menu.hidden,true,'outside click closes');
+ btn.fire('click');fireDoc('keydown',{key:'Escape'});assert.equal(menu.hidden,true,'Escape closes');
+ // An unsupported value never reaches storage.
+ c.setLang('xx');assert.equal(c.localStorage.getItem(c.LS.lang),'ru');
 });
