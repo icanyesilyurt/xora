@@ -431,8 +431,12 @@ test('Match PNG score rows fit the card frame in every locale, including ES, FR,
  for(const lang of ['es','fr','it','ja','ko','zh','ru']){
   c.localStorage.setItem(c.LS.lang,lang);text.length=0;
   const m=c.matchFunHandles('alice','bob',1);Object.assign(m,{flirt:99,vibe:99,humor:99,chaos:99,romance:99});
-  c.renderMatchPNG(m);
-  assert.deepEqual(text.filter(p=>p.y===780||p.y===812).map(p=>p.v),rows(c.I18N[lang]),lang+' PNG score rows');
+  // REAL Match draws the AI-scored rows; the same object as FUN draws none of them.
+  const real={...m,meta:{...m.meta,tier:'real',locale:lang},fun_comment:undefined,ai_comment:{[lang]:'x'},rarity:{name:'rare'}};
+  c.renderMatchPNG(real);
+  assert.deepEqual(text.filter(p=>p.y===780||p.y===812).map(p=>p.v),rows(c.I18N[lang]),lang+' REAL PNG score rows');
+  text.length=0;c.renderMatchPNG(m);
+  assert.deepEqual(text.filter(p=>p.y===780||p.y===812),[],lang+' FUN PNG has no score rows');
  }
 });
 test('wrapText keeps space wrapping for other scripts, including Korean, and wraps Japanese and Chinese on character boundaries',()=>{
@@ -613,4 +617,133 @@ test('language selector lists all 12 languages, applies and persists the pick, c
  btn.fire('click');fireDoc('keydown',{key:'Escape'});assert.equal(menu.hidden,true,'Escape closes');
  // An unsupported value never reaches storage.
  c.setLang('xx');assert.equal(c.localStorage.getItem(c.LS.lang),'ru');
+});
+
+const LOCALES12=['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'];
+const recorder=(c)=>{
+ const cjk=/[\u3000-\u30ff\u3400-\u9fff\uac00-\ud7af\uff00-\uffef]/;
+ const text=[],rects=[];
+ const target={direction:'ltr',font:'',measureText:v=>({width:[...String(v)].reduce((w,ch)=>w+(cjk.test(ch)?24:12),0)}),fillText:(v,x,y)=>text.push({v:String(v),x,y}),createLinearGradient:()=>({addColorStop(){}})};
+ const ctx=new Proxy(target,{get:(o,k)=>k in o?o[k]:()=>{}});
+ c.document.createElement=()=>({getContext:()=>ctx,toDataURL:()=>'data:,'});
+ const originalRect=c.roundRect;c.roundRect=(cx,x,y,w,h,r)=>{rects.push({x,y,w,h});originalRect(cx,x,y,w,h,r);};
+ return {text,rects};
+};
+test('FUN identity cards show persona style chips and no numeric metrics, in all 12 locales',()=>{
+ for(const lang of LOCALES12){
+  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
+  const seen=new Map();for(let n=0;n<1000&&seen.size<12;n++){const r=c.analyzeFunHandle('alice','mirror',n);seen.set(r.persona_id,r);}
+  for(const [id,r] of seen){
+   const persona=c.FUN_PERSONAS.find(p=>p.id===id);
+   const html=c.buildIdentityCard(r);
+   assert.doesNotMatch(html,/score-bar|score-val|score-chip|idcard-scores|real-metrics/,lang+' '+id+' FUN has no metric rows');
+   const chips=[...html.matchAll(/<span class="trait-chip" data-trait="(\w+)"><b>([^<]+)<\/b> ([^<]+)<\/span>/g)].map(m=>({d:m[1],label:m[2],value:m[3]}));
+   assert.deepEqual(chips.map(x=>x.d),['humor','reply','timeline'],lang+' '+id+' three chips');
+   for(const ch of chips){
+    assert.equal(ch.label,c.esc(c.I18N[lang]['trait_'+ch.d]));
+    assert.equal(ch.value,c.esc(c.I18N[lang]['trait_'+ch.d+'_'+persona.traits[ch.d]]),lang+' '+id+' '+ch.d);
+    assert.doesNotMatch(ch.value+ch.label,/\d|%/,'chips are words, not numbers');
+   }
+   // PNG: chips drawn, no percentages, no bars, nothing below the footer line except the footer.
+   const {text,rects}=recorder(c);c.renderIdentityPNG(r);
+   for(const ch of chips) assert.ok(text.some(p=>p.v===c.I18N[lang]['trait_'+ch.d+'_'+persona.traits[ch.d]]),lang+' '+id+' chip value in PNG');
+   assert.ok(!text.some(p=>/\d\s?%|%\s?\d/.test(p.v)),lang+' '+id+' no percentages in FUN PNG');
+   const box=rects.find(b=>b.x===130&&b.h>=200);assert.ok(box.y+box.h<1090,lang+' '+id+' comment box above footer');
+   const chipRects=rects.filter(b=>b.h<60&&b.y>500&&b.y<box.y);
+   assert.equal(chipRects.length,6,lang+' '+id+' three chip pills (fill + stroke)');
+   for(const b of chipRects){assert.ok(b.x>=130&&b.x+b.w<=870,lang+' '+id+' chip inside 740px row');assert.ok(b.y+b.h<box.y,'chips sit above the comment box');}
+  }
+  // Every trait value is distinct within its dimension in every locale.
+  for(const d of ['humor','reply','timeline']){
+   const vals=Object.keys(c.I18N[lang]).filter(k=>k.startsWith('trait_'+d+'_')).map(k=>c.I18N[lang][k]);
+   assert.equal(new Set(vals).size,vals.length,lang+' '+d+' values distinct');
+  }
+ }
+});
+test('FUN Match shows the entertainment percentage only: no sub-scores in HTML or PNG',()=>{
+ for(const lang of LOCALES12){
+  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
+  const m=c.matchFunHandles('alice','bob',3);
+  const html=c.buildMatchCard(m);
+  assert.doesNotMatch(html,/score-bar|score-val|match-rows/,lang);
+  for(const k of ['match_flirt','match_vibe','match_humor','match_chaos','match_romance']) assert.ok(!html.includes(c.esc(c.I18N[lang][k])),lang+' '+k+' not in FUN HTML');
+  const {text}=recorder(c);c.renderMatchPNG(m);
+  for(const k of ['match_flirt','match_vibe','match_humor','match_chaos','match_romance']) assert.ok(!text.some(p=>p.v.includes(c.I18N[lang][k])),lang+' '+k+' not in FUN PNG');
+ }
+});
+test('REAL identity card draws its metric rows from behavior_signals, deterministically, in all 12 locales',()=>{
+ const signals={reply_ratio:0.32,original_ratio:0.5,repost_ratio:0.1,quote_ratio:0.08,question_ratio:0.25,emoji_per_post:1.4,avg_text_length:142};
+ const expectKeys=['reply_ratio','original_ratio','repost_ratio','question_ratio','emoji_per_post','avg_text_length'];
+ const longComment='You open threads with a question and come back to answer the replies yourself. Most of your posts are your own words rather than reposts, and you keep them compact. When you quote someone, it is usually to add a short counterpoint.';
+ for(const lang of LOCALES12){
+  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
+  const res={meta:{tier:'real',locale:lang,version:'xora_real_v1'},handle:'alice',hash:7,rarity:{name:'epic',score:80},
+   nickname:{[lang]:'Curious Mind'},tagline:{[lang]:'Questions lead the way.'},profile_summary:{[lang]:'Asks open questions in public threads.'},
+   comment:{mirror:{[lang]:longComment},stalk:{[lang]:longComment}},behavior_signals:signals,
+   card:{color:'#8B5CF6',emoji:'🪞',top_behaviors:[{key:'duygusal_yogunluk',label:{[lang]:'AI_ONLY_LABEL'},value:88}]}};
+  const html=c.buildIdentityCard(res);
+  assert.match(html,/XORA REAL/);assert.ok(html.includes(c.esc(c.t('rarity_epic'))),lang+' rarity');
+  assert.match(html,/data-source="behavior_signals"/);assert.ok(!html.includes('AI_ONLY_LABEL'),'AI-judged metric not drawn');
+  const rows=[...html.matchAll(/data-metric="(\w+)"><span class="score-name">([^<]+)<\/span><span class="score-bar"><i style="width:(\d+)%"><\/i><\/span><span class="score-val">([^<]+)<\/span>/g)].map(m=>({key:m[1],label:m[2],bar:+m[3],value:m[4]}));
+  assert.deepEqual(rows.map(r=>r.key),expectKeys,lang+' rows');
+  assert.deepEqual(rows.map(r=>r.bar),[32,50,10,25,47,51],lang+' bars derive from the measured values');
+  assert.equal(rows[0].value,c.esc(c.formatPercent(0.32,lang)));assert.equal(rows[4].value,c.esc(c.formatDecimal(1.4,lang)));
+  assert.equal(rows[5].value,c.esc(c.I18N[lang].real_m_chars.replace('{n}','142')));
+  assert.equal(c.buildIdentityCard(res),html,'no randomness: same input, same card');
+  const moved=c.buildIdentityCard({...res,behavior_signals:{...signals,reply_ratio:0.6}});
+  assert.match(moved,/data-metric="reply_ratio"><span class="score-name">[^<]+<\/span><span class="score-bar"><i style="width:60%">/);
+  // PNG: rows + values drawn, comment fits above the footer.
+  const {text,rects}=recorder(c);c.renderIdentityPNG(res);
+  for(const r of rows) assert.ok(text.some(p=>p.v===c.I18N[lang][{reply_ratio:'real_m_reply',original_ratio:'real_m_original',repost_ratio:'real_m_repost',question_ratio:'real_m_question',emoji_per_post:'real_m_emoji',avg_text_length:'real_m_length'}[r.key]]),lang+' PNG label '+r.key);
+  assert.ok(text.some(p=>p.v===c.formatPercent(0.32,lang)),lang+' PNG value');
+  const box=rects.filter(b=>b.x===130).pop();assert.ok(box.y+box.h<=1072,lang+' REAL comment box above footer: '+(box.y+box.h));
+  const body=text.filter(p=>p.y>100&&p.y<1090&&!/^XORA|xora\.app/.test(p.v));
+  assert.ok(body.every(p=>p.y<box.y+box.h),lang+' no copy below the comment box');
+  assert.ok(text.some(p=>p.v.includes(c.t('rarity_epic'))),lang+' rarity stamped on PNG');
+ }
+ // Older REAL results without behavior_signals keep their AI metrics rather than inventing numbers.
+ const c=browser();c.localStorage.setItem(c.LS.lang,'en');
+ const legacy={meta:{tier:'real',locale:'en'},handle:'bob',nickname:{en:'X'},tagline:{en:'Y'},comment:{mirror:{en:'Z.'}},card:{color:'#111',emoji:'🪞',top_behaviors:[{key:'mizah',label:{en:'Humor'},value:70},{key:'merak',label:{en:'Curiosity'},value:64},{key:'kaos',label:{en:'Chaos'},value:40}]}};
+ const html=c.buildIdentityCard(legacy);
+ assert.match(html,/data-source="ai_metrics"/);assert.ok(html.includes('>Humor<')&&html.includes('width:70%'));
+});
+test('credit packages: 10/20/50/300 at launch prices with struck regular prices and correct capacity, in all 12 locales',()=>{
+ const c=browser();
+ assert.deepEqual({...c.COSTS},{mirror:5,stalk:5,match:10},'per-analysis prices unchanged');
+ const pk=[...c.CREDIT_PACKAGES].map(p=>({id:p.id,credits:p.credits,list:p.list,price:p.price,featured:!!p.featured,label:p.label,note:p.note||null}));
+ assert.deepEqual(pk,[
+  {id:'starter',credits:10,list:4.99,price:2.99,featured:false,label:'pkg_starter',note:null},
+  {id:'popular',credits:20,list:9.99,price:5.99,featured:true,label:'pkg_popular',note:null},
+  {id:'value',credits:50,list:24.99,price:14.99,featured:false,label:'pkg_value',note:null},
+  {id:'pro',credits:300,list:149.99,price:89.99,featured:false,label:'pkg_pro',note:'pkg_pro_note'}]);
+ assert.deepEqual([...c.CREDIT_PACKAGES].map(p=>({...c.packageCapacity(p)})),[{mirrorStalk:2,match:1},{mirrorStalk:4,match:2},{mirrorStalk:10,match:5},{mirrorStalk:60,match:30}]);
+ for(const p of c.CREDIT_PACKAGES) assert.ok(Math.abs(1-p.price/p.list-c.LAUNCH_DISCOUNT)<0.005,p.id+' is 40% off');
+ for(const lang of LOCALES12){
+  c.localStorage.setItem(c.LS.lang,lang);
+  const box={innerHTML:''},banner={textContent:''};
+  c.renderCreditPackages(box,banner);
+  assert.equal(banner.textContent,c.I18N[lang].pricing_launch.replace('{pct}',c.formatPercent(0.4,lang)),lang+' banner');
+  const packs=[...box.innerHTML.matchAll(/<div class="pack pack-(\w+)( hot)?" data-package="\w+"><p class="pack-badge">([^<]+)<\/p><p class="pack-amount">(\d+) <small>⚡<\/small><\/p><p class="pack-name">([^<]+)<\/p>(?:<p class="pack-note">([^<]+)<\/p>)?<p class="pack-price"><s class="pack-old" aria-label="[^"]+">([^<]+)<\/s> <span class="pack-now">([^<]+)<\/span><\/p><button type="button" class="btn btn-sm( btn-orange)?" data-amount="(\d+)"/g)];
+  assert.equal(packs.length,4,lang+' four packages');
+  const fill=(s,v)=>s.replace('{ms}',v.ms).replace('{mt}',v.mt);
+  const caps=[[2,1],[4,2],[10,5],[60,30]];
+  packs.forEach((m,i)=>{
+   const p=c.CREDIT_PACKAGES[i];
+   assert.equal(m[1],p.id);assert.equal(!!m[2],p.id==='popular',lang+' only 20 is highlighted');
+   assert.equal(m[3],c.esc(c.I18N[lang][p.label]),lang+' '+p.id+' badge');
+   assert.equal(+m[4],p.credits);assert.equal(+m[10],p.credits,'buy button amount');
+   assert.equal(m[5],c.esc(fill(c.I18N[lang].pkg_capacity,{ms:caps[i][0],mt:caps[i][1]})),lang+' capacity');
+   assert.equal(m[6]||null,p.id==='pro'?c.esc(c.I18N[lang].pkg_pro_note):null,lang+' pro note');
+   assert.equal(m[7],c.esc(c.formatPrice(p.list,lang)),lang+' struck regular price');assert.equal(m[8],c.esc(c.formatPrice(p.price,lang)),lang+' launch price');
+   assert.equal(!!m[9],p.id==='popular');
+  });
+  assert.doesNotMatch(box.innerHTML,/Real Analiz|Real Analysis|pkg[123]_n/,'no generic "N Real Analysis" labels');
+ }
+ c.localStorage.setItem(c.LS.lang,'en');const box={innerHTML:''};c.renderCreditPackages(box,null);
+ for(const [old,now] of [['$4.99','$2.99'],['$9.99','$5.99'],['$24.99','$14.99'],['$149.99','$89.99']]) assert.ok(box.innerHTML.includes('>'+old+'</s> <span class="pack-now">'+now+'<'),old+' -> '+now);
+ assert.match(box.innerHTML,/pack-popular hot"[^]*?>MOST POPULAR</);assert.match(box.innerHTML,/pack-pro"[^]*?>PROFESSIONAL<[^]*?>Creators &amp; Agencies</);
+ // The credits page renders from this config and keeps the payment-coming-soon click.
+ const page=fs.readFileSync('credits.html','utf8');
+ assert.match(page,/id="creditPacks"/);assert.match(page,/renderCreditPackages\(packs, banner\)/);assert.match(page,/toast\(t\("payment_soon"\)/);
+ assert.doesNotMatch(page,/data-i18n="pkg[123]_n"|\$11\.99|\$4\.99<\/p>/);
 });
