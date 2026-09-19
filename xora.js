@@ -910,62 +910,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Sessiz Muzip",
         "tagline": "Masum görünen tek bir reply ile yorumları hareketlendirebilirsin.",
-        "comment": "Herkes aynı fikirde görünürken yorumlara küçük bir soru bırakıp kenara çekiliyorsun. Öyle sakin yazıyorsun ki şaka mı ciddi mi olduğu ilk anda anlaşılmıyor. Asıl keyif, espriyi ilk yakalayanın reply'ını görmek."
+        "comment": "Herkes aynı fikirde görünürken yorumlara küçük bir soru bırakıp kenara çekiliyorsun. Öyle sakin yazıyorsun ki şaka mı ciddi mi olduğu ilk anda anlaşılmıyor. Asıl keyif, espriyi ilk yakalayanın reply'ını görmek.",
+        "stalk_tagline": "Masum görünen tek bir reply ile yorumları hareketlendirebiliyor.",
+        "stalk_comment": "Herkes aynı fikirde görünürken yorumlara küçük bir soru bırakıp kenara çekiliyor. Öyle sakin yazıyor ki şaka mı ciddi mi olduğu ilk anda anlaşılmıyor. Asıl keyfi, espriyi ilk yakalayanın reply'ını görmek."
       },
       "en": {
         "nickname": "Quiet Instigator",
         "tagline": "One innocent-looking reply and the whole thread wakes up.",
-        "comment": "When everyone in the replies seems to agree, you drop one small question and step back. You phrase it so calmly that nobody can tell whether you are joking. The best part is watching who catches on first."
+        "comment": "When everyone in the replies seems to agree, you drop one small question and step back. You phrase it so calmly that nobody can tell whether you are joking. The best part is watching who catches on first.",
+        "stalk_tagline": "One innocent-looking reply from them and the whole thread wakes up.",
+        "stalk_comment": "When everyone in the replies seems to agree, they drop one small question and step back. They phrase it so calmly that nobody can tell whether they are joking. Their favorite part is watching who catches on first."
       },
       "es": {
         "nickname": "Travieso Discreto",
         "tagline": "Una respuesta que parece inocente y el hilo entero se despierta.",
-        "comment": "Cuando en las respuestas todos parecen estar de acuerdo, dejas caer una pregunta pequeña y te retiras. La escribes con tanta calma que nadie sabe si vas en serio o en broma. Lo mejor es ver quién lo entiende primero."
+        "comment": "Cuando en las respuestas todos parecen estar de acuerdo, dejas caer una pregunta pequeña y te retiras. La escribes con tanta calma que nadie sabe si vas en serio o en broma. Lo mejor es ver quién lo entiende primero.",
+        "stalk_tagline": "Una respuesta suya que parece inocente y el hilo entero se despierta.",
+        "stalk_comment": "Cuando en las respuestas todos parecen estar de acuerdo, esta cuenta deja caer una pregunta pequeña y se retira. La escribe con tanta calma que nadie sabe si va en serio o en broma. Lo que más disfruta es ver quién lo entiende primero."
       },
       "pt": {
         "nickname": "Arteiro de Mansinho",
         "tagline": "Uma resposta com jeito inocente e a thread inteira acorda.",
-        "comment": "Quando todo mundo nas respostas parece concordar, você solta uma perguntinha e sai de fininho. Escreve com tanta calma que ninguém sabe se é sério ou brincadeira. O melhor é ver quem entende primeiro."
+        "comment": "Quando todo mundo nas respostas parece concordar, você solta uma perguntinha e sai de fininho. Escreve com tanta calma que ninguém sabe se é sério ou brincadeira. O melhor é ver quem entende primeiro.",
+        "stalk_tagline": "Uma resposta com jeito inocente dessa conta e a thread inteira acorda.",
+        "stalk_comment": "Quando todo mundo nas respostas parece concordar, essa conta solta uma perguntinha e sai de fininho. Escreve com tanta calma que ninguém sabe se é sério ou brincadeira. O melhor, para essa conta, é ver quem entende primeiro."
       },
       "ar": {
         "nickname": "المشاغب الهادئ",
         "tagline": "رد واحد يبدو بريئًا يكفي ليوقظ السلسلة كلها.",
-        "comment": "حين يبدو أن الجميع في الردود متفقون، تترك سؤالًا صغيرًا ثم تنسحب بهدوء. تكتبه بهدوء شديد لا يعرف معه أحد إن كنت جادًا أم تمزح. أمتع ما في الأمر أن ترى من يلتقط الفكرة أولًا."
+        "comment": "حين يبدو أن الجميع في الردود متفقون، تترك سؤالًا صغيرًا ثم تنسحب بهدوء. تكتبه بهدوء شديد لا يعرف معه أحد إن كنت جادًا أم تمزح. أمتع ما في الأمر أن ترى من يلتقط الفكرة أولًا.",
+        "stalk_tagline": "رد واحد يبدو بريئًا من هذا الحساب يكفي ليوقظ السلسلة كلها.",
+        "stalk_comment": "حين يبدو أن الجميع في الردود متفقون، يترك سؤالًا صغيرًا ثم ينسحب بهدوء. يكتبه بهدوء شديد لا يعرف معه أحد إن كان جادًا أم يمزح. أمتع ما في الأمر عنده أن يرى من يلتقط الفكرة أولًا."
       },
       "fr": {
         "nickname": "L'Air de Rien",
         "tagline": "Une réponse l'air de rien, et tout le fil se réveille.",
-        "comment": "Quand tout le monde semble d'accord dans les réponses, tu lâches une petite question faussement naïve et tu t'éclipses. Tu l'écris avec tant de calme que personne ne sait si tu plaisantes. Le meilleur moment, c'est de voir qui a compris en premier."
+        "comment": "Quand tout le monde semble d'accord dans les réponses, tu lâches une petite question faussement naïve et tu t'éclipses. Tu l'écris avec tant de calme que personne ne sait si tu plaisantes. Le meilleur moment, c'est de voir qui a compris en premier.",
+        "stalk_tagline": "Une réponse l'air de rien de ce compte, et tout le fil se réveille.",
+        "stalk_comment": "Quand tout le monde semble d'accord dans les réponses, ce compte lâche une petite question faussement naïve et s'éclipse. Il l'écrit avec tant de calme que personne ne sait s'il plaisante. Son moment préféré, c'est de voir qui a compris en premier."
       },
       "de": {
         "nickname": "Auf leisen Sohlen",
         "tagline": "Eine harmlos wirkende Antwort, und der ganze Thread wacht auf.",
-        "comment": "Wenn in den Antworten alle einer Meinung scheinen, setzt du eine kleine Frage ab und ziehst dich zurück. Du schreibst sie so ruhig, dass niemand weiß, ob du scherzt. Am schönsten ist es zu sehen, wer es zuerst kapiert."
+        "comment": "Wenn in den Antworten alle einer Meinung scheinen, setzt du eine kleine Frage ab und ziehst dich zurück. Du schreibst sie so ruhig, dass niemand weiß, ob du scherzt. Am schönsten ist es zu sehen, wer es zuerst kapiert.",
+        "stalk_tagline": "Eine harmlos wirkende Antwort von diesem Account, und der ganze Thread wacht auf.",
+        "stalk_comment": "Wenn in den Antworten alle einer Meinung scheinen, setzt dieser Account eine kleine Frage ab und zieht sich zurück. Er schreibt sie so ruhig, dass niemand weiß, ob er scherzt. Am schönsten findet er es zu sehen, wer es zuerst kapiert."
       },
       "it": {
         "nickname": "Il Sornione",
         "tagline": "Una risposta dall'aria innocente e tutto il thread si sveglia.",
-        "comment": "Quando nelle risposte sembrano tutti d'accordo, lasci cadere una piccola domanda e ti fai da parte. La scrivi con una calma tale che nessuno capisce se stai scherzando. Il bello è vedere chi ci arriva per primo."
+        "comment": "Quando nelle risposte sembrano tutti d'accordo, lasci cadere una piccola domanda e ti fai da parte. La scrivi con una calma tale che nessuno capisce se stai scherzando. Il bello è vedere chi ci arriva per primo.",
+        "stalk_tagline": "Una sua risposta dall'aria innocente e tutto il thread si sveglia.",
+        "stalk_comment": "Quando nelle risposte sembrano tutti d'accordo, questo account lascia cadere una piccola domanda e si fa da parte. La scrive con una calma tale che nessuno capisce se stia scherzando. Il suo momento preferito è vedere chi ci arriva per primo."
       },
       "ja": {
         "nickname": "さりげない策士",
         "tagline": "無邪気に見えるリプひとつで、スレッド全体が動き出す。",
-        "comment": "リプ欄がみんな同じ意見でまとまりかけたころ、小さな質問をひとつ置いてそっと離れる。あまりに落ち着いた書き方なので、本気なのか冗談なのか誰にもわからない。いちばん楽しいのは、最初に気づいた人のリプを見る瞬間だ。"
+        "comment": "リプ欄がみんな同じ意見でまとまりかけたころ、小さな質問をひとつ置いてそっと離れる。あまりに落ち着いた書き方なので、本気なのか冗談なのか誰にもわからない。いちばん楽しいのは、最初に気づいた人のリプを見る瞬間だ。",
+        "stalk_tagline": "無邪気に見えるリプひとつで、このアカウントはスレッド全体を動かす。",
+        "stalk_comment": "リプ欄がみんな同じ意見でまとまりかけたころ、小さな質問をひとつ置いてそっと離れるタイプだ。あまりに落ち着いた書き方なので、本気なのか冗談なのか誰にもわからない。この人がいちばん楽しむのは、最初に気づいた人のリプを見る瞬間だ。"
       },
       "ko": {
         "nickname": "은근한 장난꾼",
         "tagline": "순진해 보이는 답글 하나로 스레드 전체를 깨워요.",
-        "comment": "답글 창의 모두가 같은 의견으로 모일 즈음, 작은 질문 하나를 남기고 슬쩍 빠져요. 너무 태연하게 써서 진담인지 농담인지 아무도 확신하지 못하죠. 제일 즐거운 순간은 처음 눈치챈 사람의 답글을 볼 때예요."
+        "comment": "답글 창의 모두가 같은 의견으로 모일 즈음, 작은 질문 하나를 남기고 슬쩍 빠져요. 너무 태연하게 써서 진담인지 농담인지 아무도 확신하지 못하죠. 제일 즐거운 순간은 처음 눈치챈 사람의 답글을 볼 때예요.",
+        "stalk_tagline": "순진해 보이는 답글 하나로 이 계정은 스레드 전체를 깨워요.",
+        "stalk_comment": "답글 창의 모두가 같은 의견으로 모일 즈음, 작은 질문 하나를 남기고 슬쩍 빠지는 타입이에요. 너무 태연하게 써서 진담인지 농담인지 아무도 확신하지 못하죠. 이 사람이 제일 즐거워하는 순간은 처음 눈치챈 사람의 답글을 볼 때예요."
       },
       "zh": {
         "nickname": "安靜的搗蛋鬼",
         "tagline": "一則看似無辜的回覆，就能讓整串討論醒過來。",
-        "comment": "留言區大家的意見快要一致的時候，你輕輕丟下一個小問題就悄悄離開。你寫得太平靜了，沒有人分得出你是認真還是在開玩笑。最開心的一刻，是看到第一個聽懂的人留言。"
+        "comment": "留言區大家的意見快要一致的時候，你輕輕丟下一個小問題就悄悄離開。你寫得太平靜了，沒有人分得出你是認真還是在開玩笑。最開心的一刻，是看到第一個聽懂的人留言。",
+        "stalk_tagline": "一則看似無辜的回覆，這個帳號就能讓整串討論醒過來。",
+        "stalk_comment": "留言區大家的意見快要一致的時候，這個帳號會輕輕丟下一個小問題就悄悄離開。寫得太平靜了，沒有人分得出是認真還是在開玩笑。最開心的一刻，是看到第一個聽懂的人留言。"
       },
       "ru": {
         "nickname": "Тихий провокатор",
         "tagline": "Один невинный ответ, и весь тред оживает.",
-        "comment": "Когда в ответах все вроде бы согласны, ты оставляешь маленький вопрос и тихо уходишь. Пишешь так спокойно, что никто не понимает, всерьёз ты или шутишь. Самое приятное — увидеть, кто догадался первым."
+        "comment": "Когда в ответах все вроде бы согласны, ты оставляешь маленький вопрос и тихо уходишь. Пишешь так спокойно, что никто не понимает, всерьёз ты или шутишь. Самое приятное — увидеть, кто догадался первым.",
+        "stalk_tagline": "Один невинный ответ этого аккаунта — и весь тред оживает.",
+        "stalk_comment": "Когда в ответах все вроде бы согласны, этот аккаунт оставляет маленький вопрос и тихо уходит. Пишет так спокойно, что никто не понимает, всерьёз он или шутит. Самое приятное для него — увидеть, кто догадался первым."
       }
     }
   },
@@ -983,62 +1007,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "İnce Alaycı",
         "tagline": "Ciddi görünen bir cümlenin sonuna küçük bir ironi saklıyorsun.",
-        "comment": "Timeline'da fazla iddialı bir post görünce içindeki küçük çelişki hemen dikkatini çekiyor. Uzun bir thread yerine tek satırlık, hafif alaylı bir alıntı seçiyorsun. Espriyi açıklamak yerine anlayanların beğenmesini bekliyorsun."
+        "comment": "Timeline'da fazla iddialı bir post görünce içindeki küçük çelişki hemen dikkatini çekiyor. Uzun bir thread yerine tek satırlık, hafif alaylı bir alıntı seçiyorsun. Espriyi açıklamak yerine anlayanların beğenmesini bekliyorsun.",
+        "stalk_tagline": "Ciddi görünen bir cümlenin sonuna küçük bir ironi saklıyor.",
+        "stalk_comment": "Timeline'da fazla iddialı bir post görünce içindeki küçük çelişki hemen dikkatini çekiyor. Uzun bir thread yerine tek satırlık, hafif alaylı bir alıntı seçiyor. Espriyi açıklamak yerine anlayanların beğenmesini bekliyor."
       },
       "en": {
         "nickname": "Tongue in Cheek",
         "tagline": "Almost serious, but never quite.",
-        "comment": "A very confident post on your timeline is basically an invitation. Instead of a long rebuttal thread, you reach for a one-line quote with a gentle twist. You never explain the joke; the right people will like it."
+        "comment": "A very confident post on your timeline is basically an invitation. Instead of a long rebuttal thread, you reach for a one-line quote with a gentle twist. You never explain the joke; the right people will like it.",
+        "stalk_tagline": "Their posts sound serious until the very last word.",
+        "stalk_comment": "A very confident post on their timeline is basically an invitation. Instead of a long rebuttal thread, they reach for a one-line quote with a gentle twist. They never explain the joke; the right people will like it."
       },
       "es": {
         "nickname": "Casi en Serio",
         "tagline": "Tus frases parecen serias hasta la última palabra.",
-        "comment": "Una publicación demasiado segura de sí misma en tu timeline es casi una invitación. En lugar de un hilo larguísimo para rebatirla, eliges una cita de una sola línea con un giro sutil. Nunca explicas el chiste: quien lo entiende, le da me gusta."
+        "comment": "Una publicación demasiado segura de sí misma en tu timeline es casi una invitación. En lugar de un hilo larguísimo para rebatirla, eliges una cita de una sola línea con un giro sutil. Nunca explicas el chiste: quien lo entiende, le da me gusta.",
+        "stalk_tagline": "Sus frases parecen serias hasta la última palabra.",
+        "stalk_comment": "Una publicación demasiado segura de sí misma en su timeline es casi una invitación. En lugar de un hilo larguísimo para rebatirla, elige una cita de una sola línea con un giro sutil. Nunca explica el chiste: quien lo entiende, le da me gusta."
       },
       "pt": {
         "nickname": "Ironia Fina",
         "tagline": "Suas frases parecem sérias até a última palavra.",
-        "comment": "Um post confiante demais na sua timeline é praticamente um convite. Em vez de uma thread enorme para rebater, você escolhe um quote de uma linha com uma virada sutil. Você nunca explica a piada: quem entendeu, curte."
+        "comment": "Um post confiante demais na sua timeline é praticamente um convite. Em vez de uma thread enorme para rebater, você escolhe um quote de uma linha com uma virada sutil. Você nunca explica a piada: quem entendeu, curte.",
+        "stalk_tagline": "As frases dessa conta parecem sérias até a última palavra.",
+        "stalk_comment": "Um post confiante demais na timeline é praticamente um convite para essa conta. Em vez de uma thread enorme para rebater, ela escolhe um quote de uma linha com uma virada sutil. Nunca explica a piada: quem entendeu, curte."
       },
       "ar": {
         "nickname": "سخرية لطيفة",
         "tagline": "جملك تبدو جادة حتى آخر كلمة.",
-        "comment": "المنشور الواثق أكثر من اللازم على خطك الزمني يكاد يكون دعوة مفتوحة. بدل سلسلة طويلة للرد، تختار اقتباسًا من سطر واحد فيه لمسة ساخرة خفيفة. لا تشرح النكتة أبدًا، فمن فهمها سيضغط على الإعجاب."
+        "comment": "المنشور الواثق أكثر من اللازم على خطك الزمني يكاد يكون دعوة مفتوحة. بدل سلسلة طويلة للرد، تختار اقتباسًا من سطر واحد فيه لمسة ساخرة خفيفة. لا تشرح النكتة أبدًا، فمن فهمها سيضغط على الإعجاب.",
+        "stalk_tagline": "جمل هذا الحساب تبدو جادة حتى آخر كلمة.",
+        "stalk_comment": "المنشور الواثق أكثر من اللازم على خطه الزمني يكاد يكون دعوة مفتوحة. بدل سلسلة طويلة للرد، يختار اقتباسًا من سطر واحد فيه لمسة ساخرة خفيفة. لا يشرح النكتة أبدًا، فمن فهمها سيضغط على الإعجاب."
       },
       "fr": {
         "nickname": "Second Degré",
         "tagline": "Tes phrases ont l'air sérieuses jusqu'au dernier mot.",
-        "comment": "Un post trop sûr de lui dans ta timeline, c'est presque une invitation. Plutôt qu'un long fil pour répondre, tu choisis une citation d'une ligne, volontairement ambiguë. Tu n'expliques jamais la blague\u00a0: ceux qui l'ont comprise mettront un j'aime."
+        "comment": "Un post trop sûr de lui dans ta timeline, c'est presque une invitation. Plutôt qu'un long fil pour répondre, tu choisis une citation d'une ligne, volontairement ambiguë. Tu n'expliques jamais la blague\u00a0: ceux qui l'ont comprise mettront un j'aime.",
+        "stalk_tagline": "Ses phrases ont l'air sérieuses jusqu'au dernier mot.",
+        "stalk_comment": "Un post trop sûr de lui dans sa timeline, c'est presque une invitation. Plutôt qu'un long fil pour répondre, il choisit une citation d'une ligne, volontairement ambiguë. Il n'explique jamais la blague\u00a0: ceux qui l'ont comprise mettront un j'aime."
       },
       "de": {
         "nickname": "Mit Augenzwinkern",
         "tagline": "Deine Sätze wirken ernst bis zum letzten Wort.",
-        "comment": "Ein allzu selbstsicherer Post in deiner Timeline ist fast schon eine Einladung. Statt eines langen Gegen-Threads wählst du ein einzeiliges Zitat mit einem kleinen Dreh. Du erklärst den Witz nie; wer ihn versteht, lässt ein Like da."
+        "comment": "Ein allzu selbstsicherer Post in deiner Timeline ist fast schon eine Einladung. Statt eines langen Gegen-Threads wählst du ein einzeiliges Zitat mit einem kleinen Dreh. Du erklärst den Witz nie; wer ihn versteht, lässt ein Like da.",
+        "stalk_tagline": "Seine Sätze wirken ernst bis zum letzten Wort.",
+        "stalk_comment": "Ein allzu selbstsicherer Post in seiner Timeline ist fast schon eine Einladung. Statt eines langen Gegen-Threads wählt er ein einzeiliges Zitat mit einem kleinen Dreh. Er erklärt den Witz nie; wer ihn versteht, lässt ein Like da."
       },
       "it": {
         "nickname": "Ironia Sottile",
         "tagline": "Le tue frasi sembrano serie fino all'ultima parola.",
-        "comment": "Un post troppo sicuro di sé nella tua timeline è quasi un invito. Invece di un lungo thread di risposta, scegli una citazione di una riga con un piccolo colpo di scena. Non spieghi mai la battuta: chi l'ha capita metterà un like."
+        "comment": "Un post troppo sicuro di sé nella tua timeline è quasi un invito. Invece di un lungo thread di risposta, scegli una citazione di una riga con un piccolo colpo di scena. Non spieghi mai la battuta: chi l'ha capita metterà un like.",
+        "stalk_tagline": "Le sue frasi sembrano serie fino all'ultima parola.",
+        "stalk_comment": "Un post troppo sicuro di sé nella sua timeline è quasi un invito. Invece di un lungo thread di risposta, sceglie una citazione di una riga con un piccolo colpo di scena. Non spiega mai la battuta: chi l'ha capita metterà un like."
       },
       "ja": {
         "nickname": "ツッコミ上手",
         "tagline": "真面目に見える文の最後に、小さな皮肉を隠している。",
-        "comment": "自信満々すぎるポストがタイムラインに流れてくると、つい小さな矛盾が気になってしまう。長い反論スレッドより、ひと言だけの引用でさらっとひねるほうが好きだ。ネタの説明はしない。わかる人がいいねを押してくれれば十分だ。"
+        "comment": "自信満々すぎるポストがタイムラインに流れてくると、つい小さな矛盾が気になってしまう。長い反論スレッドより、ひと言だけの引用でさらっとひねるほうが好きだ。ネタの説明はしない。わかる人がいいねを押してくれれば十分だ。",
+        "stalk_tagline": "このアカウントの文は、最後の一語まで真面目に見える。",
+        "stalk_comment": "自信満々すぎるポストがタイムラインに流れてくると、この人はつい小さな矛盾が気になってしまう。長い反論スレッドより、ひと言だけの引用でさらっとひねるのが好みだ。ネタの説明はしない。わかる人がいいねを押してくれれば十分らしい。"
       },
       "ko": {
         "nickname": "촌철살인",
         "tagline": "진지해 보이는 문장 끝에 작은 반전을 숨겨 둬요.",
-        "comment": "타임라인에 지나치게 자신만만한 게시물이 올라오면 그 안의 모순이 먼저 보여요. 길게 반박하는 스레드 대신 한 줄짜리 인용으로 가볍게 비틀죠. 무슨 뜻인지 굳이 설명하지는 않아요. 알아들은 사람이 좋아요를 누르면 그걸로 충분하니까요."
+        "comment": "타임라인에 지나치게 자신만만한 게시물이 올라오면 그 안의 모순이 먼저 보여요. 길게 반박하는 스레드 대신 한 줄짜리 인용으로 가볍게 비틀죠. 무슨 뜻인지 굳이 설명하지는 않아요. 알아들은 사람이 좋아요를 누르면 그걸로 충분하니까요.",
+        "stalk_tagline": "이 계정의 문장은 마지막 단어까지 진지해 보여요.",
+        "stalk_comment": "타임라인에 지나치게 자신만만한 게시물이 올라오면 이 사람에겐 그 안의 모순이 먼저 보여요. 길게 반박하는 스레드 대신 한 줄짜리 인용으로 가볍게 비틀죠. 무슨 뜻인지 굳이 설명하지는 않아요. 알아들은 사람이 좋아요를 누르면 그걸로 충분하대요."
       },
       "zh": {
         "nickname": "一句話收尾",
         "tagline": "看似認真的句子，最後一個字才露出反諷。",
-        "comment": "時間軸上出現太過自信的貼文時，你總會先注意到裡面的矛盾。比起長篇反駁的串文，你更習慣用一句話的引用輕輕帶過。你不會解釋笑點在哪裡。看懂的人按個讚，這樣就夠了。"
+        "comment": "時間軸上出現太過自信的貼文時，你總會先注意到裡面的矛盾。比起長篇反駁的串文，你更習慣用一句話的引用輕輕帶過。你不會解釋笑點在哪裡。看懂的人按個讚，這樣就夠了。",
+        "stalk_tagline": "這個帳號的句子看似認真，最後一個字才露出反諷。",
+        "stalk_comment": "時間軸上出現太過自信的貼文時，這個人總會先注意到裡面的矛盾。比起長篇反駁的串文，更習慣用一句話的引用輕輕帶過。從不解釋笑點在哪裡。看懂的人按個讚，這樣就夠了。"
       },
       "ru": {
         "nickname": "Последнее слово",
         "tagline": "Твои фразы кажутся серьёзными до последнего слова.",
-        "comment": "Слишком самоуверенный пост в ленте для тебя почти приглашение. Вместо длинного треда с возражениями ты выбираешь цитату в одну строку с лёгким подвохом. Шутку ты не объясняешь. Кто понял, тот поставит лайк."
+        "comment": "Слишком самоуверенный пост в ленте для тебя почти приглашение. Вместо длинного треда с возражениями ты выбираешь цитату в одну строку с лёгким подвохом. Шутку ты не объясняешь. Кто понял, тот поставит лайк.",
+        "stalk_tagline": "Его фразы кажутся серьёзными до последнего слова.",
+        "stalk_comment": "Слишком самоуверенный пост в ленте для него почти приглашение. Вместо длинного треда с возражениями он выбирает цитату в одну строку с лёгким подвохом. Шутку он не объясняет. Кто понял, тот поставит лайк."
       }
     }
   },
@@ -1056,62 +1104,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Her Konuya Meraklı",
         "tagline": "Bir thread bitmeden aklın bir sonraki soruya gidiyor.",
-        "comment": "Bilmediğin bir konu timeline'a düşünce susmak yerine reply'a soru bırakıyorsun. Gelen her ilginç cevap yeni bir merak açıyor ve sekmeler çoğalıyor. Her konuda uzman olmaktan çok, bugün yeni bir şey öğrenmiş olmak hoşuna gidiyor."
+        "comment": "Bilmediğin bir konu timeline'a düşünce susmak yerine reply'a soru bırakıyorsun. Gelen her ilginç cevap yeni bir merak açıyor ve sekmeler çoğalıyor. Her konuda uzman olmaktan çok, bugün yeni bir şey öğrenmiş olmak hoşuna gidiyor.",
+        "stalk_tagline": "Bir thread bitmeden aklı bir sonraki soruya gidiyor.",
+        "stalk_comment": "Bilmediği bir konu timeline'a düşünce susmak yerine reply'a soru bırakıyor. Gelen her ilginç cevap yeni bir merak açıyor ve sekmeler çoğalıyor. Her konuda uzman olmaktan çok, o gün yeni bir şey öğrenmiş olmak hoşuna gidiyor."
       },
       "en": {
         "nickname": "Endlessly Curious",
         "tagline": "There is always one more question to drop in the replies.",
-        "comment": "When a topic you know nothing about hits your timeline, you ask instead of scrolling past. Every good answer opens another tab and another question. Being an expert matters less to you than ending the day having learned something new."
+        "comment": "When a topic you know nothing about hits your timeline, you ask instead of scrolling past. Every good answer opens another tab and another question. Being an expert matters less to you than ending the day having learned something new.",
+        "stalk_tagline": "There is always one more question they want to drop in the replies.",
+        "stalk_comment": "When a topic they know nothing about hits their timeline, they ask instead of scrolling past. Every good answer opens another tab and another question. Being an expert matters less to them than ending the day having learned something new."
       },
       "es": {
         "nickname": "Curiosidad Infinita",
         "tagline": "Siempre queda una pregunta más para dejar en las respuestas.",
-        "comment": "Cuando aparece en tu timeline un tema que no conoces, preguntas en lugar de seguir de largo. Cada buena respuesta te abre otra pestaña y otra duda. Te importa menos ser experto que terminar el día sabiendo algo nuevo."
+        "comment": "Cuando aparece en tu timeline un tema que no conoces, preguntas en lugar de seguir de largo. Cada buena respuesta te abre otra pestaña y otra duda. Te importa menos ser experto que terminar el día sabiendo algo nuevo.",
+        "stalk_tagline": "Siempre le queda una pregunta más para dejar en las respuestas.",
+        "stalk_comment": "Cuando aparece en su timeline un tema que no conoce, esta cuenta pregunta en lugar de seguir de largo. Cada buena respuesta le abre otra pestaña y otra duda. Le importa menos saberlo todo que terminar el día con algo nuevo aprendido."
       },
       "pt": {
         "nickname": "Curioso de Carteirinha",
         "tagline": "Sempre sobra mais uma pergunta para deixar nas respostas.",
-        "comment": "Quando um assunto que você não conhece aparece na timeline, você pergunta em vez de rolar a tela. Cada boa resposta abre outra aba e outra dúvida. Ser especialista importa menos do que terminar o dia sabendo algo novo."
+        "comment": "Quando um assunto que você não conhece aparece na timeline, você pergunta em vez de rolar a tela. Cada boa resposta abre outra aba e outra dúvida. Ser especialista importa menos do que terminar o dia sabendo algo novo.",
+        "stalk_tagline": "Sempre sobra mais uma pergunta para essa conta deixar nas respostas.",
+        "stalk_comment": "Quando um assunto desconhecido aparece na timeline, essa conta pergunta em vez de rolar a tela. Cada boa resposta abre outra aba e outra dúvida. Saber tudo importa menos do que terminar o dia com algo novo aprendido."
       },
       "ar": {
         "nickname": "يسأل عن كل شيء",
         "tagline": "هناك دائمًا سؤال آخر تتركه في الردود.",
-        "comment": "حين يظهر على خطك الزمني موضوع لا تعرفه، تسأل بدل أن تمرّ عليه. كل إجابة جيدة تفتح لك تبويبًا جديدًا وسؤالًا جديدًا. لا يهمك أن تكون خبيرًا بقدر ما يهمك أن تنهي يومك وقد عرفت شيئًا جديدًا."
+        "comment": "حين يظهر على خطك الزمني موضوع لا تعرفه، تسأل بدل أن تمرّ عليه. كل إجابة جيدة تفتح لك تبويبًا جديدًا وسؤالًا جديدًا. لا يهمك أن تكون خبيرًا بقدر ما يهمك أن تنهي يومك وقد عرفت شيئًا جديدًا.",
+        "stalk_tagline": "هناك دائمًا سؤال آخر يتركه هذا الحساب في الردود.",
+        "stalk_comment": "حين يظهر على خطه الزمني موضوع لا يعرفه، يسأل بدل أن يمرّ عليه. كل إجابة جيدة تفتح له تبويبًا جديدًا وسؤالًا جديدًا. لا يهمه أن يكون خبيرًا بقدر ما يهمه أن ينهي يومه وقد عرف شيئًا جديدًا."
       },
       "fr": {
         "nickname": "Curieux de Tout",
         "tagline": "Il reste toujours une question à glisser dans les réponses.",
-        "comment": "Quand un sujet que tu ne connais pas passe dans ta timeline, tu poses la question au lieu de faire défiler. Chaque bonne réponse ouvre un nouvel onglet et une nouvelle question. Être expert compte moins pour toi que finir la journée en ayant appris quelque chose."
+        "comment": "Quand un sujet que tu ne connais pas passe dans ta timeline, tu poses la question au lieu de faire défiler. Chaque bonne réponse ouvre un nouvel onglet et une nouvelle question. Être expert compte moins pour toi que finir la journée en ayant appris quelque chose.",
+        "stalk_tagline": "Il lui reste toujours une question à glisser dans les réponses.",
+        "stalk_comment": "Quand un sujet inconnu passe dans sa timeline, ce compte pose la question au lieu de faire défiler. Chaque bonne réponse ouvre un nouvel onglet et une nouvelle question. Tout savoir compte moins pour lui que finir la journée en ayant appris quelque chose."
       },
       "de": {
         "nickname": "Will alles wissen",
         "tagline": "Es gibt immer noch eine Frage für die Antworten.",
-        "comment": "Taucht in deiner Timeline ein Thema auf, von dem du keine Ahnung hast, fragst du nach, statt weiterzuscrollen. Jede gute Antwort öffnet einen neuen Tab und eine neue Frage. Experte zu sein ist dir weniger wichtig, als den Tag mit etwas Neuem zu beenden."
+        "comment": "Taucht in deiner Timeline ein Thema auf, von dem du keine Ahnung hast, fragst du nach, statt weiterzuscrollen. Jede gute Antwort öffnet einen neuen Tab und eine neue Frage. Experte zu sein ist dir weniger wichtig, als den Tag mit etwas Neuem zu beenden.",
+        "stalk_tagline": "Es gibt immer noch eine Frage, die er in den Antworten stellen will.",
+        "stalk_comment": "Taucht in seiner Timeline ein Thema auf, von dem er keine Ahnung hat, fragt er nach, statt weiterzuscrollen. Jede gute Antwort öffnet einen neuen Tab und eine neue Frage. Alles zu wissen ist ihm weniger wichtig, als den Tag mit etwas Neuem zu beenden."
       },
       "it": {
         "nickname": "Mille Domande",
         "tagline": "C'è sempre un'altra domanda da lasciare nelle risposte.",
-        "comment": "Quando nella tua timeline compare un argomento che non conosci, fai una domanda invece di scorrere oltre. Ogni buona risposta apre una nuova scheda e un nuovo dubbio. Essere esperto ti importa meno che finire la giornata sapendo qualcosa di nuovo."
+        "comment": "Quando nella tua timeline compare un argomento che non conosci, fai una domanda invece di scorrere oltre. Ogni buona risposta apre una nuova scheda e un nuovo dubbio. Essere esperto ti importa meno che finire la giornata sapendo qualcosa di nuovo.",
+        "stalk_tagline": "C'è sempre un'altra domanda che vuole lasciare nelle risposte.",
+        "stalk_comment": "Quando nella sua timeline compare un argomento che non conosce, questo account fa una domanda invece di scorrere oltre. Ogni buona risposta apre una nuova scheda e un nuovo dubbio. Sapere tutto gli importa meno che finire la giornata con qualcosa di nuovo."
       },
       "ja": {
         "nickname": "知りたがり",
         "tagline": "スレッドが終わる前に、もう次の疑問が浮かんでいる。",
-        "comment": "知らない話題がタイムラインに流れてくると、スルーせずにリプで質問してしまう。面白い答えがひとつ返ってくるたびに、新しいタブと新しい疑問が増えていく。何かの専門家になるより、今日ひとつ新しいことを知れたらそれでいい。"
+        "comment": "知らない話題がタイムラインに流れてくると、スルーせずにリプで質問してしまう。面白い答えがひとつ返ってくるたびに、新しいタブと新しい疑問が増えていく。何かの専門家になるより、今日ひとつ新しいことを知れたらそれでいい。",
+        "stalk_tagline": "スレッドが終わる前に、この人の頭にはもう次の疑問がある。",
+        "stalk_comment": "知らない話題がタイムラインに流れてくると、スルーせずにリプで質問するタイプだ。面白い答えがひとつ返ってくるたびに、新しいタブと新しい疑問が増えていく。何かの専門家になるより、その日ひとつ新しいことを知れたら満足らしい。"
       },
       "ko": {
         "nickname": "호기심 대장",
         "tagline": "스레드가 끝나기도 전에 다음 질문이 떠올라요.",
-        "comment": "모르는 주제가 타임라인에 뜨면 그냥 넘기지 않고 답글로 질문부터 남겨요. 재미있는 답이 하나 돌아올 때마다 새 탭과 새 궁금증이 늘어나죠. 모든 분야의 전문가가 되기보다 오늘 새로운 걸 하나 알게 되는 게 더 좋아요."
+        "comment": "모르는 주제가 타임라인에 뜨면 그냥 넘기지 않고 답글로 질문부터 남겨요. 재미있는 답이 하나 돌아올 때마다 새 탭과 새 궁금증이 늘어나죠. 모든 분야의 전문가가 되기보다 오늘 새로운 걸 하나 알게 되는 게 더 좋아요.",
+        "stalk_tagline": "스레드가 끝나기도 전에 이 사람은 다음 질문을 떠올려요.",
+        "stalk_comment": "모르는 주제가 타임라인에 뜨면 그냥 넘기지 않고 답글로 질문부터 남기는 타입이에요. 재미있는 답이 하나 돌아올 때마다 새 탭과 새 궁금증이 늘어나죠. 모든 분야의 전문가가 되기보다 그날 새로운 걸 하나 알게 되는 걸 더 좋아해요."
       },
       "zh": {
         "nickname": "什麼都想問",
         "tagline": "一串討論還沒結束，你已經想到下一個問題。",
-        "comment": "遇到不熟的話題出現在時間軸上，你不會直接滑過，而是先在留言裡發問。每得到一個有趣的答案，就多開一個分頁、多冒出一個疑問。比起成為什麼專家，今天多學到一點新東西更讓你開心。"
+        "comment": "遇到不熟的話題出現在時間軸上，你不會直接滑過，而是先在留言裡發問。每得到一個有趣的答案，就多開一個分頁、多冒出一個疑問。比起成為什麼專家，今天多學到一點新東西更讓你開心。",
+        "stalk_tagline": "一串討論還沒結束，這個人已經想到下一個問題。",
+        "stalk_comment": "遇到不熟的話題出現在時間軸上，這個帳號不會直接滑過，而是先在留言裡發問。每得到一個有趣的答案，就多開一個分頁、多冒出一個疑問。比起成為什麼專家，那天多學到一點新東西更讓這個人開心。"
       },
       "ru": {
         "nickname": "Вечно любопытный",
         "tagline": "Тред ещё не закончился, а у тебя уже новый вопрос.",
-        "comment": "Если в ленте всплывает незнакомая тема, ты не пролистываешь, а задаёшь вопрос в ответах. Каждый интересный ответ открывает новую вкладку и новый вопрос. Быть экспертом тебе важно меньше, чем закончить день, узнав что-то новое."
+        "comment": "Если в ленте всплывает незнакомая тема, ты не пролистываешь, а задаёшь вопрос в ответах. Каждый интересный ответ открывает новую вкладку и новый вопрос. Быть экспертом тебе важно меньше, чем закончить день, узнав что-то новое.",
+        "stalk_tagline": "Тред ещё не закончился, а у него уже новый вопрос.",
+        "stalk_comment": "Если в ленте всплывает незнакомая тема, этот аккаунт не пролистывает, а задаёт вопрос в ответах. Каждый интересный ответ открывает новую вкладку и новый вопрос. Знать всё ему важно меньше, чем закончить день, узнав что-то новое."
       }
     }
   },
@@ -1129,62 +1201,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Soğuk Mizah",
         "tagline": "En absürt cümleyi tamamen ciddiymiş gibi yazıyorsun.",
-        "comment": "Saçma bir fikri, sıradan bir duyuru paylaşır gibi tek satırda paylaşıyorsun. Emoji yok, açıklama yok; ciddi olup olmadığını anlamak reply'lara kalıyor. Birinin sonunda espriyi fark ettiği an, senin için en iyi etkileşim."
+        "comment": "Saçma bir fikri, sıradan bir duyuru paylaşır gibi tek satırda paylaşıyorsun. Emoji yok, açıklama yok; ciddi olup olmadığını anlamak reply'lara kalıyor. Birinin sonunda espriyi fark ettiği an, senin için en iyi etkileşim.",
+        "stalk_tagline": "En absürt cümleyi tamamen ciddiymiş gibi yazıyor.",
+        "stalk_comment": "Saçma bir fikri, sıradan bir duyuru paylaşır gibi tek satırda paylaşıyor. Emoji yok, açıklama yok; ciddi olup olmadığını anlamak reply'lara kalıyor. Birinin sonunda espriyi fark ettiği an, onun için en iyi etkileşim."
       },
       "en": {
         "nickname": "Dry Wit",
         "tagline": "You post the absurd as if it were breaking news.",
-        "comment": "You share a ridiculous thought in the same flat style as a service announcement. No emoji, no clarification, so the replies have to work out whether you meant it. The moment someone finally gets it is your favorite kind of engagement."
+        "comment": "You share a ridiculous thought in the same flat style as a service announcement. No emoji, no clarification, so the replies have to work out whether you meant it. The moment someone finally gets it is your favorite kind of engagement.",
+        "stalk_tagline": "This account posts the absurd as if it were breaking news.",
+        "stalk_comment": "They share a ridiculous thought in the same flat style as a service announcement. No emoji, no clarification, so the replies have to work out whether they meant it. The moment someone finally gets it is their favorite kind of engagement."
       },
       "es": {
         "nickname": "Cara de Póker",
         "tagline": "Publicas lo absurdo como si fuera una noticia de última hora.",
-        "comment": "Compartes una idea ridícula con el mismo estilo seco de un comunicado oficial. Sin emojis ni aclaraciones, así que las respuestas tienen que averiguar si iba en serio. El momento en que alguien por fin lo entiende es tu interacción favorita."
+        "comment": "Compartes una idea ridícula con el mismo estilo seco de un comunicado oficial. Sin emojis ni aclaraciones, así que las respuestas tienen que averiguar si iba en serio. El momento en que alguien por fin lo entiende es tu interacción favorita.",
+        "stalk_tagline": "Publica lo absurdo como si fuera una noticia de última hora.",
+        "stalk_comment": "Comparte una idea ridícula con el mismo estilo seco de un comunicado oficial. Sin emojis ni aclaraciones, así que las respuestas tienen que averiguar si iba en serio. El momento en que alguien por fin lo entiende es su interacción favorita."
       },
       "pt": {
         "nickname": "Cara de Paisagem",
         "tagline": "Você posta o absurdo como se fosse notícia urgente.",
-        "comment": "Você compartilha uma ideia ridícula no mesmo estilo seco de um comunicado oficial. Sem emoji e sem aviso, então as respostas precisam descobrir se era sério. O momento em que alguém finalmente entende é a sua interação favorita."
+        "comment": "Você compartilha uma ideia ridícula no mesmo estilo seco de um comunicado oficial. Sem emoji e sem aviso, então as respostas precisam descobrir se era sério. O momento em que alguém finalmente entende é a sua interação favorita.",
+        "stalk_tagline": "Essa conta posta o absurdo como se fosse notícia urgente.",
+        "stalk_comment": "Compartilha uma ideia ridícula no mesmo estilo seco de um comunicado oficial. Sem emoji e sem aviso, então as respostas precisam descobrir se era sério. O momento em que alguém finalmente entende é a interação favorita dessa conta."
       },
       "ar": {
         "nickname": "مزاح بوجه جاد",
         "tagline": "تنشر العبث كأنه خبر عاجل.",
-        "comment": "تشارك فكرة سخيفة بالأسلوب الجاف نفسه الذي يُكتب به بيان رسمي. بلا رموز تعبيرية ولا توضيح، فتضطر الردود إلى معرفة إن كنت تقصدها فعلًا. اللحظة التي يفهم فيها أحدهم النكتة أخيرًا هي تفاعلك المفضل."
+        "comment": "تشارك فكرة سخيفة بالأسلوب الجاف نفسه الذي يُكتب به بيان رسمي. بلا رموز تعبيرية ولا توضيح، فتضطر الردود إلى معرفة إن كنت تقصدها فعلًا. اللحظة التي يفهم فيها أحدهم النكتة أخيرًا هي تفاعلك المفضل.",
+        "stalk_tagline": "ينشر هذا الحساب العبث كأنه خبر عاجل.",
+        "stalk_comment": "يشارك فكرة سخيفة بالأسلوب الجاف نفسه الذي يُكتب به بيان رسمي. بلا رموز تعبيرية ولا توضيح، فتضطر الردود إلى معرفة إن كان يقصدها فعلًا. اللحظة التي يفهم فيها أحدهم النكتة أخيرًا هي تفاعله المفضل."
       },
       "fr": {
         "nickname": "Humour Pince-sans-rire",
         "tagline": "Tu publies l'absurde comme une information de dernière minute.",
-        "comment": "Tu partages une idée absurde avec le même style sec qu'un communiqué officiel. Pas d'émoji, pas de précision, alors les réponses doivent deviner si c'était sérieux. Le moment où quelqu'un comprend enfin, c'est ton interaction préférée."
+        "comment": "Tu partages une idée absurde avec le même style sec qu'un communiqué officiel. Pas d'émoji, pas de précision, alors les réponses doivent deviner si c'était sérieux. Le moment où quelqu'un comprend enfin, c'est ton interaction préférée.",
+        "stalk_tagline": "Ce compte publie l'absurde comme une information de dernière minute.",
+        "stalk_comment": "Il partage une idée absurde avec le même style sec qu'un communiqué officiel. Pas d'émoji, pas de précision, alors les réponses doivent deviner si c'était sérieux. Le moment où quelqu'un comprend enfin, c'est son interaction préférée."
       },
       "de": {
         "nickname": "Staubtrockener Humor",
         "tagline": "Du postest Absurdes, als wäre es eine Eilmeldung.",
-        "comment": "Du teilst eine völlig absurde Idee im gleichen nüchternen Stil wie eine offizielle Mitteilung. Kein Emoji, kein Hinweis, also müssen die Antworten herausfinden, ob du es ernst meinst. Der Moment, in dem es endlich jemand versteht, ist deine liebste Interaktion."
+        "comment": "Du teilst eine völlig absurde Idee im gleichen nüchternen Stil wie eine offizielle Mitteilung. Kein Emoji, kein Hinweis, also müssen die Antworten herausfinden, ob du es ernst meinst. Der Moment, in dem es endlich jemand versteht, ist deine liebste Interaktion.",
+        "stalk_tagline": "Dieser Account postet Absurdes, als wäre es eine Eilmeldung.",
+        "stalk_comment": "Er teilt eine völlig absurde Idee im gleichen nüchternen Stil wie eine offizielle Mitteilung. Kein Emoji, kein Hinweis, also müssen die Antworten herausfinden, ob er es ernst meint. Der Moment, in dem es endlich jemand versteht, ist seine liebste Interaktion."
       },
       "it": {
         "nickname": "Faccia Impassibile",
         "tagline": "Pubblichi l'assurdo come se fosse un'ultima ora.",
-        "comment": "Condividi un'idea assurda con lo stesso stile asciutto di un comunicato ufficiale. Niente emoji, nessuna precisazione, così le risposte devono capire se facevi sul serio. Il momento in cui qualcuno finalmente capisce è la tua interazione preferita."
+        "comment": "Condividi un'idea assurda con lo stesso stile asciutto di un comunicato ufficiale. Niente emoji, nessuna precisazione, così le risposte devono capire se facevi sul serio. Il momento in cui qualcuno finalmente capisce è la tua interazione preferita.",
+        "stalk_tagline": "Questo account pubblica l'assurdo come se fosse un'ultima ora.",
+        "stalk_comment": "Condivide un'idea assurda con lo stesso stile asciutto di un comunicato ufficiale. Niente emoji, nessuna precisazione, così le risposte devono capire se faceva sul serio. Il momento in cui qualcuno finalmente capisce è la sua interazione preferita."
       },
       "ja": {
         "nickname": "真顔でボケる人",
         "tagline": "どんなに変なことも、ニュース速報のようにポストする。",
-        "comment": "突拍子もない思いつきを、公式のお知らせのような淡々とした文でポストする。絵文字もなく補足もないので、本気かどうかはリプ欄が考えるしかない。誰かがやっと気づいた瞬間が、いちばん好きな反応だ。"
+        "comment": "突拍子もない思いつきを、公式のお知らせのような淡々とした文でポストする。絵文字もなく補足もないので、本気かどうかはリプ欄が考えるしかない。誰かがやっと気づいた瞬間が、いちばん好きな反応だ。",
+        "stalk_tagline": "このアカウントは、どんなに変なこともニュース速報のようにポストする。",
+        "stalk_comment": "突拍子もない思いつきを、公式のお知らせのような淡々とした文でポストする人だ。絵文字もなく補足もないので、本気かどうかはリプ欄が考えるしかない。誰かがやっと気づいた瞬間が、この人のいちばん好きな反応だ。"
       },
       "ko": {
         "nickname": "무표정 개그",
         "tagline": "아무리 엉뚱한 말도 속보처럼 올려요.",
-        "comment": "말도 안 되는 생각을 공식 공지처럼 담담한 문장으로 올려요. 이모지도 부연 설명도 없으니 진심인지는 답글들이 알아내야 하죠. 누군가 마침내 알아챈 그 순간이 가장 좋아하는 반응이에요."
+        "comment": "말도 안 되는 생각을 공식 공지처럼 담담한 문장으로 올려요. 이모지도 부연 설명도 없으니 진심인지는 답글들이 알아내야 하죠. 누군가 마침내 알아챈 그 순간이 가장 좋아하는 반응이에요.",
+        "stalk_tagline": "이 계정은 아무리 엉뚱한 말도 속보처럼 올려요.",
+        "stalk_comment": "말도 안 되는 생각을 공식 공지처럼 담담한 문장으로 올리는 사람이에요. 이모지도 부연 설명도 없으니 진심인지는 답글들이 알아내야 하죠. 누군가 마침내 알아챈 그 순간이 이 사람이 가장 좋아하는 반응이에요."
       },
       "zh": {
         "nickname": "正經講笑話",
         "tagline": "再離譜的事，你都能寫得像快訊一樣。",
-        "comment": "你把荒謬的想法，用公告一樣平淡的文字發成貼文。沒有表情符號，也沒有補充說明，是不是認真只能交給留言區去猜。有人終於看懂的那一刻，就是你最喜歡的互動。"
+        "comment": "你把荒謬的想法，用公告一樣平淡的文字發成貼文。沒有表情符號，也沒有補充說明，是不是認真只能交給留言區去猜。有人終於看懂的那一刻，就是你最喜歡的互動。",
+        "stalk_tagline": "再離譜的事，這個帳號都能寫得像快訊一樣。",
+        "stalk_comment": "把荒謬的想法，用公告一樣平淡的文字發成貼文。沒有表情符號，也沒有補充說明，是不是認真只能交給留言區去猜。有人終於看懂的那一刻，就是這個人最喜歡的互動。"
       },
       "ru": {
         "nickname": "Шутит с серьёзным лицом",
         "tagline": "Любую нелепость ты постишь как срочную новость.",
-        "comment": "Абсурдную мысль ты публикуешь тем же сухим стилем, что и официальное объявление. Ни эмодзи, ни пояснений, так что ответам приходится гадать, всерьёз ли это. Момент, когда кто-то наконец понимает шутку, — твоя любимая реакция."
+        "comment": "Абсурдную мысль ты публикуешь тем же сухим стилем, что и официальное объявление. Ни эмодзи, ни пояснений, так что ответам приходится гадать, всерьёз ли это. Момент, когда кто-то наконец понимает шутку, — твоя любимая реакция.",
+        "stalk_tagline": "Любую нелепость этот аккаунт постит как срочную новость.",
+        "stalk_comment": "Абсурдную мысль он публикует тем же сухим стилем, что и официальное объявление. Ни эмодзи, ни пояснений, так что ответам приходится гадать, всерьёз ли это. Момент, когда кто-то наконец понимает шутку, — его любимая реакция."
       }
     }
   },
@@ -1206,62 +1302,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Koltuk Filozofu",
         "tagline": "Sıradan bir soru sende uzun bir thread'e dönüşebiliyor.",
-        "comment": "Gelip geçen bir soruya cevap yazarken kendini beklenmedik bir hayat teorisinin içinde buluyorsun. Taslakta birkaç kez düzenlemeden fikri paylaşmıyorsun. Biri reply'da itiraz edince keyfin kaçmıyor; asıl sohbet orada başlıyor."
+        "comment": "Gelip geçen bir soruya cevap yazarken kendini beklenmedik bir hayat teorisinin içinde buluyorsun. Taslakta birkaç kez düzenlemeden fikri paylaşmıyorsun. Biri reply'da itiraz edince keyfin kaçmıyor; asıl sohbet orada başlıyor.",
+        "stalk_tagline": "Sıradan bir soru onda uzun bir thread'e dönüşebiliyor.",
+        "stalk_comment": "Gelip geçen bir soruya cevap yazarken kendini beklenmedik bir hayat teorisinin içinde buluyor. Taslakta birkaç kez düzenlemeden fikri paylaşmıyor. Biri reply'da itiraz edince keyfi kaçmıyor; asıl sohbet orada başlıyor."
       },
       "en": {
         "nickname": "Armchair Philosopher",
         "tagline": "A casual question can turn into a very long thread.",
-        "comment": "You start answering a passing question and end up with an unexpected theory about life. You edit the draft a few times before letting the idea go live. A good objection in the replies does not bother you; that is where the real conversation starts."
+        "comment": "You start answering a passing question and end up with an unexpected theory about life. You edit the draft a few times before letting the idea go live. A good objection in the replies does not bother you; that is where the real conversation starts.",
+        "stalk_tagline": "A casual question can turn into a very long thread on this account.",
+        "stalk_comment": "They start answering a passing question and end up with an unexpected theory about life. They edit the draft a few times before letting the idea go live. A good objection in the replies does not bother them; that is where the real conversation starts."
       },
       "es": {
         "nickname": "Filósofo de Sofá",
         "tagline": "Una pregunta casual puede convertirse en un hilo larguísimo.",
-        "comment": "Empiezas respondiendo a una pregunta de paso y terminas con una teoría inesperada sobre la vida. Editas el borrador varias veces antes de publicar la idea. Una buena objeción en las respuestas no te molesta: ahí empieza la conversación de verdad."
+        "comment": "Empiezas respondiendo a una pregunta de paso y terminas con una teoría inesperada sobre la vida. Editas el borrador varias veces antes de publicar la idea. Una buena objeción en las respuestas no te molesta: ahí empieza la conversación de verdad.",
+        "stalk_tagline": "En esta cuenta, una pregunta casual puede convertirse en un hilo larguísimo.",
+        "stalk_comment": "Empieza respondiendo a una pregunta de paso y termina con una teoría inesperada sobre la vida. Edita el borrador varias veces antes de publicar la idea. Una buena objeción en las respuestas no le molesta: ahí empieza la conversación de verdad."
       },
       "pt": {
         "nickname": "Filósofo de Timeline",
         "tagline": "Uma pergunta casual pode virar uma thread enorme.",
-        "comment": "Você começa respondendo a uma pergunta qualquer e termina com uma teoria inesperada sobre a vida. Edita o rascunho algumas vezes antes de publicar a ideia. Uma boa objeção nas respostas não te incomoda: é ali que a conversa de verdade começa."
+        "comment": "Você começa respondendo a uma pergunta qualquer e termina com uma teoria inesperada sobre a vida. Edita o rascunho algumas vezes antes de publicar a ideia. Uma boa objeção nas respostas não te incomoda: é ali que a conversa de verdade começa.",
+        "stalk_tagline": "Nessa conta, uma pergunta casual pode virar uma thread enorme.",
+        "stalk_comment": "Começa respondendo a uma pergunta qualquer e termina com uma teoria inesperada sobre a vida. Edita o rascunho algumas vezes antes de publicar a ideia. Uma boa objeção nas respostas não incomoda essa conta: é ali que a conversa de verdade começa."
       },
       "ar": {
         "nickname": "فيلسوف الخط الزمني",
         "tagline": "سؤال عابر قد يتحول عندك إلى سلسلة طويلة.",
-        "comment": "تبدأ بالرد على سؤال عابر فتنتهي بنظرية غير متوقعة عن الحياة. تعدّل المسودة أكثر من مرة قبل أن تنشر الفكرة. الاعتراض الجيد في الردود لا يزعجك، فمن هناك يبدأ النقاش الحقيقي."
+        "comment": "تبدأ بالرد على سؤال عابر فتنتهي بنظرية غير متوقعة عن الحياة. تعدّل المسودة أكثر من مرة قبل أن تنشر الفكرة. الاعتراض الجيد في الردود لا يزعجك، فمن هناك يبدأ النقاش الحقيقي.",
+        "stalk_tagline": "سؤال عابر قد يتحول عند هذا الحساب إلى سلسلة طويلة.",
+        "stalk_comment": "يبدأ بالرد على سؤال عابر فينتهي بنظرية غير متوقعة عن الحياة. يعدّل المسودة أكثر من مرة قبل أن ينشر الفكرة. الاعتراض الجيد في الردود لا يزعجه، فمن هناك يبدأ النقاش الحقيقي."
       },
       "fr": {
         "nickname": "Philosophe du Dimanche",
         "tagline": "Une question en passant peut devenir un très long fil.",
-        "comment": "Tu commences par répondre à une question anodine et tu finis avec une théorie inattendue sur la vie. Tu retravailles le brouillon plusieurs fois avant de publier l'idée. Une bonne objection dans les réponses ne te dérange pas\u00a0: c'est là que la vraie discussion commence."
+        "comment": "Tu commences par répondre à une question anodine et tu finis avec une théorie inattendue sur la vie. Tu retravailles le brouillon plusieurs fois avant de publier l'idée. Une bonne objection dans les réponses ne te dérange pas\u00a0: c'est là que la vraie discussion commence.",
+        "stalk_tagline": "Chez ce compte, une question en passant peut devenir un très long fil.",
+        "stalk_comment": "Il commence par répondre à une question anodine et finit avec une théorie inattendue sur la vie. Il retravaille le brouillon plusieurs fois avant de publier l'idée. Une bonne objection dans les réponses ne le dérange pas\u00a0: c'est là que la vraie discussion commence."
       },
       "de": {
         "nickname": "Philosoph der Timeline",
         "tagline": "Aus einer beiläufigen Frage kann ein sehr langer Thread werden.",
-        "comment": "Du beginnst mit der Antwort auf eine beiläufige Frage und landest bei einer überraschenden Theorie über das Leben. Den Entwurf überarbeitest du mehrmals, bevor die Idee online geht. Ein guter Einwand in den Antworten stört dich nicht, denn dort fängt die echte Diskussion an."
+        "comment": "Du beginnst mit der Antwort auf eine beiläufige Frage und landest bei einer überraschenden Theorie über das Leben. Den Entwurf überarbeitest du mehrmals, bevor die Idee online geht. Ein guter Einwand in den Antworten stört dich nicht, denn dort fängt die echte Diskussion an.",
+        "stalk_tagline": "Bei diesem Account kann aus einer beiläufigen Frage ein sehr langer Thread werden.",
+        "stalk_comment": "Er beginnt mit der Antwort auf eine beiläufige Frage und landet bei einer überraschenden Theorie über das Leben. Den Entwurf überarbeitet er mehrmals, bevor die Idee online geht. Ein guter Einwand in den Antworten stört ihn nicht, denn dort fängt die echte Diskussion an."
       },
       "it": {
         "nickname": "Filosofo da Timeline",
         "tagline": "Una domanda buttata lì può diventare un thread lunghissimo.",
-        "comment": "Inizi rispondendo a una domanda qualunque e finisci con una teoria inaspettata sulla vita. Ritocchi la bozza più volte prima di pubblicare l'idea. Un'obiezione ben fatta nelle risposte non ti dà fastidio: è lì che comincia la vera discussione."
+        "comment": "Inizi rispondendo a una domanda qualunque e finisci con una teoria inaspettata sulla vita. Ritocchi la bozza più volte prima di pubblicare l'idea. Un'obiezione ben fatta nelle risposte non ti dà fastidio: è lì che comincia la vera discussione.",
+        "stalk_tagline": "Su questo account una domanda buttata lì può diventare un thread lunghissimo.",
+        "stalk_comment": "Inizia rispondendo a una domanda qualunque e finisce con una teoria inaspettata sulla vita. Ritocca la bozza più volte prima di pubblicare l'idea. Un'obiezione ben fatta nelle risposte non gli dà fastidio: è lì che comincia la vera discussione."
       },
       "ja": {
         "nickname": "自称哲学者",
         "tagline": "何気ない質問が、いつの間にか長いスレッドになっている。",
-        "comment": "何気ない質問にリプしているうちに、人生についての意外な持論ができあがっている。投稿する前に、下書きを何度も手直ししてしまう。リプで反論されても気にならない。むしろ本当の議論はそこから始まる。"
+        "comment": "何気ない質問にリプしているうちに、人生についての意外な持論ができあがっている。投稿する前に、下書きを何度も手直ししてしまう。リプで反論されても気にならない。むしろ本当の議論はそこから始まる。",
+        "stalk_tagline": "このアカウントでは、何気ない質問がいつの間にか長いスレッドになる。",
+        "stalk_comment": "何気ない質問にリプしているうちに、人生についての意外な持論ができあがっているタイプだ。投稿する前に、下書きを何度も手直ししている。リプで反論されても気にしない。むしろ本当の議論はそこから始まると思っているようだ。"
       },
       "ko": {
         "nickname": "자칭 철학자",
         "tagline": "가벼운 질문이 어느새 긴 스레드가 돼요.",
-        "comment": "지나가는 질문에 답글을 달다 보면 어느새 인생에 대한 의외의 지론이 완성돼요. 올리기 전에 임시저장한 글을 몇 번이나 고치죠. 답글에서 누가 반박해도 괜찮아요. 진짜 토론은 오히려 거기서 시작되니까요."
+        "comment": "지나가는 질문에 답글을 달다 보면 어느새 인생에 대한 의외의 지론이 완성돼요. 올리기 전에 임시저장한 글을 몇 번이나 고치죠. 답글에서 누가 반박해도 괜찮아요. 진짜 토론은 오히려 거기서 시작되니까요.",
+        "stalk_tagline": "이 계정에서는 가벼운 질문이 어느새 긴 스레드가 돼요.",
+        "stalk_comment": "지나가는 질문에 답글을 달다 보면 어느새 인생에 대한 의외의 지론이 완성되는 타입이에요. 올리기 전에 임시저장한 글을 몇 번이나 고치죠. 답글에서 누가 반박해도 신경 쓰지 않아요. 진짜 토론은 오히려 거기서 시작된다고 보니까요."
       },
       "zh": {
         "nickname": "自封哲學家",
         "tagline": "一個隨口的問題，常常變成一長串討論。",
-        "comment": "回覆一個隨口的問題，寫著寫著就變成一套關於人生的奇怪見解。發文前，你會把草稿改上好幾次。有人在留言裡反駁也沒關係，真正的討論反而從那裡開始。"
+        "comment": "回覆一個隨口的問題，寫著寫著就變成一套關於人生的奇怪見解。發文前，你會把草稿改上好幾次。有人在留言裡反駁也沒關係，真正的討論反而從那裡開始。",
+        "stalk_tagline": "在這個帳號，一個隨口的問題常常變成一長串討論。",
+        "stalk_comment": "回覆一個隨口的問題，寫著寫著就變成一套關於人生的奇怪見解。發文前，會把草稿改上好幾次。有人在留言裡反駁也沒關係，對這個人來說，真正的討論反而從那裡開始。"
       },
       "ru": {
         "nickname": "Домашний философ",
         "tagline": "Случайный вопрос легко превращается в длинный тред.",
-        "comment": "Начинаешь с ответа на мимолётный вопрос, а заканчиваешь неожиданной теорией о жизни. Перед публикацией ты несколько раз правишь черновик. Хорошее возражение в ответах тебя не смущает, ведь настоящий спор начинается именно там."
+        "comment": "Начинаешь с ответа на мимолётный вопрос, а заканчиваешь неожиданной теорией о жизни. Перед публикацией ты несколько раз правишь черновик. Хорошее возражение в ответах тебя не смущает, ведь настоящий спор начинается именно там.",
+        "stalk_tagline": "У этого аккаунта случайный вопрос легко превращается в длинный тред.",
+        "stalk_comment": "Начинает он с ответа на мимолётный вопрос, а заканчивает неожиданной теорией о жизни. Перед публикацией он несколько раз правит черновик. Хорошее возражение в ответах его не смущает, ведь настоящий спор начинается именно там."
       }
     }
   },
@@ -1280,62 +1400,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Ortamı Okuyan",
         "tagline": "Ne yazacağın kadar ne zaman yazacağını da önemsiyorsun.",
-        "comment": "Bir yorum zincirinde yalnız en çok beğenilen cevaplara değil, söze karışamayan hesaplara da dikkat ediyorsun. Gerginleşen bir tartışmada bazen bir soru, bazen de iyi seçilmiş bir gif her şeyi yumuşatıyor. Herkesin rahatça yazabildiği bir timeline sana daha keyifli geliyor."
+        "comment": "Bir yorum zincirinde yalnız en çok beğenilen cevaplara değil, söze karışamayan hesaplara da dikkat ediyorsun. Gerginleşen bir tartışmada bazen bir soru, bazen de iyi seçilmiş bir gif her şeyi yumuşatıyor. Herkesin rahatça yazabildiği bir timeline sana daha keyifli geliyor.",
+        "stalk_tagline": "Ne yazacağı kadar ne zaman yazacağını da önemsiyor.",
+        "stalk_comment": "Bir yorum zincirinde yalnız en çok beğenilen cevaplara değil, söze karışamayan hesaplara da dikkat ediyor. Gerginleşen bir tartışmada bazen bir soru, bazen de iyi seçilmiş bir gif her şeyi yumuşatıyor. Herkesin rahatça yazabildiği bir timeline ona daha keyifli geliyor."
       },
       "en": {
         "nickname": "Reads the Timeline",
         "tagline": "You know when a reply helps and when it is better to wait.",
-        "comment": "In a busy thread you notice not just the top replies but the accounts that cannot get a word in. Sometimes a question helps, sometimes a well-chosen gif cools everything down. You enjoy the timeline most when everyone feels comfortable posting."
+        "comment": "In a busy thread you notice not just the top replies but the accounts that cannot get a word in. Sometimes a question helps, sometimes a well-chosen gif cools everything down. You enjoy the timeline most when everyone feels comfortable posting.",
+        "stalk_tagline": "They know when a reply helps and when it is better to wait.",
+        "stalk_comment": "In a busy thread they notice not just the top replies but the accounts that cannot get a word in. Sometimes a question helps, sometimes a well-chosen gif cools everything down. They enjoy the timeline most when everyone feels comfortable posting."
       },
       "es": {
         "nickname": "Lector del Ambiente",
         "tagline": "Sabes cuándo una respuesta ayuda y cuándo es mejor esperar.",
-        "comment": "En un hilo con mucho movimiento no solo miras las respuestas más populares, también a quien no consigue meter baza. A veces ayuda una pregunta; otras, un gif bien elegido lo calma todo. Disfrutas más el timeline cuando todo el mundo se siente cómodo publicando."
+        "comment": "En un hilo con mucho movimiento no solo miras las respuestas más populares, también a quien no consigue meter baza. A veces ayuda una pregunta; otras, un gif bien elegido lo calma todo. Disfrutas más el timeline cuando todo el mundo se siente cómodo publicando.",
+        "stalk_tagline": "Sabe cuándo una respuesta ayuda y cuándo es mejor esperar.",
+        "stalk_comment": "En un hilo con mucho movimiento no solo mira las respuestas más populares, también a quien no consigue meter baza. A veces le basta una pregunta; otras, un gif bien elegido lo calma todo. Disfruta más del timeline cuando todo el mundo se siente cómodo publicando."
       },
       "pt": {
         "nickname": "Sente o Clima",
         "tagline": "Você sabe quando uma resposta ajuda e quando é melhor esperar.",
-        "comment": "Numa thread movimentada, você presta atenção não só nas respostas mais curtidas, mas também em quem não consegue entrar na conversa. Às vezes uma pergunta ajuda; às vezes um gif bem escolhido acalma tudo. A timeline fica mais divertida para você quando todo mundo se sente à vontade para postar."
+        "comment": "Numa thread movimentada, você presta atenção não só nas respostas mais curtidas, mas também em quem não consegue entrar na conversa. Às vezes uma pergunta ajuda; às vezes um gif bem escolhido acalma tudo. A timeline fica mais divertida para você quando todo mundo se sente à vontade para postar.",
+        "stalk_tagline": "Essa conta sabe quando uma resposta ajuda e quando é melhor esperar.",
+        "stalk_comment": "Numa thread movimentada, presta atenção não só nas respostas mais curtidas, mas também em quem não consegue entrar na conversa. Às vezes uma pergunta ajuda; às vezes um gif bem escolhido acalma tudo. A timeline fica mais divertida quando todo mundo se sente à vontade para postar."
       },
       "ar": {
         "nickname": "يعرف متى يتكلم",
         "tagline": "تعرف متى يفيد الرد ومتى يكون الانتظار أفضل.",
-        "comment": "في سلسلة مزدحمة لا تنتبه إلى الردود الأكثر إعجابًا فقط، بل إلى الحسابات التي لا تجد مكانًا في النقاش أيضًا. أحيانًا يفيد سؤال، وأحيانًا تهدّئ صورة متحركة مختارة بعناية كل شيء. يصبح الخط الزمني أمتع لك حين يشعر الجميع بالراحة في النشر."
+        "comment": "في سلسلة مزدحمة لا تنتبه إلى الردود الأكثر إعجابًا فقط، بل إلى الحسابات التي لا تجد مكانًا في النقاش أيضًا. أحيانًا يفيد سؤال، وأحيانًا تهدّئ صورة متحركة مختارة بعناية كل شيء. يصبح الخط الزمني أمتع لك حين يشعر الجميع بالراحة في النشر.",
+        "stalk_tagline": "يعرف هذا الحساب متى يفيد الرد ومتى يكون الانتظار أفضل.",
+        "stalk_comment": "في سلسلة مزدحمة لا ينتبه إلى الردود الأكثر إعجابًا فقط، بل إلى الحسابات التي لا تجد مكانًا في النقاش أيضًا. أحيانًا يفيد سؤال، وأحيانًا تهدّئ صورة متحركة مختارة بعناية كل شيء. يصبح الخط الزمني أمتع له حين يشعر الجميع بالراحة في النشر."
       },
       "fr": {
         "nickname": "Parle au Bon Moment",
         "tagline": "Tu sais quand une réponse aide et quand il vaut mieux attendre.",
-        "comment": "Dans un fil animé, tu remarques les réponses les plus aimées, mais aussi les comptes qui n'arrivent pas à placer un mot. Parfois une question aide, parfois un gif bien choisi calme tout le monde. Tu profites davantage de la timeline quand chacun se sent à l'aise pour publier."
+        "comment": "Dans un fil animé, tu remarques les réponses les plus aimées, mais aussi les comptes qui n'arrivent pas à placer un mot. Parfois une question aide, parfois un gif bien choisi calme tout le monde. Tu profites davantage de la timeline quand chacun se sent à l'aise pour publier.",
+        "stalk_tagline": "Il sait quand une réponse aide et quand il vaut mieux attendre.",
+        "stalk_comment": "Dans un fil animé, il remarque les réponses les plus aimées, mais aussi les comptes qui n'arrivent pas à placer un mot. Parfois une question aide, parfois un gif bien choisi calme tout le monde. Il profite davantage de la timeline quand chacun se sent à l'aise pour publier."
       },
       "de": {
         "nickname": "Gespür für den Moment",
         "tagline": "Du weißt, wann eine Antwort hilft und wann Warten besser ist.",
-        "comment": "In einem vollen Thread siehst du nicht nur die meistgelikten Antworten, sondern auch die Accounts, die nicht zu Wort kommen. Manchmal hilft eine Frage, manchmal beruhigt ein gut gewähltes GIF alles. Die Timeline macht dir am meisten Spaß, wenn sich alle trauen zu posten."
+        "comment": "In einem vollen Thread siehst du nicht nur die meistgelikten Antworten, sondern auch die Accounts, die nicht zu Wort kommen. Manchmal hilft eine Frage, manchmal beruhigt ein gut gewähltes GIF alles. Die Timeline macht dir am meisten Spaß, wenn sich alle trauen zu posten.",
+        "stalk_tagline": "Er weiß, wann eine Antwort hilft und wann Warten besser ist.",
+        "stalk_comment": "In einem vollen Thread sieht er nicht nur die meistgelikten Antworten, sondern auch die Accounts, die nicht zu Wort kommen. Manchmal hilft eine Frage, manchmal beruhigt ein gut gewähltes GIF alles. Die Timeline macht ihm am meisten Spaß, wenn sich alle trauen zu posten."
       },
       "it": {
         "nickname": "Tempismo Perfetto",
         "tagline": "Sai quando una risposta aiuta e quando è meglio aspettare.",
-        "comment": "In un thread affollato noti non solo le risposte con più like, ma anche gli account che non riescono a dire la loro. A volte serve una domanda, a volte una gif scelta bene calma tutti. La timeline ti piace di più quando tutti si sentono a loro agio a pubblicare."
+        "comment": "In un thread affollato noti non solo le risposte con più like, ma anche gli account che non riescono a dire la loro. A volte serve una domanda, a volte una gif scelta bene calma tutti. La timeline ti piace di più quando tutti si sentono a loro agio a pubblicare.",
+        "stalk_tagline": "Sa quando una risposta aiuta e quando è meglio aspettare.",
+        "stalk_comment": "In un thread affollato nota non solo le risposte con più like, ma anche gli account che non riescono a dire la loro. A volte serve una domanda, a volte una gif scelta bene calma tutti. La timeline gli piace di più quando tutti si sentono a loro agio a pubblicare."
       },
       "ja": {
         "nickname": "空気が読める人",
         "tagline": "リプすべきときと、待つべきときがわかっている。",
-        "comment": "にぎやかなスレッドでは、いいねの多いリプだけでなく、なかなか会話に入れないアカウントにも気づく。質問ひとつが効くときもあれば、ぴったりの画像ひとつでスレッド全体が落ち着くこともある。みんなが気楽にポストできるタイムラインがいちばん楽しい。"
+        "comment": "にぎやかなスレッドでは、いいねの多いリプだけでなく、なかなか会話に入れないアカウントにも気づく。質問ひとつが効くときもあれば、ぴったりの画像ひとつでスレッド全体が落ち着くこともある。みんなが気楽にポストできるタイムラインがいちばん楽しい。",
+        "stalk_tagline": "この人は、リプすべきときと待つべきときがわかっている。",
+        "stalk_comment": "にぎやかなスレッドでは、いいねの多いリプだけでなく、なかなか会話に入れないアカウントにも気づく人だ。質問ひとつが効くときもあれば、ぴったりの画像ひとつでスレッド全体が落ち着くこともある。みんなが気楽にポストできるタイムラインをいちばん楽しんでいる。"
       },
       "ko": {
         "nickname": "눈치 백단",
         "tagline": "답글이 필요한 때와 기다려야 할 때를 알아요.",
-        "comment": "북적이는 스레드에서는 좋아요가 많은 답글뿐 아니라 좀처럼 대화에 끼지 못하는 계정도 놓치지 않아요. 질문 하나가 통할 때도 있고, 딱 맞는 움짤 하나가 분위기를 가라앉힐 때도 있죠. 누구나 편하게 글을 올릴 수 있는 타임라인이 제일 즐거워요."
+        "comment": "북적이는 스레드에서는 좋아요가 많은 답글뿐 아니라 좀처럼 대화에 끼지 못하는 계정도 놓치지 않아요. 질문 하나가 통할 때도 있고, 딱 맞는 움짤 하나가 분위기를 가라앉힐 때도 있죠. 누구나 편하게 글을 올릴 수 있는 타임라인이 제일 즐거워요.",
+        "stalk_tagline": "이 사람은 답글이 필요한 때와 기다려야 할 때를 알아요.",
+        "stalk_comment": "북적이는 스레드에서는 좋아요가 많은 답글뿐 아니라 좀처럼 대화에 끼지 못하는 계정도 놓치지 않는 사람이에요. 질문 하나가 통할 때도 있고, 딱 맞는 움짤 하나가 분위기를 가라앉힐 때도 있죠. 누구나 편하게 글을 올릴 수 있는 타임라인을 제일 즐거워해요."
       },
       "zh": {
         "nickname": "很會看氣氛",
         "tagline": "你知道什麼時候該回覆，什麼時候該等一等。",
-        "comment": "在熱鬧的討論串裡，你注意的不只是讚最多的留言，還有一直插不上話的帳號。有時一個問題就夠了，有時一張選對的動圖就能讓整串冷靜下來。當每個人都能自在發文，這條時間軸對你來說最有趣。"
+        "comment": "在熱鬧的討論串裡，你注意的不只是讚最多的留言，還有一直插不上話的帳號。有時一個問題就夠了，有時一張選對的動圖就能讓整串冷靜下來。當每個人都能自在發文，這條時間軸對你來說最有趣。",
+        "stalk_tagline": "這個人知道什麼時候該回覆，什麼時候該等一等。",
+        "stalk_comment": "在熱鬧的討論串裡，這個帳號注意的不只是讚最多的留言，還有一直插不上話的帳號。有時一個問題就夠了，有時一張選對的動圖就能讓整串冷靜下來。當每個人都能自在發文，這條時間軸對這個人來說最有趣。"
       },
       "ru": {
         "nickname": "Чувствует момент",
         "tagline": "Ты знаешь, когда ответ поможет, а когда лучше подождать.",
-        "comment": "В оживлённом треде ты замечаешь не только самые залайканные ответы, но и аккаунты, которым никак не удаётся вставить слово. Иногда помогает вопрос, иногда удачная гифка успокаивает всех. Лента тебе нравится больше всего, когда каждый может спокойно постить."
+        "comment": "В оживлённом треде ты замечаешь не только самые залайканные ответы, но и аккаунты, которым никак не удаётся вставить слово. Иногда помогает вопрос, иногда удачная гифка успокаивает всех. Лента тебе нравится больше всего, когда каждый может спокойно постить.",
+        "stalk_tagline": "Он знает, когда ответ поможет, а когда лучше подождать.",
+        "stalk_comment": "В оживлённом треде он замечает не только самые залайканные ответы, но и аккаунты, которым никак не удаётся вставить слово. Иногда помогает вопрос, иногда удачная гифка успокаивает всех. Лента нравится ему больше всего, когда каждый может спокойно постить."
       }
     }
   },
@@ -1356,62 +1500,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Tartışma Hakemi",
         "tagline": "Haklı çıkmaktan önce tartışmanın düzgün ilerlemesini önemsiyorsun.",
-        "comment": "Reply'lar karşılıklı atışmaya dönünce önce iki tarafın aslında ne demek istediğini anlamaya çalışıyorsun. Birine hak vermek için ötekini ekran görüntüsüyle köşeye sıkıştırmak gerekmiyor. Thread'in sonunda herkes biraz daha sakin yazıyorsa bu senin için iyi bir sonuç."
+        "comment": "Reply'lar karşılıklı atışmaya dönünce önce iki tarafın aslında ne demek istediğini anlamaya çalışıyorsun. Birine hak vermek için ötekini ekran görüntüsüyle köşeye sıkıştırmak gerekmiyor. Thread'in sonunda herkes biraz daha sakin yazıyorsa bu senin için iyi bir sonuç.",
+        "stalk_tagline": "Haklı çıkmaktan önce tartışmanın düzgün ilerlemesini önemsiyor.",
+        "stalk_comment": "Reply'lar karşılıklı atışmaya dönünce önce iki tarafın aslında ne demek istediğini anlamaya çalışıyor. Ona göre birine hak vermek için ötekini ekran görüntüsüyle köşeye sıkıştırmak gerekmiyor. Thread'in sonunda herkes biraz daha sakin yazıyorsa bu onun için iyi bir sonuç."
       },
       "en": {
         "nickname": "Voice of Reason",
         "tagline": "You can disagree in the replies without making it personal.",
-        "comment": "When the replies turn into a back-and-forth, you try to figure out what each side actually means. You do not need a screenshot war to agree with someone. If the thread ends with people posting a little more calmly, that counts as a win."
+        "comment": "When the replies turn into a back-and-forth, you try to figure out what each side actually means. You do not need a screenshot war to agree with someone. If the thread ends with people posting a little more calmly, that counts as a win.",
+        "stalk_tagline": "They can disagree in the replies without making it personal.",
+        "stalk_comment": "When the replies turn into a back-and-forth, they try to figure out what each side actually means. They do not need a screenshot war to agree with someone. If the thread ends with people posting a little more calmly, that counts as a win for them."
       },
       "es": {
         "nickname": "La Voz Sensata",
         "tagline": "Puedes discrepar en las respuestas sin llevarlo a lo personal.",
-        "comment": "Cuando las respuestas se convierten en un ida y vuelta, intentas entender qué quiere decir cada parte. No hace falta una guerra de capturas de pantalla para darle la razón a alguien. Si el hilo termina con la gente escribiendo un poco más tranquila, para ti es una victoria."
+        "comment": "Cuando las respuestas se convierten en un ida y vuelta, intentas entender qué quiere decir cada parte. No hace falta una guerra de capturas de pantalla para darle la razón a alguien. Si el hilo termina con la gente escribiendo un poco más tranquila, para ti es una victoria.",
+        "stalk_tagline": "Puede discrepar en las respuestas sin llevarlo a lo personal.",
+        "stalk_comment": "Cuando las respuestas se convierten en un ida y vuelta, intenta entender qué quiere decir cada parte. No le hace falta una guerra de capturas de pantalla para darle la razón a alguien. Si el hilo termina con la gente escribiendo un poco más tranquila, para esta cuenta es una victoria."
       },
       "pt": {
         "nickname": "Bom Senso em Pessoa",
         "tagline": "Você discorda nas respostas sem levar para o lado pessoal.",
-        "comment": "Quando as respostas viram um bate-boca, você tenta entender o que cada lado quer dizer de verdade. Não precisa de guerra de print para dar razão a alguém. Se a thread termina com todo mundo escrevendo um pouco mais calmo, isso já é uma vitória."
+        "comment": "Quando as respostas viram um bate-boca, você tenta entender o que cada lado quer dizer de verdade. Não precisa de guerra de print para dar razão a alguém. Se a thread termina com todo mundo escrevendo um pouco mais calmo, isso já é uma vitória.",
+        "stalk_tagline": "Essa conta discorda nas respostas sem levar para o lado pessoal.",
+        "stalk_comment": "Quando as respostas viram um bate-boca, tenta entender o que cada lado quer dizer de verdade. Não precisa de guerra de print para dar razão a alguém. Se a thread termina com todo mundo escrevendo um pouco mais calmo, isso já é uma vitória."
       },
       "ar": {
         "nickname": "حكيم النقاشات",
         "tagline": "تستطيع أن تختلف في الردود دون أن تجعل الأمر شخصيًا.",
-        "comment": "حين تتحول الردود إلى تراشق، تحاول أن تفهم ما يقصده كل طرف فعلًا. لا تحتاج إلى حرب لقطات شاشة كي تنصف أحدًا. إذا انتهت السلسلة والجميع يكتب بهدوء أكبر، فهذا انتصار بالنسبة إليك."
+        "comment": "حين تتحول الردود إلى تراشق، تحاول أن تفهم ما يقصده كل طرف فعلًا. لا تحتاج إلى حرب لقطات شاشة كي تنصف أحدًا. إذا انتهت السلسلة والجميع يكتب بهدوء أكبر، فهذا انتصار بالنسبة إليك.",
+        "stalk_tagline": "يستطيع هذا الحساب أن يختلف في الردود دون أن يجعل الأمر شخصيًا.",
+        "stalk_comment": "حين تتحول الردود إلى تراشق، يحاول أن يفهم ما يقصده كل طرف فعلًا. لا يحتاج إلى حرب لقطات شاشة كي ينصف أحدًا. إذا انتهت السلسلة والجميع يكتب بهدوء أكبر، فهذا انتصار بالنسبة إليه."
       },
       "fr": {
         "nickname": "Garde la Tête Froide",
         "tagline": "Tu peux être en désaccord dans les réponses sans que ça devienne personnel.",
-        "comment": "Quand les réponses tournent au ping-pong, tu essaies de comprendre ce que chaque camp veut vraiment dire. Pas besoin d'une guerre de captures d'écran pour donner raison à quelqu'un. Si le fil se termine avec des messages un peu plus calmes, c'est une victoire pour toi."
+        "comment": "Quand les réponses tournent au ping-pong, tu essaies de comprendre ce que chaque camp veut vraiment dire. Pas besoin d'une guerre de captures d'écran pour donner raison à quelqu'un. Si le fil se termine avec des messages un peu plus calmes, c'est une victoire pour toi.",
+        "stalk_tagline": "Il peut être en désaccord dans les réponses sans que ça devienne personnel.",
+        "stalk_comment": "Quand les réponses tournent au ping-pong, il essaie de comprendre ce que chaque camp veut vraiment dire. Pas besoin d'une guerre de captures d'écran pour donner raison à quelqu'un. Si le fil se termine avec des messages un peu plus calmes, c'est une victoire pour lui."
       },
       "de": {
         "nickname": "Ruhepol im Thread",
         "tagline": "Du kannst in den Antworten widersprechen, ohne persönlich zu werden.",
-        "comment": "Wenn die Antworten zum Schlagabtausch werden, versuchst du zu verstehen, was jede Seite eigentlich meint. Du brauchst keinen Screenshot-Krieg, um jemandem recht zu geben. Endet der Thread mit etwas ruhigeren Posts, ist das für dich ein Erfolg."
+        "comment": "Wenn die Antworten zum Schlagabtausch werden, versuchst du zu verstehen, was jede Seite eigentlich meint. Du brauchst keinen Screenshot-Krieg, um jemandem recht zu geben. Endet der Thread mit etwas ruhigeren Posts, ist das für dich ein Erfolg.",
+        "stalk_tagline": "Er kann in den Antworten widersprechen, ohne persönlich zu werden.",
+        "stalk_comment": "Wenn die Antworten zum Schlagabtausch werden, versucht er zu verstehen, was jede Seite eigentlich meint. Er braucht keinen Screenshot-Krieg, um jemandem recht zu geben. Endet der Thread mit etwas ruhigeren Posts, ist das für ihn ein Erfolg."
       },
       "it": {
         "nickname": "Mette Tutti d'Accordo",
         "tagline": "Sai non essere d'accordo nelle risposte senza farne una questione personale.",
-        "comment": "Quando le risposte diventano un botta e risposta, provi a capire cosa intende davvero ciascuna parte. Non serve una guerra di screenshot per dare ragione a qualcuno. Se il thread finisce con messaggi un po' più calmi, per te è una vittoria."
+        "comment": "Quando le risposte diventano un botta e risposta, provi a capire cosa intende davvero ciascuna parte. Non serve una guerra di screenshot per dare ragione a qualcuno. Se il thread finisce con messaggi un po' più calmi, per te è una vittoria.",
+        "stalk_tagline": "Sa non essere d'accordo nelle risposte senza farne una questione personale.",
+        "stalk_comment": "Quando le risposte diventano un botta e risposta, prova a capire cosa intende davvero ciascuna parte. Non gli serve una guerra di screenshot per dare ragione a qualcuno. Se il thread finisce con messaggi un po' più calmi, per questo account è una vittoria."
       },
       "ja": {
         "nickname": "まとめ役",
         "tagline": "意見が違っても、リプ欄をけんか腰にはしない。",
-        "comment": "リプの応酬が始まると、まずそれぞれが本当は何を言いたいのかを理解しようとする。誰かに賛成するのに、スクショ合戦はいらない。スレッドの最後にみんなが少し落ち着いて書けていたら、それで勝ちだ。"
+        "comment": "リプの応酬が始まると、まずそれぞれが本当は何を言いたいのかを理解しようとする。誰かに賛成するのに、スクショ合戦はいらない。スレッドの最後にみんなが少し落ち着いて書けていたら、それで勝ちだ。",
+        "stalk_tagline": "意見が違っても、このアカウントはリプ欄をけんか腰にしない。",
+        "stalk_comment": "リプの応酬が始まると、まずそれぞれが本当は何を言いたいのかを理解しようとする人だ。誰かに賛成するのに、スクショ合戦はいらないと考えている。スレッドの最後にみんなが少し落ち着いて書けていたら、この人にとってはそれで勝ちだ。"
       },
       "ko": {
         "nickname": "중재 담당",
         "tagline": "의견이 달라도 답글 창을 싸움판으로 만들지 않아요.",
-        "comment": "답글이 말싸움으로 번지면 먼저 각자가 정말 하고 싶은 말이 뭔지 파악하려고 해요. 누군가의 편을 들기 위해 캡처 전쟁까지 할 필요는 없죠. 스레드가 끝날 때 모두가 조금 더 차분하게 글을 쓰고 있다면 그걸로 성공이에요."
+        "comment": "답글이 말싸움으로 번지면 먼저 각자가 정말 하고 싶은 말이 뭔지 파악하려고 해요. 누군가의 편을 들기 위해 캡처 전쟁까지 할 필요는 없죠. 스레드가 끝날 때 모두가 조금 더 차분하게 글을 쓰고 있다면 그걸로 성공이에요.",
+        "stalk_tagline": "의견이 달라도 이 계정은 답글 창을 싸움판으로 만들지 않아요.",
+        "stalk_comment": "답글이 말싸움으로 번지면 먼저 각자가 정말 하고 싶은 말이 뭔지 파악하려는 사람이에요. 누군가의 편을 들기 위해 캡처 전쟁까지 할 필요는 없다고 생각하죠. 스레드가 끝날 때 모두가 조금 더 차분하게 글을 쓰고 있다면 이 사람에겐 그걸로 성공이에요."
       },
       "zh": {
         "nickname": "負責打圓場",
         "tagline": "意見不同，也不會讓留言區吵成一團。",
-        "comment": "留言變成你來我往的互嗆時，你會先弄清楚每一方真正想說什麼。要支持某個人，不需要打一場截圖大戰。如果整串討論最後大家都寫得平靜一點，對你來說就是贏了。"
+        "comment": "留言變成你來我往的互嗆時，你會先弄清楚每一方真正想說什麼。要支持某個人，不需要打一場截圖大戰。如果整串討論最後大家都寫得平靜一點，對你來說就是贏了。",
+        "stalk_tagline": "意見不同，這個帳號也不會讓留言區吵成一團。",
+        "stalk_comment": "留言吵成一來一往的互嗆時，這個人會先弄清楚每一方真正想說什麼。要支持某個人，不需要打一場截圖大戰。如果整串討論最後大家都寫得平靜一點，對這個人來說就是贏了。"
       },
       "ru": {
         "nickname": "Сглаживает углы",
         "tagline": "Ты можешь спорить в ответах, не переходя на личности.",
-        "comment": "Когда ответы превращаются в перепалку, ты сначала пытаешься понять, что на самом деле хочет сказать каждая сторона. Чтобы с кем-то согласиться, не нужна война скриншотов. Если тред заканчивается чуть более спокойными сообщениями, для тебя это победа."
+        "comment": "Когда ответы превращаются в перепалку, ты сначала пытаешься понять, что на самом деле хочет сказать каждая сторона. Чтобы с кем-то согласиться, не нужна война скриншотов. Если тред заканчивается чуть более спокойными сообщениями, для тебя это победа.",
+        "stalk_tagline": "Он может спорить в ответах, не переходя на личности.",
+        "stalk_comment": "Когда ответы превращаются в перепалку, он сначала пытается понять, что на самом деле хочет сказать каждая сторона. Чтобы с кем-то согласиться, ему не нужна война скриншотов. Если тред заканчивается чуть более спокойными сообщениями, для него это победа."
       }
     }
   },
@@ -1429,62 +1597,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Fazla Düşünen",
         "tagline": "Göndermeden önce taslağı bir kez daha okuyorsun.",
-        "comment": "Kısa bir reply yazarken bile noktanın fazla ciddi, ünlemin fazla hevesli durup durmadığını düşünüyorsun. Bir emoji ekleyip siliyor, kelimeyi değiştirip geri alıyorsun. Sonunda ilk yazdığını gönderince kendine biraz gülüyorsun."
+        "comment": "Kısa bir reply yazarken bile noktanın fazla ciddi, ünlemin fazla hevesli durup durmadığını düşünüyorsun. Bir emoji ekleyip siliyor, kelimeyi değiştirip geri alıyorsun. Sonunda ilk yazdığını gönderince kendine biraz gülüyorsun.",
+        "stalk_tagline": "Göndermeden önce taslağı bir kez daha okuyor.",
+        "stalk_comment": "Kısa bir reply yazarken bile noktanın fazla ciddi, ünlemin fazla hevesli durup durmadığını düşünüyor. Bir emoji ekleyip siliyor, kelimeyi değiştirip geri alıyor. Sonunda ilk yazdığını gönderince kendine biraz gülüyor."
       },
       "en": {
         "nickname": "Second Guesser",
         "tagline": "Even a short reply deserves another look.",
-        "comment": "Even a two-word reply gets checked for whether the period sounds too cold or the exclamation mark too eager. You add an emoji, delete it, swap a word and swap it back. Sending the first version after all that is a familiar little victory."
+        "comment": "Even a two-word reply gets checked for whether the period sounds too cold or the exclamation mark too eager. You add an emoji, delete it, swap a word and swap it back. Sending the first version after all that is a familiar little victory.",
+        "stalk_tagline": "Even a short reply from them gets a second look first.",
+        "stalk_comment": "Even a two-word reply gets checked for whether the period sounds too cold or the exclamation mark too eager. They add an emoji, delete it, swap a word and swap it back. Sending the first version after all that is a familiar little victory for them."
       },
       "es": {
         "nickname": "Lo Piensa Dos Veces",
         "tagline": "Hasta una respuesta corta merece otra lectura.",
-        "comment": "Incluso una respuesta de dos palabras pasa por la duda de si el punto suena demasiado frío o la exclamación demasiado entusiasta. Añades un emoji, lo borras, cambias una palabra y la vuelves a poner. Enviar la primera versión después de todo eso es una pequeña victoria conocida."
+        "comment": "Incluso una respuesta de dos palabras pasa por la duda de si el punto suena demasiado frío o la exclamación demasiado entusiasta. Añades un emoji, lo borras, cambias una palabra y la vuelves a poner. Enviar la primera versión después de todo eso es una pequeña victoria conocida.",
+        "stalk_tagline": "Hasta una respuesta corta suya merece otra lectura.",
+        "stalk_comment": "Incluso una respuesta de dos palabras pasa por la duda de si el punto suena demasiado frío o la exclamación demasiado entusiasta. Añade un emoji, lo borra, cambia una palabra y la vuelve a poner. Enviar la primera versión después de todo eso es una pequeña victoria conocida."
       },
       "pt": {
         "nickname": "Relê Antes de Mandar",
         "tagline": "Até uma resposta curta merece mais uma lida.",
-        "comment": "Até uma resposta de duas palavras passa pela dúvida se o ponto final soa frio demais ou a exclamação animada demais. Você coloca um emoji, apaga, troca uma palavra e destroca. Mandar a primeira versão depois disso tudo é uma pequena vitória conhecida."
+        "comment": "Até uma resposta de duas palavras passa pela dúvida se o ponto final soa frio demais ou a exclamação animada demais. Você coloca um emoji, apaga, troca uma palavra e destroca. Mandar a primeira versão depois disso tudo é uma pequena vitória conhecida.",
+        "stalk_tagline": "Até uma resposta curta dessa conta merece mais uma lida.",
+        "stalk_comment": "Até uma resposta de duas palavras passa pela dúvida se o ponto final soa frio demais ou a exclamação animada demais. Coloca um emoji, apaga, troca uma palavra e destroca. Mandar a primeira versão depois disso tudo é uma pequena vitória conhecida."
       },
       "ar": {
         "nickname": "يقرأ رسالته مرتين",
         "tagline": "حتى الرد القصير يستحق نظرة أخرى.",
-        "comment": "حتى الرد المكوّن من كلمتين يمر عندك بسؤال إن كانت النقطة باردة أكثر من اللازم أو علامة التعجب متحمسة أكثر من اللازم. تضيف رمزًا تعبيريًا ثم تحذفه، وتغيّر كلمة ثم تعيدها. إرسال النسخة الأولى بعد كل ذلك انتصار صغير مألوف."
+        "comment": "حتى الرد المكوّن من كلمتين يمر عندك بسؤال إن كانت النقطة باردة أكثر من اللازم أو علامة التعجب متحمسة أكثر من اللازم. تضيف رمزًا تعبيريًا ثم تحذفه، وتغيّر كلمة ثم تعيدها. إرسال النسخة الأولى بعد كل ذلك انتصار صغير مألوف.",
+        "stalk_tagline": "حتى الرد القصير من هذا الحساب يستحق نظرة أخرى قبل الإرسال.",
+        "stalk_comment": "حتى الرد المكوّن من كلمتين يمر عنده بسؤال إن كانت النقطة باردة أكثر من اللازم أو علامة التعجب متحمسة أكثر من اللازم. يضيف رمزًا تعبيريًا ثم يحذفه، ويغيّر كلمة ثم يعيدها. إرسال النسخة الأولى بعد كل ذلك انتصار صغير مألوف."
       },
       "fr": {
         "nickname": "Jamais Sans Relire",
         "tagline": "Même une réponse courte mérite une relecture.",
-        "comment": "Même une réponse de deux mots passe par la question de savoir si le point est trop froid ou le point d'exclamation trop enthousiaste. Tu ajoutes un émoji, tu l'effaces, tu changes un mot puis tu le remets. Envoyer la première version après tout ça, c'est une petite victoire bien connue."
+        "comment": "Même une réponse de deux mots passe par la question de savoir si le point est trop froid ou le point d'exclamation trop enthousiaste. Tu ajoutes un émoji, tu l'effaces, tu changes un mot puis tu le remets. Envoyer la première version après tout ça, c'est une petite victoire bien connue.",
+        "stalk_tagline": "Même une réponse courte de ce compte mérite une relecture.",
+        "stalk_comment": "Même une réponse de deux mots passe par la question de savoir si le point est trop froid ou le point d'exclamation trop enthousiaste. Il ajoute un émoji, l'efface, change un mot puis le remet. Envoyer la première version après tout ça, c'est une petite victoire bien connue."
       },
       "de": {
         "nickname": "Liest lieber nochmal",
         "tagline": "Selbst eine kurze Antwort verdient einen zweiten Blick.",
-        "comment": "Selbst bei einer Antwort aus zwei Wörtern fragst du dich, ob der Punkt zu kühl oder das Ausrufezeichen zu begeistert wirkt. Du fügst ein Emoji ein, löschst es, tauschst ein Wort und tauschst es zurück. Danach doch die erste Version abzuschicken, ist ein vertrauter kleiner Sieg."
+        "comment": "Selbst bei einer Antwort aus zwei Wörtern fragst du dich, ob der Punkt zu kühl oder das Ausrufezeichen zu begeistert wirkt. Du fügst ein Emoji ein, löschst es, tauschst ein Wort und tauschst es zurück. Danach doch die erste Version abzuschicken, ist ein vertrauter kleiner Sieg.",
+        "stalk_tagline": "Selbst eine kurze Antwort von diesem Account bekommt vorher einen zweiten Blick.",
+        "stalk_comment": "Selbst bei einer Antwort aus zwei Wörtern fragt er sich, ob der Punkt zu kühl oder das Ausrufezeichen zu begeistert wirkt. Er fügt ein Emoji ein, löscht es, tauscht ein Wort und tauscht es zurück. Danach doch die erste Version abzuschicken, ist ein vertrauter kleiner Sieg."
       },
       "it": {
         "nickname": "Rilegge Sempre",
         "tagline": "Anche una risposta breve merita una seconda lettura.",
-        "comment": "Anche una risposta di due parole passa per il dubbio se il punto sia troppo freddo o il punto esclamativo troppo entusiasta. Aggiungi un'emoji, la cancelli, cambi una parola e poi la rimetti. Mandare la prima versione dopo tutto questo è una piccola vittoria che conosci bene."
+        "comment": "Anche una risposta di due parole passa per il dubbio se il punto sia troppo freddo o il punto esclamativo troppo entusiasta. Aggiungi un'emoji, la cancelli, cambi una parola e poi la rimetti. Mandare la prima versione dopo tutto questo è una piccola vittoria che conosci bene.",
+        "stalk_tagline": "Anche una sua risposta breve merita una seconda lettura.",
+        "stalk_comment": "Anche una risposta di due parole passa per il dubbio se il punto sia troppo freddo o il punto esclamativo troppo entusiasta. Aggiunge un'emoji, la cancella, cambia una parola e poi la rimette. Mandare la prima versione dopo tutto questo è una piccola vittoria che conosce bene."
       },
       "ja": {
         "nickname": "読み返し派",
         "tagline": "短いリプでも、送る前にもう一度読み返す。",
-        "comment": "ほんの二語のリプでも、句点は冷たすぎないか、びっくりマークははしゃぎすぎないかと考えてしまう。絵文字を足しては消し、言葉を変えてはまた戻す。結局最初の文を送信して、自分の迷いにちょっと笑ってしまう。"
+        "comment": "ほんの二語のリプでも、句点は冷たすぎないか、びっくりマークははしゃぎすぎないかと考えてしまう。絵文字を足しては消し、言葉を変えてはまた戻す。結局最初の文を送信して、自分の迷いにちょっと笑ってしまう。",
+        "stalk_tagline": "短いリプでも、この人は送る前にもう一度読み返す。",
+        "stalk_comment": "ほんの二語のリプでも、句点は冷たすぎないか、びっくりマークははしゃぎすぎないかと考えてしまうタイプだ。絵文字を足しては消し、言葉を変えてはまた戻す。結局最初の文を送信して、自分の迷いにちょっと笑っているらしい。"
       },
       "ko": {
         "nickname": "다시 읽는 사람",
         "tagline": "짧은 답글도 보내기 전에 한 번 더 읽어요.",
-        "comment": "두 단어짜리 답글에도 마침표가 너무 차가운지, 느낌표가 너무 들뜬지 고민하게 돼요. 이모지를 넣었다 지우고, 단어를 바꿨다 다시 돌려놓죠. 결국 처음 쓴 문장을 보내고 혼자 고민한 게 웃겨서 피식 웃어요."
+        "comment": "두 단어짜리 답글에도 마침표가 너무 차가운지, 느낌표가 너무 들뜬지 고민하게 돼요. 이모지를 넣었다 지우고, 단어를 바꿨다 다시 돌려놓죠. 결국 처음 쓴 문장을 보내고 혼자 고민한 게 웃겨서 피식 웃어요.",
+        "stalk_tagline": "짧은 답글도 이 사람은 보내기 전에 한 번 더 읽어요.",
+        "stalk_comment": "두 단어짜리 답글에도 마침표가 너무 차가운지, 느낌표가 너무 들뜬지 고민하는 타입이에요. 이모지를 넣었다 지우고, 단어를 바꿨다 다시 돌려놓죠. 결국 처음 쓴 문장을 보내고 혼자 고민한 게 웃겨서 피식 웃는대요."
       },
       "zh": {
         "nickname": "送出前再看一次",
         "tagline": "再短的回覆，送出前都要再讀一次。",
-        "comment": "就算只是兩個字的回覆，你也會想句號會不會太冷、驚嘆號會不會太興奮。加了表情符號又刪掉，換了詞又換回來。最後還是送出最早寫好的那一句，然後笑自己想太多。"
+        "comment": "就算只是兩個字的回覆，你也會想句號會不會太冷、驚嘆號會不會太興奮。加了表情符號又刪掉，換了詞又換回來。最後還是送出最早寫好的那一句，然後笑自己想太多。",
+        "stalk_tagline": "再短的回覆，這個人送出前都要再讀一次。",
+        "stalk_comment": "就算只是兩個字的回覆，也會想句號會不會太冷、驚嘆號會不會太興奮。加了表情符號又刪掉，換了詞又換回來。最後還是送出最早寫好的那一句，然後笑自己想太多。"
       },
       "ru": {
         "nickname": "Перечитывает перед отправкой",
         "tagline": "Даже короткий ответ ты перечитываешь ещё раз.",
-        "comment": "Даже в ответе из двух слов думаешь, не слишком ли холодно выглядит точка и не слишком ли бодро — восклицательный знак. Добавляешь эмодзи, удаляешь, меняешь слово и возвращаешь обратно. В итоге отправляешь первый вариант и смеёшься над собой."
+        "comment": "Даже в ответе из двух слов думаешь, не слишком ли холодно выглядит точка и не слишком ли бодро — восклицательный знак. Добавляешь эмодзи, удаляешь, меняешь слово и возвращаешь обратно. В итоге отправляешь первый вариант и смеёшься над собой.",
+        "stalk_tagline": "Даже короткий ответ этот аккаунт перечитывает ещё раз.",
+        "stalk_comment": "Даже в ответе из двух слов он думает, не слишком ли холодно выглядит точка и не слишком ли бодро — восклицательный знак. Добавляет эмодзи, удаляет, меняет слово и возвращает обратно. В итоге отправляет первый вариант и смеётся над собой."
       }
     }
   },
@@ -1502,62 +1694,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Gizli Başrol",
         "tagline": "Az paylaşsan da akılda kalan bir cümlen hep oluyor.",
-        "comment": "Timeline'daki her boşluğu doldurma ihtiyacı duymuyorsun; çoğu zaman sessizce okuyup geçiyorsun. Paylaştığında kısa ama akılda kalan bir cümle seçiyorsun. Birinin o cümleyi günler sonra alıntılaması hoşuna gidiyor."
+        "comment": "Timeline'daki her boşluğu doldurma ihtiyacı duymuyorsun; çoğu zaman sessizce okuyup geçiyorsun. Paylaştığında kısa ama akılda kalan bir cümle seçiyorsun. Birinin o cümleyi günler sonra alıntılaması hoşuna gidiyor.",
+        "stalk_tagline": "Az paylaşsa da akılda kalan bir cümlesi hep oluyor.",
+        "stalk_comment": "Timeline'daki her boşluğu doldurma ihtiyacı duymuyor; çoğu zaman sessizce okuyup geçiyor. Paylaştığında kısa ama akılda kalan bir cümle seçiyor. Birinin o cümleyi günler sonra alıntılaması hoşuna gidiyor."
       },
       "en": {
         "nickname": "Quiet Charmer",
         "tagline": "You post rarely, but people remember the ones you do.",
-        "comment": "You do not feel the need to fill every gap in the timeline; most days you just read and scroll. When you do post, it is short and it sticks. It is quietly satisfying when someone quotes that line days later."
+        "comment": "You do not feel the need to fill every gap in the timeline; most days you just read and scroll. When you do post, it is short and it sticks. It is quietly satisfying when someone quotes that line days later.",
+        "stalk_tagline": "They post rarely, but people remember the ones they do.",
+        "stalk_comment": "They do not feel the need to fill every gap in the timeline; most days they just read and scroll. When they do post, it is short and it sticks. It quietly pleases them when someone quotes that line days later."
       },
       "es": {
         "nickname": "Encanto Discreto",
         "tagline": "Publicas poco, pero lo que publicas se recuerda.",
-        "comment": "No sientes la necesidad de llenar cada hueco del timeline; muchos días solo lees y sigues bajando. Cuando publicas, es breve y se queda. Te gusta en silencio que alguien cite esa frase días después."
+        "comment": "No sientes la necesidad de llenar cada hueco del timeline; muchos días solo lees y sigues bajando. Cuando publicas, es breve y se queda. Te gusta en silencio que alguien cite esa frase días después.",
+        "stalk_tagline": "Publica poco, pero lo que publica se recuerda.",
+        "stalk_comment": "No siente la necesidad de llenar cada hueco del timeline; muchos días solo lee y sigue bajando. Cuando publica, es breve y se queda. Le gusta en silencio que alguien cite esa frase días después."
       },
       "pt": {
         "nickname": "De Poucas Palavras",
         "tagline": "Você posta pouco, mas o que posta fica na memória.",
-        "comment": "Você não sente necessidade de preencher cada espaço da timeline; na maioria dos dias só lê e segue rolando. Quando posta, é curto e marca. É uma alegria discreta ver alguém citar aquela frase dias depois."
+        "comment": "Você não sente necessidade de preencher cada espaço da timeline; na maioria dos dias só lê e segue rolando. Quando posta, é curto e marca. É uma alegria discreta ver alguém citar aquela frase dias depois.",
+        "stalk_tagline": "Essa conta posta pouco, mas o que posta fica na memória.",
+        "stalk_comment": "Não sente necessidade de preencher cada espaço da timeline; na maioria dos dias só lê e segue rolando. Quando posta, é curto e marca. É uma alegria discreta ver alguém citar aquela frase dias depois."
       },
       "ar": {
         "nickname": "حضور بلا ضجيج",
         "tagline": "تنشر قليلًا، لكن ما تنشره يبقى في الذاكرة.",
-        "comment": "لا تشعر بالحاجة إلى ملء كل فراغ في الخط الزمني، ففي أغلب الأيام تقرأ وتواصل التمرير. وحين تنشر يكون ما تكتبه قصيرًا ويبقى. يسعدك بهدوء أن يقتبس أحدهم تلك الجملة بعد أيام."
+        "comment": "لا تشعر بالحاجة إلى ملء كل فراغ في الخط الزمني، ففي أغلب الأيام تقرأ وتواصل التمرير. وحين تنشر يكون ما تكتبه قصيرًا ويبقى. يسعدك بهدوء أن يقتبس أحدهم تلك الجملة بعد أيام.",
+        "stalk_tagline": "ينشر هذا الحساب قليلًا، لكن ما ينشره يبقى في الذاكرة.",
+        "stalk_comment": "لا يشعر بالحاجة إلى ملء كل فراغ في الخط الزمني، ففي أغلب الأيام يقرأ ويواصل التمرير. وحين ينشر يكون ما يكتبه قصيرًا ويبقى. يسعده بهدوء أن يقتبس أحدهم تلك الجملة بعد أيام."
       },
       "fr": {
         "nickname": "Discret mais Marquant",
         "tagline": "Tu publies peu, mais ce que tu publies marque.",
-        "comment": "Tu n'éprouves pas le besoin de remplir chaque silence de la timeline\u00a0; la plupart du temps, tu lis et tu fais défiler. Quand tu publies, c'est court et ça reste. Ça te fait discrètement plaisir quand quelqu'un cite cette phrase quelques jours plus tard."
+        "comment": "Tu n'éprouves pas le besoin de remplir chaque silence de la timeline\u00a0; la plupart du temps, tu lis et tu fais défiler. Quand tu publies, c'est court et ça reste. Ça te fait discrètement plaisir quand quelqu'un cite cette phrase quelques jours plus tard.",
+        "stalk_tagline": "Il publie peu, mais ce qu'il publie marque.",
+        "stalk_comment": "Il n'éprouve pas le besoin de remplir chaque silence de la timeline\u00a0; la plupart du temps, il lit et fait défiler. Quand il publie, c'est court et ça reste. Ça lui fait discrètement plaisir quand quelqu'un cite cette phrase quelques jours plus tard."
       },
       "de": {
         "nickname": "Leise und einprägsam",
         "tagline": "Du postest selten, aber was du postest, bleibt hängen.",
-        "comment": "Du musst nicht jede Lücke in der Timeline füllen; an den meisten Tagen liest du nur mit und scrollst weiter. Wenn du postest, ist es kurz und bleibt hängen. Es freut dich still, wenn jemand diesen Satz Tage später zitiert."
+        "comment": "Du musst nicht jede Lücke in der Timeline füllen; an den meisten Tagen liest du nur mit und scrollst weiter. Wenn du postest, ist es kurz und bleibt hängen. Es freut dich still, wenn jemand diesen Satz Tage später zitiert.",
+        "stalk_tagline": "Er postet selten, aber was er postet, bleibt hängen.",
+        "stalk_comment": "Er muss nicht jede Lücke in der Timeline füllen; an den meisten Tagen liest er nur mit und scrollt weiter. Wenn er postet, ist es kurz und bleibt hängen. Es freut ihn still, wenn jemand diesen Satz Tage später zitiert."
       },
       "it": {
         "nickname": "Presenza Discreta",
         "tagline": "Pubblichi poco, ma quello che pubblichi resta.",
-        "comment": "Non senti il bisogno di riempire ogni vuoto della timeline; quasi sempre leggi e scorri. Quando pubblichi, è breve e lascia il segno. Ti fa piacere, in silenzio, quando qualcuno cita quella frase giorni dopo."
+        "comment": "Non senti il bisogno di riempire ogni vuoto della timeline; quasi sempre leggi e scorri. Quando pubblichi, è breve e lascia il segno. Ti fa piacere, in silenzio, quando qualcuno cita quella frase giorni dopo.",
+        "stalk_tagline": "Pubblica poco, ma quello che pubblica resta.",
+        "stalk_comment": "Non sente il bisogno di riempire ogni vuoto della timeline; quasi sempre legge e scorre. Quando pubblica, è breve e lascia il segno. Gli fa piacere, in silenzio, quando qualcuno cita quella frase giorni dopo."
       },
       "ja": {
         "nickname": "静かな存在感",
         "tagline": "ポストは少なくても、なぜか覚えられている。",
-        "comment": "タイムラインのすきまを全部埋めようとは思わない。ほとんどの日は読んでスクロールするだけだ。ポストするときは短いけれど、ちゃんと残る。何日かあとに誰かがその一文を引用してくれると、ひそかにうれしい。"
+        "comment": "タイムラインのすきまを全部埋めようとは思わない。ほとんどの日は読んでスクロールするだけだ。ポストするときは短いけれど、ちゃんと残る。何日かあとに誰かがその一文を引用してくれると、ひそかにうれしい。",
+        "stalk_tagline": "このアカウントはポストが少ないのに、なぜか覚えられている。",
+        "stalk_comment": "タイムラインのすきまを全部埋めようとはしない人だ。ほとんどの日は読んでスクロールするだけ。ポストするときは短いけれど、ちゃんと残る。何日かあとに誰かがその一文を引用すると、ひそかにうれしいらしい。"
       },
       "ko": {
         "nickname": "조용한 존재감",
         "tagline": "자주 올리지 않아도 올린 글은 기억에 남아요.",
-        "comment": "타임라인의 빈틈을 전부 채울 필요는 없다고 생각해요. 대부분은 읽고 스크롤만 하죠. 글을 올릴 때는 짧지만 오래 남는 한 문장을 골라요. 며칠 뒤 누군가 그 문장을 인용하면 조용히 기뻐요."
+        "comment": "타임라인의 빈틈을 전부 채울 필요는 없다고 생각해요. 대부분은 읽고 스크롤만 하죠. 글을 올릴 때는 짧지만 오래 남는 한 문장을 골라요. 며칠 뒤 누군가 그 문장을 인용하면 조용히 기뻐요.",
+        "stalk_tagline": "이 계정은 자주 올리지 않아도 올린 글이 기억에 남아요.",
+        "stalk_comment": "타임라인의 빈틈을 전부 채울 필요는 없다고 생각하는 사람이에요. 대부분은 읽고 스크롤만 하죠. 글을 올릴 때는 짧지만 오래 남는 한 문장을 골라요. 며칠 뒤 누군가 그 문장을 인용하면 조용히 기뻐한대요."
       },
       "zh": {
         "nickname": "安靜的存在感",
         "tagline": "你很少發文，但發過的總讓人記得。",
-        "comment": "你不覺得需要把時間軸的每個空檔都填滿，大多數日子只是看看、往下滑。真的發文時，句子很短卻會留下來。幾天後有人引用那句話，你就會暗自開心。"
+        "comment": "你不覺得需要把時間軸的每個空檔都填滿，大多數日子只是看看、往下滑。真的發文時，句子很短卻會留下來。幾天後有人引用那句話，你就會暗自開心。",
+        "stalk_tagline": "這個帳號很少發文，但發過的總讓人記得。",
+        "stalk_comment": "不覺得需要把時間軸的每個空檔都填滿，大多數日子只是看看、往下滑。真的發文時，句子很短卻會留下來。幾天後有人引用那句話，這個人就會暗自開心。"
       },
       "ru": {
         "nickname": "Тихое присутствие",
         "tagline": "Постишь редко, но твои посты запоминаются.",
-        "comment": "Тебе не нужно заполнять каждую паузу в ленте; чаще всего ты просто читаешь и листаешь дальше. Когда ты постишь, это коротко и остаётся в памяти. Тебе тихо приятно, когда кто-то цитирует эту фразу через несколько дней."
+        "comment": "Тебе не нужно заполнять каждую паузу в ленте; чаще всего ты просто читаешь и листаешь дальше. Когда ты постишь, это коротко и остаётся в памяти. Тебе тихо приятно, когда кто-то цитирует эту фразу через несколько дней.",
+        "stalk_tagline": "Этот аккаунт постит редко, но его посты запоминаются.",
+        "stalk_comment": "Ему не нужно заполнять каждую паузу в ленте; чаще всего он просто читает и листает дальше. Когда он постит, это коротко и остаётся в памяти. Ему тихо приятно, когда кто-то цитирует эту фразу через несколько дней."
       }
     }
   },
@@ -1579,62 +1795,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Ortamı Canlandıran",
         "tagline": "Sessizleşen bir thread'i ilk hareketlendiren sen oluyorsun.",
-        "comment": "Yorumlar durgunlaşınca herkesin katılabileceği bir soru ya da mini bir anket açıyorsun. Kimseyi etiketleyip zorlamadan insanları sohbete çekmek hoşuna gidiyor. Konu tamamen başka bir yere gitse de kimse sıkılmıyorsa senin için sorun yok."
+        "comment": "Yorumlar durgunlaşınca herkesin katılabileceği bir soru ya da mini bir anket açıyorsun. Kimseyi etiketleyip zorlamadan insanları sohbete çekmek hoşuna gidiyor. Konu tamamen başka bir yere gitse de kimse sıkılmıyorsa senin için sorun yok.",
+        "stalk_tagline": "Sessizleşen bir thread'i ilk hareketlendiren o oluyor.",
+        "stalk_comment": "Yorumlar durgunlaşınca herkesin katılabileceği bir soru ya da mini bir anket açıyor. Kimseyi etiketleyip zorlamadan insanları sohbete çekmek hoşuna gidiyor. Konu tamamen başka bir yere gitse de kimse sıkılmıyorsa onun için sorun yok."
       },
       "en": {
         "nickname": "Life of the Thread",
         "tagline": "You are the one who wakes up a quiet thread.",
-        "comment": "When the replies go quiet, you start a question or a quick poll everyone can join. You like pulling people into the conversation without tagging anyone on the spot. The topic can drift somewhere completely different as long as nobody is bored."
+        "comment": "When the replies go quiet, you start a question or a quick poll everyone can join. You like pulling people into the conversation without tagging anyone on the spot. The topic can drift somewhere completely different as long as nobody is bored.",
+        "stalk_tagline": "They are the one who wakes up a quiet thread.",
+        "stalk_comment": "When the replies go quiet, they start a question or a quick poll everyone can join. They like pulling people into the conversation without tagging anyone on the spot. The topic can drift somewhere completely different as long as nobody is bored."
       },
       "es": {
         "nickname": "Alma del Hilo",
         "tagline": "Eres quien despierta un hilo que se había quedado callado.",
-        "comment": "Cuando las respuestas se apagan, lanzas una pregunta o una encuesta rápida en la que todos puedan participar. Te gusta sumar gente a la conversación sin etiquetar a nadie para ponerlo en aprietos. El tema puede terminar en otro sitio siempre que nadie se aburra."
+        "comment": "Cuando las respuestas se apagan, lanzas una pregunta o una encuesta rápida en la que todos puedan participar. Te gusta sumar gente a la conversación sin etiquetar a nadie para ponerlo en aprietos. El tema puede terminar en otro sitio siempre que nadie se aburra.",
+        "stalk_tagline": "Esta cuenta despierta los hilos que se habían quedado callados.",
+        "stalk_comment": "Cuando las respuestas se apagan, lanza una pregunta o una encuesta rápida en la que todos puedan participar. Le gusta sumar gente a la conversación sin etiquetar a nadie para ponerlo en aprietos. El tema puede terminar en otro sitio siempre que nadie se aburra."
       },
       "pt": {
         "nickname": "Anima Qualquer Conversa",
         "tagline": "Você é quem acorda uma thread que tinha ficado parada.",
-        "comment": "Quando as respostas esfriam, você lança uma pergunta ou uma enquete rápida em que todo mundo pode entrar. Gosta de puxar gente para a conversa sem marcar ninguém para colocar em saia justa. O assunto pode ir parar em outro lugar, desde que ninguém fique entediado."
+        "comment": "Quando as respostas esfriam, você lança uma pergunta ou uma enquete rápida em que todo mundo pode entrar. Gosta de puxar gente para a conversa sem marcar ninguém para colocar em saia justa. O assunto pode ir parar em outro lugar, desde que ninguém fique entediado.",
+        "stalk_tagline": "É essa conta que acorda uma thread que tinha ficado parada.",
+        "stalk_comment": "Quando as respostas esfriam, lança uma pergunta ou uma enquete rápida em que todo mundo pode entrar. Gosta de puxar gente para a conversa sem marcar ninguém para colocar em saia justa. O assunto pode ir parar em outro lugar, desde que ninguém fique entediado."
       },
       "ar": {
         "nickname": "روح النقاش",
         "tagline": "أنت من يوقظ سلسلة هدأت فيها الردود.",
-        "comment": "حين تهدأ الردود تطرح سؤالًا أو استطلاعًا سريعًا يستطيع الجميع الانضمام إليه. يعجبك أن تجذب الناس إلى النقاش دون أن تضع أحدًا في موقف محرج بالإشارة إليه. قد ينتقل الموضوع إلى مكان آخر تمامًا، والمهم ألا يملّ أحد."
+        "comment": "حين تهدأ الردود تطرح سؤالًا أو استطلاعًا سريعًا يستطيع الجميع الانضمام إليه. يعجبك أن تجذب الناس إلى النقاش دون أن تضع أحدًا في موقف محرج بالإشارة إليه. قد ينتقل الموضوع إلى مكان آخر تمامًا، والمهم ألا يملّ أحد.",
+        "stalk_tagline": "هذا الحساب هو من يوقظ سلسلة هدأت فيها الردود.",
+        "stalk_comment": "حين تهدأ الردود يطرح سؤالًا أو استطلاعًا سريعًا يستطيع الجميع الانضمام إليه. يعجبه أن يجذب الناس إلى النقاش دون أن يضع أحدًا في موقف محرج بالإشارة إليه. قد ينتقل الموضوع إلى مكان آخر تمامًا، والمهم ألا يملّ أحد."
       },
       "fr": {
         "nickname": "Vrai Boute-en-train",
         "tagline": "C'est toi qui réveilles un fil resté silencieux.",
-        "comment": "Quand les réponses s'essoufflent, tu lances une question ou un sondage rapide auquel tout le monde peut participer. Tu aimes embarquer les gens dans la discussion sans identifier personne pour le mettre mal à l'aise. Le sujet peut dériver complètement, tant que personne ne s'ennuie."
+        "comment": "Quand les réponses s'essoufflent, tu lances une question ou un sondage rapide auquel tout le monde peut participer. Tu aimes embarquer les gens dans la discussion sans identifier personne pour le mettre mal à l'aise. Le sujet peut dériver complètement, tant que personne ne s'ennuie.",
+        "stalk_tagline": "C'est ce compte qui réveille un fil resté silencieux.",
+        "stalk_comment": "Quand les réponses s'essoufflent, il lance une question ou un sondage rapide auquel tout le monde peut participer. Il aime embarquer les gens dans la discussion sans identifier personne pour le mettre mal à l'aise. Le sujet peut dériver complètement, tant que personne ne s'ennuie."
       },
       "de": {
         "nickname": "Sorgt für Stimmung",
         "tagline": "Du bist es, der einen stillen Thread wieder aufweckt.",
-        "comment": "Wenn die Antworten abflauen, startest du eine Frage oder eine schnelle Umfrage, bei der alle mitmachen können. Du holst Leute gern ins Gespräch, ohne jemanden per Markierung bloßzustellen. Das Thema darf komplett abdriften, solange sich niemand langweilt."
+        "comment": "Wenn die Antworten abflauen, startest du eine Frage oder eine schnelle Umfrage, bei der alle mitmachen können. Du holst Leute gern ins Gespräch, ohne jemanden per Markierung bloßzustellen. Das Thema darf komplett abdriften, solange sich niemand langweilt.",
+        "stalk_tagline": "Dieser Account weckt einen stillen Thread als Erster wieder auf.",
+        "stalk_comment": "Wenn die Antworten abflauen, startet er eine Frage oder eine schnelle Umfrage, bei der alle mitmachen können. Er holt Leute gern ins Gespräch, ohne jemanden per Markierung bloßzustellen. Das Thema darf komplett abdriften, solange sich niemand langweilt."
       },
       "it": {
         "nickname": "Porta il Buonumore",
         "tagline": "Sei tu a risvegliare un thread rimasto in silenzio.",
-        "comment": "Quando le risposte si spengono, lanci una domanda o un sondaggio veloce a cui tutti possono partecipare. Ti piace coinvolgere le persone senza taggare nessuno per metterlo in imbarazzo. L'argomento può finire altrove, purché nessuno si annoi."
+        "comment": "Quando le risposte si spengono, lanci una domanda o un sondaggio veloce a cui tutti possono partecipare. Ti piace coinvolgere le persone senza taggare nessuno per metterlo in imbarazzo. L'argomento può finire altrove, purché nessuno si annoi.",
+        "stalk_tagline": "È questo account a risvegliare un thread rimasto in silenzio.",
+        "stalk_comment": "Quando le risposte si spengono, lancia una domanda o un sondaggio veloce a cui tutti possono partecipare. Gli piace coinvolgere le persone senza taggare nessuno per metterlo in imbarazzo. L'argomento può finire altrove, purché nessuno si annoi."
       },
       "ja": {
         "nickname": "盛り上げ役",
         "tagline": "静かになったスレッドを、最初に動かすのはあなただ。",
-        "comment": "リプ欄が静かになってきたら、誰でも参加できる質問や手軽なアンケートを出す。誰かをメンションして困らせることなく、自然に会話へ巻き込むのが得意だ。話題がまったく別の方向へ流れても、誰も退屈していなければそれでいい。"
+        "comment": "リプ欄が静かになってきたら、誰でも参加できる質問や手軽なアンケートを出す。誰かをメンションして困らせることなく、自然に会話へ巻き込むのが得意だ。話題がまったく別の方向へ流れても、誰も退屈していなければそれでいい。",
+        "stalk_tagline": "静かになったスレッドを最初に動かすのは、このアカウントだ。",
+        "stalk_comment": "リプ欄が静かになってきたら、誰でも参加できる質問や手軽なアンケートを出す人だ。誰かをメンションして困らせることなく、自然に会話へ巻き込むのが得意。話題がまったく別の方向へ流れても、誰も退屈していなければそれでいいと思っている。"
       },
       "ko": {
         "nickname": "흥 담당",
         "tagline": "조용해진 스레드를 제일 먼저 깨우는 사람이에요.",
-        "comment": "답글이 잠잠해지면 누구나 참여할 수 있는 질문이나 간단한 투표를 올려요. 누군가를 태그해서 곤란하게 만들지 않고도 자연스럽게 대화로 끌어들이는 데 익숙하죠. 주제가 완전히 딴 데로 흘러가도 아무도 지루하지 않으면 그걸로 충분해요."
+        "comment": "답글이 잠잠해지면 누구나 참여할 수 있는 질문이나 간단한 투표를 올려요. 누군가를 태그해서 곤란하게 만들지 않고도 자연스럽게 대화로 끌어들이는 데 익숙하죠. 주제가 완전히 딴 데로 흘러가도 아무도 지루하지 않으면 그걸로 충분해요.",
+        "stalk_tagline": "조용해진 스레드를 제일 먼저 깨우는 건 이 계정이에요.",
+        "stalk_comment": "답글이 잠잠해지면 누구나 참여할 수 있는 질문이나 간단한 투표를 올리는 사람이에요. 누군가를 태그해서 곤란하게 만들지 않고도 자연스럽게 대화로 끌어들이는 데 익숙하죠. 주제가 완전히 딴 데로 흘러가도 아무도 지루하지 않으면 그걸로 충분하대요."
       },
       "zh": {
         "nickname": "炒熱氣氛的人",
         "tagline": "安靜下來的討論串，總是你先讓它熱起來。",
-        "comment": "留言一冷下來，你就會丟出一個大家都能參與的問題或小投票。你很會把人自然拉進對話，又不會因為標記誰而讓人尷尬。就算話題完全跑偏，只要沒有人無聊，那就夠了。"
+        "comment": "留言一冷下來，你就會丟出一個大家都能參與的問題或小投票。你很會把人自然拉進對話，又不會因為標記誰而讓人尷尬。就算話題完全跑偏，只要沒有人無聊，那就夠了。",
+        "stalk_tagline": "安靜下來的討論串，總是這個帳號先讓它熱起來。",
+        "stalk_comment": "留言一冷下來，就會丟出一個大家都能參與的問題或小投票。很會把人自然拉進對話，又不會因為標記誰而讓人尷尬。就算話題完全跑偏，只要沒有人無聊，對這個人來說就夠了。"
       },
       "ru": {
         "nickname": "Заводит компанию",
         "tagline": "Затихший тред первым оживляешь именно ты.",
-        "comment": "Когда ответы затихают, ты запускаешь вопрос или быстрый опрос, в котором может поучаствовать каждый. Тебе нравится втягивать людей в разговор, никого не отмечая, чтобы не ставить в неловкое положение. Тема может уйти совсем в другую сторону, лишь бы никому не было скучно."
+        "comment": "Когда ответы затихают, ты запускаешь вопрос или быстрый опрос, в котором может поучаствовать каждый. Тебе нравится втягивать людей в разговор, никого не отмечая, чтобы не ставить в неловкое положение. Тема может уйти совсем в другую сторону, лишь бы никому не было скучно.",
+        "stalk_tagline": "Затихший тред первым оживляет именно этот аккаунт.",
+        "stalk_comment": "Когда ответы затихают, он запускает вопрос или быстрый опрос, в котором может поучаствовать каждый. Ему нравится втягивать людей в разговор, никого не отмечая, чтобы не ставить в неловкое положение. Тема может уйти совсем в другую сторону, лишь бы никому не было скучно."
       }
     }
   },
@@ -1652,62 +1892,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Lafı Açan",
         "tagline": "İyi bir soruyla sıradan bir reply'ı sohbete çeviriyorsun.",
-        "comment": "Biri gününden bahsettiğinde 'sonra ne oldu' diye sormadan duramıyorsun. Küçük bir ayrıntı ilgini çekiyor ve thread'in devamını istiyorsun. Seninle başlayan kısa bir DM'in uzaması çoğu zaman bu yüzden."
+        "comment": "Biri gününden bahsettiğinde 'sonra ne oldu' diye sormadan duramıyorsun. Küçük bir ayrıntı ilgini çekiyor ve thread'in devamını istiyorsun. Seninle başlayan kısa bir DM'in uzaması çoğu zaman bu yüzden.",
+        "stalk_tagline": "İyi bir soruyla sıradan bir reply'ı sohbete çeviriyor.",
+        "stalk_comment": "Biri gününden bahsettiğinde 'sonra ne oldu' diye sormadan duramıyor. Küçük bir ayrıntı ilgisini çekiyor ve thread'in devamını istiyor. Onunla başlayan kısa bir DM'in uzaması çoğu zaman bu yüzden."
       },
       "en": {
         "nickname": "Good Listener",
         "tagline": "One good question turns a reply into a real conversation.",
-        "comment": "When someone mentions their day in a post, you cannot resist asking what happened next. A small detail catches your interest and you want the rest of the thread. That is usually why a quick DM with you turns into a long one."
+        "comment": "When someone mentions their day in a post, you cannot resist asking what happened next. A small detail catches your interest and you want the rest of the thread. That is usually why a quick DM with you turns into a long one.",
+        "stalk_tagline": "One good question from them turns a reply into a real conversation.",
+        "stalk_comment": "When someone posts about their day, this account is the first to ask what happened next. A small detail catches their interest and they want the rest of the thread. That is usually why a quick DM with them turns into a long one."
       },
       "es": {
         "nickname": "Sabe Escuchar",
         "tagline": "Una buena pregunta convierte una respuesta en una conversación.",
-        "comment": "Cuando alguien cuenta su día en una publicación, no puedes evitar preguntar qué pasó después. Un detalle pequeño te llama la atención y quieres el resto del hilo. Por eso un mensaje directo rápido contigo suele acabar siendo largo."
+        "comment": "Cuando alguien cuenta su día en una publicación, no puedes evitar preguntar qué pasó después. Un detalle pequeño te llama la atención y quieres el resto del hilo. Por eso un mensaje directo rápido contigo suele acabar siendo largo.",
+        "stalk_tagline": "Con una buena pregunta convierte una respuesta en una conversación.",
+        "stalk_comment": "Cuando alguien cuenta su día en una publicación, esta cuenta no puede evitar preguntar qué pasó después. Un detalle pequeño le llama la atención y quiere el resto del hilo. Por eso un mensaje directo rápido con esta cuenta suele acabar siendo largo."
       },
       "pt": {
         "nickname": "Escuta de Verdade",
         "tagline": "Uma boa pergunta transforma uma resposta em conversa.",
-        "comment": "Quando alguém conta do dia num post, você não resiste a perguntar o que aconteceu depois. Um detalhe pequeno chama sua atenção e você quer o resto da thread. Por isso uma DM rápida com você costuma virar uma conversa longa."
+        "comment": "Quando alguém conta do dia num post, você não resiste a perguntar o que aconteceu depois. Um detalhe pequeno chama sua atenção e você quer o resto da thread. Por isso uma DM rápida com você costuma virar uma conversa longa.",
+        "stalk_tagline": "Uma boa pergunta dessa conta transforma uma resposta em conversa.",
+        "stalk_comment": "Quando alguém conta do dia num post, essa conta não resiste a perguntar o que aconteceu depois. Um detalhe pequeno chama a atenção e dá vontade de ler o resto da thread. Por isso uma DM rápida com essa conta costuma virar uma conversa longa."
       },
       "ar": {
         "nickname": "أذن صاغية",
         "tagline": "سؤال جيد واحد يحوّل الرد إلى محادثة حقيقية.",
-        "comment": "حين يكتب أحدهم منشورًا عن يومه، لا تستطيع ألا تسأله عما حدث بعد ذلك. تلفت انتباهك تفصيلة صغيرة فتريد بقية السلسلة. لهذا غالبًا ما تطول أي رسالة خاصة سريعة معك."
+        "comment": "حين يكتب أحدهم منشورًا عن يومه، لا تستطيع ألا تسأله عما حدث بعد ذلك. تلفت انتباهك تفصيلة صغيرة فتريد بقية السلسلة. لهذا غالبًا ما تطول أي رسالة خاصة سريعة معك.",
+        "stalk_tagline": "سؤال جيد واحد من هذا الحساب يحوّل الرد إلى محادثة حقيقية.",
+        "stalk_comment": "حين يكتب أحدهم منشورًا عن يومه، لا يستطيع ألا يسأله عما حدث بعد ذلك. تلفت انتباهه تفصيلة صغيرة فيريد بقية السلسلة. لهذا غالبًا ما تطول أي رسالة خاصة سريعة معه."
       },
       "fr": {
         "nickname": "Toujours à l'Écoute",
         "tagline": "Une bonne question transforme une réponse en vraie conversation.",
-        "comment": "Quand quelqu'un raconte sa journée dans un post, tu ne peux pas t'empêcher de demander la suite. Un petit détail t'intrigue et tu veux le reste du fil. C'est souvent pour ça qu'un MP rapide avec toi finit par durer."
+        "comment": "Quand quelqu'un raconte sa journée dans un post, tu ne peux pas t'empêcher de demander la suite. Un petit détail t'intrigue et tu veux le reste du fil. C'est souvent pour ça qu'un MP rapide avec toi finit par durer.",
+        "stalk_tagline": "Une bonne question de sa part transforme une réponse en vraie conversation.",
+        "stalk_comment": "Quand quelqu'un raconte sa journée dans un post, ce compte ne peut pas s'empêcher de demander la suite. Un petit détail l'intrigue et il veut le reste du fil. C'est souvent pour ça qu'un MP rapide avec lui finit par durer."
       },
       "de": {
         "nickname": "Ganz Ohr",
         "tagline": "Eine gute Frage macht aus einer Antwort ein echtes Gespräch.",
-        "comment": "Wenn jemand in einem Post von seinem Tag erzählt, musst du einfach fragen, wie es weiterging. Ein kleines Detail macht dich neugierig, und du willst den Rest des Threads. Deshalb wird aus einer kurzen DM mit dir oft eine lange."
+        "comment": "Wenn jemand in einem Post von seinem Tag erzählt, musst du einfach fragen, wie es weiterging. Ein kleines Detail macht dich neugierig, und du willst den Rest des Threads. Deshalb wird aus einer kurzen DM mit dir oft eine lange.",
+        "stalk_tagline": "Eine gute Frage von ihm macht aus einer Antwort ein echtes Gespräch.",
+        "stalk_comment": "Wenn jemand in einem Post von seinem Tag erzählt, muss dieser Account einfach fragen, wie es weiterging. Ein kleines Detail macht ihn neugierig, und er will den Rest des Threads. Deshalb wird aus einer kurzen DM mit ihm oft eine lange."
       },
       "it": {
         "nickname": "Sempre Tutt'Orecchi",
         "tagline": "Una buona domanda trasforma una risposta in una vera conversazione.",
-        "comment": "Quando qualcuno racconta la sua giornata in un post, non resisti a chiedere come è andata a finire. Un piccolo dettaglio ti incuriosisce e vuoi il resto del thread. Per questo un DM veloce con te di solito diventa lungo."
+        "comment": "Quando qualcuno racconta la sua giornata in un post, non resisti a chiedere come è andata a finire. Un piccolo dettaglio ti incuriosisce e vuoi il resto del thread. Per questo un DM veloce con te di solito diventa lungo.",
+        "stalk_tagline": "Una sua buona domanda trasforma una risposta in una vera conversazione.",
+        "stalk_comment": "Quando qualcuno racconta la sua giornata in un post, questo account non resiste a chiedere come è andata a finire. Un piccolo dettaglio lo incuriosisce e vuole il resto del thread. Per questo un DM veloce con questo account di solito diventa lungo."
       },
       "ja": {
         "nickname": "聞き上手",
         "tagline": "いい質問ひとつで、リプを本当の会話に変えていく。",
-        "comment": "誰かがその日の出来事をポストすると、その後どうなったのか聞かずにはいられない。小さなディテールが気になって、スレッドの続きが読みたくなる。だから、あなたとの短いメッセージのやりとりは、たいてい長くなる。"
+        "comment": "誰かがその日の出来事をポストすると、その後どうなったのか聞かずにはいられない。小さなディテールが気になって、スレッドの続きが読みたくなる。だから、あなたとの短いメッセージのやりとりは、たいてい長くなる。",
+        "stalk_tagline": "いい質問ひとつで、この人はリプを本当の会話に変えていく。",
+        "stalk_comment": "誰かがその日の出来事をポストすると、その後どうなったのか聞かずにはいられないタイプだ。小さなディテールが気になって、スレッドの続きを読みたくなる。だから、このアカウントとの短いメッセージのやりとりは、たいてい長くなる。"
       },
       "ko": {
         "nickname": "잘 듣는 사람",
         "tagline": "좋은 질문 하나로 답글을 진짜 대화로 바꿔요.",
-        "comment": "누군가 하루 이야기를 게시물로 올리면 그다음에 어떻게 됐는지 묻지 않고는 못 배겨요. 작은 디테일이 궁금해져서 스레드의 다음 이야기가 읽고 싶어지죠. 그래서 당신과의 짧은 메시지는 대개 길어져요."
+        "comment": "누군가 하루 이야기를 게시물로 올리면 그다음에 어떻게 됐는지 묻지 않고는 못 배겨요. 작은 디테일이 궁금해져서 스레드의 다음 이야기가 읽고 싶어지죠. 그래서 당신과의 짧은 메시지는 대개 길어져요.",
+        "stalk_tagline": "좋은 질문 하나로 이 사람은 답글을 진짜 대화로 바꿔요.",
+        "stalk_comment": "누군가 하루 이야기를 게시물로 올리면 그다음에 어떻게 됐는지 묻지 않고는 못 배기는 타입이에요. 작은 디테일이 궁금해져서 스레드의 다음 이야기를 읽고 싶어 하죠. 그래서 이 계정과의 짧은 메시지는 대개 길어져요."
       },
       "zh": {
         "nickname": "很會聽人說話",
         "tagline": "一個好問題，就能把回覆變成真正的對話。",
-        "comment": "有人發文說起今天發生的事，你總忍不住問接下來怎麼了。一個小細節就讓你好奇，想看整串的後續。所以跟你的私訊，通常一聊就停不下來。"
+        "comment": "有人發文說起今天發生的事，你總忍不住問接下來怎麼了。一個小細節就讓你好奇，想看整串的後續。所以跟你的私訊，通常一聊就停不下來。",
+        "stalk_tagline": "一個好問題，這個人就能把回覆變成真正的對話。",
+        "stalk_comment": "有人發文說起今天發生的事，這個帳號總忍不住問接下來怎麼了。一個小細節就讓人好奇，想看整串的後續。所以跟這個帳號的私訊，通常一聊就停不下來。"
       },
       "ru": {
         "nickname": "Умеет слушать",
         "tagline": "Один хороший вопрос превращает ответ в настоящий разговор.",
-        "comment": "Когда кто-то пишет пост о своём дне, ты не можешь не спросить, что было дальше. Маленькая деталь цепляет, и тебе хочется прочитать продолжение треда. Поэтому короткая переписка в личке с тобой обычно затягивается."
+        "comment": "Когда кто-то пишет пост о своём дне, ты не можешь не спросить, что было дальше. Маленькая деталь цепляет, и тебе хочется прочитать продолжение треда. Поэтому короткая переписка в личке с тобой обычно затягивается.",
+        "stalk_tagline": "Один его хороший вопрос превращает ответ в настоящий разговор.",
+        "stalk_comment": "Когда кто-то пишет пост о своём дне, этот аккаунт не может не спросить, что было дальше. Маленькая деталь цепляет, и ему хочется прочитать продолжение треда. Поэтому короткая переписка в личке с ним обычно затягивается."
       }
     }
   },
@@ -1725,62 +1989,86 @@ var FUN_PERSONAS = [
       "tr": {
         "nickname": "Nüktedan Anlatıcı",
         "tagline": "Bir olayı anlatış biçimin de thread'in bir parçası.",
-        "comment": "Sıradan bir olayı thread'e dökerken en komik ayrıntıyı son post'a saklıyorsun. Aynı hikâyeyi başkası yazsa senin seçtiğin kelimeler eksik kalırmış gibi geliyor. En güzel kısmı, en iyi cümlenin reply'larda alıntılandığını görmek."
+        "comment": "Sıradan bir olayı thread'e dökerken en komik ayrıntıyı son post'a saklıyorsun. Aynı hikâyeyi başkası yazsa senin seçtiğin kelimeler eksik kalırmış gibi geliyor. En güzel kısmı, en iyi cümlenin reply'larda alıntılandığını görmek.",
+        "stalk_tagline": "Bir olayı anlatış biçimi de thread'in bir parçası.",
+        "stalk_comment": "Sıradan bir olayı thread'e dökerken en komik ayrıntıyı son post'a saklıyor. Aynı hikâyeyi başkası yazsa onun seçtiği kelimeler eksik kalırmış gibi geliyor. En güzel kısmı, en iyi cümlesinin reply'larda alıntılandığını görmek."
       },
       "en": {
         "nickname": "Way with Words",
         "tagline": "You know which detail makes the thread.",
-        "comment": "When you turn a small mishap into a thread, you save the funniest detail for the last post. The same story told by anyone else would miss your exact wording. Half the fun is seeing your best line quoted back in the replies."
+        "comment": "When you turn a small mishap into a thread, you save the funniest detail for the last post. The same story told by anyone else would miss your exact wording. Half the fun is seeing your best line quoted back in the replies.",
+        "stalk_tagline": "They know which detail makes the thread.",
+        "stalk_comment": "When they turn a small mishap into a thread, they save the funniest detail for the last post. The same story told by anyone else would miss their exact wording. Half the fun for them is seeing their best line quoted back in the replies."
       },
       "es": {
         "nickname": "Narrador Nato",
         "tagline": "Sabes qué detalle hace funcionar un hilo.",
-        "comment": "Cuando conviertes un pequeño desastre en un hilo, guardas el detalle más gracioso para la última publicación. La misma historia contada por otra persona perdería tus palabras exactas. La mitad de la gracia es ver tu mejor frase citada en las respuestas."
+        "comment": "Cuando conviertes un pequeño desastre en un hilo, guardas el detalle más gracioso para la última publicación. La misma historia contada por otra persona perdería tus palabras exactas. La mitad de la gracia es ver tu mejor frase citada en las respuestas.",
+        "stalk_tagline": "Sabe qué detalle hace funcionar un hilo.",
+        "stalk_comment": "Cuando convierte un pequeño desastre en un hilo, guarda el detalle más gracioso para la última publicación. La misma historia contada por otra persona perdería sus palabras exactas. La mitad de la gracia es ver su mejor frase citada en las respuestas."
       },
       "pt": {
         "nickname": "Bom de Papo",
         "tagline": "Você sabe qual detalhe faz uma thread funcionar.",
-        "comment": "Quando você transforma um pequeno perrengue numa thread, guarda o detalhe mais engraçado para o último post. A mesma história contada por outra pessoa perderia as suas palavras exatas. Metade da graça é ver sua melhor frase citada nas respostas."
+        "comment": "Quando você transforma um pequeno perrengue numa thread, guarda o detalhe mais engraçado para o último post. A mesma história contada por outra pessoa perderia as suas palavras exatas. Metade da graça é ver sua melhor frase citada nas respostas.",
+        "stalk_tagline": "Essa conta sabe qual detalhe faz uma thread funcionar.",
+        "stalk_comment": "Quando transforma um pequeno perrengue numa thread, guarda o detalhe mais engraçado para o último post. A mesma história contada por outra pessoa perderia as palavras exatas dessa conta. Metade da graça é ver a melhor frase dela citada nas respostas."
       },
       "ar": {
         "nickname": "يجيد رواية القصص",
         "tagline": "تعرف أي تفصيلة تصنع السلسلة.",
-        "comment": "حين تحوّل موقفًا صغيرًا إلى سلسلة، تحتفظ بأطرف تفصيلة للمنشور الأخير. القصة نفسها لو كتبها غيرك لفقدت كلماتك الدقيقة. نصف المتعة أن ترى أفضل جملة لك مقتبسة في الردود."
+        "comment": "حين تحوّل موقفًا صغيرًا إلى سلسلة، تحتفظ بأطرف تفصيلة للمنشور الأخير. القصة نفسها لو كتبها غيرك لفقدت كلماتك الدقيقة. نصف المتعة أن ترى أفضل جملة لك مقتبسة في الردود.",
+        "stalk_tagline": "يعرف هذا الحساب أي تفصيلة تصنع السلسلة.",
+        "stalk_comment": "حين يحوّل موقفًا صغيرًا إلى سلسلة، يحتفظ بأطرف تفصيلة للمنشور الأخير. القصة نفسها لو كتبها غيره لفقدت كلماته الدقيقة. نصف المتعة عنده أن يرى أفضل جملة له مقتبسة في الردود."
       },
       "fr": {
         "nickname": "Sens de la Formule",
         "tagline": "Tu sais quel détail fait tenir un fil.",
-        "comment": "Quand tu transformes une petite mésaventure en fil, tu gardes le détail le plus drôle pour le dernier post. La même histoire racontée par quelqu'un d'autre perdrait tes mots exacts. La moitié du plaisir, c'est de voir ta meilleure phrase citée dans les réponses."
+        "comment": "Quand tu transformes une petite mésaventure en fil, tu gardes le détail le plus drôle pour le dernier post. La même histoire racontée par quelqu'un d'autre perdrait tes mots exacts. La moitié du plaisir, c'est de voir ta meilleure phrase citée dans les réponses.",
+        "stalk_tagline": "Il sait quel détail fait tenir un fil.",
+        "stalk_comment": "Quand il transforme une petite mésaventure en fil, il garde le détail le plus drôle pour le dernier post. La même histoire racontée par quelqu'un d'autre perdrait ses mots exacts. La moitié du plaisir, c'est de voir sa meilleure phrase citée dans les réponses."
       },
       "de": {
         "nickname": "Erzählt mit Pointe",
         "tagline": "Du weißt, welches Detail einen Thread trägt.",
-        "comment": "Wenn du ein kleines Missgeschick in einen Thread verwandelst, hebst du das lustigste Detail für den letzten Post auf. Dieselbe Geschichte, von jemand anderem erzählt, hätte nicht deine genauen Worte. Die halbe Freude ist, deinen besten Satz später in den Antworten zitiert zu sehen."
+        "comment": "Wenn du ein kleines Missgeschick in einen Thread verwandelst, hebst du das lustigste Detail für den letzten Post auf. Dieselbe Geschichte, von jemand anderem erzählt, hätte nicht deine genauen Worte. Die halbe Freude ist, deinen besten Satz später in den Antworten zitiert zu sehen.",
+        "stalk_tagline": "Er weiß, welches Detail einen Thread trägt.",
+        "stalk_comment": "Wenn er ein kleines Missgeschick in einen Thread verwandelt, hebt er das lustigste Detail für den letzten Post auf. Dieselbe Geschichte, von jemand anderem erzählt, hätte nicht seine genauen Worte. Die halbe Freude ist, seinen besten Satz später in den Antworten zitiert zu sehen."
       },
       "it": {
         "nickname": "Sa Raccontarla",
         "tagline": "Sai quale dettaglio fa funzionare un thread.",
-        "comment": "Quando trasformi un piccolo disastro in un thread, tieni il dettaglio più divertente per l'ultimo post. La stessa storia raccontata da qualcun altro perderebbe le tue parole esatte. Metà del divertimento è vedere la tua frase migliore citata nelle risposte."
+        "comment": "Quando trasformi un piccolo disastro in un thread, tieni il dettaglio più divertente per l'ultimo post. La stessa storia raccontata da qualcun altro perderebbe le tue parole esatte. Metà del divertimento è vedere la tua frase migliore citata nelle risposte.",
+        "stalk_tagline": "Sa quale dettaglio fa funzionare un thread.",
+        "stalk_comment": "Quando trasforma un piccolo disastro in un thread, tiene il dettaglio più divertente per l'ultimo post. La stessa storia raccontata da qualcun altro perderebbe le sue parole esatte. Metà del divertimento è vedere la sua frase migliore citata nelle risposte."
       },
       "ja": {
         "nickname": "オチ担当",
         "tagline": "どの一文がスレッドを面白くするか、ちゃんとわかっている。",
-        "comment": "ちょっとした失敗談をスレッドにするとき、いちばん笑えるところは最後のポストまで取っておく。同じ話を別の人が書いたら、あなたの言葉選びが足りなく感じるはずだ。自分の決めゼリフがリプで引用されているのを見るのが、楽しみの半分だ。"
+        "comment": "ちょっとした失敗談をスレッドにするとき、いちばん笑えるところは最後のポストまで取っておく。同じ話を別の人が書いたら、あなたの言葉選びが足りなく感じるはずだ。自分の決めゼリフがリプで引用されているのを見るのが、楽しみの半分だ。",
+        "stalk_tagline": "どの一文がスレッドを面白くするか、この人はちゃんとわかっている。",
+        "stalk_comment": "ちょっとした失敗談をスレッドにするとき、いちばん笑えるところは最後のポストまで取っておく。同じ話を別の人が書いたら、この人の言葉選びが足りなく感じるはずだ。自分の決めゼリフがリプで引用されているのを見るのが、楽しみの半分らしい。"
       },
       "ko": {
         "nickname": "이야기꾼",
         "tagline": "어떤 한 줄이 스레드를 살리는지 정확히 알아요.",
-        "comment": "작은 실수담을 스레드로 풀 때 가장 웃긴 부분은 마지막 게시물까지 아껴 둬요. 같은 이야기를 다른 사람이 쓰면 당신의 단어 선택이 빠진 것처럼 느껴질 거예요. 나중에 당신의 명대사가 답글에서 인용되는 걸 보는 게 즐거움의 절반이에요."
+        "comment": "작은 실수담을 스레드로 풀 때 가장 웃긴 부분은 마지막 게시물까지 아껴 둬요. 같은 이야기를 다른 사람이 쓰면 당신의 단어 선택이 빠진 것처럼 느껴질 거예요. 나중에 당신의 명대사가 답글에서 인용되는 걸 보는 게 즐거움의 절반이에요.",
+        "stalk_tagline": "어떤 한 줄이 스레드를 살리는지 이 사람은 정확히 알아요.",
+        "stalk_comment": "작은 실수담을 스레드로 풀 때 가장 웃긴 부분은 마지막 게시물까지 아껴 두는 사람이에요. 같은 이야기를 다른 사람이 쓰면 이 사람의 단어 선택이 빠진 것처럼 느껴질 거예요. 자기 명대사가 답글에서 인용되는 걸 보는 게 즐거움의 절반이래요."
       },
       "zh": {
         "nickname": "很會說故事",
         "tagline": "哪一句能讓整串變好笑，你抓得很準。",
-        "comment": "把一件小糗事寫成串文時，你會把最好笑的細節留到最後一則。同樣的故事換別人來寫，就少了你挑的那些字。看到你的那句經典台詞在留言裡被引用，就是一半的樂趣。"
+        "comment": "把一件小糗事寫成串文時，你會把最好笑的細節留到最後一則。同樣的故事換別人來寫，就少了你挑的那些字。看到你的那句經典台詞在留言裡被引用，就是一半的樂趣。",
+        "stalk_tagline": "哪一句能讓整串變好笑，這個人抓得很準。",
+        "stalk_comment": "把一件小糗事寫成串文時，會把最好笑的細節留到最後一則。同樣的故事換別人來寫，就少了這個人挑的那些字。看到自己的經典台詞在留言裡被引用，就是一半的樂趣。"
       },
       "ru": {
         "nickname": "Хороший рассказчик",
         "tagline": "Ты точно знаешь, какая деталь делает тред смешным.",
-        "comment": "Превращая мелкую неудачу в тред, ты приберегаешь самую смешную деталь для последнего поста. Та же история от кого-то другого лишилась бы твоих точных слов. Половина удовольствия — увидеть свою лучшую фразу процитированной в ответах."
+        "comment": "Превращая мелкую неудачу в тред, ты приберегаешь самую смешную деталь для последнего поста. Та же история от кого-то другого лишилась бы твоих точных слов. Половина удовольствия — увидеть свою лучшую фразу процитированной в ответах.",
+        "stalk_tagline": "Он точно знает, какая деталь делает тред смешным.",
+        "stalk_comment": "Превращая мелкую неудачу в тред, он приберегает самую смешную деталь для последнего поста. Та же история от кого-то другого лишилась бы его точных слов. Половина удовольствия — увидеть свою лучшую фразу процитированной в ответах."
       }
     }
   }
@@ -1788,17 +2076,26 @@ var FUN_PERSONAS = [
 
 // Compatibility view for the existing result/card contract.
 var FUN_CARD_POOL = FUN_PERSONAS.map(function(persona) {
-  var card = { id:persona.id, emoji:persona.emoji, color:persona.color, nickname:{}, desc:{}, comments:{} };
+  // Mirror copy addresses the user ("you"); Stalk copy describes someone else's account from the outside.
+  var card = { id:persona.id, emoji:persona.emoji, color:persona.color, nickname:{}, desc:{}, comments:{}, stalkDesc:{}, stalkComments:{} };
   Object.keys(persona.locales).forEach(function(lang) {
     card.nickname[lang]=persona.locales[lang].nickname;
     card.desc[lang]=persona.locales[lang].tagline;
     card.comments[lang]=persona.locales[lang].comment;
+    card.stalkDesc[lang]=persona.locales[lang].stalk_tagline;
+    card.stalkComments[lang]=persona.locales[lang].stalk_comment;
   });
   return card;
 });
 
 function funModeComment(card, mode, lang) {
+  if (mode === "stalk" && card.stalkComments && card.stalkComments[lang]) return card.stalkComments[lang];
   return card.comments[lang] || "";
+}
+
+function funModeTagline(card, mode, lang) {
+  if (mode === "stalk" && card.stalkDesc && card.stalkDesc[lang]) return card.stalkDesc[lang];
+  return card.desc[lang] || "";
 }
 
 function funIdentityPersona(res) {
@@ -1824,6 +2121,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var nonce = Number(rerollNonce || 0);
   var seed = xhash("fun•" + actualMode + "•" + handle + "•" + nonce);
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
+  var desc = actualMode === "stalk" ? card.stalkDesc : card.desc;
   var comment = {
     mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de"), it: funModeComment(card, "mirror", "it"), ja: funModeComment(card, "mirror", "ja"), ko: funModeComment(card, "mirror", "ko"), zh: funModeComment(card, "mirror", "zh"), ru: funModeComment(card, "mirror", "ru") },
     stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de"), it: funModeComment(card, "stalk", "it"), ja: funModeComment(card, "stalk", "ja"), ko: funModeComment(card, "stalk", "ko"), zh: funModeComment(card, "stalk", "zh"), ru: funModeComment(card, "stalk", "ru") }
@@ -1836,11 +2134,11 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     source: "fun",
     persona_id: card.id,
     nickname: card.nickname,
-    tagline: card.desc,
+    tagline: desc,
     profile_emoji: card.emoji,
     comment: comment,
-    card: { persona_id: card.id, nickname: card.nickname, desc: card.desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: card.desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it], ja:[comment[actualMode].ja], ko:[comment[actualMode].ko], zh:[comment[actualMode].zh], ru:[comment[actualMode].ru] } },
+    card: { persona_id: card.id, nickname: card.nickname, desc: desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it], ja:[comment[actualMode].ja], ko:[comment[actualMode].ko], zh:[comment[actualMode].zh], ru:[comment[actualMode].ru] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };

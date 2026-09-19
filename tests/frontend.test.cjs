@@ -329,8 +329,9 @@ test('static FUN personas keep TR/EN/ES/PT/AR/FR/DE/IT/JA copy and are untouched
    assert.equal(c.realCopyForActiveLang(fun),fun,'FUN results are passed through unchanged');
    const copy=c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[lang];
    const html=c.buildIdentityCard(fun);
-   assert.ok(html.includes(c.esc(copy.nickname)) && html.includes(c.esc(copy.tagline)) && html.includes(c.esc(copy.comment)),lang+' '+fun.persona_id);
-   for(const other of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'].filter(l=>l!==lang)) assert.ok(!html.includes(c.esc(c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[other].comment)));
+   const stalk=fun.mode==='stalk';
+   assert.ok(html.includes(c.esc(copy.nickname)) && html.includes(c.esc(stalk?copy.stalk_tagline:copy.tagline)) && html.includes(c.esc(stalk?copy.stalk_comment:copy.comment)),lang+' '+fun.mode+' '+fun.persona_id);
+   for(const other of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'].filter(l=>l!==lang)){const o=c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[other];assert.ok(!html.includes(c.esc(o.comment))&&!html.includes(c.esc(o.stalk_comment)));}
   }
   const m=c.matchFunHandles('alice','bob',3);
   assert.equal(c.realCopyForActiveLang(m),m);
@@ -826,5 +827,58 @@ test('FUN Match shows one big FUN percentage labelled as a XORA FUN score; REAL 
   assert.ok(c.buildMatchCard(real).includes(c.esc(c.I18N[lang].match_overall)),lang+' REAL Match keeps match_overall');
   const png=recorder(c);c.renderMatchPNG(real);
   assert.ok(png.text.some(p=>p.v===c.I18N[lang].match_overall),lang+' REAL PNG keeps match_overall');assert.equal(png.text.filter(p=>p.y===780||p.y===812).length,2);
+ }
+});
+
+// ---------------------------------------------------------------------------------------------
+// FUN Mirror speaks to the user; FUN Stalk describes someone else's account from the outside.
+const STALK_SECOND_PERSON={tr:new RegExp("(?<!\\p{L})(?:sen|sana|seni|senin|sende|senden|seninle|kendin)(?!\\p{L})|yorsun|(?:abil|ebil)irsin|(?<!\\p{L})(?!herkesin(?!\\p{L}))\\p{L}+(?:sın|sin|sun|sün)(?!\\p{L})","iu"),en:new RegExp("(?<!\\p{L})(?:you|your|yours|yourself)(?!\\p{L})","iu"),es:new RegExp("(?<!\\p{L})(?:tú|tu|tus|te|ti|contigo|vos)(?!\\p{L})","iu"),pt:new RegExp("(?<!\\p{L})(?:você|vocês|te|ti|contigo|teu|tua|teus|tuas)(?!\\p{L})","iu"),ar:new RegExp("(?<!\\p{L})(?:أنت|أنتِ|لك|عندك|معك|بك|منك|إليك|عليك|نفسك|خطك|يومك|حسابك|رصيدك|منشورك|منشوراتك|ردك|ردودك|جملك|جملتك|كلماتك|تفاعلك|بطاقتك|رسالتك|انتباهك|يزعجك|يهمك|يسعدك|يعجبك)(?!\\p{L})","u"),fr:new RegExp("(?<!\\p{L})(?:tu|te|toi|ton|ta|tes)(?!\\p{L})|(?<!\\p{L})t['’]","iu"),de:new RegExp("(?<!\\p{L})(?:du|dich|dir|dein|deine|deinen|deinem|deiner|deines)(?!\\p{L})","iu"),it:new RegExp("(?<!\\p{L})(?:tu|ti|te|tuo|tua|tuoi|tue)(?!\\p{L})","iu"),ja:new RegExp("あなた|君|きみ|お前","u"),ko:new RegExp("당신|(?<!\\p{L})너(?:는|의|를|랑|한테|에게)(?!\\p{L})|(?<!\\p{L})네가(?!\\p{L})","u"),zh:new RegExp("你|妳|您","u"),ru:new RegExp("(?<!\\p{L})(?:ты|тебя|тебе|тобой|твой|твоя|твоё|твое|твои|твоего|твоей|твоих|твоим|твоими|твою)(?!\\p{L})|(?<!\\p{L})(?!лишь(?!\\p{L}))\\p{L}+(?:ешь|ёшь|ишь)(?:ся)?(?!\\p{L})","iu")};
+const MIRROR_SECOND_PERSON={tr:new RegExp("(?<!\\p{L})(?:sen|sana|seni|senin|sende|senden|seninle|kendin)(?!\\p{L})|yorsun|(?:abil|ebil)irsin|(?<!\\p{L})(?!herkesin(?!\\p{L}))\\p{L}+(?:sın|sin|sun|sün)(?!\\p{L})","iu"),en:new RegExp("(?<!\\p{L})(?:you|your|yours|yourself)(?!\\p{L})","iu"),es:new RegExp("(?<!\\p{L})(?:tú|tu|tus|te|ti|contigo|vos)(?!\\p{L})|(?<!\\p{L})\\p{L}{2,}(?:as|es)(?!\\p{L})","iu"),pt:new RegExp("(?<!\\p{L})(?:você|vocês|te|ti|contigo|teu|tua|teus|tuas)(?!\\p{L})","iu"),ar:new RegExp("(?<!\\p{L})(?:أنت|أنتِ|لك|عندك|معك|بك|منك|إليك|عليك|نفسك|خطك|يومك|حسابك|رصيدك|منشورك|منشوراتك|ردك|ردودك|جملك|جملتك|كلماتك|تفاعلك|بطاقتك|رسالتك|انتباهك|يزعجك|يهمك|يسعدك|يعجبك)(?!\\p{L})|(?<!\\p{L})ت\\p{L}{2,}","u"),fr:new RegExp("(?<!\\p{L})(?:tu|te|toi|ton|ta|tes)(?!\\p{L})|(?<!\\p{L})t['’]","iu"),de:new RegExp("(?<!\\p{L})(?:du|dich|dir|dein|deine|deinen|deinem|deiner|deines)(?!\\p{L})","iu"),it:new RegExp("(?<!\\p{L})(?:tu|ti|te|tuo|tua|tuoi|tue)(?!\\p{L})|(?<!\\p{L})(?:sai|noti|scegli|aggiungi|cancelli|cambi|rimetti|conosci|pubblichi|lasci|scrivi|inizi|finisci|ritocchi|provi|lanci|trasformi|tieni|resisti|vuoi|senti|leggi|scorri|fai|spieghi)(?!\\p{L})","iu"),ja:new RegExp("あなた|君|きみ|お前","u"),ko:new RegExp("당신|(?<!\\p{L})너(?:는|의|를|랑|한테|에게)(?!\\p{L})|(?<!\\p{L})네가(?!\\p{L})","u"),zh:new RegExp("你|妳|您","u"),ru:new RegExp("(?<!\\p{L})(?:ты|тебя|тебе|тобой|твой|твоя|твоё|твое|твои|твоего|твоей|твоих|твоим|твоими|твою)(?!\\p{L})|(?<!\\p{L})(?!лишь(?!\\p{L}))\\p{L}+(?:ешь|ёшь|ишь)(?:ся)?(?!\\p{L})","iu")};
+const STALK_THIRD_PERSON={tr:new RegExp("\\p{L}yor(?!\\p{L})|(?<!\\p{L})(?:onun|ona|onda|onunla|o)(?!\\p{L})","iu"),en:new RegExp("(?<!\\p{L})(?:they|their|them|this account)(?!\\p{L})","iu"),es:new RegExp("(?<!\\p{L})(?:le|les|su|sus|suyo|suya|esta cuenta|la cuenta)(?!\\p{L})","iu"),pt:new RegExp("(?<!\\p{L})(?:essa conta|dessa conta|nessa conta|a conta|ela|dela)(?!\\p{L})","iu"),ar:new RegExp("هذا الحساب|(?<!\\p{L})ي\\p{L}{2,}","u"),fr:new RegExp("(?<!\\p{L})(?:il|lui|son|sa|ses|ce compte)(?!\\p{L})","iu"),de:new RegExp("(?<!\\p{L})(?:er|ihm|ihn|sein|seine|seinen|seinem|seiner|dieser account|diesem account|dieses profil)(?!\\p{L})","iu"),it:new RegExp("(?<!\\p{L})(?:questo account|l'account|gli|suo|sua|suoi|sue|lo)(?!\\p{L})","iu"),ja:new RegExp("このアカウント|この人|タイプだ|人だ","u"),ko:new RegExp("이 계정|이 사람|타입이에요|사람이에요","u"),zh:new RegExp("這個帳號|這個人","u"),ru:new RegExp("(?<!\\p{L})(?:он|его|ему|им|этот аккаунт|этого аккаунта|у этого аккаунта)(?!\\p{L})","iu")};
+test('FUN Mirror copy is second person and FUN Stalk copy is third person in all 12 locales, both X-native',()=>{
+ const c=browser();
+ // The patterns are live: they separate the two viewpoints on real words.
+ for(const [lang,second,third] of [['tr','yazıyorsun','yazıyor'],['en','your','their'],['de','dein','sein'],['ru','пишешь','пишет'],['zh','你','這個人'],['ja','あなた','この人']]){
+  assert.ok(STALK_SECOND_PERSON[lang].test(second)&&!STALK_SECOND_PERSON[lang].test(third),lang+' pattern');
+ }
+ for(const p of c.FUN_PERSONAS)for(const lang of LOCALES12){
+  const copy=p.locales[lang],where=lang+' '+p.id;
+  const mirror=copy.tagline+' '+copy.comment,stalk=copy.stalk_tagline+' '+copy.stalk_comment;
+  assert.ok(copy.stalk_tagline&&copy.stalk_comment,where+' has Stalk copy');
+  assert.notEqual(copy.stalk_comment,copy.comment,where);assert.notEqual(copy.stalk_tagline,copy.tagline,where);
+  const address=stalk.match(STALK_SECOND_PERSON[lang]);
+  assert.equal(address,null,where+' Stalk addresses the reader: '+(address&&address[0]));
+  assert.match(stalk,STALK_THIRD_PERSON[lang],where+' Stalk describes the account from the outside');
+  // Japanese and Korean drop the pronoun naturally, so Mirror is only checked where the language marks it.
+  if(lang!=='ja'&&lang!=='ko') assert.match(mirror,MIRROR_SECOND_PERSON[lang],where+' Mirror speaks to the user');
+  for(const text of [mirror,stalk]){
+   const off=text.match(FUN_OFFLINE[lang]);assert.equal(off,null,where+' offline context: '+(off&&off[0]));
+   assert.doesNotMatch(text,FUN_CLAIM[lang],where+' claims an analysis');
+  }
+  assert.ok((copy.stalk_comment.match(lang==='ja'||lang==='zh'?/[^。！？]+[。！？]/g:/[^.!?]+[.!?]/g)||[]).length>=2,where+' Stalk comment has 2-4 sentences');
+ }
+});
+test('Stalk cards show the Stalk copy and Mirror cards the Mirror copy, in HTML and PNG',()=>{
+ for(const lang of LOCALES12){
+  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
+  const seen={mirror:new Map(),stalk:new Map()};
+  for(const mode of ['mirror','stalk'])for(let n=0;n<1000&&seen[mode].size<12;n++){const r=c.analyzeFunHandle('alice',mode,n);seen[mode].set(r.persona_id,r);}
+  for(const mode of ['mirror','stalk'])for(const [id,r] of seen[mode]){
+   const copy=c.FUN_PERSONAS.find(p=>p.id===id).locales[lang];
+   const want=mode==='stalk'?[copy.stalk_tagline,copy.stalk_comment]:[copy.tagline,copy.comment];
+   const avoid=mode==='stalk'?[copy.tagline,copy.comment]:[copy.stalk_tagline,copy.stalk_comment];
+   const html=c.buildIdentityCard(r);
+   // Compare the rendered elements exactly: in Korean a Stalk line can contain the Mirror line plus "이 계정은".
+   const shown=[html.match(/<p class="idcard-desc">([^<]*)<\/p>/)[1],html.match(/<div class="idcard-quote fun-quote"><p>([^<]*)<\/p>/)[1]];
+   assert.deepEqual(shown,want.map(t=>c.esc(t)),lang+' '+mode+' '+id+' shows its own tagline and comment');
+   for(const t of avoid) assert.ok(!shown.includes(c.esc(t)),lang+' '+mode+' '+id+' does not show the other mode');
+   assert.equal(c.funIdentityComment(r,lang),want[1]);
+   const {text}=recorder(c);c.renderIdentityPNG(r);
+   const drawn=text.filter(p=>p.x===500&&p.y>500&&p.y<1090).map(p=>p.v).join(lang==='ja'||lang==='zh'?'':' ');
+   assert.ok(drawn.includes(want[0])&&drawn.includes(want[1]),lang+' '+mode+' '+id+' PNG copy');
+   assert.equal(r.nickname[lang],copy.nickname,'nickname and persona selection unchanged');
+  }
+  // Persona selection is the same seed logic for both modes; only the presentation differs.
+  assert.equal(c.analyzeFunHandle('bob','stalk',4).persona_id,c.FUN_CARD_POOL[c.xhash('fun•stalk•bob•4')%12].id);
  }
 });
