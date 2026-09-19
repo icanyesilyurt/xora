@@ -23,7 +23,7 @@ var CREDIT_PACKAGES = [
   { id: "starter", credits: 10, list: 4.99, price: 2.99, label: "pkg_starter" },
   { id: "popular", credits: 20, list: 9.99, price: 5.99, label: "pkg_popular", featured: true },
   { id: "value", credits: 50, list: 24.99, price: 14.99, label: "pkg_value" },
-  { id: "pro", credits: 300, list: 149.99, price: 89.99, label: "pkg_pro", note: "pkg_pro_note" }
+  { id: "professional", credits: 300, list: 149.99, price: 89.99, label: "pkg_pro", note: "pkg_pro_note" }
 ];
 var FREE_CREDITS = 0;
 var xoraSupabase = null;
@@ -931,7 +931,7 @@ var I18N = {
     credits_sub: "Fun bedava. Real analiz ise X verisini gerçekten okuduğu için kredi kullanır.",
     credits_balance: "Bakiyen",
     credits_buy: "Satın Al",
-    credits_note: "Ödeme iyzico ile bağlanacak. Bu sürümde satın alma butonları test amaçlı pasiftir.",
+    credits_note: "Ödemeler iyzico'nun güvenli ödeme sayfasında alınır; kart bilgilerin XORA'ya ulaşmaz.",
     trait_humor: "Mizah",
     trait_reply: "Reply enerjisi",
     trait_timeline: "Timeline modu",
@@ -971,7 +971,13 @@ var I18N = {
     pkg_capacity: "{ms} Mirror/Stalk • {mt} Match",
     pkg_regular: "Normal fiyat",
     toast_loaded: "kredi yüklendi ⚡",
-    payment_soon: "iyzico bağlantısını bir sonraki adımda açıyoruz.",
+    pay_opening: "Güvenli ödeme sayfası açılıyor…",
+    pay_success: "{n} kredi eklendi",
+    pay_failed: "Ödeme tamamlanmadı. Bakiyen değişmedi.",
+    pay_pending: "Ödemen doğrulanıyor. Birkaç saniye sonra bakiyeni yeniden kontrol et.",
+    pay_login_required: "Kredi almak için giriş yap.",
+    pay_unavailable: "Ödeme şu anda başlatılamadı. Biraz sonra tekrar dene.",
+    pay_sandbox: "Test modu: gerçek ücret alınmaz.",
     real_err_credit: "Kredin bu analiz için yetmiyor.",
     real_err_protected: "Bu hesap korumalı; XORA kapıyı kıramıyor.",
     real_err_not_found: "Bu X hesabını bulamadım.",
@@ -1124,7 +1130,7 @@ var I18N = {
     credits_sub: "Fun is free. Real uses credits because it actually reads X data.",
     credits_balance: "Your balance",
     credits_buy: "Buy",
-    credits_note: "Payments will be connected through iyzico. Purchase buttons are disabled in this build.",
+    credits_note: "Payments are taken on iyzico's secure checkout page; your card details never reach XORA.",
     trait_humor: "Humor",
     trait_reply: "Reply energy",
     trait_timeline: "Timeline mode",
@@ -1164,7 +1170,13 @@ var I18N = {
     pkg_capacity: "{ms} Mirror/Stalk • {mt} Match",
     pkg_regular: "Regular price",
     toast_loaded: "credits loaded ⚡",
-    payment_soon: "We are connecting iyzico in the next step.",
+    pay_opening: "Opening secure checkout…",
+    pay_success: "{n} credits added",
+    pay_failed: "Payment was not completed. Your balance has not changed.",
+    pay_pending: "We're confirming your payment. Check your balance again in a few seconds.",
+    pay_login_required: "Sign in to buy credits.",
+    pay_unavailable: "Checkout couldn't be started right now. Please try again shortly.",
+    pay_sandbox: "Test mode: no real charge.",
     real_err_credit: "You do not have enough credits for this analysis.",
     real_err_protected: "That account is protected. Even XORA has boundaries.",
     real_err_not_found: "I could not find that X account.",
@@ -1324,7 +1336,7 @@ var I18N = {
     credits_sub: "Fun es gratis. Real usa créditos porque de verdad lee datos de X.",
     credits_balance: "Tu saldo",
     credits_buy: "Comprar",
-    credits_note: "Los pagos se conectarán a través de iyzico. Los botones de compra están desactivados en esta versión.",
+    credits_note: "Los pagos se hacen en la página de pago segura de iyzico; los datos de tu tarjeta nunca llegan a XORA.",
     trait_humor: "Humor",
     trait_reply: "Respuestas",
     trait_timeline: "Modo timeline",
@@ -1364,7 +1376,13 @@ var I18N = {
     pkg_capacity: "{ms} Mirror/Stalk • {mt} Match",
     pkg_regular: "Precio normal",
     toast_loaded: "créditos añadidos ⚡",
-    payment_soon: "Conectaremos iyzico en el siguiente paso.",
+    pay_opening: "Abriendo el pago seguro…",
+    pay_success: "{n} créditos añadidos",
+    pay_failed: "El pago no se completó. Tu saldo no ha cambiado.",
+    pay_pending: "Estamos confirmando tu pago. Vuelve a revisar tu saldo en unos segundos.",
+    pay_login_required: "Inicia sesión para comprar créditos.",
+    pay_unavailable: "No se pudo iniciar el pago ahora. Inténtalo de nuevo en un momento.",
+    pay_sandbox: "Modo de prueba: no se realiza ningún cargo real.",
     real_err_credit: "No tienes créditos suficientes para este análisis.",
     real_err_protected: "Esa cuenta es privada. Hasta XORA tiene límites.",
     real_err_not_found: "No encontré esa cuenta de X.",
@@ -1525,7 +1543,7 @@ var I18N = {
     credits_sub: "O Fun é grátis. O Real usa créditos porque lê de verdade os dados do X.",
     credits_balance: "Seu saldo",
     credits_buy: "Comprar",
-    credits_note: "Os pagamentos serão conectados pelo iyzico. Os botões de compra estão desativados nesta versão.",
+    credits_note: "Os pagamentos são feitos na página segura do iyzico; os dados do seu cartão nunca chegam à XORA.",
     trait_humor: "Humor",
     trait_reply: "Respostas",
     trait_timeline: "Modo timeline",
@@ -1565,7 +1583,13 @@ var I18N = {
     pkg_capacity: "{ms} Mirror/Stalk • {mt} Match",
     pkg_regular: "Preço normal",
     toast_loaded: "créditos adicionados ⚡",
-    payment_soon: "Vamos conectar o iyzico na próxima etapa.",
+    pay_opening: "Abrindo o pagamento seguro…",
+    pay_success: "{n} créditos adicionados",
+    pay_failed: "O pagamento não foi concluído. Seu saldo não mudou.",
+    pay_pending: "Estamos confirmando seu pagamento. Confira seu saldo de novo em alguns segundos.",
+    pay_login_required: "Entre para comprar créditos.",
+    pay_unavailable: "Não foi possível iniciar o pagamento agora. Tente de novo em instantes.",
+    pay_sandbox: "Modo de teste: nenhuma cobrança real.",
     real_err_credit: "Você não tem créditos suficientes para esta análise.",
     real_err_protected: "Essa conta é protegida. Até a XORA tem limites.",
     real_err_not_found: "Não encontrei essa conta do X.",
@@ -1718,7 +1742,7 @@ var I18N = {
     credits_sub: "Fun مجاني. أما Real فيستخدم الرصيد لأنه يقرأ بيانات X فعلًا.",
     credits_balance: "رصيدك",
     credits_buy: "شراء",
-    credits_note: "سيتم ربط الدفع عبر iyzico. أزرار الشراء معطلة في هذا الإصدار.",
+    credits_note: "تتم المدفوعات في صفحة الدفع الآمنة لدى iyzico، ولا تصل بيانات بطاقتك إلى XORA.",
     trait_humor: "الفكاهة",
     trait_reply: "طاقة الردود",
     trait_timeline: "نمط الخط الزمني",
@@ -1758,7 +1782,13 @@ var I18N = {
     pkg_capacity: "تحليلات Mirror/Stalk: {ms} • Match: {mt}",
     pkg_regular: "السعر العادي",
     toast_loaded: "تمت إضافة الرصيد ⚡",
-    payment_soon: "سنربط iyzico في الخطوة التالية.",
+    pay_opening: "جارٍ فتح صفحة الدفع الآمنة…",
+    pay_success: "تمت إضافة {n} إلى رصيدك",
+    pay_failed: "لم يكتمل الدفع. رصيدك لم يتغير.",
+    pay_pending: "نتحقق من دفعتك الآن. راجع رصيدك مرة أخرى بعد ثوانٍ.",
+    pay_login_required: "سجّل الدخول لشراء الرصيد.",
+    pay_unavailable: "تعذّر بدء الدفع الآن. حاول مرة أخرى بعد قليل.",
+    pay_sandbox: "وضع الاختبار: لا يتم خصم أي مبلغ حقيقي.",
     real_err_credit: "رصيدك لا يكفي لهذا التحليل.",
     real_err_protected: "هذا الحساب محمي. حتى XORA لها حدود.",
     real_err_not_found: "لم أجد هذا الحساب على X.",
@@ -1910,7 +1940,7 @@ var I18N = {
     credits_sub: "Fun est gratuit. Real utilise des crédits parce qu'il lit vraiment les données X.",
     credits_balance: "Ton solde",
     credits_buy: "Acheter",
-    credits_note: "Les paiements seront connectés via iyzico. Les boutons d'achat sont désactivés dans cette version.",
+    credits_note: "Les paiements se font sur la page sécurisée d'iyzico\u00a0; tes données de carte n'arrivent jamais chez XORA.",
     trait_humor: "Humour",
     trait_reply: "Réponses",
     trait_timeline: "Mode timeline",
@@ -1950,7 +1980,13 @@ var I18N = {
     pkg_capacity: "{ms} Mirror/Stalk • {mt} Match",
     pkg_regular: "Prix normal",
     toast_loaded: "crédits ajoutés ⚡",
-    payment_soon: "On connecte iyzico à la prochaine étape.",
+    pay_opening: "Ouverture du paiement sécurisé…",
+    pay_success: "{n} crédits ajoutés",
+    pay_failed: "Le paiement n'a pas abouti. Ton solde n'a pas changé.",
+    pay_pending: "Nous confirmons ton paiement. Vérifie ton solde dans quelques secondes.",
+    pay_login_required: "Connecte-toi pour acheter des crédits.",
+    pay_unavailable: "Impossible de lancer le paiement pour le moment. Réessaie dans un instant.",
+    pay_sandbox: "Mode test\u00a0: aucun débit réel.",
     real_err_credit: "Tu n'as pas assez de crédits pour cette analyse.",
     real_err_protected: "Ce compte est protégé. Même XORA a des limites.",
     real_err_not_found: "Je n'ai pas trouvé ce compte X.",
@@ -2102,7 +2138,7 @@ var I18N = {
     credits_sub: "Fun ist kostenlos. Real nutzt Punkte, weil es wirklich X-Daten liest.",
     credits_balance: "Dein Guthaben",
     credits_buy: "Kaufen",
-    credits_note: "Zahlungen werden über iyzico angebunden. Käufe sind in dieser Version noch deaktiviert.",
+    credits_note: "Zahlungen laufen über die sichere Zahlungsseite von iyzico; deine Kartendaten erreichen XORA nie.",
     trait_humor: "Humor",
     trait_reply: "Antworten",
     trait_timeline: "Timeline-Modus",
@@ -2142,7 +2178,13 @@ var I18N = {
     pkg_capacity: "{ms}× Mirror/Stalk • {mt}× Match",
     pkg_regular: "Regulärer Preis",
     toast_loaded: "Punkte hinzugefügt ⚡",
-    payment_soon: "Im nächsten Schritt binden wir iyzico an.",
+    pay_opening: "Sichere Zahlung wird geöffnet…",
+    pay_success: "{n} Punkte hinzugefügt",
+    pay_failed: "Die Zahlung wurde nicht abgeschlossen. Dein Guthaben ist unverändert.",
+    pay_pending: "Wir bestätigen deine Zahlung. Prüfe dein Guthaben in ein paar Sekunden noch einmal.",
+    pay_login_required: "Melde dich an, um Punkte zu kaufen.",
+    pay_unavailable: "Die Zahlung konnte gerade nicht gestartet werden. Versuch es gleich noch einmal.",
+    pay_sandbox: "Testmodus: keine echte Belastung.",
     real_err_credit: "Du hast nicht genug Punkte für diese Analyse.",
     real_err_protected: "Dieses Konto ist geschützt. Auch XORA hat Grenzen.",
     real_err_not_found: "Ich konnte dieses X-Konto nicht finden.",
@@ -2294,7 +2336,7 @@ var I18N = {
     credits_sub: "Fun è gratis. Real usa crediti perché legge davvero i dati di X.",
     credits_balance: "Il tuo saldo",
     credits_buy: "Acquista",
-    credits_note: "I pagamenti verranno collegati tramite iyzico. In questa versione i pulsanti di acquisto sono disattivati.",
+    credits_note: "I pagamenti avvengono sulla pagina sicura di iyzico; i dati della tua carta non arrivano mai a XORA.",
     trait_humor: "Umorismo",
     trait_reply: "Risposte",
     trait_timeline: "Modalità timeline",
@@ -2334,7 +2376,13 @@ var I18N = {
     pkg_capacity: "{ms} Mirror/Stalk • {mt} Match",
     pkg_regular: "Prezzo normale",
     toast_loaded: "crediti aggiunti ⚡",
-    payment_soon: "Collegheremo iyzico nel prossimo passaggio.",
+    pay_opening: "Apertura del pagamento sicuro…",
+    pay_success: "{n} crediti aggiunti",
+    pay_failed: "Il pagamento non è stato completato. Il tuo saldo non è cambiato.",
+    pay_pending: "Stiamo confermando il pagamento. Ricontrolla il saldo tra qualche secondo.",
+    pay_login_required: "Accedi per acquistare crediti.",
+    pay_unavailable: "Non è stato possibile avviare il pagamento. Riprova tra poco.",
+    pay_sandbox: "Modalità test: nessun addebito reale.",
     real_err_credit: "Non hai abbastanza crediti per questa analisi.",
     real_err_protected: "Questo account è protetto. Anche XORA ha dei limiti.",
     real_err_not_found: "Non ho trovato questo account X.",
@@ -2486,7 +2534,7 @@ var I18N = {
     credits_sub: "Funは無料。RealはXのデータを実際に読むため、クレジットを使います。",
     credits_balance: "残高",
     credits_buy: "購入",
-    credits_note: "決済はiyzicoで連携予定です。このバージョンでは購入ボタンは無効です。",
+    credits_note: "決済はiyzicoの安全な決済ページで行われ、カード情報がXORAに届くことはありません。",
     trait_humor: "ユーモア",
     trait_reply: "リプの温度",
     trait_timeline: "タイムラインでは",
@@ -2526,7 +2574,13 @@ var I18N = {
     pkg_capacity: "Mirror/Stalk {ms}回 • Match {mt}回",
     pkg_regular: "通常価格",
     toast_loaded: "クレジットを追加しました ⚡",
-    payment_soon: "次のステップでiyzicoを連携します。",
+    pay_opening: "安全な決済ページを開いています…",
+    pay_success: "{n}クレジットを追加しました",
+    pay_failed: "決済は完了しませんでした。残高は変わっていません。",
+    pay_pending: "決済を確認しています。数秒後にもう一度残高を確認してください。",
+    pay_login_required: "クレジットを購入するにはログインしてください。",
+    pay_unavailable: "現在、決済を開始できませんでした。少し時間をおいて再度お試しください。",
+    pay_sandbox: "テストモード：実際の請求は発生しません。",
     real_err_credit: "この分析に必要なクレジットが足りません。",
     real_err_protected: "このアカウントは非公開です。XORAにも越えられない線があります。",
     real_err_not_found: "そのXアカウントは見つかりませんでした。",
@@ -2678,7 +2732,7 @@ var I18N = {
     credits_sub: "Fun은 무료예요. Real은 X 데이터를 실제로 읽기 때문에 크레딧을 사용합니다.",
     credits_balance: "잔액",
     credits_buy: "구매",
-    credits_note: "결제는 iyzico로 연동할 예정이에요. 이 버전에서는 구매 버튼이 꺼져 있습니다.",
+    credits_note: "결제는 iyzico의 안전한 결제 페이지에서 진행되며, 카드 정보는 XORA에 전달되지 않아요.",
     trait_humor: "유머",
     trait_reply: "답글 스타일",
     trait_timeline: "타임라인 모드",
@@ -2718,7 +2772,13 @@ var I18N = {
     pkg_capacity: "Mirror/Stalk {ms}회 • Match {mt}회",
     pkg_regular: "정가",
     toast_loaded: "크레딧을 추가했어요 ⚡",
-    payment_soon: "다음 단계에서 iyzico를 연동합니다.",
+    pay_opening: "안전한 결제 페이지를 여는 중…",
+    pay_success: "{n} 크레딧이 추가됐어요",
+    pay_failed: "결제가 완료되지 않았어요. 잔액은 그대로예요.",
+    pay_pending: "결제를 확인하고 있어요. 몇 초 뒤 잔액을 다시 확인해 주세요.",
+    pay_login_required: "크레딧을 구매하려면 로그인하세요.",
+    pay_unavailable: "지금은 결제를 시작할 수 없어요. 잠시 후 다시 시도해 주세요.",
+    pay_sandbox: "테스트 모드: 실제 결제가 이뤄지지 않아요.",
     real_err_credit: "이 분석에 필요한 크레딧이 부족해요.",
     real_err_protected: "이 계정은 비공개예요. XORA도 넘지 못하는 선이 있습니다.",
     real_err_not_found: "그런 X 계정을 찾지 못했어요.",
@@ -2870,7 +2930,7 @@ var I18N = {
     credits_sub: "Fun 免費。Real 會實際讀取 X 資料，所以要用點數。",
     credits_balance: "餘額",
     credits_buy: "購買",
-    credits_note: "之後會串接 iyzico 付款。這個版本的購買按鈕還沒開放。",
+    credits_note: "付款在 iyzico 的安全付款頁面完成，你的卡片資料不會傳到 XORA。",
     trait_humor: "幽默",
     trait_reply: "回覆能量",
     trait_timeline: "時間軸模式",
@@ -2910,7 +2970,13 @@ var I18N = {
     pkg_capacity: "Mirror/Stalk {ms} 次 • Match {mt} 次",
     pkg_regular: "原價",
     toast_loaded: "點數已加值 ⚡",
-    payment_soon: "下一步會串接 iyzico。",
+    pay_opening: "正在開啟安全付款頁面…",
+    pay_success: "已加入 {n} 點",
+    pay_failed: "付款沒有完成，你的餘額沒有變動。",
+    pay_pending: "正在確認你的付款，請幾秒後再查看餘額。",
+    pay_login_required: "請先登入再購買點數。",
+    pay_unavailable: "目前無法開始付款，請稍後再試。",
+    pay_sandbox: "測試模式：不會實際扣款。",
     real_err_credit: "點數不夠，無法進行這次分析。",
     real_err_protected: "這個帳號沒有公開。XORA 也有不能越過的界線。",
     real_err_not_found: "找不到這個 X 帳號。",
@@ -3062,7 +3128,7 @@ var I18N = {
     credits_sub: "Fun бесплатный. Real по-настоящему читает данные X, поэтому тратит кредиты.",
     credits_balance: "Баланс",
     credits_buy: "Купить",
-    credits_note: "Оплату подключим через iyzico. В этой версии кнопка покупки пока не работает.",
+    credits_note: "Оплата проходит на защищённой странице iyzico, данные карты не попадают в XORA.",
     trait_humor: "Юмор",
     trait_reply: "Ответы",
     trait_timeline: "Лента",
@@ -3102,7 +3168,13 @@ var I18N = {
     pkg_capacity: "{ms} Mirror/Stalk • {mt} Match",
     pkg_regular: "Обычная цена",
     toast_loaded: "Кредиты начислены ⚡",
-    payment_soon: "На следующем шаге подключим iyzico.",
+    pay_opening: "Открываем защищённую страницу оплаты…",
+    pay_success: "Начислено кредитов: {n}",
+    pay_failed: "Оплата не завершена. Баланс не изменился.",
+    pay_pending: "Подтверждаем оплату. Проверь баланс ещё раз через несколько секунд.",
+    pay_login_required: "Войди, чтобы купить кредиты.",
+    pay_unavailable: "Сейчас не удалось начать оплату. Попробуй чуть позже.",
+    pay_sandbox: "Тестовый режим: реального списания нет.",
     real_err_credit: "Кредитов для этого разбора не хватает.",
     real_err_protected: "Этот аккаунт закрыт. Есть границы, которые XORA не переходит.",
     real_err_not_found: "Такой аккаунт в X не нашёлся.",
@@ -3313,6 +3385,89 @@ function renderCreditPackages(container, banner) {
       '<button type="button" class="btn btn-sm' + (pkg.featured ? ' btn-orange' : '') + '" data-amount="' + pkg.credits + '" data-i18n="credits_buy">' + esc(t("credits_buy")) + '</button>' +
     '</div>';
   }).join("");
+}
+
+/* ---------------- kredi satın alma (iyzico Checkout Form) ---------------- */
+
+var PENDING_PURCHASE_KEY = "xora_pending_purchase";
+var PAYMENT_FUNCTION = "iyzico-checkout";
+
+// Sends only the package id. Price, currency and credits are decided on the server.
+async function startCreditPurchase(packageId) {
+  if (!CREDIT_PACKAGES.some(function (p) { return p.id === packageId; })) return "unknown_package";
+  var sb = getSupabaseClient();
+  var sessionRes = sb ? await sb.auth.getSession() : null;
+  var session = sessionRes && sessionRes.data && sessionRes.data.session;
+  if (!session || !session.user) {
+    toast(t("pay_login_required"));
+    setTimeout(function () { window.location.href = "auth.html"; }, 900);
+    return "unauthorized";
+  }
+  toast(t("pay_opening"));
+  var res = await sb.functions.invoke(PAYMENT_FUNCTION, { body: { action: "create", package_id: packageId, locale: getLang() } });
+  var data = res && !res.error ? res.data : null;
+  if (!data || data.status !== "ok" || !data.purchase_id) { toast(t("pay_unavailable")); return "unavailable"; }
+  try { sessionStorage.setItem(PENDING_PURCHASE_KEY, data.purchase_id); } catch (e) {}
+  if (data.sandbox) toast(t("pay_sandbox"));
+  if (data.checkout_form_content && mountIyzicoCheckout(data.checkout_form_content)) return "opened";
+  if (data.payment_page_url && /^https:\/\/([a-z0-9-]+\.)*iyzipay\.com(?:[\/?#]|$)/.test(data.payment_page_url)) {
+    window.location.href = data.payment_page_url;
+    return "redirected";
+  }
+  toast(t("pay_unavailable"));
+  return "unavailable";
+}
+
+// iyzico's Checkout Form arrives as a loader script. It is run as-is inside the official
+// #iyzipay-checkout-form container (popup mode); card entry happens entirely in iyzico's form.
+function mountIyzicoCheckout(content) {
+  if (typeof content !== "string" || content.indexOf("iyzipay.com") < 0) return false;
+  var scripts = content.match(/<script[^>]*>([\s\S]*?)<\/script>/gi) || [];
+  if (!scripts.length) return false;
+  var host = document.getElementById("iyzipay-checkout-form");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "iyzipay-checkout-form";
+    host.className = "popup";
+    document.body.appendChild(host);
+  }
+  scripts.forEach(function (tag) {
+    var el = document.createElement("script");
+    el.textContent = tag.replace(/^<script[^>]*>/i, "").replace(/<\/script>$/i, "");
+    document.body.appendChild(el);
+  });
+  return true;
+}
+
+// After iyzico returns the buyer to credits.html, ask the server what happened. The query string
+// alone is never trusted: only the server's answer can show success or refresh the balance.
+async function handlePaymentReturn() {
+  var params = new URLSearchParams(window.location.search || "");
+  var state = params.get("payment");
+  if (!state) return null;
+  var purchaseId = params.get("purchase") || "";
+  try { if (!purchaseId) purchaseId = sessionStorage.getItem(PENDING_PURCHASE_KEY) || ""; } catch (e) {}
+  if (window.history && typeof window.history.replaceState === "function") window.history.replaceState(null, "", window.location.pathname);
+  var status = "pending", credits = 0;
+  var sb = getSupabaseClient();
+  if (sb && /^[0-9a-f-]{36}$/i.test(purchaseId)) {
+    try {
+      var res = await sb.functions.invoke(PAYMENT_FUNCTION, { body: { action: "verify", purchase_id: purchaseId } });
+      if (res && !res.error && res.data && res.data.status === "ok") { status = res.data.payment_status; credits = Number(res.data.credits) || 0; }
+    } catch (e) {}
+  } else if (state === "failed") {
+    status = "failed";
+  }
+  if (status === "completed" || status === "failed") { try { sessionStorage.removeItem(PENDING_PURCHASE_KEY); } catch (e) {} }
+  if (status === "completed") {
+    await refreshCreditsFromServer();
+    toast(fillTemplate(t("pay_success"), { n: credits }));
+  } else if (status === "failed") {
+    toast(t("pay_failed"));
+  } else {
+    toast(t("pay_pending"));
+  }
+  return { status: status, credits: credits };
 }
 
 function t(key) {
