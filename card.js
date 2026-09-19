@@ -107,7 +107,7 @@ function buildFunMatchCard(m) {
       funRibbonHtml() +
       '<div class="idcard-band match-band"><span class="idcard-avatar small">' + m.resA.archetype.emoji + '</span><span class="match-x">×</span><span class="idcard-avatar small">' + m.resB.archetype.emoji + '</span></div>' +
       '<div class="idcard-body"><p class="idcard-handle">@' + esc(m.a) + ' × @' + esc(m.b) + '</p>' +
-      '<h2 class="idcard-type match-pct">%' + m.overall + '</h2><p class="idcard-desc">' + esc(t("match_overall")) + '</p>' +
+      '<h2 class="idcard-type match-pct">%' + m.overall + '</h2><p class="idcard-desc">' + esc(t("fun_match_label")) + '</p>' +
       '<div class="idcard-quote fun-quote"><span class="quote-label">XORA FUN</span><p>' + esc(comment) + '</p></div></div>' +
       '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(xhash(m.a + m.b)) + '</span><span>xora.app</span></div></div>'
   );
@@ -776,7 +776,7 @@ function drawTraitChips(ctx, chips, top, lang, accent) {
 }
 
 function renderFunMatchPNG(m) {
-  var cv = renderMatchPNGBase(m, { scores: false }), ctx = cv.getContext("2d");
+  var cv = renderMatchPNGBase(m, { scores: false, overallLabel: t("fun_match_label") }), ctx = cv.getContext("2d");
   ctx.save();
   ctx.fillStyle="#1E2330"; roundRect(ctx,48,46,260,54,27); ctx.fill();
   ctx.fillStyle="#fff"; ctx.font="900 24px Nunito, Arial, sans-serif"; ctx.textAlign="left"; ctx.fillText("XORA FUN · FREE",70,81);
@@ -1044,7 +1044,7 @@ function renderMatchPNGBase(m, opts) {
 
   ctx.fillStyle = "#5C6270";
   ctx.font = "700 30px Nunito, Arial, sans-serif";
-  ctx.fillText(t("match_overall"), 500, 728);
+  ctx.fillText((opts && opts.overallLabel) || t("match_overall"), 500, 728);
 
   ctx.font = "700 24px Nunito, Arial, sans-serif";
   ctx.fillStyle = "#1E2330";

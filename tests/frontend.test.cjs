@@ -233,7 +233,7 @@ test('every saved locale persists and localizes; unknown stored values fall thro
  c.localStorage.setItem(c.LS.lang,'xx');assert.equal(c.getLang(),'en');
  c.navigator={languages:['de-DE']};assert.equal(c.getLang(),'de','an unknown stored value does not block detection');
 });
-for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/Compatibilidad General/,/compatibilidad/],['pt',/Meu cartão XORA FUN/,/Compatibilidade Geral/,/compatibilidade/],['ar',/بطاقتي في XORA FUN/,/التوافق العام/,/توافق/],['fr',/Ma carte XORA FUN/,/Compatibilité globale/,/compatibilité/],['de',/Meine XORA FUN-Karte/,/Gesamtübereinstimmung/,/Übereinstimmung/],['it',/La mia carta XORA FUN/,/Affinità generale/,/affinità/],['ja',/XORA FUNのカード/,/総合相性/,/相性/],['ko',/내 XORA FUN 카드/,/전체 궁합/,/궁합/],['zh',/我的 XORA FUN 卡片/,/整體速配/,/速配/],['ru',/Моя карточка XORA FUN/,/Общая совместимость/,/совместимость/]]) test(lang.toUpperCase()+' FUN cards, PNG, share and match render natively without fallback to other locales',()=>{
+for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/COMPATIBILIDAD XORA FUN/,/compatibilidad/],['pt',/Meu cartão XORA FUN/,/COMPATIBILIDADE XORA FUN/,/compatibilidade/],['ar',/بطاقتي في XORA FUN/,/توافق XORA FUN/,/توافق/],['fr',/Ma carte XORA FUN/,/COMPATIBILITÉ XORA FUN/,/compatibilité/],['de',/Meine XORA FUN-Karte/,/XORA FUN ÜBEREINSTIMMUNG/,/Übereinstimmung/],['it',/La mia carta XORA FUN/,/AFFINITÀ XORA FUN/,/affinità/],['ja',/XORA FUNのカード/,/XORA FUN相性/,/相性/],['ko',/내 XORA FUN 카드/,/XORA FUN 궁합/,/궁합/],['zh',/我的 XORA FUN 卡片/,/XORA FUN 速配/,/速配/],['ru',/Моя карточка XORA FUN/,/СОВМЕСТИМОСТЬ XORA FUN/,/совместимость/]]) test(lang.toUpperCase()+' FUN cards, PNG, share and match render natively without fallback to other locales',()=>{
  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
  const others=['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'].filter(l=>l!==lang);
  for(let nonce=0;nonce<24;nonce++){
@@ -316,7 +316,7 @@ for(const [lang,funBtn,funNote] of [['es','Saca tu Tarjeta Gratis','Esta tarjeta
   const card=node('cardHolder').innerHTML;
   assert.match(card,/XORA FUN/);
   assert.doesNotMatch(card,/Ücretsiz|Eğlence|Draw Free Card|Fun Card|Tarjeta Fun|Cartão Fun|بطاقة Fun|Carte Fun|Fun-Karte|Carta Fun|Funカード/);
-  if(name==='match') assert.ok(card.includes(c.esc(c.t('match_overall'))),lang+' match card labels');
+  if(name==='match'){assert.ok(card.includes(c.esc(c.t('fun_match_label'))),lang+' FUN match label');assert.ok(!card.includes(c.esc(c.t('match_overall'))),lang+' no analysis-style overall label on FUN');}
  }
 });
 test('static FUN personas keep TR/EN/ES/PT/AR/FR/DE/IT/JA copy and are untouched by the single-locale REAL view',()=>{
@@ -746,4 +746,85 @@ test('credit packages: 10/20/50/300 at launch prices with struck regular prices 
  const page=fs.readFileSync('credits.html','utf8');
  assert.match(page,/id="creditPacks"/);assert.match(page,/renderCreditPackages\(packs, banner\)/);assert.match(page,/toast\(t\("payment_soon"\)/);
  assert.doesNotMatch(page,/data-i18n="pkg[123]_n"|\$11\.99|\$4\.99<\/p>/);
+});
+
+// ---------------------------------------------------------------------------------------------
+// FUN persona copy is X-native: online behavior only, no offline scenes, no claim of analysis.
+const FUN_WORD=s=>new RegExp('(?<!\\p{L})(?:'+s+')(?!\\p{L})','iu');
+const FUN_OFFLINE={
+ tr:FUN_WORD('kahve\\p{L}*|kafe\\p{L}*|masa(?:da|ya|dan|nın|daki|sı)?|buluşma\\p{L}*|oda(?:da|ya|dan|nın|daki|sı)?|göz göze|yüz ifade\\p{L}*|ses ton\\p{L}*|yüz yüze|yüzünden tek|parti\\p{L}*|toplantı\\p{L}*|kalabalık\\p{L}*'),
+ en:FUN_WORD('coffee|caf[eé]|tables?|meetings?|meetups?|rooms?|eye contact|faces?|facial|straight face|voices?|tone of voice|in person|face to face|party|parties|dinner|lunch|gatherings?|hang ?outs?'),
+ es:FUN_WORD('caf[eé]|mesas?|reuni[oó]n\\p{L}*|quedadas?|salas?|habitaci[oó]n\\p{L}*|caras?|rostros?|miradas?|voz|tono de voz|en persona|cara a cara|fiestas?|cenas?'),
+ pt:FUN_WORD('caf[eé]|mesas?|encontros?|reuni[aã]o|reuni[oõ]es|salas?|quartos?|rostos?|olho no olho|voz|tom de voz|pessoalmente|cara a cara|festas?|botecos?|bar|bares|rodas?'),
+ ar:FUN_WORD('[وفبل]?(?:ال)?(?:قهوة|مقهى|طاولة|لقاء|اجتماع|غرفة|وجه|بوجه|نبرة|صوت|حفلة|جلسة|مجلس)'),
+ fr:FUN_WORD('caf[eé]|tables?|réunions?|rendez-vous|pièces?|salles?|visages?|regards?|voix|ton de voix|en personne|face à face|soirées?|fêtes?|bar'),
+ de:FUN_WORD('Kaffee|Café|Tisch\\p{L}*|\\p{L}*tisch|Treffen|Raum|Zimmer|Blickkontakt|Gesicht\\p{L}*|Miene|Stimme|Tonfall|von Angesicht|Party|Kneipe|Runde'),
+ it:FUN_WORD('caff[eè]|tavol[oai]|incontr[oi]|stanz[ae]|sal[ae]|facci[ae]|viso|volto|sguardo|voce|tono di voce|di persona|fest[ae]|bar'),
+ ja:/コーヒー|カフェ|テーブル|部屋|目が合|顔|表情|声|口調|対面|会って|飲み会|集まり|会議/u,
+ ko:/커피|카페|테이블|방에서|방 안|모임|만나서|직접 만나|눈을 마주|얼굴|표정|목소리|말투|회의|자리에 앉/u,
+ zh:/咖啡|桌上|餐桌|桌子|一桌|坐在|聚會|見面|房間|對上眼|臉|聲音|語調|語氣|面對面|派對/u,
+ ru:FUN_WORD('коф\\p{L}*|кафе|стол|стола|столом|столе|встреч\\p{L}*|комнат\\p{L}*|вечеринк\\p{L}*|лицо|лица|лицом|лице|взгляд\\p{L}*|в глаза|голос\\p{L}*|интонац\\p{L}*|вживую|тусовк\\p{L}*')
+};
+const FUN_CLAIM={
+ tr:/analiz ett|hesabına baktık|hesabını inceled|son tweet|son postların|verilerin|verilerine göre|ölçtük|hesapladık|postlarına baktık/iu,
+ en:/we analy[sz]ed|we looked at your|your (?:recent )?(?:posts|tweets|data) show|according to your|we measured|we calculated|your last tweets|we checked your/iu,
+ es:/analizamos|revisamos tu cuenta|tus últimos (?:tuits|posts|tweets)|tus datos muestran|según tus datos|medimos|calculamos/iu,
+ pt:/analisamos|olhamos sua conta|seus últimos (?:posts|tweets)|seus dados mostram|de acordo com seus dados|medimos|calculamos/iu,
+ ar:/حللنا|تحليل حسابك|نظرنا في حسابك|آخر تغريداتك|بياناتك تظهر|وفقًا لبياناتك|قسنا|حسبنا/u,
+ fr:/nous avons analysé|on a analysé|tes derniers (?:posts|tweets)|tes données montrent|selon tes données|nous avons mesuré|nous avons calculé/iu,
+ de:/wir haben (?:analysiert|gemessen|berechnet)|deine letzten (?:Posts|Tweets)|deine Daten zeigen|laut deinen Daten|analysiert/iu,
+ it:/abbiamo analizzato|i tuoi ultimi (?:post|tweet)|i tuoi dati mostrano|secondo i tuoi dati|abbiamo misurato|abbiamo calcolato/iu,
+ ja:/分析しました|分析した結果|あなたのデータ|最近のポストから|測定|計算しました/u,
+ ko:/분석했|분석 결과|당신의 데이터|최근 게시물을 보니|측정했|계산했/u,
+ zh:/我們分析|分析了你的|你的資料顯示|根據你的資料|最近的貼文看來|測量|計算了/u,
+ ru:/мы проанализировали|проанализировали|твои данные показывают|по твоим данным|твои последние посты|мы измерили|мы посчитали/iu
+};
+test('FUN persona copy is X-native in all 12 locales: no offline scenes and no claim that X data was analyzed',()=>{
+ const c=browser();
+ // The patterns are live: the pre-rewrite copy tripped them 53 times.
+ assert.ok(FUN_OFFLINE.en.test('a whole table talking')&&FUN_OFFLINE.tr.test('kısa bir kahvenin')&&FUN_OFFLINE.ja.test('コーヒー'));
+ assert.ok(FUN_CLAIM.en.test('we analyzed your posts')&&FUN_CLAIM.tr.test('postlarını analiz ettik'));
+ for(const p of c.FUN_PERSONAS)for(const lang of LOCALES12){
+  const copy=p.locales[lang],text=copy.tagline+' '+copy.comment;
+  const off=text.match(FUN_OFFLINE[lang]);assert.equal(off,null,lang+' '+p.id+' offline context: '+(off&&off[0]));
+  assert.doesNotMatch(copy.nickname+' '+text,FUN_CLAIM[lang],lang+' '+p.id+' claims an analysis');
+ }
+ // Nicknames that named a venue, room, table or gathering were renamed; old names still resolve.
+ const renamed={conversation_mediator:{tr:'Masadaki Hakem',ar:'حكيم المجلس',de:'Ruhepol der Runde'},armchair_thinker:{pt:'Filósofo de Boteco',ar:'فيلسوف المقهى',de:'Philosoph am Küchentisch',it:'Filosofo da Bar'},socially_attuned:{en:'Reads the Room'},social_catalyst:{en:'Life of the Party',es:'Alma de la Fiesta',pt:'Anima Qualquer Roda',ar:'روح الجلسة'}};
+ for(const [id,old] of Object.entries(renamed)){
+  const p=c.FUN_PERSONAS.find(x=>x.id===id);
+  for(const [lang,name] of Object.entries(old)){
+   assert.notEqual(p.locales[lang].nickname,name);assert.ok(p.legacy_names.includes(name),id+' keeps '+name+' as a legacy name');
+   c.localStorage.setItem(c.LS.lang,lang);
+   const saved={meta:{tier:'fun'},mode:'mirror',handle:'alice',nickname:{[lang]:name},card:{color:'#000'},hash:1};
+   assert.ok(c.buildIdentityCard(saved).includes(c.esc(p.locales[lang].nickname)),lang+' old saved card shows the new nickname');
+  }
+ }
+ // FUN Match comments (current and legacy) follow the same rules.
+ for(const lang of LOCALES12)for(const text of [...c.FUN_MATCH_COMMENTS[lang],...c.MATCH_COMMENTS[lang]]){
+  const off=text.match(FUN_OFFLINE[lang]);assert.equal(off,null,lang+' FUN match comment offline context: '+(off&&off[0])+' | '+text);
+  assert.doesNotMatch(text,FUN_CLAIM[lang],lang+' FUN match comment claims an analysis');
+ }
+ // French keeps a non-breaking space before : ; ? ! in persona copy.
+ for(const p of c.FUN_PERSONAS){const fr=p.locales.fr.tagline+' '+p.locales.fr.comment;assert.doesNotMatch(fr,/ [:;?!]/,p.id+' French spacing');}
+});
+test('FUN Match shows one big FUN percentage labelled as a XORA FUN score; REAL Match keeps its label',()=>{
+ for(const lang of LOCALES12){
+  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
+  const m=c.matchFunHandles('alice','bob',5);
+  const html=c.buildMatchCard(m);
+  assert.equal((html.match(/%\d+|\d+\s?%/g)||[]).length,1,lang+' exactly one percentage on the FUN Match card');
+  assert.ok(html.includes('>%'+m.overall+'</h2><p class="idcard-desc">'+c.esc(c.I18N[lang].fun_match_label)+'</p>'),lang+' big % with the FUN label');
+  assert.match(c.I18N[lang].fun_match_label,/XORA FUN/);
+  assert.ok(!html.includes(c.esc(c.I18N[lang].match_overall)),lang+' no analysis-style overall label');
+  const {text}=recorder(c);c.renderMatchPNG(m);
+  assert.deepEqual(text.filter(p=>/%\s?\d+|\d+\s?%/.test(p.v)).map(p=>p.v),['%'+m.overall],lang+' PNG: one percentage');
+  assert.ok(text.some(p=>p.v===c.I18N[lang].fun_match_label)&&!text.some(p=>p.v===c.I18N[lang].match_overall),lang+' PNG FUN label');
+  assert.deepEqual(text.filter(p=>p.y===780||p.y===812),[],lang+' no sub-score rows');
+  // REAL Match is untouched: analysis label and AI-scored rows.
+  const real={...m,meta:{...m.meta,tier:'real',locale:lang},fun_comment:undefined,ai_comment:{[lang]:'x'},rarity:{name:'rare'}};
+  assert.ok(c.buildMatchCard(real).includes(c.esc(c.I18N[lang].match_overall)),lang+' REAL Match keeps match_overall');
+  const png=recorder(c);c.renderMatchPNG(real);
+  assert.ok(png.text.some(p=>p.v===c.I18N[lang].match_overall),lang+' REAL PNG keeps match_overall');assert.equal(png.text.filter(p=>p.y===780||p.y===812).length,2);
+ }
 });
