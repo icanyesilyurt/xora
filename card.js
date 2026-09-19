@@ -81,7 +81,7 @@ function buildFunIdentityCard(res) {
   var color = (res.card && res.card.color) || (res.archetype && res.archetype.color) || "#10B8B8";
   var emoji = res.profile_emoji || (res.card && res.card.emoji) || (res.archetype && res.archetype.emoji) || "✨";
   var nick = localized((persona && persona.nickname) || res.nickname || (res.card && res.card.nickname) || (res.archetype && res.archetype.name), lang);
-  var desc = localized((persona && persona.desc) || res.tagline || (res.card && res.card.desc) || (res.archetype && res.archetype.desc), lang);
+  var desc = persona ? funModeTagline(persona, res.mode, lang) : localized(res.tagline || (res.card && res.card.desc) || (res.archetype && res.archetype.desc), lang);
   var comment = funIdentityComment(res, lang);
 
   return (
@@ -702,7 +702,7 @@ function renderFunIdentityPNG(res) {
   var color = c.color || a.color || "#10B8B8";
   var emoji = res.profile_emoji || c.emoji || a.emoji || "✨";
   var nick = localized((persona && persona.nickname) || res.nickname || c.nickname || a.name, lang);
-  var desc = localized((persona && persona.desc) || res.tagline || c.desc || a.desc, lang);
+  var desc = persona ? funModeTagline(persona, res.mode, lang) : localized(res.tagline || c.desc || a.desc, lang);
   var comment = funIdentityComment(res, lang);
   var b = baseCanvas(), ctx = b.ctx;
   drawCardFrame(ctx, color);
