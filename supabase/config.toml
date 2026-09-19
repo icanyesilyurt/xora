@@ -2,3 +2,8 @@ project_id = "jafrxhkppvvchyjbkldd"
 
 [functions.analyze-real]
 verify_jwt = true
+
+[functions.iyzico-checkout]
+# iyzico posts the payment result from the buyer's browser without a Supabase JWT; the
+# function authenticates create/verify itself and never trusts the callback without iyzico.
+verify_jwt = false

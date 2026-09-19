@@ -52,14 +52,19 @@
   var banner = document.getElementById("launchOffer");
   function renderPacks() { renderCreditPackages(packs, banner); }
 
+  var busy = false;
   packs.addEventListener("click", function (e) {
-    var btn = e.target && e.target.closest ? e.target.closest("[data-amount]") : null;
-    if (!btn) return;
-    var n = parseInt(btn.getAttribute("data-amount"), 10);
-    toast(t("payment_soon") + " (" + n + "⚡)");
+    var card = e.target && e.target.closest ? e.target.closest("[data-package]") : null;
+    if (!card || !e.target.closest("[data-amount]") || busy) return;
+    busy = true;
+    // Only the package id leaves the page; the server decides price and credits.
+    startCreditPurchase(card.getAttribute("data-package")).finally(function () { busy = false; });
   });
 
-  document.addEventListener("DOMContentLoaded", renderBalance);
+  document.addEventListener("DOMContentLoaded", function () {
+    renderBalance();
+    handlePaymentReturn().then(function (r) { if (r) renderBalance(); });
+  });
   document.addEventListener("xora:lang", renderPacks);
   renderPacks();
   renderBalance();

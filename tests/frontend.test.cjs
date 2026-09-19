@@ -715,7 +715,7 @@ test('credit packages: 10/20/50/300 at launch prices with struck regular prices 
   {id:'starter',credits:10,list:4.99,price:2.99,featured:false,label:'pkg_starter',note:null},
   {id:'popular',credits:20,list:9.99,price:5.99,featured:true,label:'pkg_popular',note:null},
   {id:'value',credits:50,list:24.99,price:14.99,featured:false,label:'pkg_value',note:null},
-  {id:'pro',credits:300,list:149.99,price:89.99,featured:false,label:'pkg_pro',note:'pkg_pro_note'}]);
+  {id:'professional',credits:300,list:149.99,price:89.99,featured:false,label:'pkg_pro',note:'pkg_pro_note'}]);
  assert.deepEqual([...c.CREDIT_PACKAGES].map(p=>({...c.packageCapacity(p)})),[{mirrorStalk:2,match:1},{mirrorStalk:4,match:2},{mirrorStalk:10,match:5},{mirrorStalk:60,match:30}]);
  for(const p of c.CREDIT_PACKAGES) assert.ok(Math.abs(1-p.price/p.list-c.LAUNCH_DISCOUNT)<0.005,p.id+' is 40% off');
  for(const lang of LOCALES12){
@@ -733,7 +733,7 @@ test('credit packages: 10/20/50/300 at launch prices with struck regular prices 
    assert.equal(m[3],c.esc(c.I18N[lang][p.label]),lang+' '+p.id+' badge');
    assert.equal(+m[4],p.credits);assert.equal(+m[10],p.credits,'buy button amount');
    assert.equal(m[5],c.esc(fill(c.I18N[lang].pkg_capacity,{ms:caps[i][0],mt:caps[i][1]})),lang+' capacity');
-   assert.equal(m[6]||null,p.id==='pro'?c.esc(c.I18N[lang].pkg_pro_note):null,lang+' pro note');
+   assert.equal(m[6]||null,p.id==='professional'?c.esc(c.I18N[lang].pkg_pro_note):null,lang+' pro note');
    assert.equal(m[7],c.esc(c.formatPrice(p.list,lang)),lang+' struck regular price');assert.equal(m[8],c.esc(c.formatPrice(p.price,lang)),lang+' launch price');
    assert.equal(!!m[9],p.id==='popular');
   });
@@ -741,10 +741,10 @@ test('credit packages: 10/20/50/300 at launch prices with struck regular prices 
  }
  c.localStorage.setItem(c.LS.lang,'en');const box={innerHTML:''};c.renderCreditPackages(box,null);
  for(const [old,now] of [['$4.99','$2.99'],['$9.99','$5.99'],['$24.99','$14.99'],['$149.99','$89.99']]) assert.ok(box.innerHTML.includes('>'+old+'</s> <span class="pack-now">'+now+'<'),old+' -> '+now);
- assert.match(box.innerHTML,/pack-popular hot"[^]*?>MOST POPULAR</);assert.match(box.innerHTML,/pack-pro"[^]*?>PROFESSIONAL<[^]*?>Creators &amp; Agencies</);
- // The credits page renders from this config and keeps the payment-coming-soon click.
+ assert.match(box.innerHTML,/pack-popular hot"[^]*?>MOST POPULAR</);assert.match(box.innerHTML,/pack-professional"[^]*?>PROFESSIONAL<[^]*?>Creators &amp; Agencies</);
+ // The credits page renders from this config and starts checkout with the package id only.
  const page=fs.readFileSync('credits.html','utf8');
- assert.match(page,/id="creditPacks"/);assert.match(page,/renderCreditPackages\(packs, banner\)/);assert.match(page,/toast\(t\("payment_soon"\)/);
+ assert.match(page,/id="creditPacks"/);assert.match(page,/renderCreditPackages\(packs, banner\)/);assert.match(page,/startCreditPurchase\(card\.getAttribute\("data-package"\)\)/);assert.match(page,/handlePaymentReturn\(\)/);
  assert.doesNotMatch(page,/data-i18n="pkg[123]_n"|\$11\.99|\$4\.99<\/p>/);
 });
 
