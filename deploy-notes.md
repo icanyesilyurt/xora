@@ -15,22 +15,22 @@ Service role key frontend'e asla yazılmaz.
 
 X Client Secret frontend'e asla yazılmaz.
 
-## GitHub Pages
+## Hosting: Cloudflare Pages
 
-GitHub Pages URL formatı:
+GitHub is source control only. Production is served by Cloudflare Pages at https://xora.roviaqr.com.
 
-https://icanyesilyurt.github.io/REPO_NAME/
+- Production branch: `main` (other branches get preview deployments on `*.pages.dev`)
+- Framework preset: None
+- Build command: `npm run build` (runs `scripts/build-pages.mjs`, no dependencies)
+- Build output directory: `dist`
+- Environment variable: `SKIP_DEPENDENCY_INSTALL=true` (the build needs no npm packages)
 
-Auth redirect URL formatı:
+The build publishes only the 7 pages, `app.js`, `xora.js`, `card.js`, `config.js` and `style.css`.
+Cloudflare serves `/mirror` for `mirror.html` (the `.html` URL redirects there), so canonical
+links are extensionless. `*.pages.dev` uses the production `config.js`, so REAL stays gated there too.
 
-https://icanyesilyurt.github.io/REPO_NAME/mirror.html
-
-Repo adı `xora` ise örnek:
-
-https://icanyesilyurt.github.io/xora/mirror.html
-
-Bu URL Supabase Auth redirect allow list'e eklenmeli ve `config.js` içinde
-`AUTH_REDIRECT_URL` olarak kullanılmalıdır.
+Supabase Auth (at cutover): Site URL `https://xora.roviaqr.com`, redirect allow list
+`https://xora.roviaqr.com/**`.
 
 ## XORA V2 / Real backend
 

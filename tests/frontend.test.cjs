@@ -148,7 +148,7 @@ test('"via @creator" appears near the homepage CTA in all 12 locales, escaped an
  assert.ok(html.indexOf('id="refVia"')>html.indexOf('data-i18n="home_hi"')&&html.indexOf('id="refVia"')<html.indexOf('class="choices"'),'the line sits next to the primary CTAs, not on a separate page');
 });
 test('the canonical domain replaces github.io in share, referral, canonical and card links; REAL stays gated on both hosts',()=>{
- for(const host of ['icanyesilyurt.github.io','xora.roviaqr.com','localhost']){
+ for(const host of ['icanyesilyurt.github.io','xora.roviaqr.com','xora.pages.dev','xora-staging.xora.pages.dev','localhost']){
   const c=browser();c.location.hostname=host;c.location.origin=host==='localhost'?'http://localhost:3000':'https://'+host;c.location.href=c.location.origin+'/xora/mirror.html';
   assert.equal(c.getPublicSiteUrl(),'https://xora.roviaqr.com/');
   assert.equal(c.creatorReferralUrl('Creator-A'),'https://xora.roviaqr.com/?ref=creator-a');
@@ -160,7 +160,7 @@ test('the canonical domain replaces github.io in share, referral, canonical and 
   const src=fs.readFileSync(f,'utf8');
   const hits=src.split('\n').filter(l=>/github\.io|xora\.app\b/.test(l));
   assert.deepEqual(hits.filter(l=>!/PRODUCTION_HOSTS = \[/.test(l)),[],f+' emits no old production URL');
-  if(f.endsWith('.html')) assert.match(src,new RegExp('<link rel="canonical" href="https://xora\\.roviaqr\\.com/'+(f==='index.html'?'':f.replace('.','\\.'))+'">'),f);
+  if(f.endsWith('.html')) assert.ok(src.includes('<link rel="canonical" href="https://xora.roviaqr.com/'+(f==='index.html'?'':f.replace(/\.html$/,''))+'">'),f+' canonical is the extensionless Cloudflare Pages URL');
  }
 });
 test('REAL HTML/PNG and share output include rarity, and REAL has no reroll',()=>{
@@ -937,4 +937,14 @@ test('Stalk cards show the Stalk copy and Mirror cards the Mirror copy, in HTML 
   // Persona selection is the same seed logic for both modes; only the presentation differs.
   assert.equal(c.analyzeFunHandle('bob','stalk',4).persona_id,c.FUN_CARD_POOL[c.xhash('fun•stalk•bob•4')%12].id);
  }
+});
+test('Cloudflare Pages build publishes exactly the static site into dist/, and nothing else',()=>{
+ const {execFileSync}=require('node:child_process');
+ const out=execFileSync(process.execPath,['scripts/build-pages.mjs'],{encoding:'utf8'});
+ assert.match(out,/7 pages, 5 assets/);
+ const files=fs.readdirSync('dist').sort();
+ assert.deepEqual(files,['app.js','auth.html','card.js','config.js','credits.html','index.html','match.html','mirror.html','profile.html','stalk.html','style.css','xora.js']);
+ for(const f of files) assert.equal(fs.readFileSync('dist/'+f,'utf8'),fs.readFileSync(f,'utf8'),f+' copied byte for byte');
+ assert.equal(JSON.parse(fs.readFileSync('package.json','utf8')).scripts.build,'node scripts/build-pages.mjs');
+ fs.rmSync('dist',{recursive:true,force:true});
 });
