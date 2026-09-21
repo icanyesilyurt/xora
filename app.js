@@ -305,16 +305,61 @@ function withTier(path, tier) {
   return path + (path.indexOf("?") >= 0 ? "&" : "?") + "tier=" + (tier === "real" ? "real" : "fun");
 }
 
-function captureReferral() {
+// Referral links (?ref=<code>) are kept for 30 days before signup. Only codes the server confirms
+// as an active creator are stored; the first one kept is never replaced, and once the account is
+// attributed server-side that attribution is what the browser keeps.
+var REFERRAL_CAPTURE_DAYS = 30;
+var referralCapture = null;
+
+function referralParam() {
   try {
-    var params = new URLSearchParams(window.location.search || "");
-    var ref = String(params.get("ref") || "").trim().toLowerCase();
-    if (!/^[a-z0-9_-]{2,64}$/.test(ref)) return;
-    if (!ref) return;
-    var existing = readJson(LS.referral, null);
-    if (existing && existing.code && existing.expires_at && Date.now() < new Date(existing.expires_at).getTime()) return;
-    writeJson(LS.referral, { code: ref, first_seen_at: new Date().toISOString(), expires_at: new Date(Date.now() + 30 * 86400000).toISOString(), model: "first_touch" });
-  } catch (e) {}
+    var ref = String(new URLSearchParams(window.location.search || "").get("ref") || "").trim().toLowerCase();
+    return /^[a-z0-9_-]{2,64}$/.test(ref) ? ref : "";
+  } catch (e) { return ""; }
+}
+
+async function previewReferral(code) {
+  var sb = getSupabaseClient();
+  if (!sb || !code) return null;
+  try {
+    var res = await sb.rpc("xora_referral_preview", { p_code: code });
+    if (res.error || !res.data || res.data.code !== code) return null;
+    return res.data;
+  } catch (e) { return null; }
+}
+
+function captureReferral() {
+  var ref = referralParam();
+  if (!ref || getReferralCode()) {
+    renderReferralVia();
+    referralCapture = Promise.resolve();
+    return referralCapture;
+  }
+  referralCapture = previewReferral(ref).then(function (creator) {
+    if (creator && !getReferralCode()) {
+      writeJson(LS.referral, { code: creator.code, handle: creator.handle, first_seen_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + REFERRAL_CAPTURE_DAYS * 86400000).toISOString(), model: "first_touch" });
+    }
+    renderReferralVia();
+  });
+  return referralCapture;
+}
+
+function saveClaimedReferral(code, expiresAt, handle) {
+  var item = readJson(LS.referral, null);
+  writeJson(LS.referral, { code: code, handle: handle || (item && item.code === code ? item.handle : "") || "",
+    expires_at: expiresAt, model: "first_touch", claimed: true });
+}
+
+function renderReferralVia() {
+  var el = document.getElementById("refVia");
+  if (!el) return;
+  var item = readJson(LS.referral, null);
+  var handle = getReferralCode() && item && item.handle ? String(item.handle).replace(/^@+/, "") : "";
+  if (!handle) { el.hidden = true; el.textContent = ""; return; }
+  var parts = t("ref_via").split("{handle}");
+  el.innerHTML = esc(parts[0]) + '<bdi dir="ltr">@' + esc(handle) + "</bdi>" + esc(parts[1] || "");
+  el.hidden = false;
 }
 
 function getReferralCode() {
@@ -330,13 +375,14 @@ function getReferralCode() {
 async function syncReferral() {
   var sb = getSupabaseClient();
   if (!sb || !getCurrentUser()) return;
-  captureReferral();
+  try { await (referralCapture || captureReferral()); } catch (e) {}
   try {
     var response = await sb.rpc("xora_capture_referral", {p_code:getReferralCode()});
     if (response.error) { console.warn("referral_sync_failed"); return; }
-    if (response.data) writeJson(LS.referral, {code:response.data.referral_code, expires_at:response.data.expires_at, model:"first_touch"});
+    if (response.data) saveClaimedReferral(response.data.referral_code, response.data.expires_at, response.data.handle);
     else localStorage.removeItem(LS.referral);
   } catch (e) { console.warn("referral_sync_failed"); }
+  renderReferralVia();
 }
 
 function markAnalysisTier(result, tier, mode) {
@@ -433,7 +479,7 @@ async function requestRealAnalysis(mode, payload) {
   if (!data.result) throw new Error("bad_response");
   sessionStorage.removeItem(pendingKey);
   if (data.result.meta && data.result.meta.referral_code && data.result.meta.referral_expires_at) {
-    writeJson(LS.referral, {code:data.result.meta.referral_code, expires_at:data.result.meta.referral_expires_at, model:"first_touch"});
+    saveClaimedReferral(data.result.meta.referral_code, data.result.meta.referral_expires_at);
   } else { localStorage.removeItem(LS.referral); }
   await refreshCreditsFromServer();
   return normalizeRealResult(data.result, mode);
@@ -467,8 +513,13 @@ function realErrorMessage(err) {
   return t("real_err_unavailable");
 }
 
+// Production hosts: the canonical domain, plus the old Pages address while it still redirects.
+var XORA_PUBLIC_ORIGIN = "https://xora.roviaqr.com";
+var XORA_PUBLIC_HOST = "xora.roviaqr.com";
+var PRODUCTION_HOSTS = ["xora.roviaqr.com", "icanyesilyurt.github.io"];
+
 function isProductionRealDisabled() {
-  return String(window.location && window.location.hostname || "").toLowerCase() === "icanyesilyurt.github.io";
+  return PRODUCTION_HOSTS.indexOf(String(window.location && window.location.hostname || "").toLowerCase()) >= 0;
 }
 
 function disableProductionRealCtas() {
@@ -501,15 +552,23 @@ function showProductionRealPause(tier) {
   return true;
 }
 
+// Shared links always point at the canonical domain root, never at the host the page runs on.
 function getPublicSiteUrl() {
   var cfg = window.XORA_CONFIG || {};
-  var base = cfg.PUBLIC_URL ? String(cfg.PUBLIC_URL) : "";
+  var base = cfg.PUBLIC_URL ? String(cfg.PUBLIC_URL) : XORA_PUBLIC_ORIGIN + "/";
   try {
-    var url = new URL(base || "index.html", base ? window.location.origin : window.location.href);
+    var url = new URL(base);
     var ref = getReferralCode();
     if (ref) url.searchParams.set("ref", ref);
     return url.href;
-  } catch (e) { return base || ""; }
+  } catch (e) { return XORA_PUBLIC_ORIGIN + "/"; }
+}
+
+// Creator link: https://xora.roviaqr.com/?ref=<code>
+function creatorReferralUrl(code) {
+  var url = new URL(XORA_PUBLIC_ORIGIN + "/");
+  url.searchParams.set("ref", String(code || "").trim().toLowerCase());
+  return url.href;
 }
 
 /* ---------------- krediler ---------------- */
@@ -841,6 +900,7 @@ var I18N = {
     says: "XORA diyor ki",
     match_overall: "Genel Uyum",
     fun_match_label: "XORA FUN UYUMU",
+    ref_via: "{handle} önerisiyle",
     match_flirt: "Flört Potansiyeli",
     match_vibe: "Kafa Uyumu",
     match_humor: "Mizah Uyumu",
@@ -1042,6 +1102,7 @@ var I18N = {
     says: "XORA says",
     match_overall: "Overall Match",
     fun_match_label: "XORA FUN MATCH",
+    ref_via: "via {handle}",
     match_flirt: "Flirt Potential",
     match_vibe: "Vibe Match",
     match_humor: "Humor Match",
@@ -1244,6 +1305,7 @@ var I18N = {
     says: "XORA dice",
     match_overall: "Compatibilidad General",
     fun_match_label: "COMPATIBILIDAD XORA FUN",
+    ref_via: "vía {handle}",
     match_flirt: "Potencial de Coqueteo",
     match_vibe: "Sintonía",
     match_humor: "Humor en Común",
@@ -1450,6 +1512,7 @@ var I18N = {
     says: "A XORA diz",
     match_overall: "Compatibilidade Geral",
     fun_match_label: "COMPATIBILIDADE XORA FUN",
+    ref_via: "via {handle}",
     match_flirt: "Potencial de Flerte",
     match_vibe: "Sintonia",
     match_humor: "Humor em Comum",
@@ -1651,6 +1714,7 @@ var I18N = {
     says: "XORA تقول",
     match_overall: "التوافق العام",
     fun_match_label: "توافق XORA FUN",
+    ref_via: "عبر {handle}",
     match_flirt: "احتمال الإعجاب",
     match_vibe: "الانسجام",
     match_humor: "حس الدعابة المشترك",
@@ -1848,6 +1912,7 @@ var I18N = {
     says: "XORA dit",
     match_overall: "Compatibilité globale",
     fun_match_label: "COMPATIBILITÉ XORA FUN",
+    ref_via: "via {handle}",
     match_flirt: "Potentiel de flirt",
     match_vibe: "Complicité",
     match_humor: "Humour en commun",
@@ -2045,6 +2110,7 @@ var I18N = {
     says: "XORA sagt",
     match_overall: "Gesamtübereinstimmung",
     fun_match_label: "XORA FUN ÜBEREINSTIMMUNG",
+    ref_via: "über {handle}",
     match_flirt: "Flirtfaktor",
     match_vibe: "Wellenlänge",
     match_humor: "Gleicher Humor",
@@ -2242,6 +2308,7 @@ var I18N = {
     says: "XORA dice",
     match_overall: "Affinità generale",
     fun_match_label: "AFFINITÀ XORA FUN",
+    ref_via: "tramite {handle}",
     match_flirt: "Potenziale di flirt",
     match_vibe: "Sintonia",
     match_humor: "Stesso umorismo",
@@ -2439,6 +2506,7 @@ var I18N = {
     says: "XORAのひと言",
     match_overall: "総合相性",
     fun_match_label: "XORA FUN相性",
+    ref_via: "{handle} さんの紹介",
     match_flirt: "恋の予感",
     match_vibe: "波長",
     match_humor: "笑いのツボ",
@@ -2636,6 +2704,7 @@ var I18N = {
     says: "XORA 한마디",
     match_overall: "전체 궁합",
     fun_match_label: "XORA FUN 궁합",
+    ref_via: "{handle} 님의 추천",
     match_flirt: "설렘 지수",
     match_vibe: "분위기 합",
     match_humor: "유머 코드",
@@ -2833,6 +2902,7 @@ var I18N = {
     says: "XORA 說",
     match_overall: "整體速配",
     fun_match_label: "XORA FUN 速配",
+    ref_via: "由 {handle} 推薦",
     match_flirt: "曖昧指數",
     match_vibe: "頻率",
     match_humor: "笑點",
@@ -3030,6 +3100,7 @@ var I18N = {
     says: "XORA говорит",
     match_overall: "Общая совместимость",
     fun_match_label: "СОВМЕСТИМОСТЬ XORA FUN",
+    ref_via: "по приглашению {handle}",
     match_flirt: "Флирт",
     match_vibe: "Настрой",
     match_humor: "Юмор",
@@ -3422,6 +3493,7 @@ function applyI18n() {
     lb.title = LANG_NAMES[current];
     lb.setAttribute("aria-label", LANG_NAMES[current]);
   }
+  renderReferralVia();
   refreshAuthUi();
 }
 

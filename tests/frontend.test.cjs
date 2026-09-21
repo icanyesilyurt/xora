@@ -103,9 +103,65 @@ test('sample-count copy suppressed in HTML, PNG text and share copy; internal me
  const text=[];const ctx=new Proxy({measureText:v=>({width:String(v).length*10}),fillText:v=>text.push(v),createLinearGradient:()=>({addColorStop(){}})},{get:(o,k)=>k in o?o[k]:()=>{}});c.document.createElement=()=>({getContext:()=>ctx});
  c.renderIdentityPNG(r);assert.doesNotMatch(text.join(' '),/25 posts/);assert.ok(text.some(v=>String(v).includes('XORA FUN')));
 });
-test('referral active first-touch propagation and expiry; local credits cannot be minted',()=>{
- const c=browser();c.location.search='?ref=creator-a';c.captureReferral();const first=c.localStorage.getItem(c.LS.referral);c.location.search='?ref=creator-b';c.captureReferral();assert.equal(c.localStorage.getItem(c.LS.referral),first);assert.match(c.getPublicSiteUrl(),/ref=creator-a/);
- c.localStorage.setItem(c.LS.referral,JSON.stringify({code:'creator-a',expires_at:'2000-01-01'}));c.captureReferral();assert.equal(c.getReferralCode(),'creator-b');assert.throws(()=>c.addCredits(100),/server_only/);assert.throws(()=>c.spendCredits(5),/server_only/);
+test('referral capture: only server-confirmed creator codes, kept 30 days across pages, first touch wins; local credits cannot be minted',async()=>{
+ const c=browser();const active={'creator-a':'CreatorA','creator-b':'bee'};const calls=[];
+ c.getSupabaseClient=()=>({rpc:async(name,args)=>{calls.push([name,{...args}]);if(name==='xora_referral_preview'){const h=active[args.p_code];return {data:h?{code:args.p_code,handle:h}:null,error:null};}throw new Error('unexpected '+name);}});
+ c.location.search='?ref=not-a-creator';await c.captureReferral();assert.equal(c.localStorage.getItem(c.LS.referral),null,'unknown code is ignored');
+ c.location.search='?ref=%3Cscript%3E';await c.captureReferral();assert.equal(calls.length,1,'malformed codes are never sent');
+ c.location.search='?ref=Creator-A';await c.captureReferral();assert.equal(c.getReferralCode(),'creator-a');
+ const saved=JSON.parse(c.localStorage.getItem(c.LS.referral));assert.equal(saved.handle,'CreatorA');
+ assert.ok(Math.abs(Date.parse(saved.expires_at)-Date.now()-30*86400000)<60000,'kept for 30 days');
+ c.location.search='?tier=fun';await c.captureReferral();assert.equal(c.getReferralCode(),'creator-a','survives navigation to pages without ?ref');
+ c.location.search='?ref=creator-b';await c.captureReferral();assert.equal(c.getReferralCode(),'creator-a','a later referral does not replace the first');
+ assert.equal(c.getPublicSiteUrl(),'https://xora.roviaqr.com/?ref=creator-a');
+ c.localStorage.setItem(c.LS.referral,JSON.stringify({code:'creator-a',expires_at:'2000-01-01'}));await c.captureReferral();assert.equal(c.getReferralCode(),'creator-b','an expired, unclaimed capture can be replaced');
+ const noServer=browser();noServer.location.search='?ref=creator-a';await noServer.captureReferral();assert.equal(noServer.getReferralCode(),'','without a server answer nothing is stored');
+ assert.throws(()=>c.addCredits(100),/server_only/);assert.throws(()=>c.spendCredits(5),/server_only/);
+});
+test('login claims the saved referral through the server RPC with only the code; an existing server attribution always wins',async()=>{
+ const c=browser();const sent=[];let server=null;
+ c.getSupabaseClient=()=>({rpc:async(name,args)=>{sent.push([name,{...args}]);
+  if(name==='xora_referral_preview') return {data:{code:args.p_code,handle:'h_'+args.p_code},error:null};
+  if(name==='xora_capture_referral'){if(!server&&args.p_code) server={user_id:'u1',referral_code:args.p_code,expires_at:new Date(Date.now()+365*86400000).toISOString(),handle:'h_'+args.p_code};return {data:server,error:null};}
+  throw new Error('unexpected '+name);}});
+ c.getCurrentUser=()=>({id:'u1'});
+ c.location.search='?ref=creator-a';await c.captureReferral();await c.syncReferral();
+ assert.deepEqual(sent.find(s=>s[0]==='xora_capture_referral')[1],{p_code:'creator-a'},'the browser sends a code, never a user or owner');
+ const claimed=JSON.parse(c.localStorage.getItem(c.LS.referral));assert.deepEqual({code:claimed.code,claimed:claimed.claimed,handle:claimed.handle},{code:'creator-a',claimed:true,handle:'h_creator-a'});
+ // Another browser arrives through creator-b, then logs into the same account.
+ c.localStorage.removeItem(c.LS.referral);c.location.search='?ref=creator-b';await c.captureReferral();assert.equal(c.getReferralCode(),'creator-b');
+ await c.syncReferral();assert.equal(c.getReferralCode(),'creator-a','the claimed attribution is not hijacked by a later referral');
+});
+test('"via @creator" appears near the homepage CTA in all 12 locales, escaped and isolated, and only for a confirmed creator',()=>{
+ for(const lang of LOCALES12){
+  const c=browser();const el={hidden:true,innerHTML:'',textContent:''};c.document.getElementById=id=>id==='refVia'?el:null;c.getLang=()=>lang;
+  c.renderReferralVia();assert.equal(el.hidden,true,lang+' hidden without a referral');
+  c.localStorage.setItem(c.LS.referral,JSON.stringify({code:'creator-a',handle:'Creator_A',expires_at:new Date(Date.now()+86400000).toISOString()}));
+  c.renderReferralVia();
+  const [before,after]=c.I18N[lang].ref_via.split('{handle}');
+  assert.equal(el.hidden,false);assert.equal(el.innerHTML,c.esc(before)+'<bdi dir="ltr">@Creator_A</bdi>'+c.esc(after||''),lang);
+  assert.ok(c.I18N[lang].ref_via.includes('{handle}')&&c.I18N[lang].ref_via.length<=30,lang+' short line with a handle slot');
+  c.localStorage.setItem(c.LS.referral,JSON.stringify({code:'creator-a',handle:'<img src=x onerror=alert(1)>',expires_at:new Date(Date.now()+86400000).toISOString()}));
+  c.renderReferralVia();assert.ok(!el.innerHTML.includes('<img'),lang+' handle is escaped');
+ }
+ const html=fs.readFileSync('index.html','utf8');
+ assert.ok(html.indexOf('id="refVia"')>html.indexOf('data-i18n="home_hi"')&&html.indexOf('id="refVia"')<html.indexOf('class="choices"'),'the line sits next to the primary CTAs, not on a separate page');
+});
+test('the canonical domain replaces github.io in share, referral, canonical and card links; REAL stays gated on both hosts',()=>{
+ for(const host of ['icanyesilyurt.github.io','xora.roviaqr.com','localhost']){
+  const c=browser();c.location.hostname=host;c.location.origin=host==='localhost'?'http://localhost:3000':'https://'+host;c.location.href=c.location.origin+'/xora/mirror.html';
+  assert.equal(c.getPublicSiteUrl(),'https://xora.roviaqr.com/');
+  assert.equal(c.creatorReferralUrl('Creator-A'),'https://xora.roviaqr.com/?ref=creator-a');
+  assert.equal(c.isProductionRealDisabled(),host!=='localhost',host);
+ }
+ const c=browser();const fun=c.markAnalysisTier(c.analyzeFunHandle('alice','mirror',0),'fun','mirror');
+ const card=c.buildIdentityCard(fun);assert.ok(card.includes('xora.roviaqr.com')&&!card.includes('xora.app'));
+ for(const f of ['app.js','card.js','xora.js','index.html','mirror.html','stalk.html','match.html','credits.html','profile.html','auth.html','config.js','config.example.js']){
+  const src=fs.readFileSync(f,'utf8');
+  const hits=src.split('\n').filter(l=>/github\.io|xora\.app\b/.test(l));
+  assert.deepEqual(hits.filter(l=>!/PRODUCTION_HOSTS = \[/.test(l)),[],f+' emits no old production URL');
+  if(f.endsWith('.html')) assert.match(src,new RegExp('<link rel="canonical" href="https://xora\\.roviaqr\\.com/'+(f==='index.html'?'':f.replace('.','\\.'))+'">'),f);
+ }
 });
 test('REAL HTML/PNG and share output include rarity, and REAL has no reroll',()=>{
  const c=browser();const r=c.analyzeHandle('alice','mirror');r.meta={tier:'real'};r.rarity={name:'epic'};
@@ -281,7 +337,7 @@ for(const lang of ['pt','ar','fr','de','it','ja','ko','zh','ru']) test('every '+
   assert.equal(text.find(p=>p.v==='@alice').dir,'ltr','handle stays LTR');
   // Line wrapping only breaks at spaces, so elided words (l', un', dell', all') never split or leave a dangling apostrophe.
   for(const p of text.filter(p=>p.x===500 && p.y>560 && p.y<1090)) assert.doesNotMatch(p.v,/^['’]|(?:^|\s)(?:l|un|dell|all|d|c|s|n|com|tutt)['’]$/i,id+' broken elision: '+p.v);
-  for(const v of ['XORA','xora.app','XORA FUN · FREE']) assert.equal(text.find(p=>p.v===v).dir,'ltr',v+' stays LTR');
+  for(const v of ['XORA','xora.roviaqr.com','XORA FUN · FREE']) assert.equal(text.find(p=>p.v===v).dir,'ltr',v+' stays LTR');
   // Japanese wraps between characters, so check the basic kinsoku rules on the drawn lines.
   if(lang==='ja'||lang==='zh') for(const p of text.filter(p=>p.x===500 && p.y>560 && p.y<1090)){
    assert.doesNotMatch(p.v,/^[、。，．・：；？！）」』】〕…]/,id+' line starts with closing punctuation: '+p.v);
@@ -382,7 +438,7 @@ test('Arabic mixed-direction content keeps handles, URL, percentages and brand n
  }
  c.localStorage.setItem(c.LS.lang,'ar');
  const share=c.shareIdentityText(fun);
- assert.match(share,/^بطاقتي في XORA FUN: «.+» 😅 اسحب بطاقتك ← \u2066https:\/\/example\.test\/.*\u2069$/);
+ assert.match(share,/^بطاقتي في XORA FUN: «.+» 😅 اسحب بطاقتك ← \u2066https:\/\/xora\.roviaqr\.com\/.*\u2069$/);
  const matchShare=c.shareMatchText(m);
  assert.ok(matchShare.startsWith('توافق '+LRI+'@alice × @bob'+PDI+' في XORA FUN: '+LRI+m.overall+'%'+PDI),matchShare);
  const real={...structuredClone(m),meta:{tier:'real',locale:'ar'},rarity:{name:'rare'}};

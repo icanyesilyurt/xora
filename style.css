@@ -432,6 +432,11 @@ body::before{
   letter-spacing:1px;
 }
 .barcode{font-family:monospace;font-size:13px;letter-spacing:0;opacity:.9}
+.idcard-host{letter-spacing:0;font-size:11px;white-space:nowrap}
+.idcard-foot>span{flex:0 0 auto;white-space:nowrap}
+.idcard-foot>.barcode{flex:1 1 0;min-width:0;overflow:hidden;text-align:center;margin:0 8px}
+.ref-via{margin:-4px auto 10px;font-size:13px;font-weight:800;color:var(--mut);text-align:center}
+.ref-via bdi{color:var(--ink)}
 
 /* ---- V3 kart ek stilleri ---- */
 .v3-summary{margin:10px 0 6px;padding:0 4px}

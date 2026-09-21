@@ -350,3 +350,104 @@ test('credits page sends only a package id and shows the result the server confi
  const before=sent.length;sb.auth.getSession=async()=>({data:{session:null}});
  assert.equal(await c.startCreditPurchase('popular'),'unauthorized');assert.equal(sent.length,before);
 });
+
+// ---------------------------------------------------------------------------------------------
+// Creator referral pilot: 30% commission on verified, referred credit purchases.
+const commissions=async db=>(await q(db,'select * from public.affiliate_commissions order by created_at')).map(r=>({...r}));
+async function asService(db,sql,args=[]){await role(db,'service_role');try{return await q(db,sql,args);}finally{await db.exec('reset role');}}
+async function referred(db,user,code='creator-x'){
+ await asService(db,`insert into public.affiliates(code,display_name) values($1,'CreatorX') on conflict do nothing`,[code]);
+ await role(db,'authenticated',user);
+ try{return (await q(db,`select public.xora_capture_referral($1) as v`,[code]))[0].v;}finally{await db.exec('reset role');}
+}
+async function buyAs(ctx,user,pkg){
+ const res=await api(ctx.fn,{action:'create',package_id:pkg},user);const body=await res.json();
+ assert.equal(res.status,200,JSON.stringify(body));
+ return {id:body.purchase_id,token:[...ctx.mock.inits.keys()].pop()};
+}
+
+test('a verified referred purchase creates exactly one 30% commission; duplicate callbacks, verify and RPC replays add none',async()=>{
+ await withFunction(async ctx=>{
+  const claim=await referred(ctx.db,A);
+  assert.equal(claim.referral_code,'creator-x');assert.equal(claim.handle,'CreatorX');
+  assert.ok(Math.abs(Date.parse(claim.expires_at)-Date.parse(claim.first_seen_at)-365*86400000)<=86400000,'12-month commission window');
+  assert.equal(Number((await asService(ctx.db,`select commission_bps from public.affiliates where code='creator-x'`))[0].commission_bps),3000,'pilot rate is 30%');
+  const {id,token}=await startPurchase(ctx,'popular');
+  assert.equal((await commissions(ctx.db)).length,0,'no commission before payment');
+  assert.equal((await callback(ctx.fn,token)).status,303);
+  let rows=await commissions(ctx.db);
+  assert.equal(rows.length,1);
+  assert.deepEqual({purchase:rows[0].purchase_id,user:rows[0].user_id,code:rows[0].referral_code,amount:Number(rows[0].purchase_amount).toFixed(2),cur:rows[0].currency,bps:rows[0].commission_bps,commission:Number(rows[0].commission_amount).toFixed(2),status:rows[0].status},
+   {purchase:id,user:A,code:'creator-x',amount:'5.99',cur:'USD',bps:3000,commission:'1.80',status:'owed'});
+  await callback(ctx.fn,token);await api(ctx.fn,{action:'verify',purchase_id:id},A);
+  await asService(ctx.db,`select public.xora_complete_credit_purchase($1,$2,$3,'popular',5.99,'USD')`,[id,token,'pay-'+token]);
+  await asService(ctx.db,`select public.xora_record_affiliate_commission($1)`,[id]);
+  rows=await commissions(ctx.db);assert.equal(rows.length,1,'still one commission');
+  assert.equal(await balance(ctx.db,A),120,'and still one credit');
+  // The rate is applied to the verified purchase amount on the server, for every package.
+  for(const [pkg,want] of [['value','4.50'],['professional','27.00'],['starter','0.90']]){
+   const p=await buyAs(ctx,A,pkg);await callback(ctx.fn,p.token);
+   const row=(await commissions(ctx.db)).find(r=>r.purchase_id===p.id);
+   assert.equal(Number(row.commission_amount).toFixed(2),want,pkg);
+  }
+ });
+});
+
+test('failed, mismatched, unattributed, expired, inactive and self-referred purchases earn no commission',async()=>{
+ await withFunction(async ctx=>{
+  await referred(ctx.db,A);
+  ctx.mock.state.detail=ok=>({...ok,paymentStatus:'FAILURE',status:'success'});
+  const failed=await startPurchase(ctx,'popular');await callback(ctx.fn,failed.token);
+  assert.equal((await purchase(ctx.db,failed.id)).status,'failed');
+  ctx.mock.state.detail=ok=>({...ok,paidPrice:'0.01',price:'0.01'});
+  const mismatch=await startPurchase(ctx,'popular');await callback(ctx.fn,mismatch.token);
+  assert.equal((await purchase(ctx.db,mismatch.id)).status,'failed');
+  ctx.mock.state.detail=null;
+  assert.equal((await commissions(ctx.db)).length,0,'failed payments earn nothing');
+  // B arrived without a referral: a direct purchase.
+  const direct=await buyAs(ctx,B,'value');await callback(ctx.fn,direct.token);
+  assert.equal((await purchase(ctx.db,direct.id)).status,'completed');
+  assert.equal((await commissions(ctx.db)).length,0,'direct purchases earn nothing');
+  // Outside the 12-month window.
+  await asService(ctx.db,`update public.affiliate_attributions set first_seen_at=now()-interval '13 months' where user_id=$1`,[A]);
+  const late=await startPurchase(ctx,'popular');await callback(ctx.fn,late.token);
+  assert.equal((await commissions(ctx.db)).length,0,'no commission after 12 months');
+  // Paused creator.
+  await asService(ctx.db,`update public.affiliate_attributions set first_seen_at=now() where user_id=$1`,[A]);
+  await asService(ctx.db,`update public.affiliates set is_active=false where code='creator-x'`);
+  const paused=await startPurchase(ctx,'popular');await callback(ctx.fn,paused.token);
+  assert.equal((await commissions(ctx.db)).length,0,'no commission for an inactive creator');
+  // A creator's own account can neither claim nor earn from its own code.
+  await asService(ctx.db,`insert into public.affiliates(code,owner_user_id) values('own-code',$1)`,[B]);
+  await role(ctx.db,'authenticated',B);
+  assert.equal((await q(ctx.db,`select public.xora_capture_referral('own-code') as v`))[0].v,null,'self-referral refused');
+  await ctx.db.exec('reset role');
+ });
+});
+
+test('refunds and chargebacks void the commission, and the admin report adds up referred revenue and 30% owed',async()=>{
+ await withFunction(async ctx=>{
+  await referred(ctx.db,A);
+  const a=await startPurchase(ctx,'popular');await callback(ctx.fn,a.token);
+  const b=await startPurchase(ctx,'value');await callback(ctx.fn,b.token);
+  const direct=await buyAs(ctx,B,'value');await callback(ctx.fn,direct.token);
+  await asService(ctx.db,`select public.xora_void_affiliate_commission($1,'chargeback: bank dispute')`,[b.id]);
+  await assert.rejects(asService(ctx.db,`select public.xora_void_affiliate_commission($1,'because')`,[a.id]),/invalid_void_reason/);
+  const report=(await asService(ctx.db,`select * from public.xora_affiliate_report where code='creator-x'`))[0];
+  assert.deepEqual({claimed:Number(report.claimed_users),signups:Number(report.referred_signups),purchases:Number(report.successful_purchases),revenue:Number(report.collected_revenue_usd).toFixed(2),owed:Number(report.commission_owed_usd).toFixed(2),voided:Number(report.voided_purchases),handle:report.handle,bps:report.commission_bps},
+   {claimed:1,signups:1,purchases:1,revenue:'5.99',owed:'1.80',voided:1,handle:'CreatorX',bps:3000});
+  // Browser roles see none of it; they can only ask whether a code is an active creator.
+  for(const r of ['anon','authenticated']){
+   await role(ctx.db,r,A);
+   for(const sql of ['select * from public.affiliate_commissions','select * from public.xora_affiliate_report','select * from public.affiliates','select * from public.affiliate_attributions',
+     `select public.xora_record_affiliate_commission('${a.id}')`,`select public.xora_void_affiliate_commission('${a.id}','refund')`,`select public.xora_attribute_referral('${A}','creator-x','x')`,
+     `select public.xora_claim_referral('${A}','creator-x')`,`insert into public.affiliate_attributions(user_id,referral_code) values('${B}','creator-x')`,
+     `update public.affiliates set commission_bps=10000`]){
+    await assert.rejects(ctx.db.exec(sql),r+': '+sql.slice(0,70));
+   }
+   assert.deepEqual((await q(ctx.db,`select public.xora_referral_preview('CREATOR-X') as v`))[0].v,{code:'creator-x',handle:'CreatorX'},r+' preview shows only code and handle');
+   assert.equal((await q(ctx.db,`select public.xora_referral_preview('nobody') as v`))[0].v,null);
+   await ctx.db.exec('reset role');
+  }
+ });
+});
