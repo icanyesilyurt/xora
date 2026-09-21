@@ -95,7 +95,7 @@ function buildFunIdentityCard(res) {
         funTraitChipsHtml(res) +
         '<div class="idcard-quote fun-quote"><p>' + esc(comment) + '</p></div>' +
       '</div>' +
-      '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(res.hash || 1) + '</span><span>xora.app</span></div>' +
+      '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(res.hash || 1) + '</span><span class="idcard-host">' + XORA_PUBLIC_HOST + '</span></div>' +
     '</div>'
   );
 }
@@ -109,7 +109,7 @@ function buildFunMatchCard(m) {
       '<div class="idcard-body"><p class="idcard-handle">@' + esc(m.a) + ' × @' + esc(m.b) + '</p>' +
       '<h2 class="idcard-type match-pct">%' + m.overall + '</h2><p class="idcard-desc">' + esc(t("fun_match_label")) + '</p>' +
       '<div class="idcard-quote fun-quote"><span class="quote-label">XORA FUN</span><p>' + esc(comment) + '</p></div></div>' +
-      '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(xhash(m.a + m.b)) + '</span><span>xora.app</span></div></div>'
+      '<div class="idcard-foot"><span>XORA FUN</span><span class="barcode">' + fakeBarcode(xhash(m.a + m.b)) + '</span><span class="idcard-host">' + XORA_PUBLIC_HOST + '</span></div></div>'
   );
 }
 
@@ -187,7 +187,7 @@ function buildRealIdentityCard(res) {
           "<p>" + esc(comment) + "</p>" +
         "</div>" +
       "</div>" +
-      '<div class="idcard-foot"><span>XORA</span><span class="barcode">' + fakeBarcode(res.hash || xhash(String(res.handle || "x"))) + '</span><span>xora.app</span></div>' +
+      '<div class="idcard-foot"><span>XORA</span><span class="barcode">' + fakeBarcode(res.hash || xhash(String(res.handle || "x"))) + '</span><span class="idcard-host">' + XORA_PUBLIC_HOST + '</span></div>' +
     "</div>"
   );
 }
@@ -263,7 +263,7 @@ function buildIdentityCardV3(res) {
       '<div class="idcard-foot">' +
         "<span>XORA</span>" +
         '<span class="barcode">' + fakeBarcode(res.hash) + "</span>" +
-        "<span>xora.app</span>" +
+        "<span class=\"idcard-host\">" + XORA_PUBLIC_HOST + "</span>" +
       "</div>" +
     "</div>"
   );
@@ -305,7 +305,7 @@ function buildIdentityCardV2(res) {
       '<div class="idcard-foot">' +
         "<span>XORA</span>" +
         '<span class="barcode">' + fakeBarcode(res.hash) + "</span>" +
-        "<span>xora.app</span>" +
+        "<span class=\"idcard-host\">" + XORA_PUBLIC_HOST + "</span>" +
       "</div>" +
     "</div>"
   );
@@ -346,7 +346,7 @@ function buildIdentityCardV1(res) {
       '<div class="idcard-foot">' +
         "<span>XORA</span>" +
         '<span class="barcode">' + fakeBarcode(res.hash) + "</span>" +
-        "<span>xora.app</span>" +
+        "<span class=\"idcard-host\">" + XORA_PUBLIC_HOST + "</span>" +
       "</div>" +
     "</div>"
   );
@@ -409,7 +409,7 @@ function buildMatchCardBase(m) {
       '<div class="idcard-foot">' +
         "<span>XORA</span>" +
         '<span class="barcode">' + fakeBarcode(xhash(m.a + m.b)) + "</span>" +
-        "<span>xora.app</span>" +
+        "<span class=\"idcard-host\">" + XORA_PUBLIC_HOST + "</span>" +
       "</div>" +
     "</div>"
   );
@@ -574,10 +574,11 @@ function drawCardFooter(ctx, h) {
   ctx.textAlign = "left";
   ctx.fillText("XORA", 110, 1140);
   ctx.textAlign = "right";
-  ctx.font = "700 26px Nunito, Arial, sans-serif";
-  ctx.fillText("xora.app", 890, 1140);
+  ctx.font = "700 22px Nunito, Arial, sans-serif";
+  ctx.fillText(XORA_PUBLIC_HOST, 890, 1140);
   ctx.textAlign = "center";
-  ctx.font = "26px monospace";
+  // Narrower barcode so it never runs into the domain on the right.
+  ctx.font = "18px monospace";
   ctx.fillText(fakeBarcode(h), 500, 1140);
 }
 
