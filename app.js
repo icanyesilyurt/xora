@@ -513,13 +513,15 @@ function realErrorMessage(err) {
   return t("real_err_unavailable");
 }
 
-// Production hosts: the canonical domain, plus the old Pages address while it still redirects.
+// Production hosts: the canonical domain (Cloudflare Pages), its *.pages.dev deployments, which use
+// the same production config, and the old GitHub Pages address until it is switched off.
 var XORA_PUBLIC_ORIGIN = "https://xora.roviaqr.com";
 var XORA_PUBLIC_HOST = "xora.roviaqr.com";
 var PRODUCTION_HOSTS = ["xora.roviaqr.com", "icanyesilyurt.github.io"];
 
 function isProductionRealDisabled() {
-  return PRODUCTION_HOSTS.indexOf(String(window.location && window.location.hostname || "").toLowerCase()) >= 0;
+  var host = String(window.location && window.location.hostname || "").toLowerCase();
+  return PRODUCTION_HOSTS.indexOf(host) >= 0 || /\.pages\.dev$/.test(host);
 }
 
 function disableProductionRealCtas() {

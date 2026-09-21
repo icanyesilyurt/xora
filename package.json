@@ -1,1 +1,1 @@
-{"name":"xora-task-01","private":true,"scripts":{"test":"node --test tests/*.test.cjs && node tests/runtime-smoke.js","check":"node tests/syntax.cjs"},"devDependencies":{"@electric-sql/pglite":"0.5.8","typescript":"5.9.3"}}
+{"name":"xora-task-01","private":true,"scripts":{"build":"node scripts/build-pages.mjs","test":"node --test tests/*.test.cjs && node tests/runtime-smoke.js","check":"node tests/syntax.cjs"},"devDependencies":{"@electric-sql/pglite":"0.5.8","typescript":"5.9.3"}}
