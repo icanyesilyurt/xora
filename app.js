@@ -3406,6 +3406,10 @@ async function startCreditPurchase(packageId) {
   toast(t("pay_opening"));
   var res = await sb.functions.invoke(PAYMENT_FUNCTION, { body: { action: "create", package_id: packageId, locale: getLang() } });
   var data = res && !res.error ? res.data : null;
+  if (!data && res && res.error && res.error.context && typeof res.error.context.clone === "function") {
+    try { data = await res.error.context.clone().json(); } catch (e) {}
+  }
+  if (data && data.provider_error) console.warn("iyzico_checkout_error", JSON.stringify(data.provider_error));
   if (!data || data.status !== "ok" || !data.purchase_id) { toast(t("pay_unavailable")); return "unavailable"; }
   try { sessionStorage.setItem(PENDING_PURCHASE_KEY, data.purchase_id); } catch (e) {}
   if (data.sandbox) toast(t("pay_sandbox"));
