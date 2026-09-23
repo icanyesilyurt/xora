@@ -44,14 +44,15 @@ function isPackageId(v: unknown): v is PackageId {
   return typeof v === "string" && Object.hasOwn(CATALOG, v);
 }
 
-function sanitizedProviderError(data: any) {
+function sanitizedProviderError(data: any, requestError?: unknown) {
   const clean = (value: unknown, fallback: string, max: number) => {
     const text = String(value || fallback).replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim();
     return text.slice(0, max);
   };
+  const thrown = requestError instanceof Error ? requestError.message : requestError;
   return {
-    code: clean(data?.errorCode, "unknown", 64),
-    message: clean(data?.errorMessage, "Checkout initialization failed", 180)
+    code: clean(data?.errorCode, thrown ? "request_error" : "unknown", 64),
+    message: clean(data?.errorMessage || thrown, "Checkout initialization failed", 180)
   };
 }
 
@@ -261,10 +262,10 @@ async function createCheckout(req: Request, body: any) {
     basketItems: [{ id: p.package_id, name: `XORA ${p.credits} credits`, category1: "Digital credits", itemType: "VIRTUAL", price: amount }]
   };
 
-  let data: any;
-  try { data = await iyzicoRequest(INITIALIZE_PATH, request); } catch { data = null; }
+  let data: any, requestError: unknown;
+  try { data = await iyzicoRequest(INITIALIZE_PATH, request); } catch (e) { data = null; requestError = e; }
   if (!data || data.status !== "success" || typeof data.token !== "string" || data.conversationId !== p.purchase_id) {
-    const providerError = sanitizedProviderError(data);
+    const providerError = sanitizedProviderError(data, requestError);
     console.warn("iyzico_initialize_rejected", JSON.stringify(providerError));
     await service.rpc("xora_fail_credit_purchase", { p_purchase_id: p.purchase_id, p_reason: "initialize_failed" });
     return json({ status: "error", code: "checkout_unavailable", provider_error: providerError }, 502);
