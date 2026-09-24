@@ -124,6 +124,15 @@ function realScoredBars(res, lang) {
   });
 }
 
+// The comment written for the result's own mode: Mirror → comment.mirror, Stalk → comment.stalk
+// (results without a stalk entry fall back to mirror), Match → the AI match analysis.
+function realModeComment(res, lang) {
+  if (!res) return "";
+  if (res.mode === "match" || (res.a && res.b && res.resA)) return matchComment(res, lang) || "";
+  var c = res.comment || {};
+  return localized(res.mode === "stalk" ? (c.stalk || c.mirror) : c.mirror, lang);
+}
+
 function buildRealIdentityCard(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var c = res.card || {};
@@ -132,7 +141,7 @@ function buildRealIdentityCard(res) {
   var nick = localized(res.nickname || c.nickname, lang);
   var tagline = localized(res.tagline || c.desc, lang);
   var summary = localized(res.profile_summary, lang);
-  var comment = res.comment ? localized(res.comment.mirror, lang) : "";
+  var comment = realModeComment(res, lang);
   var rows = realScoredBars(res, lang).map(function (row) {
     return '<div class="score-chip" data-metric="' + esc(row.key) + '">' +
       '<span class="score-name">' + esc(row.label) + "</span>" +
@@ -652,7 +661,7 @@ function shareCardModel(res) {
     description: shareShortLine(localized(res.tagline || c.desc, lang)),
     bars: bars,
     boxLabel: mode === "stalk" ? "XORA STALK" : t("share_label_mirror"),
-    analysis: res.comment ? localized(res.comment[mode] || res.comment.mirror, lang) : "",
+    analysis: realModeComment(res, lang),
     hash: res.hash || xhash(String(res.handle || "x"))
   });
 }

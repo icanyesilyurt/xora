@@ -739,6 +739,29 @@ test('REAL identity card draws the same 4-6 AI-scored bars as the share card, ne
  const html=c.buildIdentityCard(res);
  assert.equal((html.match(/class="score-chip"/g)||[]).length,6);assert.equal(c.shareCardModel(res).bars.length,6);
 });
+test('REAL cards use the comment written for the active mode: Mirror, Stalk and Match, in all 12 locales',()=>{
+ for(const lang of LOCALES12){
+  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
+  const base={meta:{tier:'real',locale:lang,version:'xora_real_v1'},handle:'alice',hash:7,rarity:{name:'rare',score:72},
+   nickname:{[lang]:'Nick'},tagline:{[lang]:'Tag line.'},
+   comment:{mirror:{[lang]:'MIRROR_VOICE you write in short bursts.'},stalk:{[lang]:'STALK_VOICE this account writes in short bursts.'}},
+   card:{color:'#8B5CF6',emoji:'🪞',top_behaviors:[{key:'mizah',label:{[lang]:'M1'},value:70},{key:'merak',label:{[lang]:'M2'},value:60},{key:'kaos',label:{[lang]:'M3'},value:50},{key:'direktlik',label:{[lang]:'M4'},value:40}]}};
+  const mirror=c.buildIdentityCard({...base,mode:'mirror'});
+  assert.ok(mirror.includes('MIRROR_VOICE')&&!mirror.includes('STALK_VOICE'),lang+' mirror in-app');
+  assert.match(c.shareCardModel({...base,mode:'mirror'}).analysis,/^MIRROR_VOICE/,lang+' mirror share');
+  const stalk=c.buildIdentityCard({...base,mode:'stalk'});
+  assert.ok(stalk.includes('STALK_VOICE')&&!stalk.includes('MIRROR_VOICE'),lang+' stalk in-app');
+  assert.match(c.shareCardModel({...base,mode:'stalk'}).analysis,/^STALK_VOICE/,lang+' stalk share');
+  // Older Stalk results that only carry a mirror entry still show their comment.
+  assert.ok(c.buildIdentityCard({...base,mode:'stalk',comment:{mirror:base.comment.mirror}}).includes('MIRROR_VOICE'),lang+' stalk fallback');
+  const m={mode:'match',a:'alice',b:'bob',handles:['alice','bob'],resA:{archetype:{emoji:'🪞'}},resB:{archetype:{emoji:'🔥'}},
+   flirt:40,vibe:70,humor:60,chaos:30,romance:20,overall:64,ci:0,rarity:{name:'rare',score:70},source:'ai',
+   meta:{version:'xora_real_match_v1',tier:'real',source:'ai',locale:lang},ai_comment:{[lang]:'MATCH_VOICE the two accounts trade quick replies.'}};
+  const match=c.buildMatchCard(m);
+  assert.ok(match.includes('MATCH_VOICE'),lang+' match in-app');
+  assert.match(c.shareCardModel(m).analysis,/^MATCH_VOICE/,lang+' match share');
+ }
+});
 test('credit packages: 10/20/50/300 at launch prices with struck regular prices and correct capacity, in all 12 locales',()=>{
  const c=browser();
  assert.deepEqual({...c.COSTS},{mirror:5,stalk:5,match:10},'per-analysis prices unchanged');
