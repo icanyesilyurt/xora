@@ -59,36 +59,16 @@ test('FUN product button paths execute without auth, credits or REAL network',as
   await node('goBtn').click();assert.match(node('cardHolder').innerHTML,/XORA FUN/);assert.equal(node('rerollBtn').hidden,false);
  }
 });
-test('production direct REAL URLs stay on a disabled input view without auth or API errors',async()=>{
- for(const name of ['mirror','stalk','match'])for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']){
-  const c=browser(),nodes=new Map();c.location.hostname='icanyesilyurt.github.io';c.location.search='?tier=real';c.getLang=()=>lang;
-  function node(id){if(!nodes.has(id))nodes.set(id,{value:'',hidden:false,textContent:'',innerHTML:'',classList:{toggle(){}},addEventListener(ev,fn){this[ev]=fn;},focus(){}});return nodes.get(id);}
-  c.document.getElementById=node;
-  c.initSession=async()=>{throw Error('Paused REAL initiated auth');};c.requestRealAnalysis=async()=>{throw Error('Paused REAL invoked API');};c.toast=()=>{throw Error('Paused REAL showed an error');};
-  const originalUrl=c.location.href;
-  const inline=[...fs.readFileSync(name+'.html','utf8').matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map(x=>x[1]).filter(x=>x.trim()).pop();
-  vm.runInContext(inline,c);await new Promise(resolve=>setImmediate(resolve));
-  assert.equal(node('goBtn').disabled,true);assert.equal(node('goBtn').textContent,c.realComingSoonText());assert.equal(node('tierNote').textContent,c.realComingSoonText());
-  await node('goBtn').click();
-  const input=node(name==='match'?'handleB':name==='mirror'?'mirrorHandleInput':'handleInput');
-  await input.keydown({key:'Enter'});
-  assert.equal(c.location.href,originalUrl);
-  assert.equal(node(name==='mirror'?'inputView':'step-input').hidden,false);
- }
- const c=browser();c.location.hostname='icanyesilyurt.github.io';
- c.getSupabaseClient=()=>{throw Error('Network client initialized');};
- await assert.rejects(c.requestRealAnalysis('mirror',{handle:'alice'}),/real_temporarily_unavailable/);
- c.location.hostname='localhost';assert.equal(c.showProductionRealPause('real'),false);
-});
-test('disabled production REAL links cannot redirect to auth and status updates without duplication',()=>{
- const c=browser();c.location.hostname='icanyesilyurt.github.io';
- const attrs=new Map([['href','mirror.html?tier=real']]);const handlers=[];let child;
- const link={classList:{add(){}},setAttribute:(k,v)=>attrs.set(k,v),getAttribute:k=>attrs.get(k),removeAttribute:k=>attrs.delete(k),querySelector:()=>child,appendChild:n=>{child=n;},addEventListener:(_ev,fn)=>handlers.push(fn)};
- c.document.querySelectorAll=()=>[link];c.document.createElement=()=>({});
- c.initAuthGuards();c.disableProductionRealCtas();const status=child;
- assert.equal(attrs.has('href'),false);assert.equal(attrs.get('aria-disabled'),'true');
- const url=c.location.href;handlers.forEach(fn=>fn.call(link,{preventDefault(){}}));assert.equal(c.location.href,url);
- c.getLang=()=> 'en';c.disableProductionRealCtas();assert.equal(child,status);assert.equal(child.textContent,'Real analysis coming soon');
+test('production REAL links remain active and use the authenticated backend path',async()=>{
+ const c=browser();c.location.hostname='xora.roviaqr.com';
+ const attrs=new Map([['href','mirror.html?tier=real']]);
+ const link={classList:{add(){}},setAttribute:(k,v)=>attrs.set(k,v),getAttribute:k=>attrs.get(k),removeAttribute:k=>attrs.delete(k),addEventListener(){}};
+ c.document.querySelectorAll=()=>[link];c.initAuthGuards();
+ assert.equal(attrs.get('href'),'mirror.html?tier=real');
+ const real=c.analyzeFunHandle('alice','mirror',0);real.meta={tier:'real'};real.rarity={name:'rare'};
+ c.getSupabaseClient=()=>({auth:{getSession:async()=>({data:{session:{user:{id:'user-a'}}}})},functions:{invoke:async(name,{body})=>{assert.equal(name,'analyze-real');assert.equal(body.mode,'mirror');return {data:{result:real}};}}});
+ c.refreshCreditsFromServer=async()=>{};
+ assert.equal((await c.requestRealAnalysis('mirror',{handle:'alice'})).meta.tier,'real');
 });
 test('legacy V1/V2/V3 and Match preserve original renderer paths without a fabricated REAL badge',()=>{
  const c=browser();const old=c.analyzeHandle('alice','mirror');
@@ -147,19 +127,18 @@ test('"via @creator" appears near the homepage CTA in all 12 locales, escaped an
  const html=fs.readFileSync('index.html','utf8');
  assert.ok(html.indexOf('id="refVia"')>html.indexOf('data-i18n="home_hi"')&&html.indexOf('id="refVia"')<html.indexOf('class="choices"'),'the line sits next to the primary CTAs, not on a separate page');
 });
-test('the canonical domain replaces github.io in share, referral, canonical and card links; REAL stays gated on both hosts',()=>{
+test('the canonical domain replaces github.io in share, referral, canonical and card links',()=>{
  for(const host of ['icanyesilyurt.github.io','xora.roviaqr.com','xora.pages.dev','xora-staging.xora.pages.dev','localhost']){
   const c=browser();c.location.hostname=host;c.location.origin=host==='localhost'?'http://localhost:3000':'https://'+host;c.location.href=c.location.origin+'/xora/mirror.html';
   assert.equal(c.getPublicSiteUrl(),'https://xora.roviaqr.com/');
   assert.equal(c.creatorReferralUrl('Creator-A'),'https://xora.roviaqr.com/?ref=creator-a');
-  assert.equal(c.isProductionRealDisabled(),host!=='localhost',host);
  }
  const c=browser();const fun=c.markAnalysisTier(c.analyzeFunHandle('alice','mirror',0),'fun','mirror');
  const card=c.buildIdentityCard(fun);assert.ok(card.includes('xora.roviaqr.com')&&!card.includes('xora.app'));
  for(const f of ['app.js','card.js','xora.js','index.html','mirror.html','stalk.html','match.html','credits.html','profile.html','auth.html','config.js','config.example.js']){
   const src=fs.readFileSync(f,'utf8');
   const hits=src.split('\n').filter(l=>/github\.io|xora\.app\b/.test(l));
-  assert.deepEqual(hits.filter(l=>!/PRODUCTION_HOSTS = \[/.test(l)),[],f+' emits no old production URL');
+  assert.deepEqual(hits,[],f+' emits no old production URL');
   if(f.endsWith('.html')) assert.ok(src.includes('<link rel="canonical" href="https://xora.roviaqr.com/'+(f==='index.html'?'':f.replace(/\.html$/,''))+'">'),f+' canonical is the extensionless Cloudflare Pages URL');
  }
 });
@@ -256,34 +235,24 @@ test('every saved locale persists and localizes; unknown stored values fall thro
  assert.equal(c.LANG_NAMES.pt,'Português');assert.equal(c.LANG_NAMES.ar,'العربية');assert.equal(c.LANG_NAMES.fr,'Français');assert.equal(c.LANG_NAMES.de,'Deutsch');assert.equal(c.LANG_NAMES.it,'Italiano');assert.equal(c.LANG_NAMES.ja,'日本語');assert.equal(c.LANG_NAMES.ko,'한국어');assert.equal(c.LANG_NAMES.zh,'繁體中文');assert.equal(c.LANG_NAMES.ru,'Русский');
  c.localStorage.setItem(c.LS.lang,'es');assert.equal(c.getLang(),'es');
  assert.equal(c.t('nav_profile'),'Perfil');
- assert.equal(c.realComingSoonText(),'El análisis real llegará pronto');
  c.localStorage.setItem(c.LS.lang,'pt');assert.equal(c.getLang(),'pt');
  assert.equal(c.t('nav_login'),'Entrar');
- assert.equal(c.realComingSoonText(),'A análise real chega em breve');
  c.localStorage.setItem(c.LS.lang,'ar');assert.equal(c.getLang(),'ar');
  assert.equal(c.t('nav_login'),'تسجيل الدخول');
- assert.equal(c.realComingSoonText(),'التحليل الحقيقي قادم قريبًا');
  c.localStorage.setItem(c.LS.lang,'fr');assert.equal(c.getLang(),'fr');
  assert.equal(c.t('nav_login'),'Se connecter');
- assert.equal(c.realComingSoonText(),"L'analyse réelle arrive bientôt");
  c.localStorage.setItem(c.LS.lang,'de');assert.equal(c.getLang(),'de');
  assert.equal(c.t('nav_login'),'Anmelden');
- assert.equal(c.realComingSoonText(),'Die echte Analyse kommt bald');
  c.localStorage.setItem(c.LS.lang,'it');assert.equal(c.getLang(),'it');
  assert.equal(c.t('nav_login'),'Accedi');
- assert.equal(c.realComingSoonText(),"L'analisi reale arriva presto");
  c.localStorage.setItem(c.LS.lang,'ja');assert.equal(c.getLang(),'ja');
  assert.equal(c.t('nav_login'),'ログイン');
- assert.equal(c.realComingSoonText(),'本格分析はまもなく公開');
  c.localStorage.setItem(c.LS.lang,'ko');assert.equal(c.getLang(),'ko');
  assert.equal(c.t('nav_login'),'로그인');
- assert.equal(c.realComingSoonText(),'정식 분석 곧 공개');
  c.localStorage.setItem(c.LS.lang,'zh');assert.equal(c.getLang(),'zh');
  assert.equal(c.t('nav_login'),'登入');
- assert.equal(c.realComingSoonText(),'正式分析即將推出');
  c.localStorage.setItem(c.LS.lang,'ru');assert.equal(c.getLang(),'ru');
  assert.equal(c.t('nav_login'),'Войти');
- assert.equal(c.realComingSoonText(),'Настоящий разбор скоро');
  c.localStorage.setItem(c.LS.lang,'tr');assert.equal(c.getLang(),'tr');
  assert.equal(c.t('nav_login'),'Giriş Yap');
  c.localStorage.setItem(c.LS.lang,'xx');assert.equal(c.getLang(),'en');

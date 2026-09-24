@@ -92,7 +92,6 @@
     document.getElementById("resultTierNote").textContent = tier === "real" ? t("real_explainer") : t("fun_explainer");
     goBtn.textContent = tier === "real" ? t("real_btn_10") : t("fun_btn");
     document.getElementById("rerollBtn").hidden = tier !== "fun";
-    showProductionRealPause(tier);
     document.getElementById("againBtn").href = "match.html?tier=" + tier;
   }
   function showResult() {
@@ -102,7 +101,6 @@
     applyI18n();
   }
   async function start() {
-    if (showProductionRealPause(tier)) return;
     if (currentState === "think") return;
     var a = /^@?[a-zA-Z0-9_]{1,15}$/.test(inA.value.trim()) ? normHandle(inA.value) : "";
     var b = /^@?[a-zA-Z0-9_]{1,15}$/.test(inB.value.trim()) ? normHandle(inB.value) : "";
@@ -153,7 +151,6 @@
 
   (async function init() {
     renderTierUi();
-    if (showProductionRealPause(tier)) { setState("input"); return; }
     await initSession();
     renderTierUi();
     if (tier === "real" && !isLoggedIn()) { window.location.href = "auth.html"; return; }

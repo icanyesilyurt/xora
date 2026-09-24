@@ -440,7 +440,6 @@ function realFunctionName() {
 }
 
 async function requestRealAnalysis(mode, payload) {
-  if (isProductionRealDisabled()) throw new Error("real_temporarily_unavailable");
   var sb = getSupabaseClient();
   if (!sb) throw new Error("real_unavailable");
   var sessionRes = await sb.auth.getSession();
@@ -517,42 +516,6 @@ function realErrorMessage(err) {
 // the same production config, and the old GitHub Pages address until it is switched off.
 var XORA_PUBLIC_ORIGIN = "https://xora.roviaqr.com";
 var XORA_PUBLIC_HOST = "xora.roviaqr.com";
-var PRODUCTION_HOSTS = ["xora.roviaqr.com", "icanyesilyurt.github.io"];
-
-function isProductionRealDisabled() {
-  var host = String(window.location && window.location.hostname || "").toLowerCase();
-  return PRODUCTION_HOSTS.indexOf(host) >= 0 || /\.pages\.dev$/.test(host);
-}
-
-function disableProductionRealCtas() {
-  if (!isProductionRealDisabled()) return;
-  var links = document.querySelectorAll('a[href*="tier=real"], a.real-disabled, .choice-action-real, .mini-mode.real');
-  for (var i = 0; i < links.length; i++) {
-    var link = links[i];
-    link.setAttribute("aria-disabled", "true");
-    link.classList.add("real-disabled");
-    link.removeAttribute("href");
-    link.setAttribute("title", realComingSoonText());
-    var status = link.querySelector(".real-coming-soon") || document.createElement("small");
-    status.className = "real-coming-soon";
-    status.textContent = realComingSoonText();
-    link.appendChild(status);
-    link.onclick = function (e) { e.preventDefault(); };
-  }
-}
-
-function realComingSoonText() {
-  return t("real_coming_soon");
-}
-
-function showProductionRealPause(tier) {
-  if (tier !== "real" || !isProductionRealDisabled()) return false;
-  var button = document.getElementById("goBtn");
-  if (button) { button.disabled = true; button.textContent = realComingSoonText(); }
-  var note = document.getElementById("tierNote");
-  if (note) note.textContent = realComingSoonText();
-  return true;
-}
 
 // Shared links always point at the canonical domain root, never at the host the page runs on.
 function getPublicSiteUrl() {
@@ -986,7 +949,6 @@ var I18N = {
     real_err_auth: "Gerçek analiz için XORA hesabına giriş yapmalısın.",
     real_err_unavailable: "Analiz tamamlanamadı. Bakiye ve geçmişini kontrol edip tekrar dene.",
     real_err_refund: "İade bekliyor. İstek kimliğin korunuyor; daha sonra tekrar kontrol et.",
-    real_coming_soon: "Gerçek analiz yakında aktif",
     rarity_common: "COMMON",
     rarity_rare: "RARE",
     rarity_epic: "EPIC",
@@ -1185,7 +1147,6 @@ var I18N = {
     real_err_auth: "Sign in to your XORA account for Real analysis.",
     real_err_unavailable: "Analysis could not finish. Check your balance and history before retrying.",
     real_err_refund: "Refund pending. Your request ID is retained; check again later.",
-    real_coming_soon: "Real analysis coming soon",
     rarity_common: "COMMON",
     rarity_rare: "RARE",
     rarity_epic: "EPIC",
@@ -1391,7 +1352,6 @@ var I18N = {
     real_err_auth: "Inicia sesión en tu cuenta de XORA para el análisis Real.",
     real_err_unavailable: "El análisis no pudo completarse. Revisa tu saldo y tu historial antes de reintentar.",
     real_err_refund: "Reembolso en proceso. Tu ID de solicitud se conserva; vuelve a comprobarlo más tarde.",
-    real_coming_soon: "El análisis real llegará pronto",
     rarity_common: "COMÚN",
     rarity_rare: "RARA",
     rarity_epic: "ÉPICA",
@@ -1598,7 +1558,6 @@ var I18N = {
     real_err_auth: "Entre na sua conta XORA para fazer a análise Real.",
     real_err_unavailable: "Não foi possível concluir a análise. Confira seu saldo e seu histórico antes de tentar de novo.",
     real_err_refund: "Reembolso pendente. O ID da sua solicitação foi mantido; confira de novo mais tarde.",
-    real_coming_soon: "A análise real chega em breve",
     rarity_common: "COMUM",
     rarity_rare: "RARO",
     rarity_epic: "ÉPICO",
@@ -1797,7 +1756,6 @@ var I18N = {
     real_err_auth: "سجل الدخول إلى حسابك في XORA لإجراء التحليل الحقيقي.",
     real_err_unavailable: "تعذر إكمال التحليل. تحقق من رصيدك وسجلك قبل إعادة المحاولة.",
     real_err_refund: "الاسترداد قيد المعالجة. تم الاحتفاظ بمعرف طلبك؛ تحقق مرة أخرى لاحقًا.",
-    real_coming_soon: "التحليل الحقيقي قادم قريبًا",
     rarity_common: "عادية",
     rarity_rare: "نادرة",
     rarity_epic: "ملحمية",
@@ -1995,7 +1953,6 @@ var I18N = {
     real_err_auth: "Connecte-toi à ton compte XORA pour l'analyse réelle.",
     real_err_unavailable: "L'analyse n'a pas pu aboutir. Vérifie ton solde et ton historique avant de réessayer.",
     real_err_refund: "Remboursement en attente. L'identifiant de ta demande est conservé\u00a0; vérifie à nouveau plus tard.",
-    real_coming_soon: "L'analyse réelle arrive bientôt",
     rarity_common: "COMMUNE",
     rarity_rare: "RARE",
     rarity_epic: "ÉPIQUE",
@@ -2193,7 +2150,6 @@ var I18N = {
     real_err_auth: "Melde dich bei deinem XORA-Konto an, um die echte Analyse zu nutzen.",
     real_err_unavailable: "Die Analyse konnte nicht abgeschlossen werden. Prüfe dein Guthaben und deinen Verlauf, bevor du es erneut versuchst.",
     real_err_refund: "Rückerstattung ausstehend. Deine Anfrage-ID bleibt erhalten; schau später noch einmal nach.",
-    real_coming_soon: "Die echte Analyse kommt bald",
     rarity_common: "GEWÖHNLICH",
     rarity_rare: "SELTEN",
     rarity_epic: "EPISCH",
@@ -2391,7 +2347,6 @@ var I18N = {
     real_err_auth: "Accedi al tuo account XORA per l'analisi reale.",
     real_err_unavailable: "Non è stato possibile completare l'analisi. Controlla saldo e cronologia prima di riprovare.",
     real_err_refund: "Rimborso in attesa. L'ID della tua richiesta è stato conservato; ricontrolla più tardi.",
-    real_coming_soon: "L'analisi reale arriva presto",
     rarity_common: "COMUNE",
     rarity_rare: "RARA",
     rarity_epic: "EPICA",
@@ -2589,7 +2544,6 @@ var I18N = {
     real_err_auth: "本格分析にはXORAアカウントへのログインが必要です。",
     real_err_unavailable: "分析を完了できませんでした。残高と履歴を確認してから再試行してください。",
     real_err_refund: "返金処理中です。リクエストIDは保存されています。しばらくしてから確認してください。",
-    real_coming_soon: "本格分析はまもなく公開",
     rarity_common: "コモン",
     rarity_rare: "レア",
     rarity_epic: "エピック",
@@ -2787,7 +2741,6 @@ var I18N = {
     real_err_auth: "정식 분석을 하려면 XORA 계정으로 로그인해야 해요.",
     real_err_unavailable: "분석을 마치지 못했어요. 잔액과 기록을 확인한 뒤 다시 시도해 주세요.",
     real_err_refund: "환불을 처리하고 있어요. 요청 ID는 저장해 두었습니다. 잠시 후 확인해 주세요.",
-    real_coming_soon: "정식 분석 곧 공개",
     rarity_common: "커먼",
     rarity_rare: "레어",
     rarity_epic: "에픽",
@@ -2985,7 +2938,6 @@ var I18N = {
     real_err_auth: "要做正式分析，請先登入 XORA 帳號。",
     real_err_unavailable: "分析沒有完成。請確認餘額和紀錄後再試一次。",
     real_err_refund: "退款處理中。請求 ID 已經保存，請稍後再確認。",
-    real_coming_soon: "正式分析即將推出",
     rarity_common: "普通",
     rarity_rare: "稀有",
     rarity_epic: "史詩",
@@ -3183,7 +3135,6 @@ var I18N = {
     real_err_auth: "Для настоящего разбора нужно войти в аккаунт XORA.",
     real_err_unavailable: "Разбор не завершился. Проверь баланс и историю и попробуй снова.",
     real_err_refund: "Возврат в обработке. Номер запроса сохранён, загляни чуть позже.",
-    real_coming_soon: "Настоящий разбор скоро",
     rarity_common: "ОБЫЧНАЯ",
     rarity_rare: "РЕДКАЯ",
     rarity_epic: "ЭПИЧЕСКАЯ",
@@ -3572,8 +3523,6 @@ document.addEventListener("DOMContentLoaded", function () {
   getCredits();
   initTopbar();
   initAuthGuards();
-  disableProductionRealCtas();
   applyI18n();
   initSession();
 });
-document.addEventListener("xora:lang", disableProductionRealCtas);
