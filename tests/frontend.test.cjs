@@ -70,12 +70,14 @@ test('production REAL links remain active and use the authenticated backend path
  c.refreshCreditsFromServer=async()=>{};
  assert.equal((await c.requestRealAnalysis('mirror',{handle:'alice'})).meta.tier,'real');
 });
-test('home exposes Mirror and Stalk REAL while Match REAL remains disabled',()=>{
+test('home exposes Mirror, Stalk and Match REAL at their verified costs',()=>{
  const html=fs.readFileSync('index.html','utf8');
  assert.match(html,/<a href="mirror\.html\?tier=real" class="choice-action choice-action-real" data-auth-required>/);
  assert.match(html,/<a href="stalk\.html\?tier=real" class="choice-action choice-action-real" data-auth-required>/);
- assert.doesNotMatch(html,/<a href="match\.html\?tier=real"/);
- assert.equal((html.match(/class="choice-action choice-action-real real-disabled" aria-disabled="true"/g)||[]).length,1);
+ assert.match(html,/<a href="match\.html\?tier=real" class="choice-action choice-action-real" data-auth-required>/);
+ assert.equal((html.match(/data-i18n="real_btn_5">Gerçek Analiz · 5 Kredi<\/b>/g)||[]).length,2);
+ assert.equal((html.match(/data-i18n="real_btn_10">Gerçek Analiz · 10 Kredi<\/b>/g)||[]).length,1);
+ assert.doesNotMatch(html,/class="choice-action choice-action-real real-disabled"/);
  assert.match(html,/<script src="app\.js\?v=mirror-real-production-1"><\/script>/);
 });
 test('legacy V1/V2/V3 and Match preserve original renderer paths without a fabricated REAL badge',()=>{
