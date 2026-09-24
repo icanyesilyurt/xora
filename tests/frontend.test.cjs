@@ -943,7 +943,20 @@ test('Cloudflare Pages build publishes exactly the static site into dist/, and n
  assert.match(out,/7 pages, 5 assets/);
  const files=fs.readdirSync('dist').sort();
  assert.deepEqual(files,['app.js','auth.html','card.js','config.js','credits.html','index.html','match.html','mirror.html','profile.html','stalk.html','style.css','xora.js']);
- for(const f of files) assert.equal(fs.readFileSync('dist/'+f,'utf8'),fs.readFileSync(f,'utf8'),f+' copied byte for byte');
+ // Assets are copied byte for byte; pages only differ in the content-hash version on each asset reference.
+ const crypto=require('node:crypto');const assets=['app.js','xora.js','card.js','config.js','style.css'];
+ const ver=Object.fromEntries(assets.map(a=>[a,crypto.createHash('sha256').update(fs.readFileSync(a)).digest('hex').slice(0,10)]));
+ const strip=h=>h.replace(/\b((?:href|src)="(?:app|xora|card|config)\.js|(?:href|src)="style\.css)\?[^"]*"/g,'$1"');
+ for(const f of files){
+  const src=fs.readFileSync(f,'utf8'),out=fs.readFileSync('dist/'+f,'utf8');
+  if(!f.endsWith('.html')){assert.equal(out,src,f+' copied byte for byte');continue;}
+  const refs=[...out.matchAll(/\b(?:href|src)="(app\.js|xora\.js|card\.js|config\.js|style\.css)([^"]*)"/g)];
+  assert.ok(refs.length>0,f+' has asset refs');
+  for(const [,a,q] of refs) assert.equal(q,'?v='+ver[a],f+' '+a+' carries its content hash');
+  assert.equal(strip(out),strip(src),f+' otherwise unchanged');
+ }
+ // A changed asset gets a new URL on the next build, so a browser-cached older copy is never reused.
+ assert.ok(fs.readFileSync('dist/stalk.html','utf8').includes('<script src="card.js?v='+ver['card.js']+'"></script>'),'stalk loads versioned card.js');
  assert.equal(JSON.parse(fs.readFileSync('package.json','utf8')).scripts.build,'node scripts/build-pages.mjs');
  fs.rmSync('dist',{recursive:true,force:true});
 });
