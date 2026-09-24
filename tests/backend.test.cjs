@@ -80,7 +80,7 @@ test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=
  const service={from(table){assert.equal(table,'x_cache'); const q={select(){return q;},eq(){return q;},gt(){return q;},async maybeSingle(){if(failure==='x') throw Error('x_api_error');return {data:{profile:{username:'alice'},posts:Array.from({length:8},(_,i)=>({text:'Question?',type:'original',metrics:{likes:i,replies:0,reposts:0}}))}};}};return q;},async rpc(name,args){calls.push({name,args});if(name==='xora_begin_real') return {data:{status:begin,result:{saved:true},balance:10}};if(name==='xora_claim_referral') return {data:{referral_code:'creator-a',expires_at:'2026-10-01'}};if(name==='xora_complete_real'){if(failure==='save')return {error:{message:'db failed'}};return {data:{result:args.p_result,balance:10}};}if(name==='xora_fail_real'){refundAttempts++;if(refundAttempts<=refundFailures) return {error:{message:'offline'}};return {data:{status:failure==='lost-save'?'succeeded':'failed',result:{saved:true},balance:20}};}throw Error(name);}};
  const e=edge({createClient:(_url,key)=>key==='test-anon'?{auth:{getUser:async()=>({data:{user:{id:'test-user'}}})}}:service,fetch:async(_url,options)=>{
  aiCalls++;if(failure==='ai')throw Error('ai_error');const payload=JSON.parse(JSON.parse(options.body).messages[0].content);
- assert.ok(payload.profile_a?.signals && payload.profile_b?.posts || payload.signals);
+ assert.ok(payload.profile_a?.signals && payload.profile_b?.own_voice || payload.signals);
  let raw=payload.profile_a?matchAI(payload.locale):profileAI(payload.locale);if(failure==='validation')raw.metrics[0].key='oops';
  return Response.json({content:[{type:'text',text:JSON.stringify(raw)}]});
  }});
@@ -111,3 +111,60 @@ test('uncached Match fetches two app-only public datasets, caches each, calls AI
  }});
  const result=await e.analyzeMatch(service,'alice','bob','en');assert.equal(xCalls,4);assert.equal(cacheWrites,2);assert.equal(aiCalls,1);assert.equal(result.meta.tier,'real');
 });
+
+// ---------------------------------------------------------------------------------------------
+// OWN VOICE / INTEREST-SHARING: reposts are someone else's words and reach the AI only as interests.
+const mixedPosts=()=>[
+ ...Array.from({length:3},(_,i)=>({id:'o'+i,text:'Kendi cümlem '+i,type:'original',metrics:{likes:i,replies:0,reposts:0}})),
+ ...Array.from({length:2},(_,i)=>({id:'r'+i,text:'@x yanıtım '+i,type:'reply',metrics:{likes:0,replies:1,reposts:0}})),
+ {id:'q0',text:'Alıntı yorumum',type:'quote',metrics:{likes:2,replies:0,reposts:1}},
+ ...Array.from({length:19},(_,i)=>({id:'p'+i,text:'RT @kulup_hesabi: Başkasının cümlesi '+i+' '+'uzun '.repeat(40),type:'repost',metrics:{likes:99,replies:9,reposts:9}}))
+];
+test('AI input separates own voice from reposts, strips repost authors and counts the real sample',()=>{
+ const e=edge();
+ const input=e.aiPostInput(mixedPosts(),true);
+ assert.deepEqual({...input.sample},{analyzed:25,original:3,reply:2,quote:1,repost:19});
+ assert.equal(input.own_voice_evidence,'normal');
+ assert.deepEqual([...input.own_voice].map(p=>p.type),['original','original','original','reply','reply','quote'],'own voice = originals, replies, quote commentary');
+ assert.ok(input.own_voice.every(p=>!/Başkasının/.test(p.text)),'no repost wording in own voice');
+ assert.equal(input.interest_sharing.length,10,'at most 10 reposts');
+ for(const r of input.interest_sharing){assert.deepEqual(Object.keys(r),['text'],'reposts carry no engagement numbers or type');assert.doesNotMatch(r.text,/^RT @/,'author prefix stripped');assert.ok(r.text.length<=120);}
+ const thin=e.aiPostInput([...mixedPosts().filter(p=>p.type==='repost'),{text:'tek',type:'original',metrics:{}},{text:'iki',type:'reply',metrics:{}}],false);
+ assert.equal(thin.own_voice_evidence,'thin','fewer than 3 own-voice posts');assert.deepEqual(Object.keys(thin.own_voice[0]),['type','text']);
+ assert.match(e.REPOST_RULE,/^Reposted text is written by someone else\. Never use repost wording to infer the user's writing tone, humour, vocabulary, personality, or archetype\. Use reposts only to understand repeated interests\/topics and sharing behaviour\.$/);
+});
+test('Mirror/Stalk/Match send the split input and the repost rule, and store the real sample counts',async()=>{
+ for(const mode of ['mirror','stalk','match']){
+  const payloads=[],systems=[];
+  const service={from(){const q={select(){return q;},eq(){return q;},gt(){return q;},async maybeSingle(){return {data:{profile:{username:'alice'},posts:mixedPosts()}};}};return q;},
+   async rpc(name,args){if(name==='xora_begin_real')return {data:{status:'claimed'}};if(name==='xora_claim_referral')return {data:null};if(name==='xora_complete_real')return {data:{result:args.p_result,balance:1}};throw Error(name);}};
+  const e=edge({createClient:(_u,key)=>key==='test-anon'?{auth:{getUser:async()=>({data:{user:{id:'u'}}})}}:service,fetch:async(_url,options)=>{
+   const body=JSON.parse(options.body);systems.push(body.system);const payload=JSON.parse(body.messages[0].content);payloads.push(payload);
+   return Response.json({content:[{type:'text',text:JSON.stringify(payload.profile_a?matchAI(payload.locale):profileAI(payload.locale))}]});}});
+  const res=await e.main(new Request('http://local.test',{method:'POST',body:JSON.stringify({mode,locale:'tr',handle:'alice',handles:['alice','bob'],request_id:'split-test-'+mode})}));
+  assert.equal(res.status,200,mode);const {result}=await res.json();
+  assert.ok(systems[0].includes(e.REPOST_RULE),mode+' system prompt carries the repost rule');
+  const sections=mode==='match'?[payloads[0].profile_a,payloads[0].profile_b]:[payloads[0]];
+  for(const s of sections){assert.equal(s.posts,undefined,'no mixed post list');assert.equal(s.own_voice.length,6);assert.equal(s.interest_sharing.length,10);assert.equal(s.sample.repost,19);}
+  assert.ok(payloads[0].rules.includes(e.REPOST_RULE),mode+' rules carry the repost rule');
+  assert.ok(payloads[0].rules.some(r=>/own_voice_evidence is "thin"/.test(r)),mode+' thin-evidence rule');
+  if(mode==='match'){for(const side of ['resA','resB'])assert.deepEqual({...result[side].sample},{analyzed:25,original:3,reply:2,quote:1,repost:19},side);}
+  else {
+   assert.deepEqual({...result.meta.sample},{analyzed:25,original:3,reply:2,quote:1,repost:19});assert.equal(result.meta.sample_size,25);
+   assert.ok(payloads[0].rules.some(r=>/exactly 6 original nickname candidates/.test(r)));assert.deepEqual([...payloads[0].nickname_style_examples],[...e.NICKNAME_STYLE_EXAMPLES.tr]);
+  }
+ }
+});
+test('nicknames: the most distinctive valid candidate wins over generic labels',()=>{
+ const e=edge({console:{warn(){}}});const sig={own_posts:8,repost_ratio:.8,question_ratio:.5};
+ for(const name of ['Tribün Yankısı','Gündem Takipçisi','Sessiz Gözlemci','Sosyal Gözlemci','Dijital Gezgin','Meraklı Biri','Paylaşmayı Seven','Sohbeti Seven']) assert.equal(e.aliasGeneric(name,'tr'),true,name);
+ for(const name of ['Kartal Gündemcisi','Tek Cümlelik Taraftar','Thread’li Kod Filozofu']) assert.equal(e.aliasGeneric(name,'tr'),false,name);
+ const pick=list=>e.pickAlias({nickname_candidates:list.map(text=>({text,evidence:'repost_ratio'}))},sig,'tr');
+ assert.equal(pick(['Tribün Yankısı','Gündem Takipçisi','Kartal Gündemcisi']).text,'Kartal Gündemcisi','generic labels are skipped while a distinctive one exists');
+ assert.equal(pick(['Kartal Gündemcisi','Tek Cümlelik Taraftar']).text,'Kartal Gündemcisi','otherwise the AI order (most distinctive first) is kept');
+ const onlyGeneric=pick(['Gündem Takipçisi']);assert.equal(onlyGeneric.text,'Gündem Takipçisi');assert.equal(onlyGeneric.source,'ai_generated_validated','a valid generic AI name still beats the fallback');
+ // Style examples are topic + behaviour, pass each locale's own quality gate and are not generic.
+ for(const [locale,examples] of Object.entries(e.NICKNAME_STYLE_EXAMPLES)) for(const x of examples){assert.equal(e.aliasValid(x,locale),true,locale+' '+x);assert.equal(e.aliasGeneric(x,locale),false,locale+' '+x);}
+ for(const locale of Object.keys(e.NICKNAME_STYLE_EXAMPLES)) assert.ok(!e.NICKNAME_STYLE_EXAMPLES[locale].some(x=>['Sessiz Gözlemci','Meraklı Biri','Curious Mind','Quiet Observer','Mente Curiosa'].includes(x)),locale);
+});
+

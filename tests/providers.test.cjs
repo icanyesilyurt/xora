@@ -96,16 +96,16 @@ test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, 
   if(mode==='match'){assert.deepEqual(Object.keys(result.ai_comment),[locale]);assert.equal(result.ai_comment[locale],copy.match);assert.deepEqual(Object.keys(result.resA.nickname),[locale]);}
   else {
    assert.deepEqual(Object.keys(result.nickname),[locale]);assert.deepEqual(Object.keys(result.comment.mirror),[locale]);
-   if(locale==='es') assert.ok(instruction.nickname_style_examples.includes('Mente Curiosa'));
-   if(locale==='pt') {assert.ok(instruction.nickname_style_examples.includes('Curioso por Natureza'));assert.match(instruction.output_language,/Brazilian Portuguese/);}
-   if(locale==='ja') {assert.ok(instruction.nickname_style_examples.includes('質問好き'));assert.match(instruction.output_language,/Japanese/);}
-   if(locale==='ru') {assert.ok(instruction.nickname_style_examples.includes('Много спрашивает'));assert.match(instruction.output_language,/Russian/);const ruCopy=[result.nickname.ru,result.tagline.ru,result.comment.mirror.ru,...result.top_behaviors.map(x=>x.label.ru)];assert.match(ruCopy.join(' '),/[\u0400-\u04ff]/);}
-   if(locale==='zh') {assert.ok(instruction.nickname_style_examples.includes('問題很多'));assert.match(instruction.output_language,/Traditional Chinese/);const zhCopy=[result.nickname.zh,result.tagline.zh,result.comment.mirror.zh,...result.top_behaviors.map(x=>x.label.zh)];assert.doesNotMatch(zhCopy.join(' '),/[A-Za-z\u3040-\u30ff\uac00-\ud7af]/);assert.match(zhCopy.join(' '),/[\u4e00-\u9fff]/);}
-   if(locale==='ko') {assert.ok(instruction.nickname_style_examples.includes('질문이 많은 사람'));assert.match(instruction.output_language,/Korean/);const koCopy=[result.nickname.ko,result.tagline.ko,result.comment.mirror.ko,...result.top_behaviors.map(x=>x.label.ko)];assert.doesNotMatch(koCopy.join(' '),/[A-Za-z]/);assert.match(koCopy.join(' '),/[\uac00-\ud7af]/);}
-   if(locale==='it') {assert.ok(instruction.nickname_style_examples.includes('Fa Tante Domande'));assert.match(instruction.output_language,/Italian/);}
-   if(locale==='de') {assert.ok(instruction.nickname_style_examples.includes('Fragt gern nach'));assert.match(instruction.output_language,/German/);}
-   if(locale==='fr') {assert.ok(instruction.nickname_style_examples.includes('Toujours une Question'));assert.match(instruction.output_language,/French/);}
-   if(locale==='ar') {assert.ok(instruction.nickname_style_examples.includes('كثير السؤال'));assert.match(instruction.output_language,/Modern Standard Arabic/);const arCopy=mode==='match'?[result.ai_comment.ar]:[result.nickname.ar,result.tagline.ar,result.comment.mirror.ar,...result.top_behaviors.map(x=>x.label.ar)];assert.doesNotMatch(arCopy.join(' '),/[A-Za-z]/);}
+   if(locale==='es') assert.ok(instruction.nickname_style_examples.includes('Hincha de Una Frase'));
+   if(locale==='pt') {assert.ok(instruction.nickname_style_examples.includes('Torcedor de Uma Frase'));assert.match(instruction.output_language,/Brazilian Portuguese/);}
+   if(locale==='ja') {assert.ok(instruction.nickname_style_examples.includes('一言サポーター'));assert.match(instruction.output_language,/Japanese/);}
+   if(locale==='ru') {assert.ok(instruction.nickname_style_examples.includes('Болельщик одной фразы'));assert.match(instruction.output_language,/Russian/);const ruCopy=[result.nickname.ru,result.tagline.ru,result.comment.mirror.ru,...result.top_behaviors.map(x=>x.label.ru)];assert.match(ruCopy.join(' '),/[\u0400-\u04ff]/);}
+   if(locale==='zh') {assert.ok(instruction.nickname_style_examples.includes('一句話球迷'));assert.match(instruction.output_language,/Traditional Chinese/);const zhCopy=[result.nickname.zh,result.tagline.zh,result.comment.mirror.zh,...result.top_behaviors.map(x=>x.label.zh)];assert.doesNotMatch(zhCopy.join(' '),/[A-Za-z\u3040-\u30ff\uac00-\ud7af]/);assert.match(zhCopy.join(' '),/[\u4e00-\u9fff]/);}
+   if(locale==='ko') {assert.ok(instruction.nickname_style_examples.includes('한 줄 응원단장'));assert.match(instruction.output_language,/Korean/);const koCopy=[result.nickname.ko,result.tagline.ko,result.comment.mirror.ko,...result.top_behaviors.map(x=>x.label.ko)];assert.doesNotMatch(koCopy.join(' '),/[A-Za-z]/);assert.match(koCopy.join(' '),/[\uac00-\ud7af]/);}
+   if(locale==='it') {assert.ok(instruction.nickname_style_examples.includes('Tifoso da Una Riga'));assert.match(instruction.output_language,/Italian/);}
+   if(locale==='de') {assert.ok(instruction.nickname_style_examples.includes('Einzeiler aus der Kurve'));assert.match(instruction.output_language,/German/);}
+   if(locale==='fr') {assert.ok(instruction.nickname_style_examples.includes('Supporter à Une Phrase'));assert.match(instruction.output_language,/French/);}
+   if(locale==='ar') {assert.ok(instruction.nickname_style_examples.includes('مشجع الجملة الواحدة'));assert.match(instruction.output_language,/Modern Standard Arabic/);const arCopy=mode==='match'?[result.ai_comment.ar]:[result.nickname.ar,result.tagline.ar,result.comment.mirror.ar,...result.top_behaviors.map(x=>x.label.ar)];assert.doesNotMatch(arCopy.join(' '),/[A-Za-z]/);}
   }
   // The card renders from the active-locale copy alone.
   const c=browser();c.localStorage.setItem(c.LS.lang,locale);
