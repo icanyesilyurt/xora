@@ -769,10 +769,10 @@ test('credit packages: 10/20/50/300 at launch prices with struck regular prices 
  assert.deepEqual({...c.COSTS},{mirror:5,stalk:5,match:10},'per-analysis prices unchanged');
  const pk=[...c.CREDIT_PACKAGES].map(p=>({id:p.id,credits:p.credits,list:p.list,price:p.price,featured:!!p.featured,label:p.label,note:p.note||null}));
  assert.deepEqual(pk,[
-  {id:'starter',credits:10,list:4.99,price:2.99,featured:false,label:'pkg_starter',note:null},
-  {id:'popular',credits:20,list:9.99,price:5.99,featured:true,label:'pkg_popular',note:null},
-  {id:'value',credits:50,list:24.99,price:14.99,featured:false,label:'pkg_value',note:null},
-  {id:'professional',credits:300,list:149.99,price:89.99,featured:false,label:'pkg_pro',note:'pkg_pro_note'}]);
+  {id:'starter',credits:10,list:249,price:149,featured:false,label:'pkg_starter',note:null},
+  {id:'popular',credits:20,list:499,price:299,featured:true,label:'pkg_popular',note:null},
+  {id:'value',credits:50,list:1249,price:749,featured:false,label:'pkg_value',note:null},
+  {id:'professional',credits:300,list:7499,price:4499,featured:false,label:'pkg_pro',note:'pkg_pro_note'}]);
  assert.deepEqual([...c.CREDIT_PACKAGES].map(p=>({...c.packageCapacity(p)})),[{mirrorStalk:2,match:1},{mirrorStalk:4,match:2},{mirrorStalk:10,match:5},{mirrorStalk:60,match:30}]);
  for(const p of c.CREDIT_PACKAGES) assert.ok(Math.abs(1-p.price/p.list-c.LAUNCH_DISCOUNT)<0.005,p.id+' is 40% off');
  for(const lang of LOCALES12){
@@ -797,7 +797,7 @@ test('credit packages: 10/20/50/300 at launch prices with struck regular prices 
   assert.doesNotMatch(box.innerHTML,/Real Analiz|Real Analysis|pkg[123]_n/,'no generic "N Real Analysis" labels');
  }
  c.localStorage.setItem(c.LS.lang,'en');const box={innerHTML:''};c.renderCreditPackages(box,null);
- for(const [old,now] of [['$4.99','$2.99'],['$9.99','$5.99'],['$24.99','$14.99'],['$149.99','$89.99']]) assert.ok(box.innerHTML.includes('>'+old+'</s> <span class="pack-now">'+now+'<'),old+' -> '+now);
+ for(const [old,now] of [['249 ₺','149 ₺'],['499 ₺','299 ₺'],['1,249 ₺','749 ₺'],['7,499 ₺','4,499 ₺']]) assert.ok(box.innerHTML.includes('>'+old+'</s> <span class="pack-now">'+now+'<'),old+' -> '+now);
  assert.match(box.innerHTML,/pack-popular hot"[^]*?>MOST POPULAR</);assert.match(box.innerHTML,/pack-professional"[^]*?>PROFESSIONAL<[^]*?>Creators &amp; Agencies</);
  // The credits page renders from this config and starts checkout with the package id only.
  const page=fs.readFileSync('credits.html','utf8');

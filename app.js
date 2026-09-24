@@ -16,14 +16,14 @@ var LS = {
 
 var COSTS = { mirror: 5, stalk: 5, match: 10 };
 
-// Launch pricing in USD. `list` is the regular price shown struck through; `price` is charged.
+// Launch pricing in TRY. `list` is the regular price shown struck through; `price` is charged.
 // Capacity is derived from COSTS so it can never drift from the real per-analysis prices.
 var LAUNCH_DISCOUNT = 0.4;
 var CREDIT_PACKAGES = [
-  { id: "starter", credits: 10, list: 4.99, price: 2.99, label: "pkg_starter" },
-  { id: "popular", credits: 20, list: 9.99, price: 5.99, label: "pkg_popular", featured: true },
-  { id: "value", credits: 50, list: 24.99, price: 14.99, label: "pkg_value" },
-  { id: "professional", credits: 300, list: 149.99, price: 89.99, label: "pkg_pro", note: "pkg_pro_note" }
+  { id: "starter", credits: 10, list: 249, price: 149, label: "pkg_starter" },
+  { id: "popular", credits: 20, list: 499, price: 299, label: "pkg_popular", featured: true },
+  { id: "value", credits: 50, list: 1249, price: 749, label: "pkg_value" },
+  { id: "professional", credits: 300, list: 7499, price: 4499, label: "pkg_pro", note: "pkg_pro_note" }
 ];
 var FREE_CREDITS = 0;
 var xoraSupabase = null;
@@ -3353,11 +3353,10 @@ function formatDecimal(value, lang) {
   return new Intl.NumberFormat(numberLocale(lang), { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value);
 }
 
-// Prices stay in USD. Arabic uses the plain $x.xx form: its Intl output mixes RTL marks with "US$",
-// while price text is already shown as an LTR-isolated value inside RTL pages.
-function formatPrice(usd, lang) {
+// Fixed TRY prices are rendered without decimals and with an explicit lira symbol in every locale.
+function formatPrice(tryAmount, lang) {
   var l = lang || getLang();
-  return new Intl.NumberFormat(l === "ar" ? "en-US" : numberLocale(l), { style: "currency", currency: "USD", currencyDisplay: "narrowSymbol" }).format(usd);
+  return new Intl.NumberFormat(numberLocale(l), { maximumFractionDigits: 0 }).format(tryAmount) + " ₺";
 }
 
 function fillTemplate(text, values) {

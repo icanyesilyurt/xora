@@ -13,14 +13,14 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.116.0";
 // Card data never reaches Xora: the card form is iyzico's.
 
 type PackageId = "starter" | "popular" | "value" | "professional";
-type CatalogEntry = { credits: number; amount: number; currency: "USD" };
+type CatalogEntry = { credits: number; amount: number; currency: "TRY" };
 type Purchase = { id: string; user_id: string; package_id: string; credits: number; amount: number | string; currency: string; provider_token: string | null; status: "pending" | "completed" | "failed" };
 
 const CATALOG: Record<PackageId, CatalogEntry> = {
-  starter: { credits: 10, amount: 2.99, currency: "USD" },
-  popular: { credits: 20, amount: 5.99, currency: "USD" },
-  value: { credits: 50, amount: 14.99, currency: "USD" },
-  professional: { credits: 300, amount: 89.99, currency: "USD" }
+  starter: { credits: 10, amount: 149, currency: "TRY" },
+  popular: { credits: 20, amount: 299, currency: "TRY" },
+  value: { credits: 50, amount: 749, currency: "TRY" },
+  professional: { credits: 300, amount: 4499, currency: "TRY" }
 };
 
 const IYZICO_SANDBOX_URL = "https://sandbox-api.iyzipay.com";
@@ -60,7 +60,7 @@ const cents = (v: unknown) => {
   const n = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" ? Number(v) : NaN;
   return Number.isFinite(n) ? Math.round(n * 100) : NaN;
 };
-// iyzico expects decimal strings with a dot, e.g. "5.99".
+// iyzico expects decimal strings with a dot, e.g. "299.00".
 const price = (amount: number | string) => (cents(amount) / 100).toFixed(2);
 
 // ---------------------------------------------------------------------------------------------

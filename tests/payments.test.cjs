@@ -15,7 +15,7 @@ const ENV={IYZICO_API_KEY:API_KEY,IYZICO_SECRET_KEY:SECRET,IYZICO_BASE_URL:'http
  SUPABASE_URL:'https://staging.test',SUPABASE_ANON_KEY:'anon-key',SUPABASE_SERVICE_ROLE_KEY:'service-key',XORA_SITE_URL:'https://site.test/xora/'};
 const INIT='/payment/iyzipos/checkoutform/initialize/auth/ecom';
 const DETAIL='/payment/iyzipos/checkoutform/auth/ecom/detail';
-const CATALOG={starter:[10,'2.99'],popular:[20,'5.99'],value:[50,'14.99'],professional:[300,'89.99']};
+const CATALOG={starter:[10,'149.00'],popular:[20,'299.00'],value:[50,'749.00'],professional:[300,'4499.00']};
 
 // Supabase client backed by PGlite. The service key acts as service_role; the anon client only
 // resolves the user named in its bearer token ("Bearer user:<uuid>").
@@ -111,8 +111,8 @@ test('credit package catalog is identical in the database, the edge function and
   await role(db,'service_role');
   for(const [id,[credits,amount]] of Object.entries(CATALOG)){
    const row=(await q(db,`select * from public.xora_credit_package($1)`,[id]))[0];
-   assert.deepEqual({credits:Number(row.credits),amount:Number(row.amount).toFixed(2),currency:row.currency},{credits,amount,currency:'USD'},id);
-   assert.deepEqual({...fn.CATALOG[id]},{credits,amount:Number(amount),currency:'USD'},id+' edge');
+   assert.deepEqual({credits:Number(row.credits),amount:Number(row.amount).toFixed(2),currency:row.currency},{credits,amount,currency:'TRY'},id);
+   assert.deepEqual({...fn.CATALOG[id]},{credits,amount:Number(amount),currency:'TRY'},id+' edge');
   }
   assert.equal((await q(db,`select * from public.xora_credit_package('pro')`)).length,0,'unknown ids are not packages');
   await db.exec('reset role');
@@ -124,15 +124,15 @@ test('credit package catalog is identical in the database, the edge function and
 test('checkout takes only the package id: tampered amount, credits, price and currency are ignored',async()=>{
  await withFunction(async ctx=>{
   for(const [pkg,[credits,amount]] of Object.entries(CATALOG)){
-   const {id}=await startPurchase(ctx,pkg,{amount:0.01,price:'0.01',paidPrice:'0.01',credits:99999,currency:'TRY'});
+   const {id}=await startPurchase(ctx,pkg,{amount:0.01,price:'0.01',paidPrice:'0.01',credits:99999,currency:'USD'});
    const init=ctx.mock.calls.filter(c=>c.path===INIT).pop().body;
-   assert.equal(init.price,amount,pkg+' price from catalog');assert.equal(init.paidPrice,amount);assert.equal(init.currency,'USD');
+   assert.equal(init.price,amount,pkg+' price from catalog');assert.equal(init.paidPrice,amount);assert.equal(init.currency,'TRY');
    assert.equal(init.conversationId,id);assert.equal(init.basketId,id);
    assert.deepEqual(init.basketItems.map(i=>({id:i.id,price:i.price,itemType:i.itemType})),[{id:pkg,price:amount,itemType:'VIRTUAL'}]);
    assert.deepEqual(init.enabledInstallments,[1]);
    assert.equal(init.callbackUrl,'https://staging.test/functions/v1/iyzico-checkout/callback');
    const row=await purchase(ctx.db,id);
-   assert.deepEqual({credits:row.credits,amount:Number(row.amount).toFixed(2),currency:row.currency,status:row.status,package_id:row.package_id},{credits,amount,currency:'USD',status:'pending',package_id:pkg});
+   assert.deepEqual({credits:row.credits,amount:Number(row.amount).toFixed(2),currency:row.currency,status:row.status,package_id:row.package_id},{credits,amount,currency:'TRY',status:'pending',package_id:pkg});
    assert.ok(row.provider_token,'token attached');
   }
   assert.equal(await balance(ctx.db,A),100,'starting a checkout never moves credits');
@@ -178,9 +178,9 @@ test('unauthenticated users cannot start, verify or credit a purchase',async()=>
   for(const r of ['anon','authenticated']){
    await role(ctx.db,r,A);
    for(const sql of [`select public.xora_begin_credit_purchase('${A}','popular')`,`select public.xora_credit_package('popular')`,
-     `select public.xora_complete_credit_purchase('${A}','t','p','popular',5.99,'USD')`,`select public.xora_fail_credit_purchase('${A}','x')`,
+     `select public.xora_complete_credit_purchase('${A}','t','p','popular',299,'TRY')`,`select public.xora_fail_credit_purchase('${A}','x')`,
      `select public.xora_attach_credit_purchase_token('${A}','tokentoken')`,`select public.xora_reconcile_credit_change('${A}','purchase',20,'x','y')`,
-     `insert into public.credit_purchases(user_id,package_id,credits,amount,currency) values('${A}','popular',20,5.99,'USD')`,
+     `insert into public.credit_purchases(user_id,package_id,credits,amount,currency) values('${A}','popular',20,299,'TRY')`,
      `update public.users set credit_balance=credit_balance+20 where id='${A}'`]){
     await assert.rejects(ctx.db.exec(sql),r+': '+sql.slice(0,60));
    }
@@ -208,7 +208,7 @@ test('a verified payment adds exactly the package credits once; duplicate callba
   assert.equal(ctx.mock.calls.filter(c=>c.path===DETAIL).length,detailCalls,'settled purchases are not re-queried');
   // Even calling the crediting RPC directly again cannot add credits.
   await role(ctx.db,'service_role');
-  const again=(await q(ctx.db,`select public.xora_complete_credit_purchase($1,$2,$3,'popular',5.99,'USD') as r`,[id,token,'pay-'+token]))[0].r;
+  const again=(await q(ctx.db,`select public.xora_complete_credit_purchase($1,$2,$3,'popular',299,'TRY') as r`,[id,token,'pay-'+token]))[0].r;
   assert.equal(again.credited,false);
   await ctx.db.exec('reset role');
   assert.equal(await balance(ctx.db,A),120);assert.equal((await ledger(ctx.db,A)).length,1);
@@ -220,9 +220,9 @@ test('failed, mismatched or foreign payments add zero credits',async()=>{
   'payment failed':ok=>({...ok,paymentStatus:'FAILURE'}),
   'amount mismatch':ok=>({...ok,price:'0.99',paidPrice:'0.99',itemTransactions:[{...ok.itemTransactions[0],price:'0.99'}]}),
   'paid price mismatch':ok=>({...ok,paidPrice:'1.00'}),
-  'currency mismatch':ok=>({...ok,currency:'TRY'}),
+  'currency mismatch':ok=>({...ok,currency:'USD'}),
   'wrong package':ok=>({...ok,itemTransactions:[{...ok.itemTransactions[0],itemId:'professional'}]}),
-  'extra item':ok=>({...ok,itemTransactions:[...ok.itemTransactions,{itemId:'starter',price:'2.99'}]}),
+  'extra item':ok=>({...ok,itemTransactions:[...ok.itemTransactions,{itemId:'starter',price:'149.00'}]}),
   'other conversation':ok=>({...ok,conversationId:'00000000-0000-4000-8000-00000000beef'}),
   'other basket':ok=>({...ok,basketId:'00000000-0000-4000-8000-00000000beef'}),
   'other token':ok=>({...ok,token:'someone-elses-token'}),
@@ -292,18 +292,18 @@ test('purchase RPCs re-check the payment in the database and cap open checkouts'
   await role(db,'service_role');
   const p1=(await q(db,`select public.xora_begin_credit_purchase($1,'popular') as r`,[A]))[0].r;
   await db.exec(`select public.xora_attach_credit_purchase_token('${p1.purchase_id}','token-one-1')`);
-  const mis=(await q(db,`select public.xora_complete_credit_purchase($1,'token-one-1','pay-1','popular',5.98,'USD') as r`,[p1.purchase_id]))[0].r;
+  const mis=(await q(db,`select public.xora_complete_credit_purchase($1,'token-one-1','pay-1','popular',298.99,'TRY') as r`,[p1.purchase_id]))[0].r;
   assert.equal(mis.status,'failed');assert.equal(mis.credited,false);
-  await assert.rejects(db.exec(`select public.xora_complete_credit_purchase('${p1.purchase_id}','token-one-1','pay-1','popular',5.99,'USD')`),/purchase_not_pending/,'a failed purchase cannot be completed');
+  await assert.rejects(db.exec(`select public.xora_complete_credit_purchase('${p1.purchase_id}','token-one-1','pay-1','popular',299,'TRY')`),/purchase_not_pending/,'a failed purchase cannot be completed');
   const p2=(await q(db,`select public.xora_begin_credit_purchase($1,'value') as r`,[A]))[0].r;
   await db.exec(`select public.xora_attach_credit_purchase_token('${p2.purchase_id}','token-two-2')`);
-  await assert.rejects(db.exec(`select public.xora_complete_credit_purchase('${p2.purchase_id}','wrong-token','pay-2','value',14.99,'USD')`),/token_mismatch/);
-  const ok=(await q(db,`select public.xora_complete_credit_purchase($1,'token-two-2','pay-2','value',14.99,'usd') as r`,[p2.purchase_id]))[0].r;
+  await assert.rejects(db.exec(`select public.xora_complete_credit_purchase('${p2.purchase_id}','wrong-token','pay-2','value',749,'TRY')`),/token_mismatch/);
+  const ok=(await q(db,`select public.xora_complete_credit_purchase($1,'token-two-2','pay-2','value',749,'try') as r`,[p2.purchase_id]))[0].r;
   assert.equal(ok.credited,true);assert.equal(Number(ok.balance),150);
   // One iyzico payment id can complete only one purchase.
   const p3=(await q(db,`select public.xora_begin_credit_purchase($1,'value') as r`,[A]))[0].r;
   await db.exec(`select public.xora_attach_credit_purchase_token('${p3.purchase_id}','token-three')`);
-  await assert.rejects(db.exec(`select public.xora_complete_credit_purchase('${p3.purchase_id}','token-three','pay-2','value',14.99,'USD')`),/duplicate key|unique/);
+  await assert.rejects(db.exec(`select public.xora_complete_credit_purchase('${p3.purchase_id}','token-three','pay-2','value',749,'TRY')`),/duplicate key|unique/);
   await assert.rejects(db.exec(`select public.xora_begin_credit_purchase('${A}','free')`),/unknown_package/);
   await assert.rejects(db.exec(`select public.xora_begin_credit_purchase(null,'popular')`),/unauthorized/);
   for(let i=0;i<3;i++) await db.exec(`select public.xora_begin_credit_purchase('${B}','starter')`);
