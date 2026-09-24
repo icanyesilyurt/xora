@@ -322,12 +322,12 @@ test('credits page sends only a package id and shows the result the server confi
  const toasts=[];c.toast=m=>toasts.push(m);
  c.document.body={appendChild(){}};c.document.getElementById=()=>null;c.document.createElement=()=>({});
  answer=()=>({status:'ok',purchase_id:'00000000-0000-4000-8000-00000000c0de',checkout_form_content:null,payment_page_url:'https://sandbox-cpp.iyzipay.com?token=abc',sandbox:true});
- c.location.href='https://example.test/xora/credits.html';
+ c.location.href='https://example.test/xora/credits.html';const assigned=[];c.location.assign=u=>{assigned.push(u);c.location.href=u;};
  await c.startCreditPurchase('popular');
  assert.equal(sent[0].name,'iyzico-checkout');
  assert.deepEqual(Object.keys(sent[0].body).sort(),['action','locale','package_id'],'no amount, price or credits leave the page');
  assert.equal(sent[0].body.package_id,'popular');
- assert.equal(c.location.href,'https://sandbox-cpp.iyzipay.com?token=abc','hosted checkout fallback');
+ assert.deepEqual(assigned,['https://sandbox-cpp.iyzipay.com?token=abc'],'hosted checkout in the same tab');
  assert.equal(await c.startCreditPurchase('unlimited'),'unknown_package');assert.equal(sent.length,1);
  // The query string says "completed", but only the server's verified answer counts.
  for(const lang of c.LANGS){
@@ -350,3 +350,42 @@ test('credits page sends only a package id and shows the result the server confi
  const before=sent.length;sb.auth.getSession=async()=>({data:{session:null}});
  assert.equal(await c.startCreditPurchase('popular'),'unauthorized');assert.equal(sent.length,before);
 });
+
+test('mobile-safe checkout: iyzico opens in the same tab after the awaited request, never in a popup or new tab',async()=>{
+ const c=browser();
+ const invokes=[];let answer;
+ const sb={auth:{getSession:async()=>({data:{session:{user:{id:A}}}})},functions:{invoke:async(name,opts)=>{invokes.push(opts.body);await new Promise(r=>setTimeout(r,5));return {data:answer(),error:null};}}};
+ c.getSupabaseClient=()=>sb;const toasts=[];c.toast=m=>toasts.push(m);
+ const appended=[],assigned=[],popups=[];
+ c.document.body={appendChild:el=>appended.push(el)};c.document.head={appendChild:el=>appended.push(el)};c.document.getElementById=()=>null;c.document.createElement=tag=>({tag});
+ c.location.href='https://xora.test/credits.html';c.location.assign=u=>assigned.push(u);
+ c.window.open=(...a)=>{popups.push(a);return null;};
+ const form='<script type="text/javascript">var iyziInit={};/* https://static.iyzipay.com/checkoutform/v2/bundle.js */</script>';
+ const live={status:'ok',purchase_id:'00000000-0000-4000-8000-00000000c0de',credits:20,sandbox:false,checkout_form_content:form,payment_page_url:'https://cpp.iyzipay.com?token=live-token&lang=tr'};
+ // The live answer carries both an embedded form and the hosted page: the hosted page wins, in this tab.
+ answer=()=>live;
+ assert.equal(await c.startCreditPurchase('popular'),'redirected');
+ assert.deepEqual(assigned,['https://cpp.iyzipay.com?token=live-token&lang=tr'],'window.location.assign to the validated paymentPageUrl');
+ assert.equal(popups.length,0,'no window.open');assert.equal(appended.length,0,'the embedded form is not mounted as well');
+ assert.equal(c.sessionStorage.getItem(c.PENDING_PURCHASE_KEY),live.purchase_id,'the return page can still verify this purchase');
+ assert.ok(!toasts.includes(c.t('pay_success')),'nothing claims success before server verification');
+ // A URL outside iyzico is never followed; the official embedded form is the fallback.
+ for(const bad of ['https://evil.example/cpp.iyzipay.com','http://cpp.iyzipay.com?token=x','https://cpp.iyzipay.com.evil.example/','javascript:alert(1)']){
+  assigned.length=0;appended.length=0;answer=()=>({...live,payment_page_url:bad});
+  assert.equal(await c.startCreditPurchase('popular'),'opened',bad);assert.deepEqual(assigned,[],bad+' not followed');assert.ok(appended.length>0,'embedded form fallback');
+  answer=()=>({...live,payment_page_url:bad,checkout_form_content:null});
+  assert.equal(await c.startCreditPurchase('popular'),'unavailable',bad);assert.deepEqual(assigned,[]);
+ }
+ assert.equal(popups.length,0,'never a popup on any path');
+ // The purchase code has no popup or new-tab logic at all.
+ assert.doesNotMatch(String(c.startCreditPurchase),/window\.open|_blank|target\s*=/);
+ // credits.html: Buy buttons are disabled for the whole initialization, stay disabled while the tab
+ // navigates to iyzico, come back on any other outcome or error, and after a Back navigation.
+ const page=fs.readFileSync('credits.html','utf8');
+ assert.match(page,/setBusy\(true\);\s*\/\/[^\n]*\n\s*startCreditPurchase\(card\.getAttribute\("data-package"\)\)\.then\(function \(result\) \{\s*if \(result !== "redirected"\) setBusy\(false\);\s*\}, function \(\) \{ setBusy\(false\); \}\)/);
+ assert.match(page,/buttons\[i\]\.disabled = on;/);
+ assert.match(page,/if \(!card \|\| !e\.target\.closest\("\[data-amount\]"\) \|\| busy\) return;/,'a second tap is ignored while busy');
+ assert.match(page,/addEventListener\("pageshow", function \(e\) \{ if \(e\.persisted\) setBusy\(false\); \}\)/);
+ assert.match(page,/app\.js\?v=iyzico-mobile-redirect-1/,'cache-busted so phones load the fixed purchase code');
+});
+
