@@ -605,97 +605,39 @@ function commentLines(ctx, text, maxW) {
 }
 
 /* ============================================================
-   REAL PAYLAŞIM KARTI — 1080 x 1350 (4:5)
-   Mirror / Stalk: ölçülen X sinyalleri (ham değerler, yuvarlanmış yüzde).
-   Match: yapay zekânın uyum skorları.
+   REAL PAYLAŞIM KARTI — 1080 x 1350 (4:5), "Sessiz Gözlemci" kartının yapısı:
+   başlık (XORA REAL · mod · nadirlik · @handle) → arketip ikonu → arketip → kısa açıklama →
+   4-6 skor çubuğu → XORA analiz kutusu → koyu XORA alt bandı.
    Yerleşim önce hesaplanır (shareCardLayout), sonra çizilir (paintShareCard):
    her metin kendi alanına sığacak şekilde küçültülür / kısaltılır.
    ============================================================ */
 
 var SHARE_W = 1080, SHARE_H = 1350;
-var SHARE_CARD = { x: 48, y: 44, w: 970, h: 1240 };
-var SHARE_PAD = 44;
-var SHARE_BAND_H = 220;
-var SHARE_FOOT_H = 64;
-var SHARE_TILE_H = 140, SHARE_TILE_GAP = 16;
-var SHARE_INK = "#1E2330", SHARE_MUT = "#5C6270", SHARE_SOFT = "#7A7F8C", SHARE_CREAM = "#FFF1E3";
+var SHARE_CARD = { x: 70, y: 60, w: 940, h: 1230 };
+var SHARE_HEADER_H = 300;
+var SHARE_FOOT_H = 88;
+var SHARE_BAR_PITCH = 50;
+var SHARE_INK = "#1E2330", SHARE_MUT = "#5C6270", SHARE_CREAM = "#FFF1E3";
 var SHARE_FONT = "Nunito, Arial, sans-serif";
 var SHARE_EMOJI_FONT = "'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif";
-
-// Which measured signals each mode shows, in grid order. Values are the raw behavior_signals the
-// backend stored; nothing is rescaled. Ratios draw a bar of exactly that percentage; the average
-// length draws against the 280-character post limit.
-var SHARE_SIGNAL_KEYS = {
-  mirror: ["original_ratio", "reply_ratio", "question_ratio", "avg_text_length"],
-  stalk: ["repost_ratio", "original_ratio", "reply_ratio", "avg_text_length"]
-};
-var SHARE_SIGNAL_FALLBACK = ["question_ratio", "repost_ratio", "reply_ratio", "original_ratio", "emoji_per_post", "avg_text_length"];
-var SHARE_SIGNAL_LABEL = { reply_ratio: "real_m_reply", original_ratio: "real_m_original", repost_ratio: "real_m_repost", question_ratio: "real_m_question", emoji_per_post: "real_m_emoji", avg_text_length: "real_m_length" };
-var SHARE_STALK_COPY = {
-  repost_ratio: ["stalk_t_repost", "stalk_u_repost"],
-  original_ratio: ["stalk_t_original", "stalk_u_original"],
-  reply_ratio: ["stalk_t_reply", "stalk_u_reply"],
-  avg_text_length: ["stalk_t_length", "stalk_u_length"]
-};
-var SHARE_MATCH_KEYS = ["vibe", "humor", "chaos", "flirt"];
-// Darker text shades for accents that are too light for small type on the cream insight box.
-var SHARE_LABEL_INK = { "#FFB000": "#A86B00", "#0FAFAF": "#0B7F7F", "#FF7A45": "#C2410C" };
+var SHARE_MATCH_KEYS = ["vibe", "humor", "chaos", "flirt", "romance"];
 var SHARE_RARITY_MARK = { common: "●", rare: "◆", epic: "★", legendary: "✦" };
+// Earlier REAL results stored a fixed mode icon; the card shows an archetype icon, so those fall back.
+var SHARE_MODE_ICONS = ["🪞", "👀"];
+var SHARE_DEFAULT_ICON = "✨";
 
 function shareLang() {
   return (typeof getLang === "function") ? getLang() : "tr";
 }
 
-function shareUpper(text, lang) {
-  try { return String(text).toLocaleUpperCase(lang); } catch (e) { return String(text).toUpperCase(); }
+function shareClamp(v) {
+  return Math.max(0, Math.min(100, Math.round(Number(v) || 0)));
 }
 
-function shareSignalTile(key, v, mode, lang) {
-  var tile = { key: key, source: "signal", raw: v, zero: v === 0 };
-  var isRatio = key !== "avg_text_length" && key !== "emoji_per_post";
-  if (isRatio) {
-    tile.value = formatPercent(Math.min(v, 1), lang);
-    tile.bar = Math.round(Math.min(v, 1) * 100);
-  } else if (key === "avg_text_length") {
-    tile.value = String(Math.round(v));
-    tile.bar = Math.round(Math.min(v / 280, 1) * 100);
-  } else {
-    tile.value = formatDecimal(v, lang);
-    tile.bar = Math.round(Math.min(v / 3, 1) * 100);
-  }
-  var stalkCopy = mode === "stalk" && SHARE_STALK_COPY[key];
-  if (stalkCopy) {
-    tile.label = t(stalkCopy[0]);
-    tile.unit = t(stalkCopy[1]);
-  } else {
-    tile.label = t(SHARE_SIGNAL_LABEL[key]);
-    tile.unit = key === "avg_text_length" ? String(t("real_m_chars")).replace("{n}", "").trim() : "";
-  }
-  // A true zero keeps an empty bar; a unit-less tile says so in words next to the number.
-  if (tile.zero && !tile.unit) tile.unit = t("share_none");
-  return tile;
-}
-
-function shareSignalTiles(res, mode, lang) {
-  var signals = res && res.behavior_signals;
-  var valid = function (k) { var v = signals && signals[k]; return typeof v === "number" && isFinite(v) && v >= 0; };
-  var keys = [];
-  if (signals && typeof signals === "object") {
-    (SHARE_SIGNAL_KEYS[mode] || SHARE_SIGNAL_KEYS.mirror).concat(SHARE_SIGNAL_FALLBACK).forEach(function (k) {
-      if (keys.length < 4 && keys.indexOf(k) < 0 && valid(k)) keys.push(k);
-    });
-  }
-  // Same rule as the in-app card: three or more measured signals, else the stored AI metrics.
-  if (keys.length >= 3) return { measured: true, tiles: keys.map(function (k) { return shareSignalTile(k, signals[k], mode, lang); }) };
-  var legacy = ((res && res.card && res.card.top_behaviors) || []).slice(0, 4).map(function (b) {
-    var v = Math.max(0, Math.min(100, Math.round(Number(b.value) || 0)));
-    return { key: b.key, source: "ai", label: b.label ? localized(b.label, lang) : b.key, value: String(v), unit: "", bar: v, zero: v === 0 };
-  });
-  return { measured: false, tiles: legacy };
-}
-
-function matchBand(v) {
-  return t(v >= 80 ? "match_band_strong" : v >= 60 ? "match_band_clear" : v >= 40 ? "match_band_moderate" : "match_band_low");
+// The first two sentences of a line, so the description under the archetype stays short.
+function shareShortLine(text) {
+  var parts = shareSentences(text);
+  return parts.slice(0, 2).join(CJK_TEXT.test(text || "") ? "" : " ");
 }
 
 function shareCardModel(res) {
@@ -705,51 +647,48 @@ function shareCardModel(res) {
   var base = {
     lang: lang,
     rtl: copyDirection(lang) === "rtl",
-    rarity: rarity,
     rarityLabel: (SHARE_RARITY_MARK[rarity] ? SHARE_RARITY_MARK[rarity] + " " : "") + rarityText(res),
     realLabel: t("real_label")
   };
   if (isMatch) {
-    var tiles = SHARE_MATCH_KEYS.map(function (k) {
-      var v = Math.max(0, Math.min(100, Math.round(Number(res[k]) || 0)));
-      return { key: k, source: "ai", label: t("match_" + k), value: String(v), unit: matchBand(v), bar: v, zero: v === 0 };
-    });
+    var iconOf = function (side) { return (side && side.archetype && side.archetype.emoji) || "👤"; };
     return Object.assign(base, {
       kind: "match",
+      modeLabel: "MATCH",
       accent: "#FF7A45",
       bandColors: ["#0FBDBD", "#FF7A45"],
-      handles: [res.a, res.b],
-      nicknames: [localized(res.resA && res.resA.nickname, lang), localized(res.resB && res.resB.nickname, lang)],
-      emojis: [(res.resA && res.resA.archetype && res.resA.archetype.emoji) || "👤", (res.resB && res.resB.archetype && res.resB.archetype.emoji) || "👤"],
-      hero: formatPercent(Math.max(0, Math.min(100, Number(res.overall) || 0)) / 100, lang),
-      subtitle: t("match_overall"),
-      tiles: tiles,
-      heading: null,
-      insightLabel: t("share_says_match"),
-      insight: matchComment(res, lang) || "",
+      handleLine: "@" + res.a + " × @" + res.b,
+      icons: [iconOf(res.resA), iconOf(res.resB)],
+      title: formatPercent(shareClamp(res.overall) / 100, lang),
+      titleIsScore: true,
+      description: t("match_overall"),
+      bars: SHARE_MATCH_KEYS.map(function (k) { return { key: k, label: t("match_" + k), value: shareClamp(res[k]) }; }),
+      boxLabel: t("share_label_match"),
+      analysis: matchComment(res, lang) || "",
       hash: xhash(String(res.a) + String(res.b))
     });
   }
   var mode = res.mode === "stalk" ? "stalk" : "mirror";
   var c = res.card || {};
-  var metrics = shareSignalTiles(res, mode, lang);
-  var comment = res.comment ? localized(res.comment[mode] || res.comment.mirror, lang) : "";
-  var hash = res.hash || xhash(String(res.handle || "x"));
+  var icon = c.emoji || res.profile_emoji || "";
+  if (!icon || SHARE_MODE_ICONS.indexOf(icon) >= 0) icon = SHARE_DEFAULT_ICON;
+  // The 4-6 evidence-scored REAL metrics the analysis returned; there is no filler row.
+  var bars = ((c.top_behaviors || res.top_behaviors) || []).slice(0, 6).map(function (b) {
+    return { key: b.key, label: b.label ? localized(b.label, lang) : b.key, value: shareClamp(b.value) };
+  });
   return Object.assign(base, {
     kind: mode,
+    modeLabel: mode.toUpperCase(),
     accent: c.color || "#2D3445",
     bandColors: [c.color || "#2D3445"],
-    handles: [res.handle],
-    emojis: [c.emoji || res.profile_emoji || (mode === "stalk" ? "👀" : "🪞")],
+    handleLine: "@" + res.handle,
+    icons: [icon],
     title: localized(res.nickname || c.nickname, lang),
-    subtitle: localized(res.tagline || c.desc, lang),
-    tiles: metrics.tiles,
-    heading: metrics.measured ? { left: t("real_metrics_title"), right: t("share_measured") } : null,
-    insightLabel: t(mode === "stalk" ? "share_says_stalk" : "share_says_mirror"),
-    insight: comment || "",
-    // The localized word is isolated so an RTL word never reorders the "#id" part.
-    caseLabel: mode === "stalk" ? "\u2068" + t("share_case") + "\u2069 #" + (hash >>> 0).toString(16).toUpperCase().slice(-4).padStart(4, "0") : "",
-    hash: hash
+    description: shareShortLine(localized(res.tagline || c.desc, lang)),
+    bars: bars,
+    boxLabel: mode === "stalk" ? "XORA STALK" : t("share_label_mirror"),
+    analysis: res.comment ? localized(res.comment[mode] || res.comment.mirror, lang) : "",
+    hash: res.hash || xhash(String(res.handle || "x"))
   });
 }
 
@@ -791,6 +730,22 @@ function shareWrap(ctx, font, text, maxW) {
   });
 }
 
+// Wraps into at most maxLines, stepping the size down first; the last line is ellipsized if needed.
+function shareFitLines(ctx, weight, max, min, text, maxW, maxLines) {
+  var lines;
+  for (var s = max; s >= min; s--) {
+    lines = shareWrap(ctx, shareFont(weight, s), text, maxW);
+    if (lines.length <= maxLines && lines.join("").indexOf("…") < 0) return { lines: lines, size: s, font: shareFont(weight, s) };
+  }
+  var font = shareFont(weight, min);
+  lines = shareWrap(ctx, font, text, maxW);
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    lines[maxLines - 1] = shareEllipsize(ctx, font, lines[maxLines - 1] + "…", maxW);
+  }
+  return { lines: lines, size: min, font: font };
+}
+
 function shareSentences(text) {
   text = String(text || "").trim();
   if (!text) return [];
@@ -798,9 +753,9 @@ function shareSentences(text) {
   return parts.map(function (s) { return s.trim(); }).filter(Boolean);
 }
 
-var SHARE_INSIGHT_SIZES = [30, 28];
+var SHARE_INSIGHT_SIZES = [27, 26, 25];
 function shareInsightBoxH(lines, size) {
-  return 64 + lines * Math.round(size * 1.36) + 22;
+  return 22 + 30 + 10 + lines * Math.round(size * 1.42) + 24;
 }
 
 // Target three lines; four only when no whole-sentence version fits in three. Whole sentences are
@@ -814,7 +769,7 @@ function shareFitInsight(ctx, text, maxW, budget) {
     for (var k = sentences.length; k >= 1; k--) {
       var candidate = sentences.slice(0, k).join(joiner);
       for (var s = 0; s < SHARE_INSIGHT_SIZES.length; s++) {
-        var size = SHARE_INSIGHT_SIZES[s], font = shareFont(700, size);
+        var size = SHARE_INSIGHT_SIZES[s], font = shareFont(600, size);
         var lines = shareWrap(ctx, font, candidate, maxW);
         if (lines.length <= passes[p] && shareInsightBoxH(lines.length, size) <= budget) {
           return { lines: lines, size: size, font: font, sentences: k, total: sentences.length };
@@ -822,7 +777,7 @@ function shareFitInsight(ctx, text, maxW, budget) {
       }
     }
   }
-  var small = SHARE_INSIGHT_SIZES[SHARE_INSIGHT_SIZES.length - 1], smallFont = shareFont(700, small);
+  var small = SHARE_INSIGHT_SIZES[SHARE_INSIGHT_SIZES.length - 1], smallFont = shareFont(600, small);
   var maxLines = 4;
   while (maxLines > 1 && shareInsightBoxH(maxLines, small) > budget) maxLines--;
   var cut = shareWrap(ctx, smallFont, sentences[0], maxW);
@@ -835,169 +790,130 @@ function shareFitInsight(ctx, text, maxW, budget) {
 
 /* ---------- yerleşim ---------- */
 
-// Returns everything the painter draws, with the final (fitted) text, its font and the box it must
-// stay inside. Tests and the local render check read the same object.
+// The Sessiz Gözlemci card: header (XORA REAL, mode, rarity, @handle), a round archetype icon over
+// the header edge, archetype, short description, 4-6 score bars, the XORA analysis box and the dark
+// footer. Returns everything the painter draws with its fitted text, font and box; tests and the
+// local render check read the same object.
 function shareCardLayout(model, ctx) {
   var card = SHARE_CARD;
-  var left = card.x + SHARE_PAD, right = card.x + card.w - SHARE_PAD, width = right - left;
   var cx = card.x + card.w / 2;
-  var bandBottom = card.y + SHARE_BAND_H;
+  var headerBottom = card.y + SHARE_HEADER_H;
   var footTop = card.y + card.h - SHARE_FOOT_H;
-  var contentBottom = footTop - 34;
   var texts = [];
-  var L = { model: model, size: { w: SHARE_W, h: SHARE_H }, card: card, bandBottom: bandBottom, footTop: footTop, texts: texts, zones: {} };
+  var L = { model: model, size: { w: SHARE_W, h: SHARE_H }, card: card, headerBottom: headerBottom, footTop: footTop, texts: texts, zones: {} };
   function text(zone, str, font, x, y, align, box, color, dir) {
     texts.push({ zone: zone, text: str, font: font, x: x, y: y, align: align, box: box, color: color || SHARE_INK, dir: dir || "ltr" });
   }
   var dir = model.rtl ? "rtl" : "ltr";
+  var isMatch = model.kind === "match";
 
-  // Band pills (brand words and rarity stay LTR).
-  var pillFont = shareFont(900, 22), modeFont = shareFont(900, 18);
-  var realW = shareWidth(ctx, pillFont, model.realLabel) + 36;
-  var modeWord = model.kind.toUpperCase();
-  var modeW = shareWidth(ctx, modeFont, modeWord) + 38;
-  var rarityW = shareWidth(ctx, pillFont, model.rarityLabel) + 42;
-  var pillY = card.y + 26;
+  // 1. Header: XORA REAL + mode on the left, rarity on the right (brand words stay LTR).
+  var realFont = shareFont(900, 22), modeFont = shareFont(900, 18), rarityFont = shareFont(900, 24);
+  var realW = shareWidth(ctx, realFont, model.realLabel) + 38;
+  var modeW = shareWidth(ctx, modeFont, model.modeLabel) + 38;
+  var rarityW = shareWidth(ctx, rarityFont, model.rarityLabel) + 46;
+  var pillMid = card.y + 28 + 25;
   L.pills = [
-    { x: card.x + 30, y: pillY, w: realW, h: 48, fill: SHARE_INK, stroke: null },
-    { x: card.x + 30 + realW + 10, y: pillY, w: modeW, h: 48, fill: "#FFFFFF", stroke: SHARE_INK },
-    // On Match the right half of the band is already orange, so the rarity pill turns white.
-    { x: card.x + card.w - 30 - rarityW, y: pillY, w: rarityW, h: 48, fill: model.kind === "match" ? "#FFFFFF" : "#FF7A45", stroke: SHARE_INK }
+    { x: card.x + 30, y: pillMid - 23, w: realW, h: 46, fill: SHARE_INK, stroke: null },
+    { x: card.x + 30 + realW + 10, y: pillMid - 21, w: modeW, h: 42, fill: "#FFFFFF", stroke: SHARE_INK },
+    // On Match the right half of the header is already orange, so the rarity badge turns white.
+    { x: card.x + card.w - 30 - rarityW, y: pillMid - 25, w: rarityW, h: 50, fill: isMatch ? "#FFFFFF" : "#FF7A45", stroke: SHARE_INK }
   ];
-  text("band", model.realLabel, pillFont, L.pills[0].x + realW / 2, pillY + 32, "center", L.pills[0], "#FFFFFF");
-  text("band", modeWord, modeFont, L.pills[1].x + modeW / 2, pillY + 31, "center", L.pills[1], SHARE_INK);
-  text("band", model.rarityLabel, pillFont, L.pills[2].x + rarityW / 2, pillY + 32, "center", L.pills[2], model.kind === "match" ? SHARE_INK : "#FFFFFF");
+  text("header", model.realLabel, realFont, L.pills[0].x + realW / 2, pillMid + 8, "center", L.pills[0], "#FFFFFF");
+  text("header", model.modeLabel, modeFont, L.pills[1].x + modeW / 2, pillMid + 7, "center", L.pills[1], SHARE_INK);
+  text("header", model.rarityLabel, rarityFont, L.pills[2].x + rarityW / 2, pillMid + 9, "center", L.pills[2], isMatch ? SHARE_INK : "#FFFFFF");
 
-  var y;
-  if (model.kind === "match") {
-    L.avatars = [{ x: cx - 100, y: bandBottom, r: 70, emoji: model.emojis[0] }, { x: cx + 100, y: bandBottom, r: 70, emoji: model.emojis[1] }];
-    L.matchChip = { x: cx, y: bandBottom, r: 32 };
-    var colW = cx - 40 - left;
-    var hA = shareFitLine(ctx, 800, 28, 18, "@" + model.handles[0], colW);
-    var hB = shareFitLine(ctx, 800, 28, 18, "@" + model.handles[1], colW);
-    var handleY = bandBottom + 70 + 44;
-    text("identity", hA.text, hA.font, cx - 40, handleY, "right", { x: left, y: handleY - 30, w: colW, h: 36 }, SHARE_SOFT);
-    text("identity", hB.text, hB.font, cx + 40, handleY, "left", { x: cx + 40, y: handleY - 30, w: colW, h: 36 }, SHARE_SOFT);
-    y = handleY;
-    if (model.nicknames[0] || model.nicknames[1]) {
-      var nickY = handleY + 30;
-      [0, 1].forEach(function (i) {
-        if (!model.nicknames[i]) return;
-        var n = shareFitLine(ctx, 800, 20, 16, model.nicknames[i], colW);
-        text("identity", n.text, n.font, i ? cx + 40 : cx - 40, nickY, i ? "left" : "right", { x: i ? cx + 40 : left, y: nickY - 22, w: colW, h: 28 }, SHARE_MUT, dir);
-      });
-      y = nickY;
-    }
-    var hero = shareFitLine(ctx, 900, 124, 80, model.hero, width);
-    var heroY = y + 12 + Math.round(hero.size * 0.9);
-    L.hero = { text: hero.text, font: hero.font, x: cx, y: heroY, size: hero.size };
-    texts.push({ zone: "identity", text: hero.text, font: hero.font, x: cx, y: heroY, align: "center", box: { x: left, y: heroY - hero.size, w: width, h: hero.size + 8 }, color: SHARE_INK, dir: "ltr", hero: true });
-    var sub = shareFitLine(ctx, 800, 28, 20, model.subtitle, width);
-    y = heroY + 44;
-    text("identity", sub.text, sub.font, cx, y, "center", { x: left, y: y - 30, w: width, h: 38 }, SHARE_MUT, dir);
-    y += 12;
-  } else {
-    L.avatars = [{ x: cx, y: bandBottom, r: 75, emoji: model.emojis[0] }];
-    if (model.caseLabel) {
-      var caseFont = "700 20px monospace";
-      var caseW = shareWidth(ctx, caseFont, model.caseLabel) + 32;
-      L.stamp = { x: card.x + card.w - 40 - caseW, y: bandBottom - 26 - 42, w: caseW, h: 42 };
-      text("band", model.caseLabel, caseFont, L.stamp.x + caseW / 2, L.stamp.y + 28, "center", L.stamp, SHARE_INK);
-    }
-    var handle = shareFitLine(ctx, 800, 30, 20, "@" + model.handles[0], width);
-    y = bandBottom + 75 + 14 + 30;
-    text("identity", handle.text, handle.font, cx, y, "center", { x: left, y: y - 32, w: width, h: 40 }, SHARE_SOFT);
-    // Title: up to two lines, stepping down from 66px; a third line is never drawn.
-    var titleSize = 66, titleLines;
-    for (; titleSize >= 48; titleSize -= 2) {
-      titleLines = shareWrap(ctx, shareFont(900, titleSize), model.title, width);
-      if (titleLines.length <= 2 && titleLines.join("").indexOf("…") < 0) break;
-    }
-    if (titleSize < 48) {
-      titleSize = 48;
-      titleLines = shareWrap(ctx, shareFont(900, 48), model.title, width);
-      if (titleLines.length > 2) titleLines = [titleLines[0], shareEllipsize(ctx, shareFont(900, 48), titleLines[1] + "…", width)];
-    }
-    var titleLH = Math.round(titleSize * 1.08);
-    titleLines.forEach(function (line, i) {
-      var ty = y + 14 + Math.round(titleSize * 0.86) + i * titleLH;
-      text("identity", line, shareFont(900, titleSize), cx, ty, "center", { x: left, y: ty - titleSize, w: width, h: titleLH }, SHARE_INK, dir);
-    });
-    y = y + 14 + Math.round(titleSize * 0.86) + (titleLines.length - 1) * titleLH;
-    if (model.subtitle) {
-      var subFont = shareFont(600, 28);
-      var subText = shareEllipsize(ctx, subFont, model.subtitle, width);
-      y += 46;
-      text("identity", subText, subFont, cx, y, "center", { x: left, y: y - 30, w: width, h: 38 }, SHARE_MUT, dir);
-    }
-    y += 12;
-  }
-  L.zones.identity = { top: bandBottom, bottom: y };
+  // 3. @handle (Match: both handles), white in the header like the old card.
+  var handle = shareFitLine(ctx, 800, 36, 22, model.handleLine, card.w - 120);
+  var handleY = card.y + 148;
+  texts.push({ zone: "header", text: handle.text, font: handle.font, x: cx, y: handleY, align: "center", box: { x: card.x + 60, y: handleY - 38, w: card.w - 120, h: 46 }, color: "#FFFFFF", dir: "ltr", handle: true });
 
-  // Tile block and insight: heights are fixed, the free space is split evenly between them.
-  var headingH = model.heading ? 38 : 0;
-  var tilesH = headingH + SHARE_TILE_H * 2 + SHARE_TILE_GAP;
-  var minGap = 20;
-  var insightBudget = contentBottom - y - tilesH - 2 * minGap;
-  var insightW = width - 60;
-  var insight = shareFitInsight(ctx, model.insight, insightW, insightBudget);
-  var insightH = insight ? shareInsightBoxH(insight.lines.length, insight.size) : 0;
-  var gap = Math.max(minGap, (contentBottom - y - tilesH - insightH) / 2);
-  var tilesTop = Math.round(y + gap);
-  L.zones.tiles = { top: tilesTop, bottom: tilesTop + tilesH };
+  // 2. Archetype icon over the header edge (Match: one per account, joined by ×).
+  var r = isMatch ? 92 : 108;
+  L.icons = isMatch
+    ? [{ x: cx - 110, y: headerBottom, r: r, emoji: model.icons[0] }, { x: cx + 110, y: headerBottom, r: r, emoji: model.icons[1] }]
+    : [{ x: cx, y: headerBottom, r: r, emoji: model.icons[0] }];
+  if (isMatch) L.matchChip = { x: cx, y: headerBottom, r: 36 };
 
-  if (model.heading) {
-    var hy = tilesTop + 20;
-    var half = (width - 16) / 2;
-    var hl = shareFitLine(ctx, 900, 18, 14, shareUpper(model.heading.left, model.lang), half);
-    var hr = shareFitLine(ctx, 800, 18, 14, model.heading.right, half);
-    var startX = model.rtl ? right - 4 : left + 4, endX = model.rtl ? left + 4 : right - 4;
-    text("tiles", hl.text, hl.font, startX, hy, model.rtl ? "right" : "left", { x: model.rtl ? right - half : left, y: hy - 20, w: half, h: 26 }, SHARE_MUT, dir);
-    text("tiles", hr.text, hr.font, endX, hy, model.rtl ? "left" : "right", { x: model.rtl ? left : right - half, y: hy - 20, w: half, h: 26 }, SHARE_MUT, dir);
-  }
-  var colWidth = (width - SHARE_TILE_GAP) / 2;
-  var gridTop = tilesTop + headingH;
-  var labelWeight = model.kind === "mirror" ? 800 : 900, labelMax = model.kind === "mirror" ? 22 : 24;
-  L.tiles = model.tiles.slice(0, 4).map(function (tile, i) {
-    var col = i % 2, row = Math.floor(i / 2);
-    if (model.rtl) col = 1 - col;
-    var tx = left + col * (colWidth + SHARE_TILE_GAP), ty = gridTop + row * (SHARE_TILE_H + SHARE_TILE_GAP);
-    var inner = { x: tx + 22, w: colWidth - 44 };
-    var edge = model.rtl ? inner.x + inner.w : inner.x, align = model.rtl ? "right" : "left";
-    var label = shareFitLine(ctx, labelWeight, labelMax, 16, tile.label, inner.w);
-    text("tile" + i, label.text, label.font, edge, ty + 40, align, { x: inner.x, y: ty + 16, w: inner.w, h: 30 }, model.kind === "mirror" ? SHARE_MUT : SHARE_INK, dir);
-    var valueFont = shareFont(900, 56);
-    var valueW = shareWidth(ctx, valueFont, tile.value);
-    texts.push({ zone: "tile" + i, text: tile.value, font: valueFont, x: edge, y: ty + 98, align: align, box: { x: inner.x, y: ty + 50, w: inner.w, h: 56 }, color: SHARE_INK, dir: "ltr", value: true });
-    if (tile.unit) {
-      var unitW = inner.w - valueW - 10;
-      var unit = shareFitLine(ctx, 800, 22, 16, tile.unit, unitW);
-      var ux = model.rtl ? edge - valueW - 10 : edge + valueW + 10;
-      text("tile" + i, unit.text, unit.font, ux, ty + 98, align, { x: model.rtl ? inner.x : ux, y: ty + 76, w: unitW, h: 28 }, SHARE_MUT, dir);
-    }
-    return { x: tx, y: ty, w: colWidth, h: SHARE_TILE_H, bar: { x: inner.x, y: ty + 112, w: inner.w, h: 12, fill: tile.bar, rtl: model.rtl }, tile: tile };
+  // Body blocks, then spread evenly between the icon and the footer.
+  var bodyTop = headerBottom + r + 18, bodyBottom = footTop - 20;
+  var innerW = card.w - 112;
+  var score = isMatch ? shareFitLine(ctx, 900, 96, 64, model.title, innerW) : null;
+  var title = score ? { lines: [score.text], size: score.size } : shareFitLines(ctx, 900, 60, 44, model.title, innerW, 2);
+  var titleLH = Math.round(title.size * 1.05);
+  var titleH = title.size + (title.lines.length - 1) * titleLH;
+  var desc = model.description ? shareFitLines(ctx, 600, 28, 25, model.description, innerW - 40, 2) : null;
+  var descLH = desc ? Math.round(desc.size * 1.35) : 0;
+  var descH = desc ? 12 + desc.size + (desc.lines.length - 1) * descLH : 0;
+  var bars = (model.bars || []).slice(0, 6);
+  var barsH = bars.length ? bars.length * SHARE_BAR_PITCH - 14 : 0;
+  var boxW = card.w - 112;
+  var fixedH = titleH + descH + barsH;
+  var insight = shareFitInsight(ctx, model.analysis, boxW - 68, bodyBottom - bodyTop - fixedH - 4 * 14);
+  var boxH = insight ? shareInsightBoxH(insight.lines.length, insight.size) : 0;
+  var groups = [titleH + descH, barsH, boxH].filter(function (h) { return h > 0; });
+  var gap = Math.max(14, (bodyBottom - bodyTop - groups.reduce(function (a, b) { return a + b; }, 0)) / (groups.length + 1));
+
+  // 4-5. Archetype (Match: the score) and the short description.
+  var y = bodyTop + gap;
+  L.zones.title = { top: y, bottom: y + titleH + descH };
+  title.lines.forEach(function (line, i) {
+    var ty = y + Math.round(title.size * 0.86) + i * titleLH;
+    texts.push({ zone: "title", text: line, font: shareFont(900, title.size), x: cx, y: ty, align: "center", box: { x: card.x + 56, y: ty - title.size, w: innerW, h: titleLH }, color: SHARE_INK, dir: model.titleIsScore ? "ltr" : dir, score: !!model.titleIsScore });
   });
+  y += titleH;
+  if (desc) {
+    y += 12;
+    desc.lines.forEach(function (line, i) {
+      var dy = y + Math.round(desc.size * 0.86) + i * descLH;
+      text("title", line, desc.font, cx, dy, "center", { x: card.x + 76, y: dy - desc.size, w: innerW - 40, h: descLH }, SHARE_MUT, dir);
+    });
+    y += desc.size + (desc.lines.length - 1) * descLH;
+  }
 
-  var insightTop = Math.round(L.zones.tiles.bottom + gap);
+  // 6. Score bars in the old style: label, bar, value.
+  if (bars.length) {
+    y += gap;
+    var labelW = 290, valueW = 64, colGap = 22;
+    var left = card.x + 64, right = card.x + card.w - 64;
+    var barX = model.rtl ? left + valueW + colGap : left + labelW + colGap;
+    var barW = right - left - labelW - valueW - 2 * colGap;
+    L.bars = bars.map(function (b, i) {
+      var rowY = y + i * SHARE_BAR_PITCH, base = rowY + 26;
+      var lab = shareFitLine(ctx, 700, 27, 18, b.label, labelW);
+      text("bars", lab.text, lab.font, model.rtl ? right : left, base, model.rtl ? "right" : "left", { x: model.rtl ? right - labelW : left, y: rowY, w: labelW, h: 36 }, SHARE_MUT, dir);
+      texts.push({ zone: "bars", text: String(b.value), font: shareFont(900, 27), x: model.rtl ? left : right, y: base, align: model.rtl ? "left" : "right", box: { x: model.rtl ? left : right - valueW, y: rowY, w: valueW, h: 36 }, color: SHARE_INK, dir: "ltr" });
+      return { x: barX, y: rowY + 6, w: barW, h: 24, fill: b.value, rtl: model.rtl, bar: b };
+    });
+    L.zones.bars = { top: y, bottom: y + barsH };
+    y += barsH;
+  } else {
+    L.bars = [];
+    L.zones.bars = { top: y, bottom: y };
+  }
+
+  // 7. The XORA analysis box.
   if (insight) {
-    var box = { x: left, y: insightTop, w: width, h: insightH };
-    var labelFit = shareFitLine(ctx, 900, 20, 14, shareUpper(model.insightLabel, model.lang), insightW);
-    text("insight", labelFit.text, labelFit.font, cx, insightTop + 42, "center", { x: left + 30, y: insightTop + 20, w: insightW, h: 28 }, SHARE_LABEL_INK[model.accent] || model.accent, dir);
-    var lh = Math.round(insight.size * 1.36);
+    y += gap;
+    var box = { x: card.x + 56, y: y, w: boxW, h: boxH };
+    var lab2 = shareFitLine(ctx, 900, 23, 16, model.boxLabel, boxW - 68);
+    text("analysis", lab2.text, lab2.font, cx, y + 22 + 22, "center", { x: box.x + 34, y: y + 18, w: boxW - 68, h: 30 }, SHARE_INK, dir);
+    var lh = Math.round(insight.size * 1.42);
     insight.lines.forEach(function (line, i) {
-      var ly = insightTop + 64 + Math.round(insight.size * 0.95) + i * lh;
-      text("insight", line, insight.font, cx, ly, "center", { x: left + 30, y: ly - insight.size, w: insightW, h: lh }, SHARE_INK, dir);
+      var ly = y + 22 + 30 + 10 + Math.round(insight.size * 0.9) + i * lh;
+      text("analysis", line, insight.font, cx, ly, "center", { x: box.x + 34, y: ly - insight.size, w: boxW - 68, h: lh }, SHARE_INK, dir);
     });
     L.insight = { box: box, lines: insight.lines, size: insight.size, sentences: insight.sentences, total: insight.total, truncated: !!insight.truncated, dashed: model.kind === "stalk" };
-    L.zones.insight = { top: insightTop, bottom: insightTop + insightH };
+    L.zones.analysis = { top: y, bottom: y + boxH };
   } else {
-    L.zones.insight = { top: insightTop, bottom: insightTop };
+    L.zones.analysis = { top: y, bottom: y };
   }
 
-  var footY = footTop + 42;
-  text("footer", "XORA", shareFont(900, 28), card.x + 36, footY, "left", { x: card.x + 36, y: footTop + 12, w: 140, h: 40 }, "#FFF6E9");
-  text("footer", XORA_PUBLIC_HOST, shareFont(800, 20), card.x + card.w - 36, footY, "right", { x: card.x + card.w - 36 - 260, y: footTop + 16, w: 260, h: 34 }, "#FFF6E9");
-  L.barcode = { text: fakeBarcode(model.hash), font: "17px monospace", x: cx + 10, y: footY - 2 };
+  // 8. Dark footer: XORA, barcode, host.
+  var footY = footTop + 56;
+  text("footer", "XORA", shareFont(900, 32), card.x + 40, footY, "left", { x: card.x + 40, y: footTop + 20, w: 130, h: 44 }, "#FFF6E9");
+  text("footer", XORA_PUBLIC_HOST, shareFont(800, 23), card.x + card.w - 40, footY, "right", { x: card.x + card.w - 40 - 300, y: footTop + 24, w: 300, h: 38 }, "#FFF6E9");
+  L.barcode = { text: fakeBarcode(model.hash), font: "19px monospace", x: cx + 6, y: footY - 2 };
   return L;
 }
 
@@ -1008,71 +924,60 @@ function paintShareCard(ctx, L) {
   ctx.textBaseline = "alphabetic";
   ctx.direction = "ltr";
   ctx.fillStyle = "#FFF6E9"; ctx.fillRect(0, 0, SHARE_W, SHARE_H);
-  ctx.fillStyle = "rgba(15,189,189,0.12)"; ctx.beginPath(); ctx.arc(80, 90, 190, 0, 7); ctx.fill();
-  ctx.fillStyle = "rgba(255,122,69,0.12)"; ctx.beginPath(); ctx.arc(1040, 1270, 230, 0, 7); ctx.fill();
+  ctx.fillStyle = "rgba(15,189,189,0.12)"; ctx.beginPath(); ctx.arc(80, 90, 200, 0, 7); ctx.fill();
+  ctx.fillStyle = "rgba(255,122,69,0.12)"; ctx.beginPath(); ctx.arc(1040, 1290, 240, 0, 7); ctx.fill();
 
-  // Card body with the XORA hard shadow.
-  ctx.fillStyle = "rgba(30,35,48,0.85)"; roundRect(ctx, card.x + 14, card.y + 16, card.w, card.h, 40); ctx.fill();
+  // Card with the old soft shadow.
+  ctx.save();
+  ctx.shadowColor = "rgba(30,35,48,0.20)"; ctx.shadowBlur = 44; ctx.shadowOffsetY = 18;
   ctx.fillStyle = "#FFFFFF"; roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.fill();
+  ctx.restore();
 
   ctx.save();
   roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.clip();
   if (m.bandColors.length > 1) {
     var mid = card.x + card.w / 2;
-    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w / 2, SHARE_BAND_H);
-    ctx.fillStyle = m.bandColors[1]; ctx.fillRect(mid, card.y, card.w / 2, SHARE_BAND_H);
+    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w / 2, SHARE_HEADER_H);
+    ctx.fillStyle = m.bandColors[1]; ctx.fillRect(mid, card.y, card.w / 2, SHARE_HEADER_H);
     ctx.fillStyle = SHARE_INK;
-    ctx.beginPath(); ctx.moveTo(mid + 24, card.y); ctx.lineTo(mid + 30, card.y); ctx.lineTo(mid - 24, L.bandBottom); ctx.lineTo(mid - 30, L.bandBottom); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(mid + 30, card.y); ctx.lineTo(mid + 36, card.y); ctx.lineTo(mid - 30, L.headerBottom); ctx.lineTo(mid - 36, L.headerBottom); ctx.closePath(); ctx.fill();
   } else {
-    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w, SHARE_BAND_H);
+    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w, SHARE_HEADER_H);
     ctx.fillStyle = "rgba(255,255,255,0.18)";
-    ctx.beginPath(); ctx.arc(card.x + 180, card.y + 50, 110, 0, 7); ctx.fill();
-    ctx.beginPath(); ctx.arc(card.x + card.w - 90, card.y + 220, 130, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(card.x + 115, card.y + 55, 125, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(card.x + card.w - 60, card.y + 250, 120, 0, 7); ctx.fill();
   }
-  ctx.fillStyle = SHARE_INK; ctx.fillRect(card.x, L.bandBottom - 2.5, card.w, 5);
-  ctx.fillStyle = SHARE_INK; ctx.fillRect(card.x, L.footTop, card.w, SHARE_FOOT_H);
+  ctx.fillStyle = SHARE_INK; ctx.fillRect(card.x, L.headerBottom - 2, card.w, 4);
+  ctx.fillRect(card.x, L.footTop, card.w, SHARE_FOOT_H);
   ctx.restore();
-  ctx.lineWidth = 5; ctx.strokeStyle = SHARE_INK; roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.stroke();
+  ctx.lineWidth = 4; ctx.strokeStyle = SHARE_INK; roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.stroke();
 
   L.pills.forEach(function (p) {
     ctx.fillStyle = p.fill; roundRect(ctx, p.x, p.y, p.w, p.h, p.h / 2); ctx.fill();
     if (p.stroke) { ctx.lineWidth = 3; ctx.strokeStyle = p.stroke; roundRect(ctx, p.x, p.y, p.w, p.h, p.h / 2); ctx.stroke(); }
   });
-  if (L.stamp) {
-    ctx.save();
-    ctx.translate(L.stamp.x + L.stamp.w / 2, L.stamp.y + L.stamp.h / 2); ctx.rotate(-0.07); ctx.translate(-(L.stamp.x + L.stamp.w / 2), -(L.stamp.y + L.stamp.h / 2));
-    ctx.fillStyle = "rgba(255,255,255,0.88)"; roundRect(ctx, L.stamp.x, L.stamp.y, L.stamp.w, L.stamp.h, 10); ctx.fill();
-    if (ctx.setLineDash) ctx.setLineDash([8, 6]);
-    ctx.lineWidth = 3; ctx.strokeStyle = SHARE_INK; roundRect(ctx, L.stamp.x, L.stamp.y, L.stamp.w, L.stamp.h, 10); ctx.stroke();
-    if (ctx.setLineDash) ctx.setLineDash([]);
-    ctx.restore();
-  }
 
-  L.avatars.forEach(function (a) {
+  L.icons.forEach(function (a) {
     ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, 7); ctx.fillStyle = "#FFFFFF"; ctx.fill();
-    ctx.lineWidth = 6; ctx.strokeStyle = SHARE_INK; ctx.stroke();
+    ctx.lineWidth = 7; ctx.strokeStyle = SHARE_INK; ctx.stroke();
     ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = SHARE_INK;
-    ctx.font = Math.round(a.r * 1.05) + "px " + SHARE_EMOJI_FONT; ctx.fillText(a.emoji, a.x, a.y + 4);
+    ctx.font = Math.round(a.r * 1.07) + "px " + SHARE_EMOJI_FONT; ctx.fillText(a.emoji, a.x, a.y + 6);
     ctx.textBaseline = "alphabetic";
   });
   if (L.matchChip) {
     var chip = L.matchChip;
     ctx.beginPath(); ctx.arc(chip.x, chip.y, chip.r, 0, 7); ctx.fillStyle = SHARE_INK; ctx.fill();
-    ctx.lineWidth = 4; ctx.strokeStyle = "#FFFFFF"; ctx.stroke();
-    ctx.fillStyle = "#FFFFFF"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = shareFont(900, 36); ctx.fillText("×", chip.x, chip.y + 2);
+    ctx.lineWidth = 5; ctx.strokeStyle = "#FFFFFF"; ctx.stroke();
+    ctx.fillStyle = "#FFFFFF"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = shareFont(900, 40); ctx.fillText("×", chip.x, chip.y + 2);
     ctx.textBaseline = "alphabetic";
   }
 
-  L.tiles.forEach(function (tl) {
-    ctx.fillStyle = "#FFFFFF"; roundRect(ctx, tl.x, tl.y, tl.w, tl.h, 22); ctx.fill();
-    ctx.lineWidth = 3; ctx.strokeStyle = SHARE_INK; roundRect(ctx, tl.x, tl.y, tl.w, tl.h, 22); ctx.stroke();
-    var b = tl.bar;
-    // The track is always drawn; the fill is exactly the measured share and is omitted at 0.
-    ctx.fillStyle = "#E3E5EA"; roundRect(ctx, b.x, b.y, b.w, b.h, b.h / 2); ctx.fill();
+  L.bars.forEach(function (b) {
+    ctx.fillStyle = "#ECEDF0"; roundRect(ctx, b.x, b.y, b.w, b.h, b.h / 2); ctx.fill();
     var fw = Math.round(b.w * b.fill / 100);
     if (fw > 0) {
       ctx.save(); roundRect(ctx, b.x, b.y, b.w, b.h, b.h / 2); ctx.clip();
-      ctx.fillStyle = m.accent; ctx.fillRect(b.rtl ? b.x + b.w - fw : b.x, b.y, fw, b.h);
+      ctx.fillStyle = m.accent; roundRect(ctx, b.rtl ? b.x + b.w - fw : b.x, b.y, fw, b.h, b.h / 2); ctx.fill();
       ctx.restore();
     }
   });
@@ -1087,16 +992,21 @@ function paintShareCard(ctx, L) {
 
   L.texts.forEach(function (tx) {
     ctx.font = tx.font; ctx.fillStyle = tx.color; ctx.textAlign = tx.align; ctx.direction = tx.dir;
-    if (tx.hero) {
-      // Digits in ink, the percent sign in XORA orange.
-      var parts = String(tx.text).split(/([\d٠-٩]+)/).filter(Boolean);
+    if (tx.score || (tx.handle && m.kind === "match")) {
+      // Match: the percent sign in XORA orange; handles in white with a soft "×".
+      var parts = String(tx.text).split(tx.score ? /([\d٠-٩]+)/ : /( × )/).filter(Boolean);
       var total = parts.reduce(function (w, p) { return w + ctx.measureText(p).width; }, 0);
       var x = tx.x - total / 2;
       ctx.textAlign = "left"; ctx.direction = "ltr";
       parts.forEach(function (p) {
-        ctx.fillStyle = /[\d٠-٩]/.test(p) ? SHARE_INK : "#FF7A45";
+        ctx.fillStyle = tx.score ? (/[\d٠-٩]/.test(p) ? SHARE_INK : "#FF7A45") : (p === " × " ? "rgba(255,255,255,0.85)" : "#FFFFFF");
         ctx.fillText(p, x, tx.y); x += ctx.measureText(p).width;
       });
+      return;
+    }
+    if (tx.handle) {
+      ctx.save(); ctx.shadowColor = "rgba(30,35,48,0.35)"; ctx.shadowOffsetY = 2;
+      ctx.fillText(tx.text, tx.x, tx.y); ctx.restore();
       return;
     }
     ctx.fillText(tx.text, tx.x, tx.y);

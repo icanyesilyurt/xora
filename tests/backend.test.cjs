@@ -168,3 +168,29 @@ test('nicknames: the most distinctive valid candidate wins over generic labels',
  for(const locale of Object.keys(e.NICKNAME_STYLE_EXAMPLES)) assert.ok(!e.NICKNAME_STYLE_EXAMPLES[locale].some(x=>['Sessiz Gözlemci','Meraklı Biri','Curious Mind','Quiet Observer','Mente Curiosa'].includes(x)),locale);
 });
 
+test('card icons: the chosen archetype brings its own validated emoji; unsafe or missing icons fall back deterministically',async()=>{
+ const e=edge({console:{warn(){}}});const sig={own_posts:8,repost_ratio:.8,question_ratio:.5};
+ for(const ok of ['🦅','🛋️','💥','📣','⚽']) assert.ok(e.iconValid(ok),ok);
+ for(const bad of ['🇹🇷','👍🏽','👨‍💻','1️⃣','✝️','☪️','🔫','🖕','🍆','🏴','🦅🦅','ab','',null,42]) assert.equal(e.iconValid(bad),null,String(bad));
+ const pick=list=>e.pickAlias({nickname_candidates:list},sig,'tr');
+ assert.equal(pick([{text:'Kartal Gündemcisi',evidence:'repost_ratio',emoji:'🦅'}]).icon,'🦅','icon of the chosen name');
+ assert.equal(pick([{text:'Gündem Takipçisi',evidence:'repost_ratio',emoji:'📰'},{text:'Kartal Gündemcisi',evidence:'repost_ratio',emoji:'🦅'}]).icon,'🦅','the icon follows the name that wins, not the first candidate');
+ assert.equal(pick([{text:'Kartal Gündemcisi',evidence:'repost_ratio',emoji:'🇹🇷'}]).icon,'📣','unsafe icon falls back to its evidence');
+ assert.equal(e.pickAlias({nickname_candidates:[{text:'Kartal Gündemcisi',evidence:'repost_ratio'}],emoji:'🦅'},sig,'tr').icon,'🦅','result emoji as second choice');
+ const fb=e.pickAlias({nickname_candidates:[]},{question_ratio:.5},'tr');assert.equal(fb.source,'fallback');assert.equal(fb.icon,'❓','fallback name keeps a matching icon');
+ assert.equal(e.pickAlias({nickname_candidates:[]},{},'tr').icon,'✨');
+ // Saved results carry the icon in card.emoji, profile_emoji and archetype.emoji; never the old fixed 🪞/👀.
+ for(const mode of ['mirror','stalk']){
+  const raw=profileAI('tr');raw.nickname_candidates=[{text:'Kartal Gündemcisi',evidence:'question_ratio',emoji:'🦅'}];
+  const r=e.normalizeAIProfile(raw,'alice',mode,{own_posts:8,question_ratio:.5},'tr');
+  assert.deepEqual([r.card.emoji,r.profile_emoji,r.archetype.emoji],['🦅','🦅','🦅'],mode);
+ }
+ const raw=profileAI('tr');raw.nickname_candidates=[];raw.emoji='👀';
+ assert.equal(e.normalizeAIProfile(raw,'alice','stalk',{own_posts:8,question_ratio:.5},'tr').card.emoji,'❓','no candidate: evidence icon, not the AI result emoji');
+ // Match: one icon per account from the AI, 👤 when missing or unsafe.
+ const service={from(){const q={select(){return q;},eq(){return q;},gt(){return q;},async maybeSingle(){return {data:{profile:{username:'alice'},posts:Array.from({length:8},()=>({text:'Soru?',type:'original',metrics:{likes:0,replies:0,reposts:0}}))}};}};return q;}};
+ for(const [a,b,want] of [['⚽','💻',['⚽','💻']],['🇹🇷',undefined,['👤','👤']]]){
+  const m=edge({fetch:async()=>Response.json({content:[{type:'text',text:JSON.stringify({...matchAI('tr'),icon_a:a,icon_b:b})}]})});
+  const res=await m.analyzeMatch(service,'alice','bob','tr');assert.deepEqual([res.resA.archetype.emoji,res.resB.archetype.emoji],want);
+ }
+});

@@ -470,9 +470,8 @@ test('Match PNG score rows fit the card frame in every locale, including ES, FR,
   // REAL Match draws the AI-scored rows; the same object as FUN draws none of them.
   const real={...m,meta:{...m.meta,tier:'real',locale:lang},fun_comment:undefined,ai_comment:{[lang]:'x'},rarity:{name:'rare'}};
   c.renderMatchPNG(real);
-  // REAL Match is drawn by the 4:5 share card: four compatibility tiles, not the old one-line rows.
-  for(const k of ['match_vibe','match_humor','match_chaos','match_flirt']) assert.ok(text.some(p=>p.v===c.I18N[lang][k]),lang+' REAL PNG tile '+k);
-  assert.ok(!text.some(p=>p.v===c.I18N[lang].match_romance),lang+' romance stays on the in-app card only');
+  // REAL Match is drawn by the 4:5 share card: five compatibility bars, not the old one-line rows.
+  assert.deepEqual(JSON.parse(JSON.stringify(c.shareCardModel(real).bars)).map(x=>x.label),['match_vibe','match_humor','match_chaos','match_flirt','match_romance'].map(k=>c.I18N[lang][k]),lang+' REAL share-card bars');
   assert.deepEqual(text.filter(p=>p.y===780||p.y===812),[],lang+' no old score rows');
   text.length=0;c.renderMatchPNG(m);
   assert.deepEqual(text.filter(p=>p.y===780||p.y===812),[],lang+' FUN PNG has no score rows');
@@ -731,12 +730,10 @@ test('REAL identity card draws its metric rows from behavior_signals, determinis
   assert.equal(c.buildIdentityCard(res),html,'no randomness: same input, same card');
   const moved=c.buildIdentityCard({...res,behavior_signals:{...signals,reply_ratio:0.6}});
   assert.match(moved,/data-metric="reply_ratio"><span class="score-name">[^<]+<\/span><span class="score-bar"><i style="width:60%">/);
-  // PNG: the 4:5 share card shows the four Mirror signals as raw values; the in-app card keeps all six.
+  // PNG: the share card shows the REAL AI-scored metrics as bars; the in-app card keeps the six raw signals.
   const {text}=recorder(c);c.renderIdentityPNG(res);
-  for(const k of ['real_m_original','real_m_reply','real_m_question','real_m_length']) assert.ok(text.some(p=>p.v===c.I18N[lang][k]),lang+' PNG label '+k);
-  for(const k of ['real_m_repost','real_m_emoji']) assert.ok(!text.some(p=>p.v===c.I18N[lang][k]),lang+' '+k+' only in the app');
-  for(const v of [0.5,0.32,0.25]) assert.ok(text.some(p=>p.v===c.formatPercent(v,lang)),lang+' PNG raw value '+v);
-  assert.ok(text.some(p=>p.v==='142'),lang+' average length drawn as measured');
+  assert.deepEqual(JSON.parse(JSON.stringify(c.shareCardModel(res).bars)),[{key:'duygusal_yogunluk',label:'AI_ONLY_LABEL',value:88}],lang+' share-card bars');
+  for(const k of ['real_m_original','real_m_reply','real_m_repost','real_metrics_title']) assert.ok(!text.some(p=>p.v===c.I18N[lang][k]),lang+' '+k+' only in the app');
   assert.ok(text.some(p=>p.v.includes(c.t('rarity_epic'))),lang+' rarity on PNG');
  }
  // Older REAL results without behavior_signals keep their AI metrics rather than inventing numbers.
@@ -932,26 +929,29 @@ test('Cloudflare Pages build publishes exactly the static site into dist/, and n
 });
 
 // ---------------------------------------------------------------------------------------------
-// REAL 4:5 share card (1080x1350). Mirror/Stalk show raw X signals; Match shows compatibility scores.
-// The measurer is font-aware (size from ctx.font, CJK/Hangul one em wide) so fitting is exercised.
+// REAL 4:5 share card (1080x1350) on the Sessiz Gözlemci structure: header (XORA REAL, mode, rarity,
+// @handle), archetype icon, archetype, short description, 4-6 score bars, XORA analysis box, footer.
+// The measurer is font-aware so fitting is exercised.
 const arr=x=>JSON.parse(JSON.stringify(x));
 const shareCtx=()=>{
  const wide=/[　-ヿ㐀-鿿가-힯＀-￯]/;
- const fills=[],texts=[];
+ const texts=[];
  const target={font:'10px sans-serif',direction:'ltr',textAlign:'left',
   measureText(v){const m=/(\d+)px/.exec(this.font);const px=m?+m[1]:10;const k=/^(800|900)/.test(this.font)?0.64:0.58;return {width:[...String(v)].reduce((w,ch)=>w+(wide.test(ch)?px:px*k),0)};},
-  fillText(v,x,y){texts.push({v:String(v),x,y,font:this.font});},fillRect(x,y,w,h){fills.push({x,y,w,h,style:this.fillStyle});},createLinearGradient:()=>({addColorStop(){}})};
- return {ctx:new Proxy(target,{get:(o,k)=>k in o?o[k]:()=>{}}),fills,texts};
+  fillText(v,x,y){texts.push({v:String(v),x,y,font:this.font});},createLinearGradient:()=>({addColorStop(){}})};
+ return {ctx:new Proxy(target,{get:(o,k)=>k in o?o[k]:()=>{}}),texts};
 };
-const SHARE_SIGNALS={reply_ratio:0.32,original_ratio:0.5,repost_ratio:0.1,quote_ratio:0.08,question_ratio:0.25,emoji_per_post:1.4,avg_text_length:142};
-const shareIdentity=(lang,mode,over={})=>({mode,meta:{tier:'real',locale:lang,version:'xora_real_v1'},handle:'alice',hash:7,rarity:{name:'epic',score:80},
- nickname:{[lang]:'Curious Mind'},tagline:{[lang]:'Questions lead the way.'},profile_summary:{[lang]:'Asks open questions.'},
+const tb=(lang,rows)=>rows.map(([key,label,value])=>({key,label:{[lang]:label},value}));
+const shareIdentity=(lang,mode,over={})=>({mode,meta:{tier:'real',locale:lang,version:'xora_real_v1',sample_size:25,sample:{analyzed:25,original:12,reply:8,quote:2,repost:3}},handle:'alice',hash:7,rarity:{name:'epic',score:80},
+ nickname:{[lang]:'Curious Mind'},tagline:{[lang]:'Questions lead the way. Replies follow soon after. Then another question.'},profile_summary:{[lang]:'Asks open questions.'},
  comment:{mirror:{[lang]:'You open threads with a question. Most posts are your own words. When you quote someone, it is to add a counterpoint.'},stalk:{[lang]:'This account opens threads with a question. Most posts are its own words.'}},
- behavior_signals:{...SHARE_SIGNALS},card:{color:'#7C4DFF',emoji:mode==='stalk'?'👀':'🪞',top_behaviors:[{key:'mizah',label:{[lang]:'AI_ONLY_LABEL'},value:88}]},...over});
+ behavior_signals:{reply_ratio:0.32,original_ratio:0.48,repost_ratio:0.12,quote_ratio:0.08,question_ratio:0.25,emoji_per_post:1.4,avg_text_length:142},
+ card:{color:'#7C4DFF',emoji:'🦅',top_behaviors:tb(lang,[['detaycilik','Detail',88],['merak','Curiosity',81],['ozgunluk','Originality',76],['tartisma_enerjisi','Debate',58],['mizah','Humor',44]])},...over});
 const shareMatch=(lang,over={})=>({mode:'match',a:'alice',b:'bob',ci:0,overall:77,flirt:58,vibe:81,humor:74,chaos:66,romance:42,rarity:{name:'rare'},
- resA:{handle:'alice',nickname:{[lang]:'Curious Mind'},archetype:{emoji:'👤'}},resB:{handle:'bob',nickname:{[lang]:'Chatty One'},archetype:{emoji:'👤'}},
+ resA:{handle:'alice',nickname:{[lang]:'Curious Mind'},archetype:{emoji:'⚽'}},resB:{handle:'bob',nickname:{[lang]:'Chatty One'},archetype:{emoji:'💻'}},
  meta:{version:'xora_real_match_v1',tier:'real',locale:lang},ai_comment:{[lang]:'Both of you get to the point. One asks, the other answers.'},...over});
 const layoutFor=(c,res)=>{const {ctx}=shareCtx();return c.shareCardLayout(c.shareCardModel(c.cardPresentationCopy(c.realCopyForActiveLang(res))),ctx);};
+const drawnOn=(c,res)=>{const {ctx,texts}=shareCtx();c.paintShareCard(ctx,c.shareCardLayout(c.shareCardModel(c.cardPresentationCopy(c.realCopyForActiveLang(res))),ctx));return texts.map(t=>t.v);};
 function assertLayoutFits(c,L,where){
  const {ctx}=shareCtx();
  assert.deepEqual({...L.size},{w:1080,h:1350},where+' 4:5 canvas');
@@ -960,61 +960,47 @@ function assertLayoutFits(c,L,where){
   assert.ok(w<=t.box.w+0.5,where+' '+t.zone+' text fits its box ('+Math.round(w)+'>'+Math.round(t.box.w)+'): '+t.text);
   const x0=t.align==='center'?t.x-w/2:t.align==='right'?t.x-w:t.x;
   assert.ok(x0>=L.card.x+8&&x0+w<=L.card.x+L.card.w-8,where+' '+t.zone+' inside the card: '+t.text);
-  if(t.zone!=='band'&&t.zone!=='footer') assert.ok(t.y>L.bandBottom&&t.y<L.footTop,where+' '+t.zone+' in the body: '+t.text);
  }
- const z=L.zones;
- assert.ok(z.identity.bottom<=z.tiles.top&&z.tiles.bottom<=z.insight.top&&z.insight.bottom<=L.footTop-20,where+' zones in order, above the footer '+JSON.stringify(z));
- assert.equal(L.tiles.length,4,where+' 2x2 tiles');
- for(const tl of L.tiles){assert.ok(tl.y>=z.tiles.top&&tl.y+tl.h<=z.tiles.bottom,where+' tile in its zone');assert.ok(tl.bar.fill>=0&&tl.bar.fill<=100);}
- if(L.insight){assert.ok(L.insight.lines.length>=1&&L.insight.lines.length<=4,where+' insight 1-4 lines');}
+ const z=L.zones,lowestIcon=Math.max(...L.icons.map(i=>i.y+i.r));
+ assert.ok(lowestIcon<z.title.top&&z.title.bottom<=z.bars.top&&z.bars.bottom<=z.analysis.top&&z.analysis.bottom<=L.footTop-14,where+' icon, title, bars, analysis, footer in order '+JSON.stringify(z));
+ assert.ok(L.bars.length<=6,where+' at most six bars');
+ if(L.insight) assert.ok(L.insight.lines.length>=1&&L.insight.lines.length<=4,where+' analysis 1-4 lines');
 }
-test('REAL share card is 1080x1350 and draws Mirror/Stalk from raw behavior_signals, Match from compatibility scores',()=>{
+test('REAL share card follows the Sessiz Gözlemci structure with REAL data, rarity and the archetype icon',()=>{
  for(const lang of LOCALES12){
   const c=browser();c.localStorage.setItem(c.LS.lang,lang);
   const cv={width:0,height:0,getContext:()=>shareCtx().ctx};c.document.createElement=()=>cv;
   c.renderIdentityPNG(shareIdentity(lang,'mirror'));assert.deepEqual([cv.width,cv.height],[1080,1350],lang+' PNG size');
-  const mirror=arr(c.shareCardModel(shareIdentity(lang,'mirror')));
-  assert.deepEqual(mirror.tiles.map(t=>t.key),['original_ratio','reply_ratio','question_ratio','avg_text_length'],lang+' Mirror signals');
-  assert.deepEqual(mirror.tiles.map(t=>t.label),['real_m_original','real_m_reply','real_m_question','real_m_length'].map(k=>c.I18N[lang][k]),lang+' Mirror uses the in-app metric names');
-  assert.deepEqual(mirror.tiles.map(t=>t.value),[c.formatPercent(0.5,lang),c.formatPercent(0.32,lang),c.formatPercent(0.25,lang),'142'],lang+' raw values, not scores');
-  assert.deepEqual(mirror.tiles.map(t=>t.bar),[50,32,25,51],lang+' bars are the measured share (length against 280)');
-  assert.equal(mirror.tiles[3].unit,c.I18N[lang].real_m_chars.replace('{n}','').trim());
-  assert.ok(mirror.heading&&mirror.heading.left===c.I18N[lang].real_metrics_title&&mirror.heading.right===c.I18N[lang].share_measured,lang+' says the numbers are measured X data');
-  assert.ok(!mirror.tiles.some(t=>t.label==='AI_ONLY_LABEL'),lang+' AI metric not shown as a tile');
-  const stalk=arr(c.shareCardModel(shareIdentity(lang,'stalk')));
-  assert.deepEqual(stalk.tiles.map(t=>t.key),['repost_ratio','original_ratio','reply_ratio','avg_text_length'],lang+' Stalk signals');
-  assert.deepEqual(stalk.tiles.map(t=>[t.label,t.unit]),[['stalk_t_repost','stalk_u_repost'],['stalk_t_original','stalk_u_original'],['stalk_t_reply','stalk_u_reply'],['stalk_t_length','stalk_u_length']].map(([a,b])=>[c.I18N[lang][a],c.I18N[lang][b]]),lang+' Stalk titles name the raw metric');
-  assert.deepEqual(stalk.tiles.map(t=>t.value),[c.formatPercent(0.1,lang),c.formatPercent(0.5,lang),c.formatPercent(0.32,lang),'142']);
-  assert.equal(stalk.insight,'This account opens threads with a question. Most posts are its own words.',lang+' Stalk shows the Stalk comment');
-  assert.ok(stalk.caseLabel.includes(c.I18N[lang].share_case)&&!mirror.caseLabel,lang+' case stamp only on Stalk');
-  const match=arr(c.shareCardModel(shareMatch(lang)));
-  assert.deepEqual(match.tiles.map(t=>[t.label,t.value,t.bar]),[['match_vibe',81],['match_humor',74],['match_chaos',66],['match_flirt',58]].map(([k,v])=>[c.I18N[lang][k],String(v),v]),lang+' Match compatibility tiles');
-  assert.deepEqual(match.tiles.map(t=>t.unit),['match_band_strong','match_band_clear','match_band_clear','match_band_moderate'].map(k=>c.I18N[lang][k]));
-  assert.equal(match.hero,c.formatPercent(0.77,lang));assert.equal(match.subtitle,c.I18N[lang].match_overall);assert.equal(match.heading,null,lang+' Match makes no measured-data claim');
-  assert.deepEqual([match.insightLabel,mirror.insightLabel,stalk.insightLabel],['share_says_match','share_says_mirror','share_says_stalk'].map(k=>c.I18N[lang][k]),lang+' each mode has its own voice');
-  // Deterministic: the same result always gives the same card.
-  assert.deepEqual(JSON.stringify(layoutFor(c,shareIdentity(lang,'mirror'))),JSON.stringify(layoutFor(c,shareIdentity(lang,'mirror'))));
+  for(const mode of ['mirror','stalk']){
+   const model=arr(c.shareCardModel(shareIdentity(lang,mode))),drawn=drawnOn(c,shareIdentity(lang,mode));
+   assert.deepEqual([model.modeLabel,model.handleLine,model.title],[mode.toUpperCase(),'@alice','Curious Mind'],lang+' '+mode);
+   assert.deepEqual(model.icons,['🦅'],lang+' '+mode+' archetype icon, not a mode icon');
+   assert.equal(model.description,'Questions lead the way. Replies follow soon after.',lang+' description: at most two sentences');
+   assert.deepEqual(model.bars.map(b=>[b.label,b.value]),[['Detail',88],['Curiosity',81],['Originality',76],['Debate',58],['Humor',44]],lang+' REAL AI-scored metrics as bars');
+   assert.equal(model.boxLabel,mode==='stalk'?'XORA STALK':c.I18N[lang].share_label_mirror,lang+' box label');
+   for(const want of ['XORA REAL',mode.toUpperCase(),'@alice','Curious Mind','XORA',c.XORA_PUBLIC_HOST]) assert.ok(drawn.includes(want),lang+' '+mode+' draws '+want);
+   assert.ok(drawn.some(v=>v.endsWith(c.t('rarity_epic'))),lang+' rarity');
+  }
+  assert.equal(c.shareCardModel(shareIdentity(lang,'stalk')).analysis,'This account opens threads with a question. Most posts are its own words.',lang+' Stalk comment');
+  // Match: score hero, both handles, one AI icon per account, five compatibility bars, chemistry box.
+  const m=arr(c.shareCardModel(shareMatch(lang)));
+  assert.deepEqual([m.modeLabel,m.handleLine,m.title,m.description,m.boxLabel],['MATCH','@alice × @bob',c.formatPercent(0.77,lang),c.I18N[lang].match_overall,c.I18N[lang].share_label_match],lang+' Match');
+  assert.deepEqual(m.icons,['⚽','💻'],lang+' Match icons');
+  assert.deepEqual(m.bars.map(b=>[b.label,b.value]),[['match_vibe',81],['match_humor',74],['match_chaos',66],['match_flirt',58],['match_romance',42]].map(([k,v])=>[c.I18N[lang][k],v]),lang+' Match bars');
+  assert.deepEqual(arr(c.shareCardModel(shareMatch(lang,{resA:{},resB:undefined})).icons),['👤','👤'],lang+' Match icon fallback');
  }
 });
-test('a true 0% keeps an empty bar on a visible track, never a minimum fill',()=>{
+test('share-card bars and icon: 4-6 real metrics without filler, never a fixed mode icon',()=>{
  for(const lang of LOCALES12){
   const c=browser();c.localStorage.setItem(c.LS.lang,lang);
-  const res=shareIdentity(lang,'stalk',{behavior_signals:{...SHARE_SIGNALS,reply_ratio:0}});
-  const reply=arr(c.shareCardModel(res)).tiles.find(t=>t.key==='reply_ratio');
-  assert.deepEqual([reply.value,reply.bar,reply.zero,reply.unit],[c.formatPercent(0,lang),0,true,c.I18N[lang].stalk_u_reply],lang+' Stalk 0% keeps its unit');
-  // Mirror tiles have no unit, so a zero says so in words.
-  const mz=c.shareCardModel(shareIdentity(lang,'mirror',{behavior_signals:{...SHARE_SIGNALS,reply_ratio:0,question_ratio:0.004}})).tiles;
-  assert.equal(mz[1].unit,c.I18N[lang].share_none,lang+' Mirror 0% labelled');assert.equal(mz[1].bar,0);
-  assert.equal(mz[2].bar,0,'0.4% rounds to an empty bar');assert.notEqual(mz[2].unit,c.I18N[lang].share_none,'only a true zero is called none');
-  // Painter: the track is drawn for every tile, the fill only where the value is above zero.
-  const {ctx,fills}=shareCtx();const L=c.shareCardLayout(c.shareCardModel(res),ctx);const rects=[];
-  const orig=c.roundRect;c.roundRect=(cx,x,y,w,h,r)=>{rects.push({x,y,w,h});orig(cx,x,y,w,h,r);};
-  c.paintShareCard(ctx,L);c.roundRect=orig;
-  const replyTile=L.tiles.find(tl=>tl.tile.key==='reply_ratio');
-  assert.ok(rects.some(r=>r.x===replyTile.bar.x&&r.y===replyTile.bar.y&&r.w===replyTile.bar.w),lang+' empty track drawn');
-  assert.ok(!fills.some(f=>f.y===replyTile.bar.y&&f.x>=replyTile.bar.x&&f.x<replyTile.bar.x+replyTile.bar.w),lang+' no fill on a 0% bar');
-  const repost=L.tiles.find(tl=>tl.tile.key==='repost_ratio');
-  assert.ok(fills.some(f=>f.y===repost.bar.y&&Math.abs(f.w-Math.round(repost.bar.w*0.1))<=1),lang+' 10% fills exactly 10%');
+  for(const n of [4,5,6]){
+   const rows=Array.from({length:n},(_,i)=>['k'+i,'Metric '+i,90-i*10]);
+   const L=layoutFor(c,shareIdentity(lang,'mirror',{card:{color:'#0FAFAF',emoji:'🛋️',top_behaviors:tb(lang,rows)}}));
+   assert.equal(L.bars.length,n,lang+' '+n+' bars shown as returned');assertLayoutFits(c,L,lang+' '+n+' bars');
+   for(const b of L.bars) assert.ok(b.fill===b.bar.value&&b.fill>0,'bar length is the score');
+  }
+  // Earlier REAL results stored a fixed 🪞/👀; the card never shows those as the archetype icon.
+  for(const old of ['🪞','👀','']) assert.deepEqual(arr(c.shareCardModel(shareIdentity(lang,'stalk',{card:{color:'#111',emoji:old,top_behaviors:[]},profile_emoji:old})).icons),['✨'],lang+' '+JSON.stringify(old));
  }
 });
 test('share card text never overflows its box at 1080x1350, in all 12 locales with long native copy',()=>{
@@ -1024,42 +1010,33 @@ test('share card text never overflows its box at 1080x1350, in all 12 locales wi
   const longest=f=>personas.map(p=>p[f]).sort((a,b)=>b.length-a.length)[0];
   const nick=longest('nickname')+' '+personas[0].nickname,tag=longest('tagline')+' '+longest('stalk_tagline');
   const comment=longest('comment')+' '+longest('stalk_comment');
-  const extreme={reply_ratio:1,original_ratio:1,repost_ratio:1,quote_ratio:0,question_ratio:1,emoji_per_post:9,avg_text_length:280};
+  const longBars=tb(lang,personas.slice(0,6).map((p,i)=>['k'+i,p.nickname+' '+p.nickname,95-i*14]));
   for(const mode of ['mirror','stalk']){
    assertLayoutFits(c,layoutFor(c,shareIdentity(lang,mode)),lang+' '+mode);
-   const r=shareIdentity(lang,mode,{handle:'abcdefghijklmno',nickname:{[lang]:nick},tagline:{[lang]:tag},comment:{mirror:{[lang]:comment},stalk:{[lang]:comment}},behavior_signals:extreme});
-   assertLayoutFits(c,layoutFor(c,r),lang+' '+mode+' long');
+   assertLayoutFits(c,layoutFor(c,shareIdentity(lang,mode,{handle:'abcdefghijklmno',nickname:{[lang]:nick},tagline:{[lang]:tag},comment:{mirror:{[lang]:comment},stalk:{[lang]:comment}},card:{color:'#7C4DFF',emoji:'🦅',top_behaviors:longBars}})),lang+' '+mode+' long');
   }
   assertLayoutFits(c,layoutFor(c,shareMatch(lang)),lang+' match');
-  assertLayoutFits(c,layoutFor(c,shareMatch(lang,{a:'abcdefghijklmno',b:'ponmlkjihgfedcb',overall:100,vibe:0,humor:100,chaos:100,flirt:99,resA:{nickname:{[lang]:nick},archetype:{emoji:'👤'}},resB:{nickname:{[lang]:nick},archetype:{emoji:'👤'}},ai_comment:{[lang]:comment}})),lang+' match long');
-  // Older REAL results without behavior_signals fall back to their AI metrics, still in four tiles.
-  const legacy=shareIdentity(lang,'mirror',{behavior_signals:undefined,card:{color:'#111',emoji:'🪞',top_behaviors:[{key:'mizah',label:{[lang]:'Humor'},value:70},{key:'merak',label:{[lang]:'Curiosity'},value:64},{key:'kaos',label:{[lang]:'Chaos'},value:40},{key:'ironi',label:{[lang]:'Irony'},value:55}]}});
-  const lm=arr(c.shareCardModel(legacy));assert.equal(lm.heading,null,lang+' AI metrics are not labelled as measured');assert.deepEqual(lm.tiles.map(t=>t.value),['70','64','40','55']);
-  assertLayoutFits(c,layoutFor(c,legacy),lang+' legacy');
+  assertLayoutFits(c,layoutFor(c,shareMatch(lang,{a:'abcdefghijklmno',b:'ponmlkjihgfedcb',overall:100,vibe:0,humor:100,chaos:100,flirt:99,romance:15,ai_comment:{[lang]:comment}})),lang+' match long');
  }
 });
-test('XORA says targets three lines, four only as a fallback, dropping whole sentences first',()=>{
+test('XORA analysis targets three lines, four only as a fallback, dropping whole sentences first',()=>{
  const c=browser();c.localStorage.setItem(c.LS.lang,'en');
  const {ctx}=shareCtx();
  const s1='You open threads with a question and come back to answer the replies yourself.';
  const s2='Most of your posts are your own words rather than reposts, and you keep them compact.';
  const s3='When you quote someone, it is usually to add a short counterpoint.';
- const fit=c.shareFitInsight(ctx,[s1,s2,s3].join(' '),822,400);
+ const fit=c.shareFitInsight(ctx,[s1,s2,s3].join(' '),760,500);
  assert.ok(fit.lines.length<=3,'three lines: '+fit.lines.length);
  assert.equal(fit.lines.join(' '),[s1,s2,s3].slice(0,fit.sentences).join(' '),'whole sentences, nothing cut mid-sentence');
  assert.ok(fit.sentences<3,'the last sentence is dropped rather than going to four lines');
- // A single sentence longer than three lines may use four.
  const long='You '+'keep adding one more careful detail to every thread '.repeat(3).trim()+'.';
- const four=c.shareFitInsight(ctx,long,822,400);assert.equal(four.lines.length,4);assert.ok(!four.truncated);
- // Nothing ever exceeds four lines or the height budget.
- const huge=c.shareFitInsight(ctx,long.repeat(4),822,400);assert.ok(huge.lines.length<=4&&huge.truncated&&huge.lines[huge.lines.length-1].endsWith('…'));
- const tight=c.shareFitInsight(ctx,[s1,s2,s3].join(' '),822,160);assert.ok(c.shareInsightBoxH(tight.lines.length,tight.size)<=160||tight.truncated);
- // CJK splits on the ideographic full stop.
+ const four=c.shareFitInsight(ctx,long,760,500);assert.equal(four.lines.length,4);assert.ok(!four.truncated);
+ const huge=c.shareFitInsight(ctx,long.repeat(4),760,500);assert.ok(huge.lines.length<=4&&huge.truncated&&huge.lines[huge.lines.length-1].endsWith('…'));
  assert.deepEqual(arr(c.shareSentences('質問が多い。答えも早い。')),['質問が多い。','答えも早い。']);
 });
-test('share card copy exists in all 12 locales',()=>{
+test('share-card box labels exist in all 12 locales and the retired share-card copy is gone',()=>{
  const c=browser();
- const keys=['share_measured','share_says_mirror','share_says_stalk','share_says_match','share_none','share_case','stalk_t_repost','stalk_t_original','stalk_t_reply','stalk_t_length','stalk_u_repost','stalk_u_original','stalk_u_reply','stalk_u_length','match_band_strong','match_band_clear','match_band_moderate','match_band_low'];
- for(const lang of LOCALES12)for(const k of keys) assert.ok(typeof c.I18N[lang][k]==='string'&&c.I18N[lang][k].trim(),lang+' '+k);
- for(const lang of LOCALES12) assert.equal(new Set(['stalk_t_repost','stalk_t_original','stalk_t_reply','stalk_t_length'].map(k=>c.I18N[lang][k])).size,4,lang+' distinct Stalk titles');
+ for(const lang of LOCALES12)for(const k of ['share_label_mirror','share_label_match']) assert.ok(typeof c.I18N[lang][k]==='string'&&c.I18N[lang][k].trim(),lang+' '+k);
+ assert.equal(c.I18N.tr.share_label_mirror,'XORA AYNA');assert.equal(c.I18N.tr.share_label_match,'KİMYA RAPORU');
+ for(const lang of LOCALES12)for(const k of ['share_measured','share_none','share_case','stalk_t_repost','match_band_strong','share_says_mirror','stat_chars']) assert.equal(c.I18N[lang][k],undefined,lang+' '+k+' removed');
 });

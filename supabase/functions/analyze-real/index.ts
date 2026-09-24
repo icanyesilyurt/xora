@@ -229,9 +229,9 @@ function aiResultSchema(isMatch: boolean) {
     ? {key:{type:"string",enum:MATCH_METRICS},value:score}
     : {key:{type:"string",enum:ALLOWED_METRICS},label:text,value:score});
   const common = {metrics:{type:"array",items:metric,minItems:isMatch?6:4,maxItems:6},comment:text};
-  if (isMatch) return object({...common,overall:{type:"number",minimum:15,maximum:99}});
+  if (isMatch) return object({...common,overall:{type:"number",minimum:15,maximum:99},icon_a:text,icon_b:text});
   return object({...common,
-    nickname_candidates:{type:"array",items:object({text,evidence:text}),minItems:0,maxItems:6},
+    nickname_candidates:{type:"array",items:object({text,evidence:text,emoji:text}),minItems:0,maxItems:6},
     tagline:text,summary:text,emoji:text,
     observations:{type:"array",items:text,maxItems:3}
   });
@@ -470,20 +470,38 @@ const GENERIC_ALIAS: Record<Locale, RegExp> = {
 function aliasGeneric(text: string, locale: Locale) {
   return GENERIC_ALIAS[locale].test(text.normalize("NFKC").toLocaleLowerCase(REAL_LOCALES[locale].bcp47));
 }
+// Card icons: one emoji chosen by the AI for the archetype (Match: for each account). Accepted only
+// as a single standalone pictograph; flags, skin tones, joined sequences, keycaps and religious,
+// political, violent or crude symbols are refused, and the icon then falls back deterministically.
+const BLOCKED_ICONS = new Set([..."✝☦☪☮☸☯✡🕉🛐🕎🔯📿🕌🕍⛪🛕⛩🔫💣🔪🗡⚔🪓💉💊🩸☠⚰⚱🖕🍆🍑💦🏳🏴🚩🏁"]);
+const ICON_BY_EVIDENCE: Record<string,string> = {
+  reply_ratio:"💬", avg_text_length:"📜", emoji_per_post:"🎨", question_ratio:"❓", vocabulary_diversity:"📚",
+  original_ratio:"📝", quote_ratio:"🔁", repost_ratio:"📣", exclamation_ratio:"🎉", own_posts:"📝"
+};
+const DEFAULT_ICON = "✨";
+function iconValid(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const icon = v.trim().replace(/\uFE0F/g, "");
+  const chars = [...icon];
+  if (chars.length !== 1 || !/\p{Extended_Pictographic}/u.test(icon) || BLOCKED_ICONS.has(icon)) return null;
+  return icon;
+}
 // Candidates carry one name in the request locale; only that locale's quality gate applies. The AI
 // lists them most distinctive first; the first valid, non-generic one wins, then the first valid one.
 function pickAlias(raw: any, signals: any, locale: Locale) {
   const active=new Set(activeAliasEvidence(signals));
-  const valid:Array<{text:string;evidence:string}>=[];
+  const valid:Array<{text:string;evidence:string;emoji:unknown}>=[];
   for (const c of (Array.isArray(raw?.nickname_candidates) ? raw.nickname_candidates : []).slice(0,6)) {
     if (!c || typeof c.evidence!=="string" || !active.has(c.evidence)) continue;
     if (!aliasValid(c.text,locale)) continue;
-    valid.push({text:c.text.trim(),evidence:c.evidence});
+    valid.push({text:c.text.trim(),evidence:c.evidence,emoji:c.emoji});
   }
   const best=valid.find(c=>!aliasGeneric(c.text,locale)) || valid[0];
-  if (best) return {text:best.text,source:"ai_generated_validated",evidence:best.evidence};
+  // The icon belongs to the chosen name: its own emoji, then the result's emoji, then its evidence.
+  if (best) return {text:best.text,source:"ai_generated_validated",evidence:best.evidence,icon:iconValid(best.emoji) || iconValid(raw?.emoji) || ICON_BY_EVIDENCE[best.evidence] || DEFAULT_ICON};
   console.warn("nickname_fallback");
-  return {text:fallbackAlias(signals,locale),source:"fallback"};
+  const rule=ALIASES.find(a=>a.test(signals));
+  return {text:fallbackAlias(signals,locale),source:"fallback",icon:(rule && ICON_BY_EVIDENCE[rule.key]) || DEFAULT_ICON};
 }
 const MATCH_METRICS = ["flirt","vibe","humor","chaos","romance","chemistry"];
 function validateMetrics(raw:any, keys:readonly string[], min:number, max:number) {
@@ -539,7 +557,7 @@ function normalizeAIProfile(raw: any, handle: string, mode: "mirror"|"stalk", si
   const metrics = validateMetrics(raw.metrics, ALLOWED_METRICS, 4, 6).map((m:any)=>({key:m.key,label:inLocale(locale,validCopy(m.label,40)),value:m.value}));
   const alias = pickAlias(raw, signals, locale);
   const rarity = rarityFromMetrics(metrics);
-  const emoji = mode === "stalk" ? "👀" : "🪞";
+  const emoji = alias.icon;
   const comment = validCopy(raw.comment);
   const result:any = {
     mode, handle, handles:[handle], source:"ai", nickname:inLocale(locale,alias.text), profile_emoji:emoji,
@@ -577,10 +595,11 @@ async function analyzeOne(service:any, handle:string, mode:"mirror"|"stalk", loc
       "Every candidate must cite exactly one key from nickname_evidence. Do not invent evidence keys. If nickname_evidence is empty return an empty candidate list.",
       "Write all user-facing copy only in output_language, as a native speaker would; never translate from another language and never add other languages.",
       "Metric values are calibrated: 50 is ordinary/neutral, 70 is clearly present, 85 is strong, 90+ requires unusually strong evidence.",
-      "Do not mention how many posts were analyzed in user-facing copy."
+      "Do not mention how many posts were analyzed in user-facing copy.",
+      "Give every nickname candidate one emoji that pictures that nickname itself (an animal, object or symbol). Never a flag, a skin-tone or combined emoji, or a religious, political or violent symbol."
     ],
     output_schema: {
-      nickname_candidates:[{text:"2-4 natural words in output_language",evidence:"signal/pattern key"}],
+      nickname_candidates:[{text:"2-4 natural words in output_language",evidence:"signal/pattern key",emoji:"one emoji picturing this nickname"}],
       tagline:"one short line in output_language",
       summary:"one concise sentence in output_language",
       comment:"2-3 concise witty sentences in output_language grounded in evidence",
@@ -609,9 +628,9 @@ function normalizeMatchAI(raw:any, a:string, b:string, resA:any, resB:any, local
 async function analyzeMatch(service:any,a:string,b:string,locale:Locale) {
   const datasets=await Promise.all([getDataset(service,a),getDataset(service,b)]);
   const profiles=datasets.map((d,i)=>({handle:i?b:a,profile:d.profile,signals:computeSignals(d.posts),...aiPostInput(d.posts,false)}));
-  const ai=await callAI({task:"Compare two public X profiles using supplied evidence. No sensitive inferences or relationship predictions. Never mention sample counts.",rules:OWN_VOICE_RULES,locale,output_language:REAL_LOCALES[locale].language,output_schema:{overall:"number 15-99",metrics:MATCH_METRICS.map(key=>({key,value:"number 15-95"})),comment:"two concise evidence-grounded sentences in output_language"},profile_a:profiles[0],profile_b:profiles[1]});
+  const ai=await callAI({task:"Compare two public X profiles using supplied evidence. No sensitive inferences or relationship predictions. Never mention sample counts.",rules:OWN_VOICE_RULES,locale,output_language:REAL_LOCALES[locale].language,output_schema:{overall:"number 15-99",metrics:MATCH_METRICS.map(key=>({key,value:"number 15-95"})),comment:"two concise evidence-grounded sentences in output_language",icon_a:"one emoji picturing profile_a's own-voice posting (animal, object or symbol; never a flag, skin-tone, religious, political or violent symbol)",icon_b:"the same for profile_b"},profile_a:profiles[0],profile_b:profiles[1]});
   // Minimal deterministic renderer shims, not separate AI analyses.
-  const shims=profiles.map(p=>({handle:p.handle,nickname:inLocale(locale,fallbackAlias(p.signals,locale)),archetype:{emoji:"👤"},sample:p.sample}));
+  const shims=profiles.map((p,i)=>({handle:p.handle,nickname:inLocale(locale,fallbackAlias(p.signals,locale)),archetype:{emoji:iconValid(i?ai?.icon_b:ai?.icon_a) || "👤"},sample:p.sample}));
   return normalizeMatchAI(ai,a,b,shims[0],shims[1],locale);
 }
 function validateRequest(body:any) {
@@ -676,5 +695,5 @@ async function main(req: Request) {
   }
 }
 
-export {main,analyzeMatch,analyzeOne,validateRequest,validateMetrics,aliasValid,activeAliasEvidence,pickAlias,fallbackAlias,normalizeAIProfile,behaviorSignals,normalizeMatchAI,computeSignals,validCopy,callAI,getAIConfig,aiResultSchema,parseProviderResult,xErrorDiagnostic,safeDiagnosticText,PLANNED_LOCALES,REAL_LOCALES,aiPostInput,sampleCounts,aliasGeneric,REPOST_RULE,NICKNAME_STYLE_EXAMPLES};
+export {main,analyzeMatch,analyzeOne,validateRequest,validateMetrics,aliasValid,activeAliasEvidence,pickAlias,fallbackAlias,normalizeAIProfile,behaviorSignals,normalizeMatchAI,computeSignals,validCopy,callAI,getAIConfig,aiResultSchema,parseProviderResult,xErrorDiagnostic,safeDiagnosticText,PLANNED_LOCALES,REAL_LOCALES,iconValid,ICON_BY_EVIDENCE,aiPostInput,sampleCounts,aliasGeneric,REPOST_RULE,NICKNAME_STYLE_EXAMPLES};
 Deno.serve(main);
