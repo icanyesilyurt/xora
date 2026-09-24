@@ -70,6 +70,13 @@ test('production REAL links remain active and use the authenticated backend path
  c.refreshCreditsFromServer=async()=>{};
  assert.equal((await c.requestRealAnalysis('mirror',{handle:'alice'})).meta.tier,'real');
 });
+test('home exposes only Mirror REAL while Stalk and Match REAL remain disabled',()=>{
+ const html=fs.readFileSync('index.html','utf8');
+ assert.match(html,/<a href="mirror\.html\?tier=real" class="choice-action choice-action-real" data-auth-required>/);
+ assert.doesNotMatch(html,/<a href="(?:stalk|match)\.html\?tier=real"/);
+ assert.equal((html.match(/class="choice-action choice-action-real real-disabled" aria-disabled="true"/g)||[]).length,2);
+ assert.match(html,/<script src="app\.js\?v=mirror-real-production-1"><\/script>/);
+});
 test('legacy V1/V2/V3 and Match preserve original renderer paths without a fabricated REAL badge',()=>{
  const c=browser();const old=c.analyzeHandle('alice','mirror');
  const v1={handle:'alice',archetype:c.archetypeById('legacy'),ci:0,scores:Object.fromEntries(c.SCORE_KEYS.map(k=>[k,50])),hash:1};

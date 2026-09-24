@@ -744,7 +744,7 @@ body::before{
 .mini-mode{display:inline-flex;text-decoration:none;border:2px solid var(--ink);border-radius:999px;padding:5px 9px;font-size:10.5px;font-weight:900;color:var(--ink);box-shadow:0 2px 0 var(--ink)}
 .mini-mode.fun{background:var(--teal-soft)}
 .mini-mode.real{background:var(--orange-soft)}
-.real-disabled{cursor:not-allowed;opacity:.58;filter:grayscale(.18)}
+.real-disabled{cursor:not-allowed;opacity:.58;filter:grayscale(.18);pointer-events:none}
 .real-coming-soon{display:block;font-size:9px;line-height:1.1;color:var(--mut);margin-top:2px}
 .history-tier{flex:0 0 auto;padding:3px 7px;border-radius:999px;font-size:9.5px;font-weight:900;letter-spacing:.5px;border:1.5px solid var(--ink)}
 .history-tier.tier-fun{background:var(--teal-soft)}
