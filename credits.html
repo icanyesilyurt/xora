@@ -42,7 +42,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="app.js?v=iyzico-try-production-1"></script>
+<script src="app.js?v=iyzico-mobile-redirect-1"></script>
 <script>
 (function () {
   function renderBalance() {
@@ -51,16 +51,30 @@
 
   var packs = document.getElementById("creditPacks");
   var banner = document.getElementById("launchOffer");
-  function renderPacks() { renderCreditPackages(packs, banner); }
-
   var busy = false;
+  // While a checkout is being created every Buy button is disabled, so a double tap cannot start
+  // a second checkout. It stays disabled while the tab leaves for iyzico and is restored otherwise.
+  function setBusy(on) {
+    busy = on;
+    var buttons = packs.querySelectorAll("[data-amount]");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].disabled = on;
+      if (on) buttons[i].setAttribute("aria-busy", "true"); else buttons[i].removeAttribute("aria-busy");
+    }
+  }
+  function renderPacks() { renderCreditPackages(packs, banner); if (busy) setBusy(true); }
+
   packs.addEventListener("click", function (e) {
     var card = e.target && e.target.closest ? e.target.closest("[data-package]") : null;
     if (!card || !e.target.closest("[data-amount]") || busy) return;
-    busy = true;
+    setBusy(true);
     // Only the package id leaves the page; the server decides price and credits.
-    startCreditPurchase(card.getAttribute("data-package")).finally(function () { busy = false; });
+    startCreditPurchase(card.getAttribute("data-package")).then(function (result) {
+      if (result !== "redirected") setBusy(false);
+    }, function () { setBusy(false); });
   });
+  // Coming back from iyzico with the browser's Back button can restore this page from cache.
+  window.addEventListener("pageshow", function (e) { if (e.persisted) setBusy(false); });
 
   document.addEventListener("DOMContentLoaded", function () {
     renderBalance();

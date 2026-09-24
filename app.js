@@ -3363,11 +3363,14 @@ async function startCreditPurchase(packageId) {
   if (!data || data.status !== "ok" || !data.purchase_id) { toast(t("pay_unavailable")); return "unavailable"; }
   try { sessionStorage.setItem(PENDING_PURCHASE_KEY, data.purchase_id); } catch (e) {}
   if (data.sandbox) toast(t("pay_sandbox"));
-  if (data.checkout_form_content && mountIyzicoCheckout(data.checkout_form_content)) return "opened";
+  // iyzico's hosted payment page opens in this same tab. This runs after awaited requests, so a new
+  // window would no longer count as a user gesture and mobile browsers can block it; a same-tab
+  // navigation is always allowed. iyzico returns the buyer through the existing callback.
   if (data.payment_page_url && /^https:\/\/([a-z0-9-]+\.)*iyzipay\.com(?:[\/?#]|$)/.test(data.payment_page_url)) {
-    window.location.href = data.payment_page_url;
+    window.location.assign(data.payment_page_url);
     return "redirected";
   }
+  if (data.checkout_form_content && mountIyzicoCheckout(data.checkout_form_content)) return "opened";
   toast(t("pay_unavailable"));
   return "unavailable";
 }
