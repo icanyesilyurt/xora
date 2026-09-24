@@ -90,7 +90,6 @@ body::before{
 .real-metrics{margin-top:12px}
 .real-metrics .idcard-scores{margin-top:0}
 .real-metrics .score-val{flex:0 0 auto;min-width:44px;white-space:nowrap;text-align:right}
-.real-metrics-title{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
 .lang-btn::after{content:"";border:4px solid transparent;border-top-color:currentColor;margin-top:4px}
 /* Language menu: sits under the pill. inset-inline-end keeps it on screen in both LTR and RTL.
    The header is raised above main only so the open menu is not painted under the page. */

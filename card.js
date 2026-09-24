@@ -113,45 +113,15 @@ function buildFunMatchCard(m) {
   );
 }
 
-/* ---------------- REAL kart: ölçülen davranış ---------------- */
+/* ---------------- REAL kart: AI puanlı metrikler ---------------- */
 
-// REAL metric rows come only from behavior_signals, which analyze-real computes from the fetched
-// posts (computeSignals). Ratios are shown as percentages; the two open-ended values use a fixed
-// reference for the bar (3 emoji per post, 280 characters) while the text shows the measured value.
-var REAL_SIGNAL_ROWS = [
-  { key: "reply_ratio", label: "real_m_reply", kind: "ratio" },
-  { key: "original_ratio", label: "real_m_original", kind: "ratio" },
-  { key: "repost_ratio", label: "real_m_repost", kind: "ratio" },
-  { key: "question_ratio", label: "real_m_question", kind: "ratio" },
-  { key: "emoji_per_post", label: "real_m_emoji", kind: "per_post", full: 3 },
-  { key: "avg_text_length", label: "real_m_length", kind: "chars", full: 280 }
-];
-
-function realMetricRows(res, lang) {
-  var signals = res && res.behavior_signals;
-  var rows = [];
-  if (signals && typeof signals === "object") {
-    REAL_SIGNAL_ROWS.forEach(function (def) {
-      var v = signals[def.key];
-      if (typeof v !== "number" || !isFinite(v) || v < 0) return;
-      var row = { key: def.key, label: t(def.label) };
-      if (def.kind === "ratio") {
-        v = Math.min(v, 1);
-        row.bar = Math.round(v * 100);
-        row.value = formatPercent(v, lang);
-      } else {
-        row.bar = Math.round(Math.min(v / def.full, 1) * 100);
-        row.value = def.kind === "per_post" ? formatDecimal(v, lang) : fillTemplate(t("real_m_chars"), { n: Math.round(v) });
-      }
-      rows.push(row);
-    });
-  }
-  if (rows.length >= 3) return { measured: true, rows: rows };
-  // Results saved before behavior_signals existed only carry the AI-assessed metrics; keep showing those.
-  var legacy = ((res && res.card && res.card.top_behaviors) || []).slice(0, 6).map(function (b) {
-    return { key: b.key, label: b.label ? localized(b.label, lang) : b.key, bar: b.value, value: String(b.value) };
+// The 4-6 evidence-scored metrics analyze-real returns (validated 15-95 on the server). The in-app
+// card and the share card both draw exactly these bars; raw behavior_signals are never drawn.
+function realScoredBars(res, lang) {
+  var c = (res && res.card) || {};
+  return ((c.top_behaviors || (res && res.top_behaviors)) || []).slice(0, 6).map(function (b) {
+    return { key: b.key, label: b.label ? localized(b.label, lang) : b.key, value: shareClamp(b.value) };
   });
-  return { measured: false, rows: legacy };
 }
 
 function buildRealIdentityCard(res) {
@@ -163,12 +133,11 @@ function buildRealIdentityCard(res) {
   var tagline = localized(res.tagline || c.desc, lang);
   var summary = localized(res.profile_summary, lang);
   var comment = res.comment ? localized(res.comment.mirror, lang) : "";
-  var metrics = realMetricRows(res, lang);
-  var rows = metrics.rows.map(function (row) {
+  var rows = realScoredBars(res, lang).map(function (row) {
     return '<div class="score-chip" data-metric="' + esc(row.key) + '">' +
       '<span class="score-name">' + esc(row.label) + "</span>" +
-      '<span class="score-bar"><i style="width:' + row.bar + '%"></i></span>' +
-      '<span class="score-val">' + esc(row.value) + "</span>" +
+      '<span class="score-bar"><i style="width:' + row.value + '%"></i></span>' +
+      '<span class="score-val">' + row.value + "</span>" +
     "</div>";
   }).join("");
   return (
@@ -179,9 +148,7 @@ function buildRealIdentityCard(res) {
         '<h2 class="idcard-type">' + esc(nick) + "</h2>" +
         (tagline ? '<p class="idcard-desc">' + esc(tagline) + "</p>" : "") +
         (summary && summary !== tagline ? '<p class="idcard-summary">' + esc(summary) + "</p>" : "") +
-        (rows ? '<div class="real-metrics"' + (metrics.measured ? ' data-source="behavior_signals"' : ' data-source="ai_metrics"') + ">" +
-          (metrics.measured ? '<p class="real-metrics-title">' + esc(t("real_metrics_title")) + "</p>" : "") +
-          '<div class="idcard-scores">' + rows + "</div></div>" : "") +
+        (rows ? '<div class="real-metrics" data-source="ai_metrics"><div class="idcard-scores">' + rows + "</div></div>" : "") +
         '<div class="idcard-quote">' +
           '<span class="quote-label">' + esc(t("says")) + "</span>" +
           "<p>" + esc(comment) + "</p>" +
@@ -673,9 +640,7 @@ function shareCardModel(res) {
   var icon = c.emoji || res.profile_emoji || "";
   if (!icon || SHARE_MODE_ICONS.indexOf(icon) >= 0) icon = SHARE_DEFAULT_ICON;
   // The 4-6 evidence-scored REAL metrics the analysis returned; there is no filler row.
-  var bars = ((c.top_behaviors || res.top_behaviors) || []).slice(0, 6).map(function (b) {
-    return { key: b.key, label: b.label ? localized(b.label, lang) : b.key, value: shareClamp(b.value) };
-  });
+  var bars = realScoredBars(res, lang);
   return Object.assign(base, {
     kind: mode,
     modeLabel: mode.toUpperCase(),

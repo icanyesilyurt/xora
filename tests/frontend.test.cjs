@@ -709,38 +709,35 @@ test('FUN Match shows the entertainment percentage only: no sub-scores in HTML o
   for(const k of ['match_flirt','match_vibe','match_humor','match_chaos','match_romance']) assert.ok(!text.some(p=>p.v.includes(c.I18N[lang][k])),lang+' '+k+' not in FUN PNG');
  }
 });
-test('REAL identity card draws its metric rows from behavior_signals, deterministically, in all 12 locales',()=>{
- const signals={reply_ratio:0.32,original_ratio:0.5,repost_ratio:0.1,quote_ratio:0.08,question_ratio:0.25,emoji_per_post:1.4,avg_text_length:142};
- const expectKeys=['reply_ratio','original_ratio','repost_ratio','question_ratio','emoji_per_post','avg_text_length'];
+test('REAL identity card draws the same 4-6 AI-scored bars as the share card, never raw behavior_signals, in all 12 locales',()=>{
+ const signals={reply_ratio:0,original_ratio:0.5,repost_ratio:0.1,quote_ratio:0.08,question_ratio:0,emoji_per_post:0,avg_text_length:142};
  const longComment='You open threads with a question and come back to answer the replies yourself. Most of your posts are your own words rather than reposts, and you keep them compact. When you quote someone, it is usually to add a short counterpoint.';
  for(const lang of LOCALES12){
   const c=browser();c.localStorage.setItem(c.LS.lang,lang);
+  const top=[{key:'direktlik',label:{[lang]:'AI_DIRECT'},value:84},{key:'mizah',label:{[lang]:'AI_HUMOR'},value:67},{key:'merak',label:{[lang]:'AI_CURIOUS'},value:15},{key:'sosyallik',label:{[lang]:'AI_SOCIAL'},value:95},{key:'detaycilik',label:{[lang]:'AI_DETAIL'},value:64}];
   const res={meta:{tier:'real',locale:lang,version:'xora_real_v1'},handle:'alice',hash:7,rarity:{name:'epic',score:80},
    nickname:{[lang]:'Curious Mind'},tagline:{[lang]:'Questions lead the way.'},profile_summary:{[lang]:'Asks open questions in public threads.'},
    comment:{mirror:{[lang]:longComment},stalk:{[lang]:longComment}},behavior_signals:signals,
-   card:{color:'#8B5CF6',emoji:'🪞',top_behaviors:[{key:'duygusal_yogunluk',label:{[lang]:'AI_ONLY_LABEL'},value:88}]}};
+   card:{color:'#8B5CF6',emoji:'🪞',top_behaviors:top}};
   const html=c.buildIdentityCard(res);
   assert.match(html,/XORA REAL/);assert.ok(html.includes(c.esc(c.t('rarity_epic'))),lang+' rarity');
-  assert.match(html,/data-source="behavior_signals"/);assert.ok(!html.includes('AI_ONLY_LABEL'),'AI-judged metric not drawn');
-  const rows=[...html.matchAll(/data-metric="(\w+)"><span class="score-name">([^<]+)<\/span><span class="score-bar"><i style="width:(\d+)%"><\/i><\/span><span class="score-val">([^<]+)<\/span>/g)].map(m=>({key:m[1],label:m[2],bar:+m[3],value:m[4]}));
-  assert.deepEqual(rows.map(r=>r.key),expectKeys,lang+' rows');
-  assert.deepEqual(rows.map(r=>r.bar),[32,50,10,25,47,51],lang+' bars derive from the measured values');
-  assert.equal(rows[0].value,c.esc(c.formatPercent(0.32,lang)));assert.equal(rows[4].value,c.esc(c.formatDecimal(1.4,lang)));
-  assert.equal(rows[5].value,c.esc(c.I18N[lang].real_m_chars.replace('{n}','142')));
+  assert.match(html,/data-source="ai_metrics"/);assert.doesNotMatch(html,/behavior_signals|reply_ratio|question_ratio|emoji_per_post|avg_text_length|width:0%/,lang+' no raw signal rows');
+  const rows=[...html.matchAll(/data-metric="(\w+)"><span class="score-name">([^<]+)<\/span><span class="score-bar"><i style="width:(\d+)%"><\/i><\/span><span class="score-val">([^<]+)<\/span>/g)].map(m=>({key:m[1],label:m[2],value:+m[3],text:m[4]}));
+  // In-app rows and share-card bars are the same list, in the same order, with the same values.
+  assert.deepEqual(rows.map(r=>({key:r.key,label:r.label,value:r.value})),JSON.parse(JSON.stringify(c.shareCardModel(res).bars)),lang+' same bars as share card');
+  assert.deepEqual(rows.map(r=>r.key),top.map(b=>b.key),lang+' rows');
+  assert.deepEqual(rows.map(r=>r.text),['84','67','15','95','64'],lang+' values');
   assert.equal(c.buildIdentityCard(res),html,'no randomness: same input, same card');
-  const moved=c.buildIdentityCard({...res,behavior_signals:{...signals,reply_ratio:0.6}});
-  assert.match(moved,/data-metric="reply_ratio"><span class="score-name">[^<]+<\/span><span class="score-bar"><i style="width:60%">/);
-  // PNG: the share card shows the REAL AI-scored metrics as bars; the in-app card keeps the six raw signals.
+  assert.equal(c.buildIdentityCard({...res,behavior_signals:{...signals,reply_ratio:0.6}}),html,lang+' raw signals do not change the card');
   const {text}=recorder(c);c.renderIdentityPNG(res);
-  assert.deepEqual(JSON.parse(JSON.stringify(c.shareCardModel(res).bars)),[{key:'duygusal_yogunluk',label:'AI_ONLY_LABEL',value:88}],lang+' share-card bars');
-  for(const k of ['real_m_original','real_m_reply','real_m_repost','real_metrics_title']) assert.ok(!text.some(p=>p.v===c.I18N[lang][k]),lang+' '+k+' only in the app');
   assert.ok(text.some(p=>p.v.includes(c.t('rarity_epic'))),lang+' rarity on PNG');
  }
- // Older REAL results without behavior_signals keep their AI metrics rather than inventing numbers.
+ // Six metrics at most, on both cards.
  const c=browser();c.localStorage.setItem(c.LS.lang,'en');
- const legacy={meta:{tier:'real',locale:'en'},handle:'bob',nickname:{en:'X'},tagline:{en:'Y'},comment:{mirror:{en:'Z.'}},card:{color:'#111',emoji:'🪞',top_behaviors:[{key:'mizah',label:{en:'Humor'},value:70},{key:'merak',label:{en:'Curiosity'},value:64},{key:'kaos',label:{en:'Chaos'},value:40}]}};
- const html=c.buildIdentityCard(legacy);
- assert.match(html,/data-source="ai_metrics"/);assert.ok(html.includes('>Humor<')&&html.includes('width:70%'));
+ const seven=['a','b','c','d','e','f','g'].map((k,i)=>({key:k,label:{en:'M'+k},value:20+i*10}));
+ const res={meta:{tier:'real',locale:'en'},handle:'bob',nickname:{en:'X'},tagline:{en:'Y'},comment:{mirror:{en:'Z.'}},card:{color:'#111',emoji:'🪞',top_behaviors:seven}};
+ const html=c.buildIdentityCard(res);
+ assert.equal((html.match(/class="score-chip"/g)||[]).length,6);assert.equal(c.shareCardModel(res).bars.length,6);
 });
 test('credit packages: 10/20/50/300 at launch prices with struck regular prices and correct capacity, in all 12 locales',()=>{
  const c=browser();

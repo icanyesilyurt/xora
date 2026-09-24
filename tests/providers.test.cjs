@@ -113,11 +113,10 @@ test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, 
   assert.match(html,/XORA REAL/);
   if(mode==='match') assert.ok(html.includes(c.esc(copy.match)));
   else {assert.ok(html.includes(c.esc(copy.nickname)));assert.ok(html.includes(c.esc(copy.comment)));assert.ok(html.includes(c.esc(copy.tagline)));
-   // Metric rows come from the posts, not from AI judgment: 8 original posts, each 'How does this work?'.
+   // behavior_signals are still measured from the posts (8 originals, each 'How does this work?') but are not drawn.
    assert.deepEqual({...result.behavior_signals},{reply_ratio:0,original_ratio:1,repost_ratio:0,quote_ratio:0,question_ratio:1,emoji_per_post:0,avg_text_length:19});
-   assert.match(html,/data-source="behavior_signals"/);assert.ok(html.includes(c.esc(c.t('real_metrics_title'))));
-   assert.ok(html.includes('<span class="score-val">'+c.esc(c.formatPercent(1,locale))+'</span>'),'question share row');
-   assert.ok(!html.includes('<span class="score-name">'+c.esc(copy.label)+'</span>'),'AI metric labels are not drawn as bars');}
+   assert.match(html,/data-source="ai_metrics"/);assert.doesNotMatch(html,/data-metric="(reply|original|repost|question)_ratio"/);
+   assert.ok(html.includes('<span class="score-name">'+c.esc(copy.label)+'</span>'),'AI metric labels are drawn as bars');}
   assert.match(mode==='match'?c.shareMatchText(result):c.shareIdentityText(result),/XORA REAL/);
   if(mode!=='match') assert.ok(c.shareIdentityText(result).includes(copy.nickname));
  }
