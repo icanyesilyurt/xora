@@ -416,7 +416,7 @@ function buildMatchCardBase(m) {
 }
 
 /* ============================================================
-   PNG ÜRETİMİ (canvas) — 1000 x 1250
+   PNG ÜRETİMİ (canvas) — FUN / eski kartlar 1000 x 1250, REAL paylaşım kartı 1080 x 1350
    ============================================================ */
 
 // Japanese and other CJK copy is written without spaces, so it has to wrap on character
@@ -585,85 +585,10 @@ function drawCardFooter(ctx, h) {
 /* --- kimlik kartı PNG --- */
 function renderIdentityPNG(res) {
   if (resultTier(res) === "fun") return renderFunIdentityPNG(res);
-  if (resultTier(res) === "real") return stampRealCanvas(renderRealIdentityPNG(res), res);
-  var cv;
-  if (isV3Result(res)) cv = renderIdentityPNGV3(res);
-  else if (isV2Result(res)) cv = renderIdentityPNGV2(res);
-  else cv = renderIdentityPNGV1(res);
-  return resultTier(res) === "real" ? stampRealCanvas(cv, res) : cv;
-}
-
-/* --- REAL PNG: ölçülen davranış satırları --- */
-// Everything is laid out top-down and measured, so the comment box always ends above the footer
-// (y=1090): its font steps down, and only as a last resort the comment is cut with an ellipsis.
-function renderRealIdentityPNG(res) {
-  var lang = (typeof getLang === "function") ? getLang() : "tr";
-  var c = res.card || {};
-  var color = c.color || "#1E2330";
-  var emoji = c.emoji || res.profile_emoji || "🪞";
-  var nick = localized(res.nickname || c.nickname, lang);
-  var tagline = localized(res.tagline || c.desc, lang);
-  var summary = localized(res.profile_summary, lang);
-  var comment = res.comment ? localized(res.comment.mirror, lang) : "";
-  var metrics = realMetricRows(res, lang);
-  var b = baseCanvas(), ctx = b.ctx;
-  drawCardFrame(ctx, color);
-
-  ctx.textAlign = "center";
-  ctx.beginPath(); ctx.arc(500, 300, 76, 0, 7);
-  ctx.fillStyle = "#FFFFFF"; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = "#1E2330"; ctx.stroke();
-  ctx.font = "84px 'Segoe UI Emoji','Apple Color Emoji',sans-serif"; ctx.fillText(emoji, 500, 330);
-  ctx.fillStyle = "#8A8F9C"; ctx.font = "700 28px Nunito, Arial, sans-serif"; ctx.fillText("@" + res.handle, 500, 418);
-  ctx.direction = copyDirection(lang);
-
-  ctx.fillStyle = "#1E2330"; ctx.font = "900 50px Nunito, Arial, sans-serif";
-  var y = wrapText(ctx, nick, 500, 476, 720, 56);
-  if (tagline) { ctx.fillStyle = "#5C6270"; ctx.font = "600 25px Nunito, Arial, sans-serif"; y = wrapText(ctx, tagline, 500, y + 44, 720, 31); }
-  if (summary && summary !== tagline) { ctx.fillStyle = "#8A8F9C"; ctx.font = "600 21px Nunito, Arial, sans-serif"; y = wrapText(ctx, summary, 500, y + 34, 720, 27); }
-
-  if (metrics.rows.length) {
-    y += 26;
-    if (metrics.measured) {
-      ctx.fillStyle = "#8A8F9C"; ctx.font = "900 17px Nunito, Arial, sans-serif";
-      ctx.fillText(t("real_metrics_title").toUpperCase(), 500, y + 14);
-      y += 26;
-    }
-    var labelX = 140, labelW = 250, barX = 410, barW = 330, valueX = 860, rowH = 36;
-    metrics.rows.forEach(function (row, i) {
-      var ry = y + i * rowH;
-      ctx.textAlign = "left";
-      var size = 21;
-      ctx.font = "800 " + size + "px Nunito, Arial, sans-serif";
-      while (size > 15 && ctx.measureText(row.label).width > labelW) { size--; ctx.font = "800 " + size + "px Nunito, Arial, sans-serif"; }
-      ctx.fillStyle = "#5C6270"; ctx.fillText(row.label, labelX, ry + 17);
-      ctx.fillStyle = "#ECEDF0"; roundRect(ctx, barX, ry, barW, 20, 10); ctx.fill();
-      ctx.fillStyle = color; roundRect(ctx, barX, ry, Math.max(Math.round(barW * row.bar / 100), 12), 20, 10); ctx.fill();
-      ctx.textAlign = "right"; ctx.fillStyle = "#1E2330"; ctx.font = "900 21px Nunito, Arial, sans-serif";
-      ctx.fillText(row.value, valueX, ry + 17);
-    });
-    y += metrics.rows.length * rowH;
-  }
-
-  var top = y + 16, limit = 1072;
-  var fonts = [[23, 29], [21, 27], [19, 24], [17, 22]], lines = [], font = fonts[fonts.length - 1];
-  for (var f = 0; f < fonts.length; f++) {
-    ctx.font = "600 " + fonts[f][0] + "px Nunito, Arial, sans-serif";
-    lines = commentLines(ctx, comment, 660);
-    font = fonts[f];
-    if (top + 70 + lines.length * font[1] <= limit) break;
-  }
-  var maxLines = Math.max(1, Math.floor((limit - top - 70) / font[1]));
-  if (lines.length > maxLines) { lines = lines.slice(0, maxLines); lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, "") + "…"; }
-  var boxH = 70 + lines.length * font[1];
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#FFF1E3"; roundRect(ctx, 130, top, 740, boxH, 24); ctx.fill();
-  ctx.strokeStyle = color; ctx.lineWidth = 3; roundRect(ctx, 130, top, 740, boxH, 24); ctx.stroke();
-  ctx.fillStyle = color; ctx.font = "900 20px Nunito, Arial, sans-serif"; ctx.fillText(t("says").toUpperCase(), 500, top + 32);
-  ctx.fillStyle = "#1E2330"; ctx.font = "600 " + font[0] + "px Nunito, Arial, sans-serif";
-  lines.forEach(function (line, i) { ctx.fillText(line, 500, top + 62 + i * font[1]); });
-
-  drawCardFooter(ctx, res.hash || xhash(String(res.handle || "x")));
-  return b.cv;
+  if (resultTier(res) === "real") return renderShareCard(res);
+  if (isV3Result(res)) return renderIdentityPNGV3(res);
+  if (isV2Result(res)) return renderIdentityPNGV2(res);
+  return renderIdentityPNGV1(res);
 }
 
 // Same breaking rules as wrapText (CJK by character, everything else at spaces), returning lines.
@@ -679,19 +604,514 @@ function commentLines(ctx, text, maxW) {
   return lines;
 }
 
-/* --- V3 PNG: profil okuma (sadeleştirilmiş) --- */
-function stampRealCanvas(cv, res) {
-  var ctx = cv.getContext("2d");
-  var label = "XORA REAL · " + rarityText(res);
+/* ============================================================
+   REAL PAYLAŞIM KARTI — 1080 x 1350 (4:5)
+   Mirror / Stalk: ölçülen X sinyalleri (ham değerler, yuvarlanmış yüzde).
+   Match: yapay zekânın uyum skorları.
+   Yerleşim önce hesaplanır (shareCardLayout), sonra çizilir (paintShareCard):
+   her metin kendi alanına sığacak şekilde küçültülür / kısaltılır.
+   ============================================================ */
+
+var SHARE_W = 1080, SHARE_H = 1350;
+var SHARE_CARD = { x: 48, y: 44, w: 970, h: 1240 };
+var SHARE_PAD = 44;
+var SHARE_BAND_H = 220;
+var SHARE_FOOT_H = 64;
+var SHARE_TILE_H = 140, SHARE_TILE_GAP = 16;
+var SHARE_INK = "#1E2330", SHARE_MUT = "#5C6270", SHARE_SOFT = "#7A7F8C", SHARE_CREAM = "#FFF1E3";
+var SHARE_FONT = "Nunito, Arial, sans-serif";
+var SHARE_EMOJI_FONT = "'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif";
+
+// Which measured signals each mode shows, in grid order. Values are the raw behavior_signals the
+// backend stored; nothing is rescaled. Ratios draw a bar of exactly that percentage; the average
+// length draws against the 280-character post limit.
+var SHARE_SIGNAL_KEYS = {
+  mirror: ["original_ratio", "reply_ratio", "question_ratio", "avg_text_length"],
+  stalk: ["repost_ratio", "original_ratio", "reply_ratio", "avg_text_length"]
+};
+var SHARE_SIGNAL_FALLBACK = ["question_ratio", "repost_ratio", "reply_ratio", "original_ratio", "emoji_per_post", "avg_text_length"];
+var SHARE_SIGNAL_LABEL = { reply_ratio: "real_m_reply", original_ratio: "real_m_original", repost_ratio: "real_m_repost", question_ratio: "real_m_question", emoji_per_post: "real_m_emoji", avg_text_length: "real_m_length" };
+var SHARE_STALK_COPY = {
+  repost_ratio: ["stalk_t_repost", "stalk_u_repost"],
+  original_ratio: ["stalk_t_original", "stalk_u_original"],
+  reply_ratio: ["stalk_t_reply", "stalk_u_reply"],
+  avg_text_length: ["stalk_t_length", "stalk_u_length"]
+};
+var SHARE_MATCH_KEYS = ["vibe", "humor", "chaos", "flirt"];
+// Darker text shades for accents that are too light for small type on the cream insight box.
+var SHARE_LABEL_INK = { "#FFB000": "#A86B00", "#0FAFAF": "#0B7F7F", "#FF7A45": "#C2410C" };
+var SHARE_RARITY_MARK = { common: "●", rare: "◆", epic: "★", legendary: "✦" };
+
+function shareLang() {
+  return (typeof getLang === "function") ? getLang() : "tr";
+}
+
+function shareUpper(text, lang) {
+  try { return String(text).toLocaleUpperCase(lang); } catch (e) { return String(text).toUpperCase(); }
+}
+
+function shareSignalTile(key, v, mode, lang) {
+  var tile = { key: key, source: "signal", raw: v, zero: v === 0 };
+  var isRatio = key !== "avg_text_length" && key !== "emoji_per_post";
+  if (isRatio) {
+    tile.value = formatPercent(Math.min(v, 1), lang);
+    tile.bar = Math.round(Math.min(v, 1) * 100);
+  } else if (key === "avg_text_length") {
+    tile.value = String(Math.round(v));
+    tile.bar = Math.round(Math.min(v / 280, 1) * 100);
+  } else {
+    tile.value = formatDecimal(v, lang);
+    tile.bar = Math.round(Math.min(v / 3, 1) * 100);
+  }
+  var stalkCopy = mode === "stalk" && SHARE_STALK_COPY[key];
+  if (stalkCopy) {
+    tile.label = t(stalkCopy[0]);
+    tile.unit = t(stalkCopy[1]);
+  } else {
+    tile.label = t(SHARE_SIGNAL_LABEL[key]);
+    tile.unit = key === "avg_text_length" ? String(t("real_m_chars")).replace("{n}", "").trim() : "";
+  }
+  // A true zero keeps an empty bar; a unit-less tile says so in words next to the number.
+  if (tile.zero && !tile.unit) tile.unit = t("share_none");
+  return tile;
+}
+
+function shareSignalTiles(res, mode, lang) {
+  var signals = res && res.behavior_signals;
+  var valid = function (k) { var v = signals && signals[k]; return typeof v === "number" && isFinite(v) && v >= 0; };
+  var keys = [];
+  if (signals && typeof signals === "object") {
+    (SHARE_SIGNAL_KEYS[mode] || SHARE_SIGNAL_KEYS.mirror).concat(SHARE_SIGNAL_FALLBACK).forEach(function (k) {
+      if (keys.length < 4 && keys.indexOf(k) < 0 && valid(k)) keys.push(k);
+    });
+  }
+  // Same rule as the in-app card: three or more measured signals, else the stored AI metrics.
+  if (keys.length >= 3) return { measured: true, tiles: keys.map(function (k) { return shareSignalTile(k, signals[k], mode, lang); }) };
+  var legacy = ((res && res.card && res.card.top_behaviors) || []).slice(0, 4).map(function (b) {
+    var v = Math.max(0, Math.min(100, Math.round(Number(b.value) || 0)));
+    return { key: b.key, source: "ai", label: b.label ? localized(b.label, lang) : b.key, value: String(v), unit: "", bar: v, zero: v === 0 };
+  });
+  return { measured: false, tiles: legacy };
+}
+
+function matchBand(v) {
+  return t(v >= 80 ? "match_band_strong" : v >= 60 ? "match_band_clear" : v >= 40 ? "match_band_moderate" : "match_band_low");
+}
+
+function shareCardModel(res) {
+  var lang = shareLang();
+  var isMatch = res && (res.mode === "match" || (res.a && res.b && res.resA));
+  var rarity = rarityName(res);
+  var base = {
+    lang: lang,
+    rtl: copyDirection(lang) === "rtl",
+    rarity: rarity,
+    rarityLabel: (SHARE_RARITY_MARK[rarity] ? SHARE_RARITY_MARK[rarity] + " " : "") + rarityText(res),
+    realLabel: t("real_label")
+  };
+  if (isMatch) {
+    var tiles = SHARE_MATCH_KEYS.map(function (k) {
+      var v = Math.max(0, Math.min(100, Math.round(Number(res[k]) || 0)));
+      return { key: k, source: "ai", label: t("match_" + k), value: String(v), unit: matchBand(v), bar: v, zero: v === 0 };
+    });
+    return Object.assign(base, {
+      kind: "match",
+      accent: "#FF7A45",
+      bandColors: ["#0FBDBD", "#FF7A45"],
+      handles: [res.a, res.b],
+      nicknames: [localized(res.resA && res.resA.nickname, lang), localized(res.resB && res.resB.nickname, lang)],
+      emojis: [(res.resA && res.resA.archetype && res.resA.archetype.emoji) || "👤", (res.resB && res.resB.archetype && res.resB.archetype.emoji) || "👤"],
+      hero: formatPercent(Math.max(0, Math.min(100, Number(res.overall) || 0)) / 100, lang),
+      subtitle: t("match_overall"),
+      tiles: tiles,
+      heading: null,
+      insightLabel: t("share_says_match"),
+      insight: matchComment(res, lang) || "",
+      hash: xhash(String(res.a) + String(res.b))
+    });
+  }
+  var mode = res.mode === "stalk" ? "stalk" : "mirror";
+  var c = res.card || {};
+  var metrics = shareSignalTiles(res, mode, lang);
+  var comment = res.comment ? localized(res.comment[mode] || res.comment.mirror, lang) : "";
+  var hash = res.hash || xhash(String(res.handle || "x"));
+  return Object.assign(base, {
+    kind: mode,
+    accent: c.color || "#2D3445",
+    bandColors: [c.color || "#2D3445"],
+    handles: [res.handle],
+    emojis: [c.emoji || res.profile_emoji || (mode === "stalk" ? "👀" : "🪞")],
+    title: localized(res.nickname || c.nickname, lang),
+    subtitle: localized(res.tagline || c.desc, lang),
+    tiles: metrics.tiles,
+    heading: metrics.measured ? { left: t("real_metrics_title"), right: t("share_measured") } : null,
+    insightLabel: t(mode === "stalk" ? "share_says_stalk" : "share_says_mirror"),
+    insight: comment || "",
+    // The localized word is isolated so an RTL word never reorders the "#id" part.
+    caseLabel: mode === "stalk" ? "\u2068" + t("share_case") + "\u2069 #" + (hash >>> 0).toString(16).toUpperCase().slice(-4).padStart(4, "0") : "",
+    hash: hash
+  });
+}
+
+/* ---------- ölçüm yardımcıları ---------- */
+
+function shareFont(weight, size) {
+  return weight + " " + size + "px " + SHARE_FONT;
+}
+
+function shareWidth(ctx, font, text) {
+  ctx.font = font;
+  return ctx.measureText(String(text)).width;
+}
+
+// Cuts text (by code point) until it fits, ending in an ellipsis.
+function shareEllipsize(ctx, font, text, maxW) {
+  text = String(text || "");
+  if (shareWidth(ctx, font, text) <= maxW) return text;
+  var chars = Array.from(text);
+  while (chars.length && shareWidth(ctx, font, chars.join("").replace(/\s+$/, "") + "…") > maxW) chars.pop();
+  return chars.length ? chars.join("").replace(/\s+$/, "") + "…" : "";
+}
+
+// Largest size in [max..min] whose text fits maxW on one line; at min the text is ellipsized.
+function shareFitLine(ctx, weight, max, min, text, maxW) {
+  for (var s = max; s >= min; s--) {
+    if (shareWidth(ctx, shareFont(weight, s), text) <= maxW) return { text: String(text), size: s, font: shareFont(weight, s) };
+  }
+  var font = shareFont(weight, min);
+  return { text: shareEllipsize(ctx, font, text, maxW), size: min, font: font };
+}
+
+// Wraps like the other PNG renderers (CJK by character, others at spaces); any line still wider
+// than maxW (one unbreakable word) is ellipsized so nothing is drawn outside its zone.
+function shareWrap(ctx, font, text, maxW) {
+  ctx.font = font;
+  return commentLines(ctx, String(text || ""), maxW).map(function (line) {
+    return shareWidth(ctx, font, line) <= maxW ? line : shareEllipsize(ctx, font, line, maxW);
+  });
+}
+
+function shareSentences(text) {
+  text = String(text || "").trim();
+  if (!text) return [];
+  var parts = CJK_TEXT.test(text) ? text.split(/(?<=[。！？!?])/) : text.split(/(?<=[.!?؟…])\s+/);
+  return parts.map(function (s) { return s.trim(); }).filter(Boolean);
+}
+
+var SHARE_INSIGHT_SIZES = [30, 28];
+function shareInsightBoxH(lines, size) {
+  return 64 + lines * Math.round(size * 1.36) + 22;
+}
+
+// Target three lines; four only when no whole-sentence version fits in three. Whole sentences are
+// dropped from the end before any line is cut, and the box never exceeds the height budget.
+function shareFitInsight(ctx, text, maxW, budget) {
+  var sentences = shareSentences(text);
+  if (!sentences.length) return null;
+  var joiner = CJK_TEXT.test(text) ? "" : " ";
+  var passes = [3, 4];
+  for (var p = 0; p < passes.length; p++) {
+    for (var k = sentences.length; k >= 1; k--) {
+      var candidate = sentences.slice(0, k).join(joiner);
+      for (var s = 0; s < SHARE_INSIGHT_SIZES.length; s++) {
+        var size = SHARE_INSIGHT_SIZES[s], font = shareFont(700, size);
+        var lines = shareWrap(ctx, font, candidate, maxW);
+        if (lines.length <= passes[p] && shareInsightBoxH(lines.length, size) <= budget) {
+          return { lines: lines, size: size, font: font, sentences: k, total: sentences.length };
+        }
+      }
+    }
+  }
+  var small = SHARE_INSIGHT_SIZES[SHARE_INSIGHT_SIZES.length - 1], smallFont = shareFont(700, small);
+  var maxLines = 4;
+  while (maxLines > 1 && shareInsightBoxH(maxLines, small) > budget) maxLines--;
+  var cut = shareWrap(ctx, smallFont, sentences[0], maxW);
+  if (cut.length > maxLines) {
+    cut = cut.slice(0, maxLines);
+    cut[maxLines - 1] = shareEllipsize(ctx, smallFont, cut[maxLines - 1] + "…", maxW);
+  }
+  return { lines: cut, size: small, font: smallFont, sentences: 1, total: sentences.length, truncated: true };
+}
+
+/* ---------- yerleşim ---------- */
+
+// Returns everything the painter draws, with the final (fitted) text, its font and the box it must
+// stay inside. Tests and the local render check read the same object.
+function shareCardLayout(model, ctx) {
+  var card = SHARE_CARD;
+  var left = card.x + SHARE_PAD, right = card.x + card.w - SHARE_PAD, width = right - left;
+  var cx = card.x + card.w / 2;
+  var bandBottom = card.y + SHARE_BAND_H;
+  var footTop = card.y + card.h - SHARE_FOOT_H;
+  var contentBottom = footTop - 34;
+  var texts = [];
+  var L = { model: model, size: { w: SHARE_W, h: SHARE_H }, card: card, bandBottom: bandBottom, footTop: footTop, texts: texts, zones: {} };
+  function text(zone, str, font, x, y, align, box, color, dir) {
+    texts.push({ zone: zone, text: str, font: font, x: x, y: y, align: align, box: box, color: color || SHARE_INK, dir: dir || "ltr" });
+  }
+  var dir = model.rtl ? "rtl" : "ltr";
+
+  // Band pills (brand words and rarity stay LTR).
+  var pillFont = shareFont(900, 22), modeFont = shareFont(900, 18);
+  var realW = shareWidth(ctx, pillFont, model.realLabel) + 36;
+  var modeWord = model.kind.toUpperCase();
+  var modeW = shareWidth(ctx, modeFont, modeWord) + 38;
+  var rarityW = shareWidth(ctx, pillFont, model.rarityLabel) + 42;
+  var pillY = card.y + 26;
+  L.pills = [
+    { x: card.x + 30, y: pillY, w: realW, h: 48, fill: SHARE_INK, stroke: null },
+    { x: card.x + 30 + realW + 10, y: pillY, w: modeW, h: 48, fill: "#FFFFFF", stroke: SHARE_INK },
+    // On Match the right half of the band is already orange, so the rarity pill turns white.
+    { x: card.x + card.w - 30 - rarityW, y: pillY, w: rarityW, h: 48, fill: model.kind === "match" ? "#FFFFFF" : "#FF7A45", stroke: SHARE_INK }
+  ];
+  text("band", model.realLabel, pillFont, L.pills[0].x + realW / 2, pillY + 32, "center", L.pills[0], "#FFFFFF");
+  text("band", modeWord, modeFont, L.pills[1].x + modeW / 2, pillY + 31, "center", L.pills[1], SHARE_INK);
+  text("band", model.rarityLabel, pillFont, L.pills[2].x + rarityW / 2, pillY + 32, "center", L.pills[2], model.kind === "match" ? SHARE_INK : "#FFFFFF");
+
+  var y;
+  if (model.kind === "match") {
+    L.avatars = [{ x: cx - 100, y: bandBottom, r: 70, emoji: model.emojis[0] }, { x: cx + 100, y: bandBottom, r: 70, emoji: model.emojis[1] }];
+    L.matchChip = { x: cx, y: bandBottom, r: 32 };
+    var colW = cx - 40 - left;
+    var hA = shareFitLine(ctx, 800, 28, 18, "@" + model.handles[0], colW);
+    var hB = shareFitLine(ctx, 800, 28, 18, "@" + model.handles[1], colW);
+    var handleY = bandBottom + 70 + 44;
+    text("identity", hA.text, hA.font, cx - 40, handleY, "right", { x: left, y: handleY - 30, w: colW, h: 36 }, SHARE_SOFT);
+    text("identity", hB.text, hB.font, cx + 40, handleY, "left", { x: cx + 40, y: handleY - 30, w: colW, h: 36 }, SHARE_SOFT);
+    y = handleY;
+    if (model.nicknames[0] || model.nicknames[1]) {
+      var nickY = handleY + 30;
+      [0, 1].forEach(function (i) {
+        if (!model.nicknames[i]) return;
+        var n = shareFitLine(ctx, 800, 20, 16, model.nicknames[i], colW);
+        text("identity", n.text, n.font, i ? cx + 40 : cx - 40, nickY, i ? "left" : "right", { x: i ? cx + 40 : left, y: nickY - 22, w: colW, h: 28 }, SHARE_MUT, dir);
+      });
+      y = nickY;
+    }
+    var hero = shareFitLine(ctx, 900, 124, 80, model.hero, width);
+    var heroY = y + 12 + Math.round(hero.size * 0.9);
+    L.hero = { text: hero.text, font: hero.font, x: cx, y: heroY, size: hero.size };
+    texts.push({ zone: "identity", text: hero.text, font: hero.font, x: cx, y: heroY, align: "center", box: { x: left, y: heroY - hero.size, w: width, h: hero.size + 8 }, color: SHARE_INK, dir: "ltr", hero: true });
+    var sub = shareFitLine(ctx, 800, 28, 20, model.subtitle, width);
+    y = heroY + 44;
+    text("identity", sub.text, sub.font, cx, y, "center", { x: left, y: y - 30, w: width, h: 38 }, SHARE_MUT, dir);
+    y += 12;
+  } else {
+    L.avatars = [{ x: cx, y: bandBottom, r: 75, emoji: model.emojis[0] }];
+    if (model.caseLabel) {
+      var caseFont = "700 20px monospace";
+      var caseW = shareWidth(ctx, caseFont, model.caseLabel) + 32;
+      L.stamp = { x: card.x + card.w - 40 - caseW, y: bandBottom - 26 - 42, w: caseW, h: 42 };
+      text("band", model.caseLabel, caseFont, L.stamp.x + caseW / 2, L.stamp.y + 28, "center", L.stamp, SHARE_INK);
+    }
+    var handle = shareFitLine(ctx, 800, 30, 20, "@" + model.handles[0], width);
+    y = bandBottom + 75 + 14 + 30;
+    text("identity", handle.text, handle.font, cx, y, "center", { x: left, y: y - 32, w: width, h: 40 }, SHARE_SOFT);
+    // Title: up to two lines, stepping down from 66px; a third line is never drawn.
+    var titleSize = 66, titleLines;
+    for (; titleSize >= 48; titleSize -= 2) {
+      titleLines = shareWrap(ctx, shareFont(900, titleSize), model.title, width);
+      if (titleLines.length <= 2 && titleLines.join("").indexOf("…") < 0) break;
+    }
+    if (titleSize < 48) {
+      titleSize = 48;
+      titleLines = shareWrap(ctx, shareFont(900, 48), model.title, width);
+      if (titleLines.length > 2) titleLines = [titleLines[0], shareEllipsize(ctx, shareFont(900, 48), titleLines[1] + "…", width)];
+    }
+    var titleLH = Math.round(titleSize * 1.08);
+    titleLines.forEach(function (line, i) {
+      var ty = y + 14 + Math.round(titleSize * 0.86) + i * titleLH;
+      text("identity", line, shareFont(900, titleSize), cx, ty, "center", { x: left, y: ty - titleSize, w: width, h: titleLH }, SHARE_INK, dir);
+    });
+    y = y + 14 + Math.round(titleSize * 0.86) + (titleLines.length - 1) * titleLH;
+    if (model.subtitle) {
+      var subFont = shareFont(600, 28);
+      var subText = shareEllipsize(ctx, subFont, model.subtitle, width);
+      y += 46;
+      text("identity", subText, subFont, cx, y, "center", { x: left, y: y - 30, w: width, h: 38 }, SHARE_MUT, dir);
+    }
+    y += 12;
+  }
+  L.zones.identity = { top: bandBottom, bottom: y };
+
+  // Tile block and insight: heights are fixed, the free space is split evenly between them.
+  var headingH = model.heading ? 38 : 0;
+  var tilesH = headingH + SHARE_TILE_H * 2 + SHARE_TILE_GAP;
+  var minGap = 20;
+  var insightBudget = contentBottom - y - tilesH - 2 * minGap;
+  var insightW = width - 60;
+  var insight = shareFitInsight(ctx, model.insight, insightW, insightBudget);
+  var insightH = insight ? shareInsightBoxH(insight.lines.length, insight.size) : 0;
+  var gap = Math.max(minGap, (contentBottom - y - tilesH - insightH) / 2);
+  var tilesTop = Math.round(y + gap);
+  L.zones.tiles = { top: tilesTop, bottom: tilesTop + tilesH };
+
+  if (model.heading) {
+    var hy = tilesTop + 20;
+    var half = (width - 16) / 2;
+    var hl = shareFitLine(ctx, 900, 18, 14, shareUpper(model.heading.left, model.lang), half);
+    var hr = shareFitLine(ctx, 800, 18, 14, model.heading.right, half);
+    var startX = model.rtl ? right - 4 : left + 4, endX = model.rtl ? left + 4 : right - 4;
+    text("tiles", hl.text, hl.font, startX, hy, model.rtl ? "right" : "left", { x: model.rtl ? right - half : left, y: hy - 20, w: half, h: 26 }, SHARE_MUT, dir);
+    text("tiles", hr.text, hr.font, endX, hy, model.rtl ? "left" : "right", { x: model.rtl ? left : right - half, y: hy - 20, w: half, h: 26 }, SHARE_MUT, dir);
+  }
+  var colWidth = (width - SHARE_TILE_GAP) / 2;
+  var gridTop = tilesTop + headingH;
+  var labelWeight = model.kind === "mirror" ? 800 : 900, labelMax = model.kind === "mirror" ? 22 : 24;
+  L.tiles = model.tiles.slice(0, 4).map(function (tile, i) {
+    var col = i % 2, row = Math.floor(i / 2);
+    if (model.rtl) col = 1 - col;
+    var tx = left + col * (colWidth + SHARE_TILE_GAP), ty = gridTop + row * (SHARE_TILE_H + SHARE_TILE_GAP);
+    var inner = { x: tx + 22, w: colWidth - 44 };
+    var edge = model.rtl ? inner.x + inner.w : inner.x, align = model.rtl ? "right" : "left";
+    var label = shareFitLine(ctx, labelWeight, labelMax, 16, tile.label, inner.w);
+    text("tile" + i, label.text, label.font, edge, ty + 40, align, { x: inner.x, y: ty + 16, w: inner.w, h: 30 }, model.kind === "mirror" ? SHARE_MUT : SHARE_INK, dir);
+    var valueFont = shareFont(900, 56);
+    var valueW = shareWidth(ctx, valueFont, tile.value);
+    texts.push({ zone: "tile" + i, text: tile.value, font: valueFont, x: edge, y: ty + 98, align: align, box: { x: inner.x, y: ty + 50, w: inner.w, h: 56 }, color: SHARE_INK, dir: "ltr", value: true });
+    if (tile.unit) {
+      var unitW = inner.w - valueW - 10;
+      var unit = shareFitLine(ctx, 800, 22, 16, tile.unit, unitW);
+      var ux = model.rtl ? edge - valueW - 10 : edge + valueW + 10;
+      text("tile" + i, unit.text, unit.font, ux, ty + 98, align, { x: model.rtl ? inner.x : ux, y: ty + 76, w: unitW, h: 28 }, SHARE_MUT, dir);
+    }
+    return { x: tx, y: ty, w: colWidth, h: SHARE_TILE_H, bar: { x: inner.x, y: ty + 112, w: inner.w, h: 12, fill: tile.bar, rtl: model.rtl }, tile: tile };
+  });
+
+  var insightTop = Math.round(L.zones.tiles.bottom + gap);
+  if (insight) {
+    var box = { x: left, y: insightTop, w: width, h: insightH };
+    var labelFit = shareFitLine(ctx, 900, 20, 14, shareUpper(model.insightLabel, model.lang), insightW);
+    text("insight", labelFit.text, labelFit.font, cx, insightTop + 42, "center", { x: left + 30, y: insightTop + 20, w: insightW, h: 28 }, SHARE_LABEL_INK[model.accent] || model.accent, dir);
+    var lh = Math.round(insight.size * 1.36);
+    insight.lines.forEach(function (line, i) {
+      var ly = insightTop + 64 + Math.round(insight.size * 0.95) + i * lh;
+      text("insight", line, insight.font, cx, ly, "center", { x: left + 30, y: ly - insight.size, w: insightW, h: lh }, SHARE_INK, dir);
+    });
+    L.insight = { box: box, lines: insight.lines, size: insight.size, sentences: insight.sentences, total: insight.total, truncated: !!insight.truncated, dashed: model.kind === "stalk" };
+    L.zones.insight = { top: insightTop, bottom: insightTop + insightH };
+  } else {
+    L.zones.insight = { top: insightTop, bottom: insightTop };
+  }
+
+  var footY = footTop + 42;
+  text("footer", "XORA", shareFont(900, 28), card.x + 36, footY, "left", { x: card.x + 36, y: footTop + 12, w: 140, h: 40 }, "#FFF6E9");
+  text("footer", XORA_PUBLIC_HOST, shareFont(800, 20), card.x + card.w - 36, footY, "right", { x: card.x + card.w - 36 - 260, y: footTop + 16, w: 260, h: 34 }, "#FFF6E9");
+  L.barcode = { text: fakeBarcode(model.hash), font: "17px monospace", x: cx + 10, y: footY - 2 };
+  return L;
+}
+
+/* ---------- çizim ---------- */
+
+function paintShareCard(ctx, L) {
+  var m = L.model, card = L.card;
+  ctx.textBaseline = "alphabetic";
+  ctx.direction = "ltr";
+  ctx.fillStyle = "#FFF6E9"; ctx.fillRect(0, 0, SHARE_W, SHARE_H);
+  ctx.fillStyle = "rgba(15,189,189,0.12)"; ctx.beginPath(); ctx.arc(80, 90, 190, 0, 7); ctx.fill();
+  ctx.fillStyle = "rgba(255,122,69,0.12)"; ctx.beginPath(); ctx.arc(1040, 1270, 230, 0, 7); ctx.fill();
+
+  // Card body with the XORA hard shadow.
+  ctx.fillStyle = "rgba(30,35,48,0.85)"; roundRect(ctx, card.x + 14, card.y + 16, card.w, card.h, 40); ctx.fill();
+  ctx.fillStyle = "#FFFFFF"; roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.fill();
+
   ctx.save();
-  ctx.textAlign = "left";
-  ctx.font = "900 24px Nunito, Arial, sans-serif";
-  var w = ctx.measureText(label).width + 44;
-  ctx.fillStyle = "#1E2330";
-  roundRect(ctx, 48, 46, w, 54, 27); ctx.fill();
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillText(label, 70, 81);
+  roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.clip();
+  if (m.bandColors.length > 1) {
+    var mid = card.x + card.w / 2;
+    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w / 2, SHARE_BAND_H);
+    ctx.fillStyle = m.bandColors[1]; ctx.fillRect(mid, card.y, card.w / 2, SHARE_BAND_H);
+    ctx.fillStyle = SHARE_INK;
+    ctx.beginPath(); ctx.moveTo(mid + 24, card.y); ctx.lineTo(mid + 30, card.y); ctx.lineTo(mid - 24, L.bandBottom); ctx.lineTo(mid - 30, L.bandBottom); ctx.closePath(); ctx.fill();
+  } else {
+    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w, SHARE_BAND_H);
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.beginPath(); ctx.arc(card.x + 180, card.y + 50, 110, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(card.x + card.w - 90, card.y + 220, 130, 0, 7); ctx.fill();
+  }
+  ctx.fillStyle = SHARE_INK; ctx.fillRect(card.x, L.bandBottom - 2.5, card.w, 5);
+  ctx.fillStyle = SHARE_INK; ctx.fillRect(card.x, L.footTop, card.w, SHARE_FOOT_H);
   ctx.restore();
+  ctx.lineWidth = 5; ctx.strokeStyle = SHARE_INK; roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.stroke();
+
+  L.pills.forEach(function (p) {
+    ctx.fillStyle = p.fill; roundRect(ctx, p.x, p.y, p.w, p.h, p.h / 2); ctx.fill();
+    if (p.stroke) { ctx.lineWidth = 3; ctx.strokeStyle = p.stroke; roundRect(ctx, p.x, p.y, p.w, p.h, p.h / 2); ctx.stroke(); }
+  });
+  if (L.stamp) {
+    ctx.save();
+    ctx.translate(L.stamp.x + L.stamp.w / 2, L.stamp.y + L.stamp.h / 2); ctx.rotate(-0.07); ctx.translate(-(L.stamp.x + L.stamp.w / 2), -(L.stamp.y + L.stamp.h / 2));
+    ctx.fillStyle = "rgba(255,255,255,0.88)"; roundRect(ctx, L.stamp.x, L.stamp.y, L.stamp.w, L.stamp.h, 10); ctx.fill();
+    if (ctx.setLineDash) ctx.setLineDash([8, 6]);
+    ctx.lineWidth = 3; ctx.strokeStyle = SHARE_INK; roundRect(ctx, L.stamp.x, L.stamp.y, L.stamp.w, L.stamp.h, 10); ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  L.avatars.forEach(function (a) {
+    ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, 7); ctx.fillStyle = "#FFFFFF"; ctx.fill();
+    ctx.lineWidth = 6; ctx.strokeStyle = SHARE_INK; ctx.stroke();
+    ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = SHARE_INK;
+    ctx.font = Math.round(a.r * 1.05) + "px " + SHARE_EMOJI_FONT; ctx.fillText(a.emoji, a.x, a.y + 4);
+    ctx.textBaseline = "alphabetic";
+  });
+  if (L.matchChip) {
+    var chip = L.matchChip;
+    ctx.beginPath(); ctx.arc(chip.x, chip.y, chip.r, 0, 7); ctx.fillStyle = SHARE_INK; ctx.fill();
+    ctx.lineWidth = 4; ctx.strokeStyle = "#FFFFFF"; ctx.stroke();
+    ctx.fillStyle = "#FFFFFF"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = shareFont(900, 36); ctx.fillText("×", chip.x, chip.y + 2);
+    ctx.textBaseline = "alphabetic";
+  }
+
+  L.tiles.forEach(function (tl) {
+    ctx.fillStyle = "#FFFFFF"; roundRect(ctx, tl.x, tl.y, tl.w, tl.h, 22); ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = SHARE_INK; roundRect(ctx, tl.x, tl.y, tl.w, tl.h, 22); ctx.stroke();
+    var b = tl.bar;
+    // The track is always drawn; the fill is exactly the measured share and is omitted at 0.
+    ctx.fillStyle = "#E3E5EA"; roundRect(ctx, b.x, b.y, b.w, b.h, b.h / 2); ctx.fill();
+    var fw = Math.round(b.w * b.fill / 100);
+    if (fw > 0) {
+      ctx.save(); roundRect(ctx, b.x, b.y, b.w, b.h, b.h / 2); ctx.clip();
+      ctx.fillStyle = m.accent; ctx.fillRect(b.rtl ? b.x + b.w - fw : b.x, b.y, fw, b.h);
+      ctx.restore();
+    }
+  });
+
+  if (L.insight) {
+    var box = L.insight.box;
+    ctx.fillStyle = SHARE_CREAM; roundRect(ctx, box.x, box.y, box.w, box.h, 26); ctx.fill();
+    if (L.insight.dashed && ctx.setLineDash) ctx.setLineDash([12, 8]);
+    ctx.lineWidth = 3; ctx.strokeStyle = m.accent; roundRect(ctx, box.x, box.y, box.w, box.h, 26); ctx.stroke();
+    if (ctx.setLineDash) ctx.setLineDash([]);
+  }
+
+  L.texts.forEach(function (tx) {
+    ctx.font = tx.font; ctx.fillStyle = tx.color; ctx.textAlign = tx.align; ctx.direction = tx.dir;
+    if (tx.hero) {
+      // Digits in ink, the percent sign in XORA orange.
+      var parts = String(tx.text).split(/([\d٠-٩]+)/).filter(Boolean);
+      var total = parts.reduce(function (w, p) { return w + ctx.measureText(p).width; }, 0);
+      var x = tx.x - total / 2;
+      ctx.textAlign = "left"; ctx.direction = "ltr";
+      parts.forEach(function (p) {
+        ctx.fillStyle = /[\d٠-٩]/.test(p) ? SHARE_INK : "#FF7A45";
+        ctx.fillText(p, x, tx.y); x += ctx.measureText(p).width;
+      });
+      return;
+    }
+    ctx.fillText(tx.text, tx.x, tx.y);
+  });
+  ctx.direction = "ltr"; ctx.textAlign = "center"; ctx.fillStyle = "#FFF6E9";
+  ctx.font = L.barcode.font; ctx.fillText(L.barcode.text, L.barcode.x, L.barcode.y);
+}
+
+function renderShareCard(res) {
+  var cv = document.createElement("canvas");
+  cv.width = SHARE_W;
+  cv.height = SHARE_H;
+  var ctx = applyLocaleFont(cv.getContext("2d"), shareLang());
+  var layout = shareCardLayout(shareCardModel(res), ctx);
+  paintShareCard(ctx, layout);
   return cv;
 }
 
@@ -785,6 +1205,7 @@ function renderFunMatchPNG(m) {
   return cv;
 }
 
+/* --- V3 PNG: profil okuma (sadeleştirilmiş) --- */
 function renderIdentityPNGV3(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var color = (res.card && res.card.color) || "#1B1B1B";
@@ -1010,7 +1431,7 @@ function renderIdentityPNGV1(res) {
 /* --- match kartı PNG --- unchanged */
 function renderMatchPNG(m) {
   if (resultTier(m) === "fun") return renderFunMatchPNG(m);
-  return resultTier(m) === "real" ? stampRealCanvas(renderMatchPNGBase(m), m) : renderMatchPNGBase(m);
+  return resultTier(m) === "real" ? renderShareCard(m) : renderMatchPNGBase(m);
 }
 
 function renderMatchPNGBase(m, opts) {
