@@ -47,8 +47,9 @@ function report(r) {
   const lines = [`## @${r.handle}`, "", `Sample: ${r.input_stats.analyzed} posts — ${r.input_stats.original} original, ${r.input_stats.reply} reply, ${r.input_stats.quote} quote, ${r.input_stats.repost} repost`, "", "| Bar | Score | Conf. | Evidence (internal) |", "|---|---|---|---|"];
   for (const t of r.selected_traits) lines.push(`| ${t.label} \`${t.id}\` | ${t.score} | ${t.confidence} | ${t.evidence} (posts ${t.post_refs.join(", ")}) |`);
   lines.push("", `**Persistent interests:** ${r.persistent_interests.map(i => `${i.label} (${i.confidence})`).join(", ") || "—"}`, "", `**Analysis:** ${r.character_analysis}`, "",
+    `**AI latency:** ${(r.ai_latency_ms / 1000).toFixed(1)} s`, "",
     `**Confidence:** ${r.confidence.overall} · data ${r.confidence.data_sufficiency} · limitations: ${r.confidence.limitations.join(", ") || "none"}`);
-  if (r.dropped.length) lines.push("", `_Dropped by validator:_ ${r.dropped.map(d => `${d.id} (${d.reason})`).join(", ")}`);
+  lines.push("", `**Dropped by server validation:** ${r.dropped.map(d => `${d.id} (${d.reason})`).join(", ") || "none"}`);
   return lines.join("\n");
 }
 
@@ -60,7 +61,9 @@ for (const handle of handles) {
   const row = rows.find(r => String(r.username || r.profile?.username || "").toLowerCase() === handle);
   if (!row) { sections.push(`## @${handle}\n\nNo saved x_cache row.`); console.error(`@${handle}: no saved data`); continue; }
   try {
+    const started = performance.now();
     const result = await edge.analyzeSerious({ ...row.profile, username: row.profile?.username || handle }, row.posts || [], "tr");
+    result.ai_latency_ms = Math.round(performance.now() - started);
     fs.writeFileSync(path.join(outDir, `${handle}.json`), JSON.stringify(result, null, 2));
     sections.push(report(result));
   } catch (e) {
