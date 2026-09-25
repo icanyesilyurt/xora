@@ -33,3 +33,6 @@ TASK_02_SMOKE_TEST.md
 REMOTE_BEFORE_RECONCILIATION.md
 MIGRATION_HISTORY_PLAN.md
 SCM01_REPORT.md
+
+# Local REAL analysis runs on saved account data
+real-analysis-out/

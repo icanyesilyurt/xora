@@ -1,9 +1,16 @@
 const fs=require('node:fs');
 const vm=require('node:vm');
 const ts=require('typescript');
+// The edge function and its local modules are bundled into one script: local ES imports are
+// dropped and the module bodies are prepended, so their exports share the function's scope.
+const EDGE_DIR='supabase/functions/analyze-real/';
+const EDGE_MODULES=['ontology.ts','real-analysis.ts','index.ts'];
+const stripImports=src=>src.replace(/^import\s[\s\S]*?\sfrom\s+"[^"]+";[ \t]*\r?\n/gm,'');
+function edgeSource() {
+  return EDGE_MODULES.map(f=>stripImports(fs.readFileSync(EDGE_DIR+f,'utf8'))).join('\n');
+}
 function edge(options={}) {
-  let source=fs.readFileSync('supabase/functions/analyze-real/index.ts','utf8');
-  source=source.replace(/^import .*\r?\n/,'').replace('Deno.serve(main);','');
+  const source=edgeSource().replace('Deno.serve(main);','');
   const output=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
   const context={exports:{},console,Error,Response,Request,Headers,AbortSignal,crypto,fetch:async()=>{throw Error('Unexpected live fetch');},Deno:{env:{get:k=>({SUPABASE_URL:'http://local.test',SUPABASE_ANON_KEY:'test-anon',SUPABASE_SERVICE_ROLE_KEY:'test-service',X_BEARER_TOKEN:'test-x',AI_PROVIDER:'anthropic',AI_API_KEY:'test-ai',AI_MODEL:'mock-model'})[k]}},...options};
   vm.createContext(context); vm.runInContext(output,context);
@@ -35,4 +42,4 @@ const AI_COPY={
 };
 const profileAI=(locale='en')=>{const c=AI_COPY[locale];return {nickname_candidates:[{text:c.nickname,evidence:'question_ratio'}],metrics:['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label:c.label,value:70})),tagline:c.tagline,summary:c.summary,comment:c.comment,observations:[c.observation],emoji:'🪞'};};
 const matchAI=(locale='en')=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment:AI_COPY[locale].match});
-module.exports={edge,browser,profileAI,matchAI,AI_COPY};
+module.exports={edge,edgeSource,browser,profileAI,matchAI,AI_COPY};
