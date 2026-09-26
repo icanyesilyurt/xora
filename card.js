@@ -133,16 +133,26 @@ function realModeComment(res, lang) {
   return localized(res.mode === "stalk" ? (c.stalk || c.mirror) : c.mirror, lang);
 }
 
+// The in-app REAL card is the compact 4:5 share-card layout (header with @handle and the round icon,
+// title, short description, 4-6 bars, XORA analysis box, dark footer), built from the same model as
+// the 1080 x 1350 PNG. The analysis box shows as many whole sentences as fit; when sentences are
+// left out, the complete analysis follows directly under the card.
+var REAL_CARD_ANALYSIS_BUDGET = { latin: 230, cjk: 105 };
+
+function realCardAnalysis(text) {
+  var sentences = shareSentences(text);
+  var cjk = CJK_TEXT.test(text || "");
+  var joiner = cjk ? "" : " ", budget = cjk ? REAL_CARD_ANALYSIS_BUDGET.cjk : REAL_CARD_ANALYSIS_BUDGET.latin;
+  var k = 1;
+  while (k < sentences.length && sentences.slice(0, k + 1).join(joiner).length <= budget) k++;
+  return { text: sentences.slice(0, k).join(joiner), full: sentences.join(joiner), truncated: k < sentences.length };
+}
+
 function buildRealIdentityCard(res) {
-  var lang = (typeof getLang === "function") ? getLang() : "tr";
-  var c = res.card || {};
-  var color = c.color || "#1E2330";
-  var emoji = c.emoji || res.profile_emoji || "🪞";
-  var nick = localized(res.nickname || c.nickname, lang);
-  var tagline = localized(res.tagline || c.desc, lang);
-  var summary = localized(res.profile_summary, lang);
-  var comment = realModeComment(res, lang);
-  var rows = realScoredBars(res, lang).map(function (row) {
+  var m = shareCardModel(res);
+  var color = m.accent || "#1E2330";
+  var analysis = realCardAnalysis(m.analysis);
+  var rows = m.bars.map(function (row) {
     return '<div class="score-chip" data-metric="' + esc(row.key) + '">' +
       '<span class="score-name">' + esc(row.label) + "</span>" +
       '<span class="score-bar"><i style="width:' + row.value + '%"></i></span>' +
@@ -150,21 +160,22 @@ function buildRealIdentityCard(res) {
     "</div>";
   }).join("");
   return (
-    '<div class="idcard realcard" style="--ac:' + color + '">' +
-      '<div class="idcard-band"><span class="idcard-avatar">' + emoji + "</span></div>" +
-      '<div class="idcard-body">' +
-        '<p class="idcard-handle">@' + esc(res.handle) + "</p>" +
-        '<h2 class="idcard-type">' + esc(nick) + "</h2>" +
-        (tagline ? '<p class="idcard-desc">' + esc(tagline) + "</p>" : "") +
-        (summary && summary !== tagline ? '<p class="idcard-summary">' + esc(summary) + "</p>" : "") +
-        (rows ? '<div class="real-metrics" data-source="ai_metrics"><div class="idcard-scores">' + rows + "</div></div>" : "") +
-        '<div class="idcard-quote">' +
-          '<span class="quote-label">' + esc(t("says")) + "</span>" +
-          "<p>" + esc(comment) + "</p>" +
-        "</div>" +
+    '<div class="idcard realcard" data-layout="4:5" style="--ac:' + color + '">' +
+      '<div class="rc-head">' +
+        '<p class="idcard-handle">' + esc(m.handleLine) + "</p>" +
+        '<span class="idcard-avatar">' + m.icons[0] + "</span>" +
       "</div>" +
-      '<div class="idcard-foot"><span>XORA</span><span class="barcode">' + fakeBarcode(res.hash || xhash(String(res.handle || "x"))) + '</span><span class="idcard-host">' + XORA_PUBLIC_HOST + '</span></div>' +
-    "</div>"
+      '<div class="rc-body">' +
+        '<div class="rc-title">' +
+          (m.title ? '<h2 class="idcard-type">' + esc(m.title) + "</h2>" : "") +
+          (m.description ? '<p class="idcard-desc">' + esc(m.description) + "</p>" : "") +
+        "</div>" +
+        (rows ? '<div class="real-metrics" data-source="ai_metrics"><div class="idcard-scores">' + rows + "</div></div>" : "") +
+        (analysis.text ? '<div class="idcard-quote rc-analysis"><span class="quote-label">' + esc(m.boxLabel) + "</span><p>" + esc(analysis.text) + "</p></div>" : "") +
+      "</div>" +
+      '<div class="idcard-foot"><span>XORA</span><span class="barcode">' + fakeBarcode(m.hash) + '</span><span class="idcard-host">' + XORA_PUBLIC_HOST + '</span></div>' +
+    "</div>" +
+    (analysis.truncated ? '<div class="real-analysis-full" data-source="character_analysis"><span class="quote-label">' + esc(m.boxLabel) + "</span><p>" + esc(analysis.full) + "</p></div>" : "")
   );
 }
 

@@ -40,6 +40,33 @@ const AI_COPY={
  zh:{nickname:'問題很多',tagline:'靠問題把話題帶下去。',summary:'常常問開放式的問題。',comment:'你習慣用問題打開一段對話。',label:'評語',observation:'很常提問。',match:'兩個帳號都很愛問問題。'},
  ru:{nickname:'Много спрашивает',tagline:'Идёт вперёд через вопросы.',summary:'Задаёт открытые вопросы.',comment:'Ты открываешь разговор вопросом.',label:'Комментарий',observation:'Часто задаёт вопросы.',match:'Оба аккаунта много спрашивают.'}
 };
+// Serious-analysis copy: three sentences per locale, no sample counts.
+const ANALYSIS_COPY={
+ tr:'Hesap düşüncelerini sorularla açıyor. Yanıtlarında kısa ve net kalıyor. Gündeme kendi cümleleriyle katılıyor.',
+ en:'The account opens its thoughts with questions. Its replies stay short and clear. It joins the conversation in its own words.',
+ es:'La cuenta abre sus ideas con preguntas. Sus respuestas son breves y claras. Participa en la conversación con sus propias palabras.',
+ pt:'A conta abre suas ideias com perguntas. As respostas são curtas e claras. Participa da conversa com as próprias palavras.',
+ ar:'يفتح الحساب أفكاره بالأسئلة. ردوده قصيرة وواضحة. يشارك في النقاش بكلماته الخاصة.',
+ fr:'Le compte ouvre ses idées par des questions. Ses réponses restent courtes et claires. Il participe à la conversation avec ses propres mots.',
+ de:'Das Konto beginnt seine Gedanken mit Fragen. Die Antworten bleiben kurz und klar. Es beteiligt sich mit eigenen Worten am Gespräch.',
+ it:'L’account apre i suoi pensieri con domande. Le risposte restano brevi e chiare. Partecipa alla conversazione con parole proprie.',
+ ja:'このアカウントは質問から考えを始める。返信は短く明確だ。自分の言葉で会話に参加している。',
+ ko:'이 계정은 질문으로 생각을 엽니다. 답글은 짧고 분명합니다. 자신의 말로 대화에 참여합니다.',
+ zh:'這個帳號習慣用問題開啟想法。回覆簡短而清楚。會用自己的話參與討論。',
+ ru:'Аккаунт начинает свои мысли с вопросов. Ответы остаются короткими и ясными. Он участвует в разговоре своими словами.'
+};
+// A valid serious-analysis result for fixtures whose posts are own-voice originals (indexes 0-7).
+const seriousAI=(locale='en')=>({ontology_version:'real-1.0',
+ selected_traits:[{id:'questioning',score:82,confidence:.8,evidence:'Soru ile açılan paylaşımlar.',post_refs:[0,1,2]},{id:'curiosity',score:74,confidence:.75,evidence:'Merak eden sorular.',post_refs:[3,4]},{id:'brevity',score:66,confidence:.7,evidence:'Kısa cümleler.',post_refs:[5,6]},{id:'confidence',score:55,confidence:.6,evidence:'Kendinden emin sorular.',post_refs:[0,2]}],
+ persistent_interests:[],character_analysis:ANALYSIS_COPY[locale],confidence:{overall:.7,data_sufficiency:'high',limitations:[]}});
+// Serious-analysis requests are recognised by their schema name (OpenAI) or ontology prompt (Anthropic).
+const isSeriousRequest=body=>body?.text?.format?.name==='xora_real_analysis'||String(body?.system||'').includes('FIXED ONTOLOGY');
+// The serious prompt names the output language; map it back to the locale for fixtures.
+function seriousLocale(body,e){
+ const system=String(body.instructions||body.system||'');
+ const m=system.match(/Write 3-5 complete sentences in (.*?), in the third person/s);
+ return Object.keys(e.REAL_LOCALES).find(l=>m&&e.REAL_LOCALES[l].language===m[1])||'en';
+}
 const profileAI=(locale='en')=>{const c=AI_COPY[locale];return {nickname_candidates:[{text:c.nickname,evidence:'question_ratio'}],metrics:['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label:c.label,value:70})),tagline:c.tagline,summary:c.summary,comment:c.comment,observations:[c.observation],emoji:'🪞'};};
 const matchAI=(locale='en')=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment:AI_COPY[locale].match});
-module.exports={edge,edgeSource,browser,profileAI,matchAI,AI_COPY};
+module.exports={edge,edgeSource,seriousAI,isSeriousRequest,seriousLocale,ANALYSIS_COPY,browser,profileAI,matchAI,AI_COPY};

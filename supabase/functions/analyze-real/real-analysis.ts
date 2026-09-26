@@ -116,8 +116,10 @@ function uniqueRefs(raw: unknown, postCount: number) {
   if (!Array.isArray(raw)) return [];
   return [...new Set(raw.filter(r => Number.isInteger(r) && r >= 0 && r < postCount) as number[])];
 }
+// Latin/Cyrillic/Arabic sentences end in punctuation plus a space; CJK sentences end in a full-width
+// mark with no space after it.
 export function sentenceCount(text: string) {
-  return text.trim().split(/(?<=[.!?…])\s+(?=\S)/u).filter(s => /\p{L}/u.test(s)).length;
+  return text.trim().split(/(?<=[.!?…؟])\s+(?=\S)|(?<=[。！？])/u).filter(s => /\p{L}/u.test(s)).length;
 }
 // User-facing text never states sample sizes; also no markup and no links.
 const COUNT_CLAIM = /\d[\d\s.,%'-]*(?:posts?|tweets?|paylaşım|gönderi|tweet|ileti)|(?:posts?|tweets?|paylaşım|gönderi|ileti|sample|örneklem)[^.!?]{0,35}\d|(?:analy[sz]ed|incelenen|analiz edilen)[^.!?]{0,35}(?:posts?|tweets?|paylaşım|gönderi)|%\s*\d|\d\s*%/iu;

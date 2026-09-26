@@ -1,5 +1,5 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');
-const {edge,profileAI,matchAI,AI_COPY}=require('./helpers.cjs');
+const {edge,profileAI,matchAI,AI_COPY,seriousAI,isSeriousRequest,seriousLocale}=require('./helpers.cjs');
 test('strict request validation before billing',()=>{
  const e=edge();const base={mode:'mirror',locale:'tr',handle:'@Alice',request_id:'request-123'};
  assert.equal(e.validateRequest(base).handles[0],'alice');
@@ -79,7 +79,9 @@ test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=
  const calls=[];let aiCalls=0;let refundAttempts=0;
  const service={from(table){assert.equal(table,'x_cache'); const q={select(){return q;},eq(){return q;},gt(){return q;},async maybeSingle(){if(failure==='x') throw Error('x_api_error');return {data:{profile:{username:'alice'},posts:Array.from({length:8},(_,i)=>({text:'Question?',type:'original',metrics:{likes:i,replies:0,reposts:0}}))}};}};return q;},async rpc(name,args){calls.push({name,args});if(name==='xora_begin_real') return {data:{status:begin,result:{saved:true},balance:10}};if(name==='xora_claim_referral') return {data:{referral_code:'creator-a',expires_at:'2026-10-01'}};if(name==='xora_complete_real'){if(failure==='save')return {error:{message:'db failed'}};return {data:{result:args.p_result,balance:10}};}if(name==='xora_fail_real'){refundAttempts++;if(refundAttempts<=refundFailures) return {error:{message:'offline'}};return {data:{status:failure==='lost-save'?'succeeded':'failed',result:{saved:true},balance:20}};}throw Error(name);}};
  const e=edge({createClient:(_url,key)=>key==='test-anon'?{auth:{getUser:async()=>({data:{user:{id:'test-user'}}})}}:service,fetch:async(_url,options)=>{
- aiCalls++;if(failure==='ai')throw Error('ai_error');const payload=JSON.parse(JSON.parse(options.body).messages[0].content);
+ aiCalls++;if(failure==='ai')throw Error('ai_error');const body=JSON.parse(options.body);
+ if(isSeriousRequest(body)) return Response.json({content:[{type:'text',text:JSON.stringify(seriousAI(seriousLocale(body,e)))}]});
+ const payload=JSON.parse(body.messages[0].content);
  assert.ok(payload.profile_a?.signals && payload.profile_b?.own_voice || payload.signals);
  let raw=payload.profile_a?matchAI(payload.locale):profileAI(payload.locale);if(failure==='validation')raw.metrics[0].key='oops';
  return Response.json({content:[{type:'text',text:JSON.stringify(raw)}]});
@@ -87,8 +89,8 @@ test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=
  return {e,calls,get aiCalls(){return aiCalls;}};
 }
 function request(mode='match'){return new Request('http://local.test',{method:'POST',body:JSON.stringify({mode,locale:'en',handle:'alice',handles:['alice','bob'],request_id:'request-123'})});}
-test('Match runs one AI call total; Mirror and Stalk run one each',async()=>{
- for(const mode of ['match','mirror','stalk']){const f=fixture();const response=await f.e.main(request(mode));assert.equal(response.status,200);const data=await response.json();assert.equal(f.aiCalls,1);assert.equal(data.result.meta.tier,'real');assert.ok(data.result.rarity);assert.equal(f.calls.filter(x=>x.name==='xora_complete_real').length,1);assert.equal(f.calls.filter(x=>x.name==='xora_fail_real').length,0);}
+test('Match runs one AI call total; Mirror and Stalk run two (card copy + serious analysis)',async()=>{
+ for(const mode of ['match','mirror','stalk']){const f=fixture();const response=await f.e.main(request(mode));assert.equal(response.status,200);const data=await response.json();assert.equal(f.aiCalls,mode==='match'?1:2);assert.equal(data.result.meta.tier,'real');assert.ok(data.result.rarity);assert.equal(f.calls.filter(x=>x.name==='xora_complete_real').length,1);assert.equal(f.calls.filter(x=>x.name==='xora_fail_real').length,0);}
 });
 test('X, AI, validation and save failures settle refund; retry same refund on RPC errors',async()=>{
  for(const failure of ['x','ai','validation','save']){const f=fixture({failure});assert.equal((await f.e.main(request())).status,500);assert.equal(f.calls.filter(x=>x.name==='xora_fail_real').length,1);}
@@ -135,11 +137,12 @@ test('AI input separates own voice from reposts, strips repost authors and count
 });
 test('Mirror/Stalk/Match send the split input and the repost rule, and store the real sample counts',async()=>{
  for(const mode of ['mirror','stalk','match']){
-  const payloads=[],systems=[];
+  const payloads=[],systems=[],seriousInputs=[];
   const service={from(){const q={select(){return q;},eq(){return q;},gt(){return q;},async maybeSingle(){return {data:{profile:{username:'alice'},posts:mixedPosts()}};}};return q;},
    async rpc(name,args){if(name==='xora_begin_real')return {data:{status:'claimed'}};if(name==='xora_claim_referral')return {data:null};if(name==='xora_complete_real')return {data:{result:args.p_result,balance:1}};throw Error(name);}};
   const e=edge({createClient:(_u,key)=>key==='test-anon'?{auth:{getUser:async()=>({data:{user:{id:'u'}}})}}:service,fetch:async(_url,options)=>{
-   const body=JSON.parse(options.body);systems.push(body.system);const payload=JSON.parse(body.messages[0].content);payloads.push(payload);
+   const body=JSON.parse(options.body);if(isSeriousRequest(body)){seriousInputs.push(JSON.parse(body.messages[0].content));return Response.json({content:[{type:'text',text:JSON.stringify(seriousAI('tr'))}]});}
+   systems.push(body.system);const payload=JSON.parse(body.messages[0].content);payloads.push(payload);
    return Response.json({content:[{type:'text',text:JSON.stringify(payload.profile_a?matchAI(payload.locale):profileAI(payload.locale))}]});}});
   const res=await e.main(new Request('http://local.test',{method:'POST',body:JSON.stringify({mode,locale:'tr',handle:'alice',handles:['alice','bob'],request_id:'split-test-'+mode})}));
   assert.equal(res.status,200,mode);const {result}=await res.json();
@@ -151,7 +154,11 @@ test('Mirror/Stalk/Match send the split input and the repost rule, and store the
   if(mode==='match'){for(const side of ['resA','resB'])assert.deepEqual({...result[side].sample},{analyzed:25,original:3,reply:2,quote:1,repost:19},side);}
   else {
    assert.deepEqual({...result.meta.sample},{analyzed:25,original:3,reply:2,quote:1,repost:19});assert.equal(result.meta.sample_size,25);
-   assert.ok(payloads[0].rules.some(r=>/exactly 6 original nickname candidates/.test(r)));assert.deepEqual([...payloads[0].nickname_style_examples],[...e.NICKNAME_STYLE_EXAMPLES.tr]);
+   assert.ok(payloads[0].rules.some(r=>/exactly 6 original nickname candidates/.test(r)));
+   // The serious analysis gets the same fetched posts as one indexed list, reposts marked and de-attributed.
+   assert.equal(seriousInputs.length,1);const sp=seriousInputs[0].posts;assert.equal(sp.length,25);
+   assert.deepEqual(sp.slice(0,6).map(p=>p.type),['original','original','original','reply','reply','quote']);
+   assert.ok(sp.slice(6).every(p=>p.type==='repost'&&!/^RT @/.test(p.text)));assert.deepEqual([...payloads[0].nickname_style_examples],[...e.NICKNAME_STYLE_EXAMPLES.tr]);
   }
  }
 });

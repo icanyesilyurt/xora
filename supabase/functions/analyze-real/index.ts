@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.116.0";
-import { analysisSchema, analysisSystemPrompt, analysisUserInput, normalizeAnalysis } from "./real-analysis.ts";
+import { analysisSchema, analysisSystemPrompt, analysisUserInput, normalizeAnalysis, ANALYSIS_VERSION } from "./real-analysis.ts";
 
 type Mode = "mirror" | "stalk" | "match";
 // The DB contract already accepts every planned locale. The edge function serves a locale only
@@ -273,7 +273,7 @@ async function callAI(input: unknown) {
 }
 
 // One provider round-trip with a strict JSON contract; shared by the card copy and the serious analysis layer.
-async function requestAI(opts:{system:string;user:string;schema:unknown;name:string;maxOutputTokens:number;maxTokens:number;temperature:number}) {
+async function requestAI(opts:{system:string;user:string;schema:unknown;name:string;maxOutputTokens:number;maxTokens:number;temperature:number;timeoutMs?:number}) {
   const {provider,key,model}=getAIConfig();
   const {system,user,schema}=opts;
   const url=provider==="openai" ? "https://api.openai.com/v1/responses" : "https://api.anthropic.com/v1/messages";
@@ -284,7 +284,7 @@ async function requestAI(opts:{system:string;user:string;schema:unknown;name:str
     ? {model,store:false,instructions:system,input:[{role:"user",content:user}],tools:[],tool_choice:"none",max_output_tokens:opts.maxOutputTokens,text:{format:{type:"json_schema",name:opts.name,strict:true,schema}}}
     : {model,max_tokens:opts.maxTokens,temperature:opts.temperature,system:`${system}\n\nReturn the result contract described by this JSON schema: ${JSON.stringify(schema)}`,messages:[{role:"user",content:user}]};
   // One attempt only: no fallback to another provider, model or weaker output format.
-  const response=await fetch(url,{method:"POST",signal:AbortSignal.timeout(45000),headers,body:JSON.stringify(body)});
+  const response=await fetch(url,{method:"POST",signal:AbortSignal.timeout(opts.timeoutMs ?? 45000),headers,body:JSON.stringify(body)});
   if (!response.ok) throw new Error("ai_error");
   let envelope:any;
   try { envelope=await response.json(); } catch { throw new Error("ai_bad_response"); }
@@ -581,6 +581,29 @@ function normalizeAIProfile(raw: any, handle: string, mode: "mirror"|"stalk", si
   return result;
 }
 
+// The serious analysis drives the visible REAL card: its 4-6 fixed-ontology traits are the bars
+// (labels from the ontology, never from the AI) and its character analysis is the main XORA text.
+// Interests, confidence, evidence and validator drops are kept on the result for internal review.
+function applySeriousAnalysis(result:any, serious:any, locale:Locale) {
+  const bars = serious.selected_traits.map((t:any)=>({key:t.id,label:{tr:t.label},value:t.score}));
+  // Also held to the card copy's multilingual no-sample-count rule.
+  const text = validCopy(serious.character_analysis, 1200);
+  result.behaviors = bars;
+  result.top_behaviors = bars;
+  result.comment = {mirror:inLocale(locale,text), stalk:inLocale(locale,text)};
+  result.rarity = rarityFromMetrics(bars);
+  result.card = {...result.card, top_behaviors:bars, color:colorForRarity(result.rarity.name)};
+  result.archetype = {...result.archetype, color:result.card.color, comments:inLocale(locale,[text])};
+  result.analysis = {
+    version:serious.version, ontology_version:serious.ontology_version, ts:serious.ts,
+    selected_traits:serious.selected_traits.map((t:any)=>({id:t.id,score:t.score,confidence:t.confidence,evidence:t.evidence,post_refs:t.post_refs})),
+    persistent_interests:serious.persistent_interests.map((i:any)=>({id:i.id,confidence:i.confidence,post_refs:i.post_refs})),
+    confidence:serious.confidence, dropped:serious.dropped, input_stats:serious.input_stats,
+  };
+  result.meta.analysis_version = ANALYSIS_VERSION;
+  return result;
+}
+
 async function analyzeOne(service:any, handle:string, mode:"mirror"|"stalk", locale:Locale) {
   const dataset = await getDataset(service, handle);
   const signals = computeSignals(dataset.posts);
@@ -614,17 +637,19 @@ async function analyzeOne(service:any, handle:string, mode:"mirror"|"stalk", loc
     },
     profile:dataset.profile, signals, ...aiPostInput(dataset.posts, true)
   };
-  const ai = await callAI(instruction);
-  const result = normalizeAIProfile(ai, handle, mode, signals, locale);
+  // The existing card-copy call (nickname, tagline) and the serious analysis run in parallel on the
+  // same dataset. Either failing fails the request, which is then refunded like any other failure.
+  const [ai, serious] = await Promise.all([callAI(instruction), analyzeSerious(dataset.profile, dataset.posts, locale)]);
+  const result = applySeriousAnalysis(normalizeAIProfile(ai, handle, mode, signals, locale), serious, locale);
   result.meta.cache_hit = dataset.cache_hit;
   result.meta.sample = sampleCounts(dataset.posts);
   return result;
 }
 
-// Serious REAL analysis layer (fixed ontology, no nicknames). Not wired into the paid card flow yet:
-// it is validated on saved accounts first. Reuses the cached X dataset, never refetches it.
+// Serious REAL analysis layer (fixed ontology, no nicknames). Runs on the same fetched/cached X
+// dataset as the card copy; it never fetches X data itself.
 async function analyzeSerious(profile:any, posts:Post[], locale:Locale="tr") {
-  const raw=await requestAI({system:analysisSystemPrompt(REAL_LOCALES[locale].language),user:JSON.stringify(analysisUserInput(profile,posts)),schema:analysisSchema(),name:"xora_real_analysis",maxOutputTokens:4000,maxTokens:2500,temperature:0.2});
+  const raw=await requestAI({system:analysisSystemPrompt(REAL_LOCALES[locale].language),user:JSON.stringify(analysisUserInput(profile,posts)),schema:analysisSchema(),name:"xora_real_analysis",maxOutputTokens:6000,maxTokens:3000,temperature:0.2,timeoutMs:60000});
   return {...normalizeAnalysis(raw,posts,profile),locale,ts:new Date().toISOString()};
 }
 
@@ -707,5 +732,5 @@ async function main(req: Request) {
   }
 }
 
-export {main,analyzeSerious,requestAI,analyzeMatch,analyzeOne,validateRequest,validateMetrics,aliasValid,activeAliasEvidence,pickAlias,fallbackAlias,normalizeAIProfile,behaviorSignals,normalizeMatchAI,computeSignals,validCopy,callAI,getAIConfig,aiResultSchema,parseProviderResult,xErrorDiagnostic,safeDiagnosticText,PLANNED_LOCALES,REAL_LOCALES,iconValid,ICON_BY_EVIDENCE,aiPostInput,sampleCounts,aliasGeneric,REPOST_RULE,NICKNAME_STYLE_EXAMPLES};
+export {main,analyzeSerious,applySeriousAnalysis,requestAI,analyzeMatch,analyzeOne,validateRequest,validateMetrics,aliasValid,activeAliasEvidence,pickAlias,fallbackAlias,normalizeAIProfile,behaviorSignals,normalizeMatchAI,computeSignals,validCopy,callAI,getAIConfig,aiResultSchema,parseProviderResult,xErrorDiagnostic,safeDiagnosticText,PLANNED_LOCALES,REAL_LOCALES,iconValid,ICON_BY_EVIDENCE,aiPostInput,sampleCounts,aliasGeneric,REPOST_RULE,NICKNAME_STYLE_EXAMPLES};
 Deno.serve(main);
