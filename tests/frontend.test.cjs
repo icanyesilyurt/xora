@@ -997,7 +997,8 @@ function assertLayoutFits(c,L,where){
  const z=L.zones,lowestIcon=Math.max(...L.icons.map(i=>i.y+i.r));
  assert.ok(lowestIcon<z.title.top&&z.title.bottom<=z.bars.top&&z.bars.bottom<=z.analysis.top&&z.analysis.bottom<=L.footTop-14,where+' icon, title, bars, analysis, footer in order '+JSON.stringify(z));
  assert.ok(L.bars.length<=6,where+' at most six bars');
- if(L.insight) assert.ok(L.insight.lines.length>=1&&L.insight.lines.length<=4,where+' analysis 1-4 lines');
+ if(L.insight&&L.model.kind==='match') assert.ok(L.insight.lines.length>=1&&L.insight.lines.length<=4,where+' match analysis 1-4 lines');
+ if(L.insight&&L.model.kind!=='match') assert.ok(L.insight.lines.length>=1,where+' analysis drawn');
 }
 test('REAL share card follows the Sessiz Gözlemci structure with REAL data, rarity and the archetype icon',()=>{
  for(const lang of LOCALES12){
@@ -1066,6 +1067,25 @@ test('XORA analysis targets three lines, four only as a fallback, dropping whole
  const four=c.shareFitInsight(ctx,long,760,500);assert.equal(four.lines.length,4);assert.ok(!four.truncated);
  const huge=c.shareFitInsight(ctx,long.repeat(4),760,500);assert.ok(huge.lines.length<=4&&huge.truncated&&huge.lines[huge.lines.length-1].endsWith('…'));
  assert.deepEqual(arr(c.shareSentences('質問が多い。答えも早い。')),['質問が多い。','答えも早い。']);
+});
+test('REAL share card draws the complete 3-6 sentence analysis inside the 4:5 card, with 4-6 bars',()=>{
+ const tr=['Hesap, gündeme duygusal tepkiden çok gerekçeli yorumla katılan analitik bir profil çiziyor.','Futbol üzerine yazdıkları taraftar coşkusundan ziyade taktik ve veri odaklı; iddiaları sınayıp gerektiğinde yanıtlarda karşı görüşe net biçimde itiraz ediyor.','Mizahı kuru ve kısa, çoğunlukla ciddi bir tespitin sonuna eklenen tek satırlık bir iğneleme olarak ortaya çıkıyor.','Ekonomi yorumlarında da aynı yöntemi kullanarak günlük fiyat değişimlerini genel tabloyla ilişkilendiriyor.','Seyrek gece paylaşımlarında beliren kişisel ve hafif melankolik ton, hesabın genel olarak mesafeli üslubuyla dikkat çekici bir kontrast oluşturuyor.','Dil gündelik ama özenli; argo yerine kısa ve hedefli cümleleri tercih ediyor.'];
+ for(const lang of ['tr','en','ja']){
+  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
+  for(const n of [3,6]) for(const bars of [4,6]){
+   const text=tr.slice(0,n).join(' ');
+   const rows=Array.from({length:bars},(_,i)=>['k'+i,'Ayrılık ve Kırgınlık Teması',90-i*8]);
+   const res=shareIdentity(lang,'mirror',{nickname:{[lang]:'Gece Kuşu'},tagline:{[lang]:'Geceleri daha çok konuşan bir gözlemci.'},comment:{mirror:{[lang]:text},stalk:{[lang]:text}},card:{color:'#7C4DFF',emoji:'🦉',top_behaviors:tb(lang,rows)}});
+   const L=layoutFor(c,res);assertLayoutFits(c,L,lang+' '+n+' sentences '+bars+' bars');
+   assert.equal(L.bars.length,bars);assert.equal(L.insight.truncated,false,'nothing cut');assert.equal(L.insight.sentences,n,'every sentence drawn');
+   assert.equal(L.insight.lines.join(' ').replace(/\s+/g,' '),text,'the drawn lines are the full analysis');
+   assert.ok(L.insight.size>=18,'readable size');
+   // The in-app card shows the same full text inside the card and no second panel.
+   const html=c.buildIdentityCard(res);
+   assert.ok(html.includes(c.esc(text)));assert.doesNotMatch(html,/real-analysis-full/);assert.match(html,/data-layout="4:5"/);
+   assert.equal((html.match(/class="idcard /g)||[]).length,1,'one card');
+  }
+ }
 });
 test('share-card box labels exist in all 12 locales and the retired share-card copy is gone',()=>{
  const c=browser();

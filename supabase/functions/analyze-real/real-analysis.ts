@@ -92,7 +92,8 @@ export function analysisSystemPrompt(outputLanguage: string) {
     "",
     "PERSISTENT INTERESTS. Topics that recur across the sample: at least 3 posts (any type, reposts included), not a single one-off event or thread. Max 5, strongest first. confidence reflects how recurrent and central the topic is. Interests do not automatically become traits.",
     "",
-    `CHARACTER ANALYSIS. Write 3-5 complete sentences in ${outputLanguage}, in the third person ("Hesap ..." / "The account ..."). Serious, specific and useful, like a real analyst's note. Cover the dominant communication style, how the account interacts (own posts vs replies vs quotes vs reposts), language and expression, persistent interests, and one notable tendency or contrast. Interpret patterns; do not retell individual posts, quote them, or summarise the latest news. Never state post counts, percentiles or numbers of analysed posts.`,
+    `CHARACTER ANALYSIS. Write 3-6 complete, meaningful sentences in ${outputLanguage}, in the third person ("Hesap ..." / "The account ..."): 3 when the evidence is thin, up to 6 when it is rich; never pad. Keep the whole text under about 850 characters. Describe the PERSONA visible through the account, like a real analyst's character note: communication style, emotional and expressive style, social behaviour (how it engages with others through posts, replies and quotes), language and tone, recurring interests where they shape the character, and notable contrasts or tendencies.`,
+    `It must never read like a recap of recent posts. Do not list what the account recently posted about (events, tours, matches, places, dates, products) and do not retell or quote posts; interpret what they reveal instead. Avoid: "The account posts about concerts, tour preparation and Ankara." Prefer: "The account communicates with high energy and an informal, accessible tone; personal expression mixes naturally with professional content, so the profile feels conversational rather than institutional." Never state post counts, percentiles or numbers of analysed posts.`,
     "Describe only observable behaviour on X. Never diagnose health or mental state, and never infer political side or ideology, religion, ethnicity, nationality, sexual orientation, age or gender. Topic interest in politics or religion may be named neutrally without taking or attributing a side.",
     "",
     "CONFIDENCE. overall is your confidence in the whole analysis. data_sufficiency: low when own-voice evidence is thin, high when there is plenty of varied own writing. limitations lists only the listed codes that apply.",
@@ -126,9 +127,9 @@ const COUNT_CLAIM = /\d[\d\s.,%'-]*(?:posts?|tweets?|paylaşım|gönderi|tweet|i
 function validAnalysisText(v: unknown) {
   if (typeof v !== "string") throw new Error("ai_bad_analysis");
   const text = v.replace(/\s+/g, " ").trim();
-  if (!text || text.length > 1200 || /[<>]|https?:\/\//i.test(text) || COUNT_CLAIM.test(text)) throw new Error("ai_bad_analysis");
+  if (!text || text.length > 1100 || /[<>]|https?:\/\//i.test(text) || COUNT_CLAIM.test(text)) throw new Error("ai_bad_analysis");
   const n = sentenceCount(text);
-  if (n < 3 || n > 5) throw new Error("ai_bad_analysis");
+  if (n < 3 || n > 6) throw new Error("ai_bad_analysis");
   return text;
 }
 

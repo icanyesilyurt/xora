@@ -117,12 +117,14 @@ test('contradictory and near-duplicate pairs, category limit and score caps',()=
  assert.deepEqual(plain(n4.confidence.limitations).sort(),['few_own_posts','mostly_reposts']);
 });
 
-test('character analysis must be 3-5 sentences, without counts, links or markup',()=>{
+test('character analysis must be 3-6 sentences, without counts, links or markup',()=>{
  const e=edge();
- for(const bad of ['Tek cümle.','Bir. İki.',ANALYSIS+' Altı. Yedi.','Hesap 25 paylaşımda analitik. İki. Üç.','Hesap analitik. Detay için https://x.com bakın. Üç.','Hesap <b>analitik</b>. İki. Üç.','Paylaşımların %80 kadarı yanıt. İki. Üç.']) {
+ for(const bad of ['Tek cümle.','Bir. İki.',ANALYSIS+' Beş. Altı. Yedi.','x'.repeat(1101)+'. İki. Üç.','Hesap 25 paylaşımda analitik. İki. Üç.','Hesap analitik. Detay için https://x.com bakın. Üç.','Hesap <b>analitik</b>. İki. Üç.','Paylaşımların %80 kadarı yanıt. İki. Üç.']) {
   const r=raw();r.character_analysis=bad;assert.throws(()=>e.normalizeAnalysis(r,posts()),/ai_bad_analysis/,bad);
  }
  assert.equal(e.sentenceCount(ANALYSIS),4);
+ // 3 and 6 sentences are both valid; CJK and Arabic punctuation count as sentence ends.
+ for(const ok of [ANALYSIS.split('. ').slice(0,3).join('. ')+'.',ANALYSIS+' Beş. Altı.','このアカウントは質問から始める。返信は短い。自分の言葉で話す。','يفتح الحساب أفكاره بالأسئلة؟ ردوده قصيرة. يشارك بكلماته.']){const r=raw();r.character_analysis=ok;assert.ok(e.normalizeAnalysis(r,posts()).character_analysis,ok);}
 });
 
 test('analyzeSerious performs one strict provider call and returns the normalized record',async()=>{

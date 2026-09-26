@@ -134,24 +134,50 @@ function realModeComment(res, lang) {
 }
 
 // The in-app REAL card is the compact 4:5 share-card layout (header with @handle and the round icon,
-// title, short description, 4-6 bars, XORA analysis box, dark footer), built from the same model as
-// the 1080 x 1350 PNG. The analysis box shows as many whole sentences as fit; when sentences are
-// left out, the complete analysis follows directly under the card.
-var REAL_CARD_ANALYSIS_BUDGET = { latin: 230, cjk: 105 };
+// nickname, tagline, 4-6 bars, XORA analysis box, dark footer), built from the same model as the
+// 1080 x 1350 PNG. The full 3-6 sentence analysis always sits inside the card: its type size steps
+// down with the text length (CJK characters count double), then fitRealCards measures the rendered
+// card and steps it down further if needed, so the card never grows or clips.
+var REAL_CARD_ANALYSIS_SIZES = [[380, 3.3], [520, 3.1], [660, 2.9], [800, 2.7], [950, 2.5], [Infinity, 2.3]];
 
-function realCardAnalysis(text) {
-  var sentences = shareSentences(text);
-  var cjk = CJK_TEXT.test(text || "");
-  var joiner = cjk ? "" : " ", budget = cjk ? REAL_CARD_ANALYSIS_BUDGET.cjk : REAL_CARD_ANALYSIS_BUDGET.latin;
-  var k = 1;
-  while (k < sentences.length && sentences.slice(0, k + 1).join(joiner).length <= budget) k++;
-  return { text: sentences.slice(0, k).join(joiner), full: sentences.join(joiner), truncated: k < sentences.length };
+function realCardAnalysisSize(text) {
+  var units = Array.from(String(text || "")).reduce(function (n, ch) { return n + (CJK_TEXT.test(ch) ? 2 : 1); }, 0);
+  for (var i = 0; i < REAL_CARD_ANALYSIS_SIZES.length; i++) if (units <= REAL_CARD_ANALYSIS_SIZES[i][0]) return REAL_CARD_ANALYSIS_SIZES[i][1];
+  return REAL_CARD_ANALYSIS_SIZES[REAL_CARD_ANALYSIS_SIZES.length - 1][1];
 }
+
+// After a REAL card is on screen, the analysis size steps down (never below 1.9cqw) until the full
+// text fits its box. Cards scale with their width, so this runs when cards appear and on resize.
+function fitRealCardAnalysis(card) {
+  var box = card && card.querySelector && card.querySelector(".rc-analysis");
+  if (!box || !box.clientHeight) return;
+  var size = parseFloat(box.getAttribute("data-fs")) || 2.6, guard = 0;
+  box.style.setProperty("--rc-fs", size + "cqw");
+  while (box.scrollHeight > box.clientHeight + 1 && size > 1.9 && guard++ < 40) {
+    size = Math.round((size - 0.05) * 100) / 100;
+    box.style.setProperty("--rc-fs", size + "cqw");
+  }
+}
+function fitRealCards(root) {
+  if (!root || !root.querySelectorAll) return;
+  Array.prototype.forEach.call(root.querySelectorAll(".realcard"), fitRealCardAnalysis);
+}
+(function watchRealCards() {
+  if (typeof document === "undefined" || typeof MutationObserver === "undefined" || !document.documentElement) return;
+  var queued = false;
+  function refit() { queued = false; fitRealCards(document); }
+  function schedule() { if (!queued) { queued = true; (window.requestAnimationFrame || setTimeout)(refit); } }
+  new MutationObserver(function (records) {
+    for (var i = 0; i < records.length; i++) if (records[i].addedNodes.length) { schedule(); return; }
+  }).observe(document.documentElement, { childList: true, subtree: true });
+  window.addEventListener("resize", schedule);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+})();
 
 function buildRealIdentityCard(res) {
   var m = shareCardModel(res);
   var color = m.accent || "#1E2330";
-  var analysis = realCardAnalysis(m.analysis);
+  var analysis = String(m.analysis || "").trim();
   var rows = m.bars.map(function (row) {
     return '<div class="score-chip" data-metric="' + esc(row.key) + '">' +
       '<span class="score-name">' + esc(row.label) + "</span>" +
@@ -171,11 +197,10 @@ function buildRealIdentityCard(res) {
           (m.description ? '<p class="idcard-desc">' + esc(m.description) + "</p>" : "") +
         "</div>" +
         (rows ? '<div class="real-metrics" data-source="ai_metrics"><div class="idcard-scores">' + rows + "</div></div>" : "") +
-        (analysis.text ? '<div class="idcard-quote rc-analysis"><span class="quote-label">' + esc(m.boxLabel) + "</span><p>" + esc(analysis.text) + "</p></div>" : "") +
+        (analysis ? '<div class="idcard-quote rc-analysis" data-fs="' + realCardAnalysisSize(analysis) + '" style="--rc-fs:' + realCardAnalysisSize(analysis) + 'cqw"><span class="quote-label">' + esc(m.boxLabel) + "</span><p>" + esc(analysis) + "</p></div>" : "") +
       "</div>" +
       '<div class="idcard-foot"><span>XORA</span><span class="barcode">' + fakeBarcode(m.hash) + '</span><span class="idcard-host">' + XORA_PUBLIC_HOST + '</span></div>' +
-    "</div>" +
-    (analysis.truncated ? '<div class="real-analysis-full" data-source="character_analysis"><span class="quote-label">' + esc(m.boxLabel) + "</span><p>" + esc(analysis.full) + "</p></div>" : "")
+    "</div>"
   );
 }
 
@@ -604,6 +629,8 @@ var SHARE_CARD = { x: 70, y: 60, w: 940, h: 1230 };
 var SHARE_HEADER_H = 300;
 var SHARE_FOOT_H = 88;
 var SHARE_BAR_PITCH = 50;
+// REAL Mirror/Stalk use a tighter header, icon, bars and footer so the full analysis fits; Match keeps the original geometry.
+var SHARE_REAL = { headerH: 236, footH: 74, iconR: 80, handleY: 126, barPitch: 40, barText: 24, barH: 20, minGap: 10 };
 var SHARE_INK = "#1E2330", SHARE_MUT = "#5C6270", SHARE_CREAM = "#FFF1E3";
 var SHARE_FONT = "Nunito, Arial, sans-serif";
 var SHARE_EMOJI_FONT = "'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif";
@@ -773,6 +800,24 @@ function shareFitInsight(ctx, text, maxW, budget) {
   return { lines: cut, size: small, font: smallFont, sentences: 1, total: sentences.length, truncated: true };
 }
 
+// REAL cards show the complete analysis: the size steps down until every line fits the box budget,
+// nothing is dropped or cut. Only text that cannot fit even at the smallest size falls back to
+// whole-sentence fitting.
+var SHARE_FULL_INSIGHT_SIZES = [27, 26, 25, 24, 23, 22, 21, 20, 19, 18];
+function shareFitFullInsight(ctx, text, maxW, budget) {
+  var sentences = shareSentences(text);
+  if (!sentences.length) return null;
+  var full = sentences.join(CJK_TEXT.test(text) ? "" : " ");
+  for (var s = 0; s < SHARE_FULL_INSIGHT_SIZES.length; s++) {
+    var size = SHARE_FULL_INSIGHT_SIZES[s], font = shareFont(600, size);
+    var lines = shareWrap(ctx, font, full, maxW);
+    if (lines.join("").indexOf("…") < 0 && shareInsightBoxH(lines.length, size) <= budget) {
+      return { lines: lines, size: size, font: font, sentences: sentences.length, total: sentences.length };
+    }
+  }
+  return shareFitInsight(ctx, text, maxW, budget);
+}
+
 /* ---------- yerleşim ---------- */
 
 // The Sessiz Gözlemci card: header (XORA REAL, mode, rarity, @handle), a round archetype icon over
@@ -782,10 +827,12 @@ function shareFitInsight(ctx, text, maxW, budget) {
 function shareCardLayout(model, ctx) {
   var card = SHARE_CARD;
   var cx = card.x + card.w / 2;
-  var headerBottom = card.y + SHARE_HEADER_H;
-  var footTop = card.y + card.h - SHARE_FOOT_H;
+  var compact = model.kind !== "match";
+  var headerH = compact ? SHARE_REAL.headerH : SHARE_HEADER_H, footH = compact ? SHARE_REAL.footH : SHARE_FOOT_H;
+  var headerBottom = card.y + headerH;
+  var footTop = card.y + card.h - footH;
   var texts = [];
-  var L = { model: model, size: { w: SHARE_W, h: SHARE_H }, card: card, headerBottom: headerBottom, footTop: footTop, texts: texts, zones: {} };
+  var L = { model: model, size: { w: SHARE_W, h: SHARE_H }, card: card, headerH: headerH, footH: footH, headerBottom: headerBottom, footTop: footTop, texts: texts, zones: {} };
   function text(zone, str, font, x, y, align, box, color, dir) {
     texts.push({ zone: zone, text: str, font: font, x: x, y: y, align: align, box: box, color: color || SHARE_INK, dir: dir || "ltr" });
   }
@@ -810,34 +857,37 @@ function shareCardLayout(model, ctx) {
 
   // 3. @handle (Match: both handles), white in the header like the old card.
   var handle = shareFitLine(ctx, 800, 36, 22, model.handleLine, card.w - 120);
-  var handleY = card.y + 148;
+  var handleY = card.y + (compact ? SHARE_REAL.handleY : 148);
   texts.push({ zone: "header", text: handle.text, font: handle.font, x: cx, y: handleY, align: "center", box: { x: card.x + 60, y: handleY - 38, w: card.w - 120, h: 46 }, color: "#FFFFFF", dir: "ltr", handle: true });
 
   // 2. Archetype icon over the header edge (Match: one per account, joined by ×).
-  var r = isMatch ? 92 : 108;
+  var r = isMatch ? 92 : SHARE_REAL.iconR;
   L.icons = isMatch
     ? [{ x: cx - 110, y: headerBottom, r: r, emoji: model.icons[0] }, { x: cx + 110, y: headerBottom, r: r, emoji: model.icons[1] }]
     : [{ x: cx, y: headerBottom, r: r, emoji: model.icons[0] }];
   if (isMatch) L.matchChip = { x: cx, y: headerBottom, r: 36 };
 
   // Body blocks, then spread evenly between the icon and the footer.
-  var bodyTop = headerBottom + r + 18, bodyBottom = footTop - 20;
+  var bodyTop = headerBottom + r + (compact ? 10 : 18), bodyBottom = footTop - (compact ? 16 : 20);
+  var pitch = compact ? SHARE_REAL.barPitch : SHARE_BAR_PITCH, minGap = compact ? SHARE_REAL.minGap : 14;
   var innerW = card.w - 112;
   var score = isMatch ? shareFitLine(ctx, 900, 96, 64, model.title, innerW) : null;
-  var title = score ? { lines: [score.text], size: score.size } : shareFitLines(ctx, 900, 60, 44, model.title, innerW, 2);
+  var title = score ? { lines: [score.text], size: score.size } : shareFitLines(ctx, 900, compact ? 54 : 60, compact ? 40 : 44, model.title, innerW, compact ? 1 : 2);
   var titleLH = Math.round(title.size * 1.05);
   var titleH = title.size + (title.lines.length - 1) * titleLH;
-  var desc = model.description ? shareFitLines(ctx, 600, 28, 25, model.description, innerW - 40, 2) : null;
+  var desc = model.description ? shareFitLines(ctx, 600, compact ? 25 : 28, compact ? 21 : 25, model.description, innerW - 40, compact ? 1 : 2) : null;
   var descLH = desc ? Math.round(desc.size * 1.35) : 0;
-  var descH = desc ? 12 + desc.size + (desc.lines.length - 1) * descLH : 0;
+  var descGap = compact ? 8 : 12;
+  var descH = desc ? descGap + desc.size + (desc.lines.length - 1) * descLH : 0;
   var bars = (model.bars || []).slice(0, 6);
-  var barsH = bars.length ? bars.length * SHARE_BAR_PITCH - 14 : 0;
+  var barsH = bars.length ? bars.length * pitch - (compact ? 12 : 14) : 0;
   var boxW = card.w - 112;
   var fixedH = titleH + descH + barsH;
-  var insight = shareFitInsight(ctx, model.analysis, boxW - 68, bodyBottom - bodyTop - fixedH - 4 * 14);
+  var budget = bodyBottom - bodyTop - fixedH - 4 * minGap;
+  var insight = compact ? shareFitFullInsight(ctx, model.analysis, boxW - 68, budget) : shareFitInsight(ctx, model.analysis, boxW - 68, budget);
   var boxH = insight ? shareInsightBoxH(insight.lines.length, insight.size) : 0;
   var groups = [titleH + descH, barsH, boxH].filter(function (h) { return h > 0; });
-  var gap = Math.max(14, (bodyBottom - bodyTop - groups.reduce(function (a, b) { return a + b; }, 0)) / (groups.length + 1));
+  var gap = Math.max(minGap, (bodyBottom - bodyTop - groups.reduce(function (a, b) { return a + b; }, 0)) / (groups.length + 1));
 
   // 4-5. Archetype (Match: the score) and the short description.
   var y = bodyTop + gap;
@@ -848,7 +898,7 @@ function shareCardLayout(model, ctx) {
   });
   y += titleH;
   if (desc) {
-    y += 12;
+    y += descGap;
     desc.lines.forEach(function (line, i) {
       var dy = y + Math.round(desc.size * 0.86) + i * descLH;
       text("title", line, desc.font, cx, dy, "center", { x: card.x + 76, y: dy - desc.size, w: innerW - 40, h: descLH }, SHARE_MUT, dir);
@@ -864,11 +914,12 @@ function shareCardLayout(model, ctx) {
     var barX = model.rtl ? left + valueW + colGap : left + labelW + colGap;
     var barW = right - left - labelW - valueW - 2 * colGap;
     L.bars = bars.map(function (b, i) {
-      var rowY = y + i * SHARE_BAR_PITCH, base = rowY + 26;
-      var lab = shareFitLine(ctx, 700, 27, 18, b.label, labelW);
-      text("bars", lab.text, lab.font, model.rtl ? right : left, base, model.rtl ? "right" : "left", { x: model.rtl ? right - labelW : left, y: rowY, w: labelW, h: 36 }, SHARE_MUT, dir);
-      texts.push({ zone: "bars", text: String(b.value), font: shareFont(900, 27), x: model.rtl ? left : right, y: base, align: model.rtl ? "left" : "right", box: { x: model.rtl ? left : right - valueW, y: rowY, w: valueW, h: 36 }, color: SHARE_INK, dir: "ltr" });
-      return { x: barX, y: rowY + 6, w: barW, h: 24, fill: b.value, rtl: model.rtl, bar: b };
+      var barText = compact ? SHARE_REAL.barText : 27, barH = compact ? SHARE_REAL.barH : 24;
+      var rowY = y + i * pitch, base = rowY + (compact ? 22 : 26);
+      var lab = shareFitLine(ctx, 700, barText, 18, b.label, labelW);
+      text("bars", lab.text, lab.font, model.rtl ? right : left, base, model.rtl ? "right" : "left", { x: model.rtl ? right - labelW : left, y: rowY, w: labelW, h: pitch - 14 }, SHARE_MUT, dir);
+      texts.push({ zone: "bars", text: String(b.value), font: shareFont(900, barText), x: model.rtl ? left : right, y: base, align: model.rtl ? "left" : "right", box: { x: model.rtl ? left : right - valueW, y: rowY, w: valueW, h: pitch - 14 }, color: SHARE_INK, dir: "ltr" });
+      return { x: barX, y: rowY + 6, w: barW, h: barH, fill: b.value, rtl: model.rtl, bar: b };
     });
     L.zones.bars = { top: y, bottom: y + barsH };
     y += barsH;
@@ -895,9 +946,9 @@ function shareCardLayout(model, ctx) {
   }
 
   // 8. Dark footer: XORA, barcode, host.
-  var footY = footTop + 56;
-  text("footer", "XORA", shareFont(900, 32), card.x + 40, footY, "left", { x: card.x + 40, y: footTop + 20, w: 130, h: 44 }, "#FFF6E9");
-  text("footer", XORA_PUBLIC_HOST, shareFont(800, 23), card.x + card.w - 40, footY, "right", { x: card.x + card.w - 40 - 300, y: footTop + 24, w: 300, h: 38 }, "#FFF6E9");
+  var footY = footTop + (compact ? 48 : 56);
+  text("footer", "XORA", shareFont(900, 32), card.x + 40, footY, "left", { x: card.x + 40, y: footY - 36, w: 130, h: 44 }, "#FFF6E9");
+  text("footer", XORA_PUBLIC_HOST, shareFont(800, 23), card.x + card.w - 40, footY, "right", { x: card.x + card.w - 40 - 300, y: footY - 32, w: 300, h: 38 }, "#FFF6E9");
   L.barcode = { text: fakeBarcode(model.hash), font: "19px monospace", x: cx + 6, y: footY - 2 };
   return L;
 }
@@ -922,18 +973,18 @@ function paintShareCard(ctx, L) {
   roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.clip();
   if (m.bandColors.length > 1) {
     var mid = card.x + card.w / 2;
-    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w / 2, SHARE_HEADER_H);
-    ctx.fillStyle = m.bandColors[1]; ctx.fillRect(mid, card.y, card.w / 2, SHARE_HEADER_H);
+    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w / 2, L.headerH);
+    ctx.fillStyle = m.bandColors[1]; ctx.fillRect(mid, card.y, card.w / 2, L.headerH);
     ctx.fillStyle = SHARE_INK;
     ctx.beginPath(); ctx.moveTo(mid + 30, card.y); ctx.lineTo(mid + 36, card.y); ctx.lineTo(mid - 30, L.headerBottom); ctx.lineTo(mid - 36, L.headerBottom); ctx.closePath(); ctx.fill();
   } else {
-    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w, SHARE_HEADER_H);
+    ctx.fillStyle = m.bandColors[0]; ctx.fillRect(card.x, card.y, card.w, L.headerH);
     ctx.fillStyle = "rgba(255,255,255,0.18)";
     ctx.beginPath(); ctx.arc(card.x + 115, card.y + 55, 125, 0, 7); ctx.fill();
-    ctx.beginPath(); ctx.arc(card.x + card.w - 60, card.y + 250, 120, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(card.x + card.w - 60, card.y + L.headerH - 50, 120, 0, 7); ctx.fill();
   }
   ctx.fillStyle = SHARE_INK; ctx.fillRect(card.x, L.headerBottom - 2, card.w, 4);
-  ctx.fillRect(card.x, L.footTop, card.w, SHARE_FOOT_H);
+  ctx.fillRect(card.x, L.footTop, card.w, L.footH);
   ctx.restore();
   ctx.lineWidth = 4; ctx.strokeStyle = SHARE_INK; roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.stroke();
 

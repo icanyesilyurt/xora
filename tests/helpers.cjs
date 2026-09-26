@@ -64,9 +64,18 @@ const isSeriousRequest=body=>body?.text?.format?.name==='xora_real_analysis'||St
 // The serious prompt names the output language; map it back to the locale for fixtures.
 function seriousLocale(body,e){
  const system=String(body.instructions||body.system||'');
- const m=system.match(/Write 3-5 complete sentences in (.*?), in the third person/s);
+ const m=system.match(/Write 3-6 complete, meaningful sentences in (.*?), in the third person/s);
+ return Object.keys(e.REAL_LOCALES).find(l=>m&&e.REAL_LOCALES[l].language===m[1])||'en';
+}
+// Nickname-call fixtures: exactly two words per locale, with the locale's tagline.
+const NICK_COPY={tr:'Soru Ustası',en:'Question Master',es:'Maestro Preguntón',pt:'Mestre Curioso',ar:'سيد الأسئلة',fr:'Maître Curieux',de:'Neugieriger Frager',it:'Maestro Curioso',ja:'質問の 達人',ko:'질문 달인',zh:'提問 達人',ru:'Главный почемучка'};
+const nicknameAI=(locale='en')=>({nickname:NICK_COPY[locale],tagline:AI_COPY[locale].tagline,emoji:'🦉'});
+const isNicknameRequest=body=>body?.text?.format?.name==='xora_real_nickname'||String(body?.system||'').includes("XORA's nickname writer");
+function nicknameLocale(body,e){
+ const system=String(body.instructions||body.system||'');
+ const m=system.match(/naturally give this character, in (.*?)\. It must be EXACTLY TWO WORDS/s);
  return Object.keys(e.REAL_LOCALES).find(l=>m&&e.REAL_LOCALES[l].language===m[1])||'en';
 }
 const profileAI=(locale='en')=>{const c=AI_COPY[locale];return {nickname_candidates:[{text:c.nickname,evidence:'question_ratio'}],metrics:['ironi','mizah','kaos','ozgunluk'].map(key=>({key,label:c.label,value:70})),tagline:c.tagline,summary:c.summary,comment:c.comment,observations:[c.observation],emoji:'🪞'};};
 const matchAI=(locale='en')=>({overall:73,metrics:['flirt','vibe','humor','chaos','romance','chemistry'].map(key=>({key,value:70})),comment:AI_COPY[locale].match});
-module.exports={edge,edgeSource,seriousAI,isSeriousRequest,seriousLocale,ANALYSIS_COPY,browser,profileAI,matchAI,AI_COPY};
+module.exports={edge,edgeSource,NICK_COPY,nicknameAI,isNicknameRequest,nicknameLocale,seriousAI,isSeriousRequest,seriousLocale,ANALYSIS_COPY,browser,profileAI,matchAI,AI_COPY};

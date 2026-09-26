@@ -1,5 +1,5 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');
-const {edge,profileAI,matchAI,AI_COPY,seriousAI,isSeriousRequest,seriousLocale}=require('./helpers.cjs');
+const {edge,profileAI,matchAI,AI_COPY,seriousAI,isSeriousRequest,seriousLocale,nicknameAI,isNicknameRequest,nicknameLocale,NICK_COPY,ANALYSIS_COPY}=require('./helpers.cjs');
 test('strict request validation before billing',()=>{
  const e=edge();const base={mode:'mirror',locale:'tr',handle:'@Alice',request_id:'request-123'};
  assert.equal(e.validateRequest(base).handles[0],'alice');
@@ -14,66 +14,63 @@ test('X upstream diagnostics are phase-specific and sanitized',()=>{
  const plain=e.xErrorDiagnostic('tweets_fetch',503,'Authorization: Bearer abcdefghijklmnopqrstuvwxyz\ninternal failure');
  assert.equal(plain.phase,'tweets_fetch');assert.equal(plain.status,503);assert.ok(plain.detail.length<=160);assert.doesNotMatch(plain.detail,/Bearer\s+abcdefghijklmnopqrstuvwxyz/);assert.doesNotMatch(plain.detail,/Authorization/i);
 });
-test('REAL shape, rarity, nickname evidence and safe deterministic fallback',()=>{
- const e=edge();const sig={question_ratio:.8,own_posts:8};const raw=profileAI('tr');
- const result=e.normalizeAIProfile(raw,'alice','mirror',sig,'tr');
- assert.equal(result.meta.tier,'real');assert.ok(['common','rare','epic','legendary'].includes(result.rarity.name));
- assert.equal(result.meta.alias_source,'ai_generated_validated');assert.equal(result.nickname.tr,'Meraklı Biri');
- for(const v of ['Cosmic Potato Wizard','Kozmik Salatalık','Bipolar Genius','a','<img src=x>','Meraklı Biri https://x.test','One Two Three Four Five']) assert.equal(e.aliasValid(v,'en'),false,v);
- for(const [v,lang] of [['Meraklı Biri','tr'],['Sessiz Gözlemci','tr'],['Thoughtful Conversationalist','en'],['Inquisitive Mind','en']]) assert.equal(e.aliasValid(v,lang),true,v);
- raw.nickname_candidates[0].evidence='invented';assert.equal(e.pickAlias(raw,sig,'tr').source,'fallback');
- raw.nickname_candidates[0].evidence='question_ratio';assert.equal(e.pickAlias(raw,{own_posts:8,question_ratio:0},'tr').source,'fallback');
- const novel={nickname_candidates:[{text:'Meraklı Muhabbetçi',evidence:'question_ratio'}]};assert.equal(e.pickAlias(novel,{own_posts:8,question_ratio:.8},'tr').source,'ai_generated_validated');
-});
-test('REAL AI output is generated for the request locale only (tr, en, es, pt, ar, fr, de, it, ja)',()=>{
- const e=edge();const sig={question_ratio:.8,own_posts:8};
- const otherKeys=/(?:_tr|_en|_es)$/;
- for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']){
-  const copy=AI_COPY[locale];
-  // The model output carries no per-locale field names and no other language.
-  const raw=profileAI(locale);
-  assert.equal(Object.keys(raw).some(k=>otherKeys.test(k)),false);
-  const result=e.normalizeAIProfile(raw,'alice','mirror',sig,locale);
-  assert.equal(result.meta.locale,locale);
-  for(const field of [result.nickname,result.tagline,result.profile_summary,result.comment.mirror,result.comment.stalk,result.card.nickname,result.card.desc,result.archetype.comments,...result.top_behaviors.map(m=>m.label)]) assert.deepEqual(Object.keys(field),[locale]);
-  assert.equal(result.nickname[locale],copy.nickname);
-  assert.equal(result.tagline[locale],copy.tagline);
-  assert.equal(result.profile_summary[locale],copy.summary);
-  assert.equal(result.comment.mirror[locale],copy.comment);
-  assert.equal(result.archetype.comments[locale][0],copy.comment);
-  for(const metric of result.top_behaviors) assert.equal(metric.label[locale],copy.label);
-  // Locale-independent parts are unchanged by locale.
-  assert.equal(JSON.stringify(result.rarity),JSON.stringify(e.normalizeAIProfile(profileAI('en'),'alice','mirror',sig,'en').rarity));
-  const match=e.normalizeMatchAI(matchAI(locale),'a','b',{},{},locale);
-  assert.equal(match.meta.locale,locale);assert.deepEqual(Object.keys(match.ai_comment),[locale]);assert.equal(match.ai_comment[locale],copy.match);
-  // A missing or unsafe field in the request locale is rejected, never filled from another language.
-  for(const mutation of [r=>delete r.comment,r=>r.comment='',r=>r.tagline='Se analizaron 25 publicaciones.',r=>r.summary='Foram analisadas 25 publicações.',r=>r.comment='تم تحليل 25 منشورًا.',r=>r.tagline='حللنا ٢٥ تغريدة.',r=>r.summary='Après 25 publications, ce compte pose beaucoup de questions.',r=>r.comment='Publications analysées : 25 au total.',r=>r.tagline='25 Beiträge ausgewertet.',r=>r.summary='Nach 25 analysierten Beiträgen wirkt das Konto neugierig.',r=>r.tagline='Dopo 25 pubblicazioni sembra un account curioso.',r=>r.comment='Analizzati tutti i post recenti, emerge molta curiosità.',r=>r.tagline='25件の投稿を分析しました。',r=>r.summary='投稿を分析したところ、好奇心が強いようです。',r=>delete r.summary,r=>delete r.metrics[0].label]){
-   const bad=profileAI(locale);mutation(bad);assert.throws(()=>e.normalizeAIProfile(bad,'alice','mirror',sig,locale),/ai_bad/);
-  }
-  const badMatch=matchAI(locale);delete badMatch.comment;assert.throws(()=>e.normalizeMatchAI(badMatch,'a','b',{},{},locale),/ai_bad_copy/);
-  // Fallback nickname is native to the request locale only.
-  const fallback=e.pickAlias({nickname_candidates:[]},{question_ratio:.8},locale);
-  assert.equal(fallback.source,'fallback');assert.equal(fallback.text,copy.nickname);assert.equal(e.aliasValid(fallback.text,locale),true);
- }
-});
-test('REAL schema asks for one set of user-facing strings, independent of locale count',()=>{
+// A serious-analysis result as analyzeSerious returns it, for the nickname and result builders.
+const seriousFor=(locale='tr')=>{const e=edge();const posts=Array.from({length:8},(_,i)=>({text:'Soru?',type:'original',metrics:{likes:i,replies:0,reposts:0}}));return {...e.normalizeAnalysis(seriousAI(locale),posts,{username:'alice'}),locale,ts:'2026-09-26T00:00:00Z'};};
+test('nickname rule: exactly two words, letters only',()=>{
  const e=edge();
- for(const isMatch of [false,true]){
-  const schema=JSON.parse(JSON.stringify(e.aiResultSchema(isMatch)));
-  const names=[];(function walk(node){if(node&&typeof node==='object'){for(const [k,v] of Object.entries(node)){if(k==='properties')names.push(...Object.keys(v));walk(v);}}})(schema);
-  assert.equal(names.some(n=>/^(?:tr|en|es|pt|it|fr|de|ru|ja|ko|zh|ar)$|_(?:tr|en|es)$/.test(n)),false,'no per-locale fields in schema');
-  assert.ok(names.includes('comment'));
-  if(!isMatch){for(const n of ['tagline','summary','label','text','nickname_candidates'])assert.ok(names.includes(n),n);}
- }
- assert.deepEqual([...e.PLANNED_LOCALES],['tr','en','es','pt','it','fr','de','ru','ja','ko','zh','ar']);
- assert.deepEqual(Object.keys(e.REAL_LOCALES),['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']);
+ for(const ok of ['Sessiz Gözlemci','Kaos Elçisi','Gece Kuşu','  Tatlı   Bela ','Laf-Cambazı Usta','質問の 達人','سيد الأسئلة','Главный почемучка']) assert.ok(e.nicknameValid(ok),ok);
+ assert.equal(e.nicknameValid('  Tatlı   Bela '),'Tatlı Bela');
+ for(const bad of ['Gözlemci','Sessiz Gece Kuşu','Transfer Dönemi Yorumcusu','Gece Kuşu!','Gece 2Kuşu','Gece Kuşu 🦉','#Gece Kuşu','質問好き','',null,42,'a'.repeat(30)+' '+'b'.repeat(20)]) assert.equal(e.nicknameValid(bad),null,String(bad));
+ // Every fallback is two words, in every locale.
+ for(const [category,v] of Object.entries(e.NICKNAME_FALLBACKS)) for(const [locale,name] of Object.entries(v.names)) assert.ok(e.nicknameValid(name),category+' '+locale+' '+name);
 });
-test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=>{
+test('nickname input is the character profile only: never raw posts',()=>{
+ const e=edge();const serious=seriousFor('tr');
+ const input=JSON.parse(JSON.stringify(e.nicknameInput(serious,'alice')));
+ assert.deepEqual(Object.keys(input),['handle','traits','character_analysis','persistent_interests']);
+ assert.deepEqual(input.traits.map(t=>Object.keys(t)),input.traits.map(()=>['id','label','score']));
+ assert.equal(input.character_analysis,ANALYSIS_COPY.tr);
+ assert.doesNotMatch(JSON.stringify(input),/Soru\?|post_refs|evidence|"posts"/);
+ const system=e.nicknameSystemPrompt('Turkish');
+ assert.match(system,/EXACTLY TWO WORDS/);assert.match(system,/never see the account's posts/);assert.match(system,/never build the name from a recent topic/);
+});
+test('nickname generation: one retry on a non two-word name, then a trait-based fallback',async()=>{
+ const run=async(replies)=>{const bodies=[];let i=0;
+  const e=edge({console:{warn(){}},fetch:async(_u,o)=>{bodies.push(JSON.parse(o.body));const r=replies[Math.min(i++,replies.length-1)];if(r instanceof Error)throw r;return Response.json({content:[{type:'text',text:JSON.stringify(r)}]});}});
+  return {nick:await e.generateNickname(seriousFor('tr'),'alice','tr'),bodies};};
+ let r=await run([{nickname:'Soru Ustası',tagline:'Her konuya bir soruyla girer.',emoji:'🦉'}]);
+ assert.deepEqual({...r.nick},{text:'Soru Ustası',tagline:'Her konuya bir soruyla girer.',icon:'🦉',source:'ai',attempts:1});assert.equal(r.bodies.length,1);
+ r=await run([{nickname:'Soru',tagline:'x',emoji:'🦉'},{nickname:'Meraklı Kedi',tagline:'Sorar durur.',emoji:'🐈'}]);
+ assert.equal(r.nick.text,'Meraklı Kedi');assert.equal(r.nick.attempts,2);assert.equal(r.bodies.length,2);
+ assert.equal(r.bodies[0].messages[0].content,r.bodies[1].messages[0].content,'the retry uses the same character profile');
+ r=await run([{nickname:'Gece Yarısı Soru Makinesi',tagline:'x',emoji:'🦉'},{nickname:'Sorucu',tagline:'x',emoji:'🦉'}]);
+ // Strongest character trait is questioning (communication) -> its fallback.
+ assert.deepEqual({...r.nick},{text:'Laf Cambazı',tagline:'',icon:'🎤',source:'fallback',attempts:2});assert.equal(r.bodies.length,2);
+ r=await run([new Error('network'),new Error('network')]);assert.equal(r.nick.source,'fallback');assert.equal(r.nick.text,'Laf Cambazı');
+ // Unsafe emoji and sample-count taglines are dropped, not fatal.
+ r=await run([{nickname:'Soru Ustası',tagline:'25 paylaşım incelendi.',emoji:'🇹🇷'}]);
+ assert.equal(r.nick.source,'ai');assert.equal(r.nick.tagline,'');assert.equal(r.nick.icon,'🎤');
+});
+test('REAL result: ontology bars, serious analysis as the main text, locale-only copy',()=>{
  const e=edge();
- for(const mutation of [r=>r.metrics[0].key='unknown',r=>r.metrics[0].value=101,r=>r.metrics[0].value='70',r=>r.metrics[0].value=NaN,r=>r.metrics[1].key=r.metrics[0].key,r=>r.metrics=[],r=>r.comment='25 posts analyzed.',r=>r.tagline='20 paylaşım incelendi.',r=>r.summary={},r=>r.observations=[{text:'bad'}]]) {
-  const raw=profileAI('en');mutation(raw);assert.throws(()=>e.normalizeAIProfile(raw,'alice','stalk',{own_posts:8},'en'),/ai_bad/);
+ for(const locale of ['tr','en','ja']){
+  const serious=seriousFor(locale);
+  const r=e.buildRealResult('alice','mirror',{sample_size:8,question_ratio:1,own_posts:8},locale,serious,{text:NICK_COPY[locale],tagline:AI_COPY[locale].tagline,icon:'🦉',source:'ai',attempts:1});
+  assert.equal(r.meta.tier,'real');assert.equal(r.meta.analysis_version,'real_analysis_v1');assert.ok(['common','rare','epic','legendary'].includes(r.rarity.name));
+  assert.deepEqual(JSON.parse(JSON.stringify(r.top_behaviors)),[{key:'questioning',label:{tr:'Soru Odaklı Üslup'},value:82},{key:'curiosity',label:{tr:'Merak'},value:74},{key:'brevity',label:{tr:'Özlü Anlatım'},value:66},{key:'confidence',label:{tr:'Özgüven'},value:55}]);
+  for(const field of [r.nickname,r.tagline,r.comment.mirror,r.comment.stalk,r.card.nickname,r.card.desc,r.archetype.comments]) assert.deepEqual(Object.keys(field),[locale]);
+  assert.equal(r.nickname[locale],NICK_COPY[locale]);assert.equal(r.comment.mirror[locale],ANALYSIS_COPY[locale]);
+  assert.deepEqual([r.card.emoji,r.profile_emoji,r.archetype.emoji],['🦉','🦉','🦉']);
+  assert.equal(r.analysis.ontology_version,'real-1.0');assert.ok(r.analysis.selected_traits.every(t=>t.evidence&&t.post_refs.length));
  }
- const match=matchAI();match.metrics[0].key='unknown';assert.throws(()=>e.normalizeMatchAI(match,'a','b',{}, {},'en'),/ai_bad_metrics/);
+ const serious=seriousFor('en');serious.character_analysis='25 posts analyzed. Two. Three.';
+ assert.throws(()=>e.buildRealResult('alice','mirror',{},'en',serious,{text:'A B',tagline:'',icon:'🦉'}),/ai_bad_copy/);
+});
+test('malformed Match AI metrics/copy rejected, never renamed or silently clamped',()=>{
+ const e=edge();
+ for(const mutate of [m=>m.metrics[0].key='unknown',m=>m.metrics[0].value=101,m=>m.metrics[1].key=m.metrics[0].key,m=>m.comment='25 posts analyzed.',m=>delete m.comment,m=>m.overall=150]){
+  const match=matchAI();mutate(match);assert.throws(()=>e.normalizeMatchAI(match,'a','b',{},{},'en'),/ai_bad/);
+ }
 });
  function fixture({failure,refundFailures=0,begin='claimed'}={}) {
  const calls=[];let aiCalls=0;let refundAttempts=0;
@@ -81,6 +78,7 @@ test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=
  const e=edge({createClient:(_url,key)=>key==='test-anon'?{auth:{getUser:async()=>({data:{user:{id:'test-user'}}})}}:service,fetch:async(_url,options)=>{
  aiCalls++;if(failure==='ai')throw Error('ai_error');const body=JSON.parse(options.body);
  if(isSeriousRequest(body)) return Response.json({content:[{type:'text',text:JSON.stringify(seriousAI(seriousLocale(body,e)))}]});
+ if(isNicknameRequest(body)) return Response.json({content:[{type:'text',text:JSON.stringify(nicknameAI(nicknameLocale(body,e)))}]});
  const payload=JSON.parse(body.messages[0].content);
  assert.ok(payload.profile_a?.signals && payload.profile_b?.own_voice || payload.signals);
  let raw=payload.profile_a?matchAI(payload.locale):profileAI(payload.locale);if(failure==='validation')raw.metrics[0].key='oops';
@@ -89,7 +87,7 @@ test('malformed AI metrics/copy rejected, never renamed or silently clamped',()=
  return {e,calls,get aiCalls(){return aiCalls;}};
 }
 function request(mode='match'){return new Request('http://local.test',{method:'POST',body:JSON.stringify({mode,locale:'en',handle:'alice',handles:['alice','bob'],request_id:'request-123'})});}
-test('Match runs one AI call total; Mirror and Stalk run two (card copy + serious analysis)',async()=>{
+test('Match runs one AI call total; Mirror and Stalk run two (serious analysis, then nickname)',async()=>{
  for(const mode of ['match','mirror','stalk']){const f=fixture();const response=await f.e.main(request(mode));assert.equal(response.status,200);const data=await response.json();assert.equal(f.aiCalls,mode==='match'?1:2);assert.equal(data.result.meta.tier,'real');assert.ok(data.result.rarity);assert.equal(f.calls.filter(x=>x.name==='xora_complete_real').length,1);assert.equal(f.calls.filter(x=>x.name==='xora_fail_real').length,0);}
 });
 test('X, AI, validation and save failures settle refund; retry same refund on RPC errors',async()=>{
@@ -137,63 +135,40 @@ test('AI input separates own voice from reposts, strips repost authors and count
 });
 test('Mirror/Stalk/Match send the split input and the repost rule, and store the real sample counts',async()=>{
  for(const mode of ['mirror','stalk','match']){
-  const payloads=[],systems=[],seriousInputs=[];
+  const payloads=[],systems=[],seriousInputs=[],nicknameInputs=[];
   const service={from(){const q={select(){return q;},eq(){return q;},gt(){return q;},async maybeSingle(){return {data:{profile:{username:'alice'},posts:mixedPosts()}};}};return q;},
    async rpc(name,args){if(name==='xora_begin_real')return {data:{status:'claimed'}};if(name==='xora_claim_referral')return {data:null};if(name==='xora_complete_real')return {data:{result:args.p_result,balance:1}};throw Error(name);}};
   const e=edge({createClient:(_u,key)=>key==='test-anon'?{auth:{getUser:async()=>({data:{user:{id:'u'}}})}}:service,fetch:async(_url,options)=>{
    const body=JSON.parse(options.body);if(isSeriousRequest(body)){seriousInputs.push(JSON.parse(body.messages[0].content));return Response.json({content:[{type:'text',text:JSON.stringify(seriousAI('tr'))}]});}
+   if(isNicknameRequest(body)){nicknameInputs.push(JSON.parse(body.messages[0].content));return Response.json({content:[{type:'text',text:JSON.stringify(nicknameAI('tr'))}]});}
    systems.push(body.system);const payload=JSON.parse(body.messages[0].content);payloads.push(payload);
    return Response.json({content:[{type:'text',text:JSON.stringify(payload.profile_a?matchAI(payload.locale):profileAI(payload.locale))}]});}});
   const res=await e.main(new Request('http://local.test',{method:'POST',body:JSON.stringify({mode,locale:'tr',handle:'alice',handles:['alice','bob'],request_id:'split-test-'+mode})}));
   assert.equal(res.status,200,mode);const {result}=await res.json();
-  assert.ok(systems[0].includes(e.REPOST_RULE),mode+' system prompt carries the repost rule');
-  const sections=mode==='match'?[payloads[0].profile_a,payloads[0].profile_b]:[payloads[0]];
-  for(const s of sections){assert.equal(s.posts,undefined,'no mixed post list');assert.equal(s.own_voice.length,6);assert.equal(s.interest_sharing.length,10);assert.equal(s.sample.repost,19);}
-  assert.ok(payloads[0].rules.includes(e.REPOST_RULE),mode+' rules carry the repost rule');
-  assert.ok(payloads[0].rules.some(r=>/own_voice_evidence is "thin"/.test(r)),mode+' thin-evidence rule');
-  if(mode==='match'){for(const side of ['resA','resB'])assert.deepEqual({...result[side].sample},{analyzed:25,original:3,reply:2,quote:1,repost:19},side);}
-  else {
+  if(mode==='match'){
+   assert.ok(systems[0].includes(e.REPOST_RULE),'match system prompt carries the repost rule');
+   for(const s of [payloads[0].profile_a,payloads[0].profile_b]){assert.equal(s.posts,undefined,'no mixed post list');assert.equal(s.own_voice.length,6);assert.equal(s.interest_sharing.length,10);assert.equal(s.sample.repost,19);}
+   assert.ok(payloads[0].rules.includes(e.REPOST_RULE),'match rules carry the repost rule');
+   assert.ok(payloads[0].rules.some(r=>/own_voice_evidence is "thin"/.test(r)),'thin-evidence rule');
+   for(const side of ['resA','resB'])assert.deepEqual({...result[side].sample},{analyzed:25,original:3,reply:2,quote:1,repost:19},side);
+  } else {
+   assert.equal(payloads.length,0,'no raw-post nickname/card-copy call');
    assert.deepEqual({...result.meta.sample},{analyzed:25,original:3,reply:2,quote:1,repost:19});assert.equal(result.meta.sample_size,25);
-   assert.ok(payloads[0].rules.some(r=>/exactly 6 original nickname candidates/.test(r)));
-   // The serious analysis gets the same fetched posts as one indexed list, reposts marked and de-attributed.
+   // The serious analysis gets the fetched posts as one indexed list, reposts marked and de-attributed.
    assert.equal(seriousInputs.length,1);const sp=seriousInputs[0].posts;assert.equal(sp.length,25);
    assert.deepEqual(sp.slice(0,6).map(p=>p.type),['original','original','original','reply','reply','quote']);
-   assert.ok(sp.slice(6).every(p=>p.type==='repost'&&!/^RT @/.test(p.text)));assert.deepEqual([...payloads[0].nickname_style_examples],[...e.NICKNAME_STYLE_EXAMPLES.tr]);
+   assert.ok(sp.slice(6).every(p=>p.type==='repost'&&!/^RT @/.test(p.text)));
+   // The nickname sees the character profile only.
+   assert.equal(nicknameInputs.length,1);assert.deepEqual(Object.keys(nicknameInputs[0]),['handle','traits','character_analysis','persistent_interests']);
+   assert.doesNotMatch(JSON.stringify(nicknameInputs[0]),/Kendi cümlem|yanıtım|Başkasının|Alıntı yorumum/);
+   assert.equal(result.nickname.tr,'Soru Ustası');assert.equal(result.comment.mirror.tr,ANALYSIS_COPY.tr);
   }
  }
 });
-test('nicknames: the most distinctive valid candidate wins over generic labels',()=>{
- const e=edge({console:{warn(){}}});const sig={own_posts:8,repost_ratio:.8,question_ratio:.5};
- for(const name of ['Tribün Yankısı','Gündem Takipçisi','Sessiz Gözlemci','Sosyal Gözlemci','Dijital Gezgin','Meraklı Biri','Paylaşmayı Seven','Sohbeti Seven']) assert.equal(e.aliasGeneric(name,'tr'),true,name);
- for(const name of ['Kartal Gündemcisi','Tek Cümlelik Taraftar','Thread’li Kod Filozofu']) assert.equal(e.aliasGeneric(name,'tr'),false,name);
- const pick=list=>e.pickAlias({nickname_candidates:list.map(text=>({text,evidence:'repost_ratio'}))},sig,'tr');
- assert.equal(pick(['Tribün Yankısı','Gündem Takipçisi','Kartal Gündemcisi']).text,'Kartal Gündemcisi','generic labels are skipped while a distinctive one exists');
- assert.equal(pick(['Kartal Gündemcisi','Tek Cümlelik Taraftar']).text,'Kartal Gündemcisi','otherwise the AI order (most distinctive first) is kept');
- const onlyGeneric=pick(['Gündem Takipçisi']);assert.equal(onlyGeneric.text,'Gündem Takipçisi');assert.equal(onlyGeneric.source,'ai_generated_validated','a valid generic AI name still beats the fallback');
- // Style examples are topic + behaviour, pass each locale's own quality gate and are not generic.
- for(const [locale,examples] of Object.entries(e.NICKNAME_STYLE_EXAMPLES)) for(const x of examples){assert.equal(e.aliasValid(x,locale),true,locale+' '+x);assert.equal(e.aliasGeneric(x,locale),false,locale+' '+x);}
- for(const locale of Object.keys(e.NICKNAME_STYLE_EXAMPLES)) assert.ok(!e.NICKNAME_STYLE_EXAMPLES[locale].some(x=>['Sessiz Gözlemci','Meraklı Biri','Curious Mind','Quiet Observer','Mente Curiosa'].includes(x)),locale);
-});
-
-test('card icons: the chosen archetype brings its own validated emoji; unsafe or missing icons fall back deterministically',async()=>{
- const e=edge({console:{warn(){}}});const sig={own_posts:8,repost_ratio:.8,question_ratio:.5};
+test('card icons: unsafe icons are refused; Match icons fall back deterministically',async()=>{
+ const e=edge();
  for(const ok of ['🦅','🛋️','💥','📣','⚽']) assert.ok(e.iconValid(ok),ok);
  for(const bad of ['🇹🇷','👍🏽','👨‍💻','1️⃣','✝️','☪️','🔫','🖕','🍆','🏴','🦅🦅','ab','',null,42]) assert.equal(e.iconValid(bad),null,String(bad));
- const pick=list=>e.pickAlias({nickname_candidates:list},sig,'tr');
- assert.equal(pick([{text:'Kartal Gündemcisi',evidence:'repost_ratio',emoji:'🦅'}]).icon,'🦅','icon of the chosen name');
- assert.equal(pick([{text:'Gündem Takipçisi',evidence:'repost_ratio',emoji:'📰'},{text:'Kartal Gündemcisi',evidence:'repost_ratio',emoji:'🦅'}]).icon,'🦅','the icon follows the name that wins, not the first candidate');
- assert.equal(pick([{text:'Kartal Gündemcisi',evidence:'repost_ratio',emoji:'🇹🇷'}]).icon,'📣','unsafe icon falls back to its evidence');
- assert.equal(e.pickAlias({nickname_candidates:[{text:'Kartal Gündemcisi',evidence:'repost_ratio'}],emoji:'🦅'},sig,'tr').icon,'🦅','result emoji as second choice');
- const fb=e.pickAlias({nickname_candidates:[]},{question_ratio:.5},'tr');assert.equal(fb.source,'fallback');assert.equal(fb.icon,'❓','fallback name keeps a matching icon');
- assert.equal(e.pickAlias({nickname_candidates:[]},{},'tr').icon,'✨');
- // Saved results carry the icon in card.emoji, profile_emoji and archetype.emoji; never the old fixed 🪞/👀.
- for(const mode of ['mirror','stalk']){
-  const raw=profileAI('tr');raw.nickname_candidates=[{text:'Kartal Gündemcisi',evidence:'question_ratio',emoji:'🦅'}];
-  const r=e.normalizeAIProfile(raw,'alice',mode,{own_posts:8,question_ratio:.5},'tr');
-  assert.deepEqual([r.card.emoji,r.profile_emoji,r.archetype.emoji],['🦅','🦅','🦅'],mode);
- }
- const raw=profileAI('tr');raw.nickname_candidates=[];raw.emoji='👀';
- assert.equal(e.normalizeAIProfile(raw,'alice','stalk',{own_posts:8,question_ratio:.5},'tr').card.emoji,'❓','no candidate: evidence icon, not the AI result emoji');
  // Match: one icon per account from the AI, 👤 when missing or unsafe.
  const service={from(){const q={select(){return q;},eq(){return q;},gt(){return q;},async maybeSingle(){return {data:{profile:{username:'alice'},posts:Array.from({length:8},()=>({text:'Soru?',type:'original',metrics:{likes:0,replies:0,reposts:0}}))}};}};return q;}};
  for(const [a,b,want] of [['⚽','💻',['⚽','💻']],['🇹🇷',undefined,['👤','👤']]]){
