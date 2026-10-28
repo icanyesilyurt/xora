@@ -589,6 +589,8 @@ body::before{
 .pack-note{font-size:12px;font-weight:700;color:var(--mut);margin:-8px 0 12px}
 .pack-old{color:var(--mut);font-size:13px;font-weight:700;margin-inline-end:6px}
 .pack-now{font-size:20px}
+.pack-per{color:var(--mut);font-size:13px;font-weight:700;margin:2px 0 14px}
+.pack-save{color:#E0663A}
 .launch-offer{display:inline-block;margin:4px 0 16px;padding:6px 14px;border:2px solid var(--ink);border-radius:999px;background:var(--orange);color:#fff;font-size:13px;font-weight:900;letter-spacing:.04em;box-shadow:0 3px 0 var(--ink)}
 .launch-offer:empty{display:none}
 

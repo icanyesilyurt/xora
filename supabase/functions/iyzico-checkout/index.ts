@@ -18,9 +18,9 @@ type Purchase = { id: string; user_id: string; package_id: string; credits: numb
 
 const CATALOG: Record<PackageId, CatalogEntry> = {
   starter: { credits: 10, amount: 149, currency: "TRY" },
-  popular: { credits: 20, amount: 299, currency: "TRY" },
-  value: { credits: 50, amount: 749, currency: "TRY" },
-  professional: { credits: 300, amount: 4499, currency: "TRY" }
+  popular: { credits: 20, amount: 279, currency: "TRY" },
+  value: { credits: 50, amount: 599, currency: "TRY" },
+  professional: { credits: 300, amount: 2999, currency: "TRY" }
 };
 
 const IYZICO_SANDBOX_URL = "https://sandbox-api.iyzipay.com";
