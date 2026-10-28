@@ -124,6 +124,7 @@
 
     if (tier === "fun") {
       lastResult = markAnalysisTier(analyzeFunHandle(handle, "mirror", reroll), "fun", "mirror");
+      if (resultTier(lastResult) !== "real") trackSiteEvent("fun_card", "mirror");
       if (isLoggedIn()) saveAnalysisRecord("mirror", [handle], lastResult);
       setState("analyzing");
       playThinking(document.getElementById("thinkMsg"), "mirror", showResult);

@@ -26,6 +26,20 @@
 .ad-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .ad-acts .btn{font-size:12px;padding:7px 12px}
 .ad-msg{color:var(--mut);font-weight:700;margin-top:8px}
+.st-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 10px}
+.st-tabs button{padding:7px 14px;border:2.5px solid var(--ink);border-radius:999px;background:#fff;font:900 13px Nunito,sans-serif;color:var(--ink);cursor:pointer}
+.st-tabs button.on{background:var(--ink);color:#fff}
+.st-group{font-weight:900;font-size:12px;letter-spacing:.6px;color:var(--mut);margin:14px 0 6px;text-transform:uppercase}
+.st-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.st{border:2.5px solid var(--ink);border-radius:14px;padding:10px 12px;background:#fff}
+.st small{display:block;color:var(--mut);font-weight:800;font-size:12px}
+.st b{display:block;font-size:22px;font-weight:900;margin-top:2px;line-height:1.15}
+.st i{display:block;font-style:normal;color:var(--mut);font-weight:700;font-size:11.5px;margin-top:2px}
+.st.hl{background:#E6F7F6}
+.st-days{width:100%;border-collapse:collapse;margin-top:8px;font-size:13.5px}
+.st-days th{text-align:end;color:var(--mut);font-size:11.5px;font-weight:800;padding:5px 4px;border-bottom:2px solid var(--ink)}
+.st-days td{text-align:end;padding:6px 4px;border-bottom:1px solid rgba(0,0,0,.08);font-weight:800}
+.st-days th:first-child,.st-days td:first-child{text-align:start}
 </style>
 </head>
 <body>
@@ -37,7 +51,8 @@
 <main class="page">
   <span class="mode-emoji">🛠️</span>
   <h1>Yönetim</h1>
-  <p class="sub">Partnerler ve kazançları.</p>
+  <p class="sub">Genel durum, partnerler ve kazançları.</p>
+  <div id="adStats"></div>
   <div id="adBody"><p class="ad-msg">Yükleniyor…</p></div>
 </main>
 
@@ -77,6 +92,59 @@
     if (res.error) throw new Error(/not_admin/.test(res.error.message) ? "not_admin" : res.error.message);
     return res.data;
   }
+
+  // ---- Genel durum ----
+  var statsEl = document.getElementById("adStats"), statsDays = 30;
+  function num(n) { return new Intl.NumberFormat("tr-TR").format(Number(n || 0)); }
+  function pct(a, b) { return b > 0 ? "%" + Math.round(a / b * 1000) / 10 : "–"; }
+  function tile(label, value, note, hl) {
+    return '<div class="st' + (hl ? ' hl' : '') + '"><small>' + esc(label) + '</small><b>' + esc(value) + '</b>' + (note ? '<i>' + esc(note) + '</i>' : '') + '</div>';
+  }
+  function moneyList(obj) {
+    var keys = Object.keys(obj || {}).sort();
+    return keys.length ? keys.map(function (c) { return money(obj[c], c); }).join(" + ") : money(0, "TRY");
+  }
+  async function renderStats() {
+    var tabs = [[1, "Bugün"], [7, "7 gün"], [30, "30 gün"], [0, "Tümü"]];
+    var head = '<div class="panel"><p style="font-weight:900">Genel durum</p><div class="st-tabs">' +
+      tabs.map(function (t) { return '<button type="button" data-days="' + t[0] + '"' + (t[0] === statsDays ? ' class="on"' : '') + '>' + t[1] + '</button>'; }).join("") + '</div>';
+    statsEl.innerHTML = head + '<p class="ad-msg">Yükleniyor…</p></div>';
+    var s;
+    try { s = await call("xora_admin_stats", { p_days: statsDays }); }
+    catch (e) { statsEl.innerHTML = head + '<p class="ad-msg">Rakamlar alınamadı. (İstatistik güncellemesi veritabanına henüz eklenmemiş olabilir.)</p></div>'; return; }
+    var real = s.real_by_mode || {};
+    var html = head +
+      '<p class="st-group">Trafik</p><div class="st-grid">' +
+        tile("Ziyaretçi", num(s.visitors), num(s.page_views) + " sayfa görüntüleme") +
+        tile("Partner linkinden", num(s.ref_visitors), pct(s.ref_visitors, s.visitors) + " ziyaretçi") +
+        tile("Yeni üye", num(s.signups), "Toplam " + num(s.users_total) + " · dönüşüm " + pct(s.signups, s.visitors)) +
+      '</div><p class="st-group">Kartlar</p><div class="st-grid">' +
+        tile("Fun kart", num(s.fun_cards), "Ücretsiz") +
+        tile("Real analiz", num(s.real_cards), "Mirror " + num(real.mirror) + " · Stalk " + num(real.stalk) + " · Match " + num(real.match)) +
+        tile("Başarısız Real", num(s.real_failed), "Kredisi otomatik iade") +
+        tile("X'te paylaşılan", s.shared_cards == null ? "–" : num(s.shared_cards), "Kart görseli") +
+      '</div><p class="st-group">Satış</p><div class="st-grid">' +
+        tile("Ciro", moneyList(s.revenue), num(s.sales) + " satış · " + num(s.buyers) + " alıcı", true) +
+        tile("Satılan kredi", num(s.credits_sold), "Üyelerin " + pct(s.buyers, s.signups) + "'i aldı") +
+        tile("Yarım kalan ödeme", num(s.checkouts_open), num(s.checkouts_failed) + " başarısız") +
+      '</div><p class="st-group">Krediler</p><div class="st-grid">' +
+        tile("Harcanan kredi", num(s.credits_spent), num(s.credits_refunded) + " iade edildi") +
+        tile("Bekleyen kredi", num(s.credits_outstanding), "Hesaplarda duran (hediye dâhil)") +
+        tile("Ödenecek komisyon", moneyList(s.commission_unpaid), num(s.partners_active) + " aktif partner") +
+      '</div><p class="st-group">Son 14 gün</p><table class="st-days"><thead><tr><th>Gün</th><th>Ziyaretçi</th><th>Üye</th><th>Fun</th><th>Real</th><th>Satış</th></tr></thead><tbody>' +
+        (s.daily || []).map(function (d) {
+          var day = new Date(d.day + "T12:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "short", weekday: "short" });
+          return '<tr><td>' + esc(day) + '</td><td>' + num(d.visitors) + '</td><td>' + num(d.signups) + '</td><td>' + num(d.fun_cards) + '</td><td>' + num(d.real_cards) + '</td><td>' + num(d.sales) + '</td></tr>';
+        }).join("") +
+      '</tbody></table><p class="ad-msg" style="font-size:12px">Ziyaret ve Fun kart sayımı bu güncellemeyle başladı; öncesi görünmez.</p></div>';
+    statsEl.innerHTML = html;
+  }
+  statsEl.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-days]") : null;
+    if (!b) return;
+    statsDays = Number(b.getAttribute("data-days"));
+    renderStats();
+  });
 
   function partnerHtml(p) {
     var nums = '<span><em>Gelen</em> ' + esc(p.signups) + '</span><span><em>Satış</em> ' + esc(p.sales) + '</span><span><em>Oran</em> %' + esc(Math.round(p.commission_bps / 100)) + '</span>';
@@ -160,6 +228,7 @@
     if (!s || !s.data || !s.data.session) { body.innerHTML = '<p class="ad-msg">Önce XORA hesabınla giriş yap.</p><a class="btn btn-orange" href="auth.html">Giriş yap</a>'; return; }
     try {
       if (!(await call("xora_is_admin"))) { msg("Bu sayfa sadece site sahibi içindir."); return; }
+      renderStats();
       await render();
     } catch (err) { msg(err.message === "not_admin" ? "Bu sayfa sadece site sahibi içindir." : "Bilgiler alınamadı: " + err.message); }
   })();
