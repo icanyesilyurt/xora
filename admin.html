@@ -51,7 +51,7 @@
   // Owner-only page. The server refuses every call from accounts that are not in xora_admins.
   var body = document.getElementById("adBody");
   var sb = typeof getSupabaseClient === "function" ? getSupabaseClient() : null;
-  var siteUrl = typeof getPublicSiteUrl === "function" ? getPublicSiteUrl() : location.origin + "/";
+  var siteUrl = typeof getSiteRoot === "function" ? getSiteRoot() : location.origin + "/";
   var panelBase = siteUrl.replace(/\/+$/, "") + "/partner?key=";
 
   function msg(text) { body.innerHTML = '<p class="ad-msg">' + esc(text) + '</p>'; }
@@ -107,12 +107,20 @@
         '<button type="submit" class="btn btn-orange">Partner oluştur</button><p class="ad-msg" id="adNewMsg"></p></form></div>' +
       '<div id="adList">' + (list.length ? list.map(partnerHtml).join("") : '<p class="ad-msg">Henüz partner yok.</p>') + '</div>';
 
-    var name = document.getElementById("adName"), code = document.getElementById("adCode"), touched = false;
-    code.addEventListener("input", function () { touched = true; });
-    name.addEventListener("input", function () { if (!touched) code.value = slug(name.value); });
+    // Link codes are random by default (e.g. x7k2m9), so a partner link reveals neither the owner nor
+    // the partner. A readable code can still be typed in by hand.
+    var name = document.getElementById("adName"), code = document.getElementById("adCode");
+    function randomCode() {
+      var abc = "abcdefghjkmnpqrstuvwxyz23456789", out = "x", buf = new Uint32Array(5);
+      crypto.getRandomValues(buf);
+      for (var i = 0; i < buf.length; i++) out += abc[buf[i] % abc.length];
+      return list.some(function (p) { return p.code === out; }) ? randomCode() : out;
+    }
+    code.value = randomCode();
     document.getElementById("adNew").addEventListener("submit", async function (e) {
       e.preventDefault();
       var out = document.getElementById("adNewMsg");
+      if (!code.value.trim()) code.value = randomCode();
       var c = slug(code.value), rate = Math.round(Number(document.getElementById("adRate").value));
       if (!/^[a-z0-9_-]{2,40}$/.test(c)) { out.textContent = "Link kodu en az 2 karakter olmalı (harf, rakam, - ve _)."; return; }
       if (list.some(function (p) { return p.code === c; })) { out.textContent = "Bu link kodu zaten kullanılıyor."; return; }

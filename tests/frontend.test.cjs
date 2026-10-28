@@ -1110,3 +1110,10 @@ test('share-card box labels exist in all 12 locales and the retired share-card c
  assert.equal(c.I18N.tr.share_label_mirror,'XORA AYNA');assert.equal(c.I18N.tr.share_label_match,'KİMYA RAPORU');
  for(const lang of LOCALES12)for(const k of ['share_measured','share_none','share_case','stalk_t_repost','match_band_strong','share_says_mirror','stat_chars']) assert.equal(c.I18N[lang][k],undefined,lang+' '+k+' removed');
 });
+test('partner and admin links use the bare site root, never the ref remembered in this browser',()=>{
+ const c=browser();
+ c.localStorage.setItem(c.LS.referral,JSON.stringify({code:'someone',expires_at:new Date(Date.now()+864e5).toISOString()}));
+ assert.match(c.getPublicSiteUrl(),/\?ref=someone$/,'shared card text still carries the arriving ref');
+ assert.equal(c.getSiteRoot(),'https://xora.roviaqr.com/');
+ for(const f of ['admin.html','partner.html']){const h=fs.readFileSync(f,'utf8');assert.ok(h.includes('getSiteRoot()'),f);assert.ok(!h.includes('getPublicSiteUrl()'),f);}
+});

@@ -115,7 +115,7 @@
     var p = res.data;
     if (!p) { try { localStorage.removeItem(KEY_STORE); } catch (e) {} body.innerHTML = '<p class="pp-empty">' + esc(s.bad) + '</p>'; return; }
     if (p.display_name) document.getElementById("ppSub").textContent = p.display_name + " · " + s.sub;
-    var link = (typeof getPublicSiteUrl === "function" ? getPublicSiteUrl() : location.origin + "/") + "?ref=" + encodeURIComponent(p.code);
+    var link = (typeof getSiteRoot === "function" ? getSiteRoot() : location.origin + "/") + "?ref=" + encodeURIComponent(p.code);
     var html = '<div class="panel"><p style="font-weight:900">' + esc(s.link) + '</p>' +
       '<div class="pp-link"><input id="ppLink" readonly value="' + esc(link) + '"><button type="button" class="btn btn-sm btn-orange" id="ppCopy">' + esc(s.copy) + '</button></div>' +
       '<div class="pp-stats">' + stat(s.rate, "%" + Math.round(p.commission_bps / 100)) + stat(s.signups, p.signups) + stat(s.buyers, p.buyers) + '</div></div>';
