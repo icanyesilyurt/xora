@@ -146,13 +146,14 @@ test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, 
   const html=mode==='match'?c.buildMatchCard(result):c.buildIdentityCard(result);
   assert.match(html,/XORA REAL/);
   if(mode==='match') assert.ok(html.includes(c.esc(copy.match)));
-  else {assert.ok(html.includes(c.esc(NICK_COPY[locale])));assert.ok(html.includes(c.esc(ANALYSIS_COPY[locale])));assert.ok(html.includes(c.esc(copy.tagline)));
+  else {// Japanese and Chinese nicknames are shown without the space between their two words.
+   assert.ok(html.includes(c.esc(/^(ja|zh)$/.test(locale)?NICK_COPY[locale].replace(' ',''):NICK_COPY[locale])));assert.ok(html.includes(c.esc(ANALYSIS_COPY[locale])));assert.ok(html.includes(c.esc(copy.tagline)));
    // behavior_signals are still measured from the posts (8 originals, each 'How does this work?') but are not drawn.
    assert.deepEqual({...result.behavior_signals},{reply_ratio:0,original_ratio:1,repost_ratio:0,quote_ratio:0,question_ratio:1,emoji_per_post:0,avg_text_length:19});
    assert.match(html,/data-source="ai_metrics"/);assert.doesNotMatch(html,/data-metric="(reply|original|repost|question)_ratio"/);
    assert.ok(html.includes('<span class="score-name">'+c.esc(c.I18N?QUESTIONING[locale]:'')+'</span>'),'ontology labels are drawn as bars, in the result language');assert.ok(!html.includes('<span class="score-name">'+c.esc(copy.label)+'</span>'),'AI-written metric labels are never drawn');}
   assert.match(mode==='match'?c.shareMatchText(result):c.shareIdentityText(result),/XORA REAL/);
-  if(mode!=='match') assert.ok(c.shareIdentityText(result).includes(NICK_COPY[locale]));
+  if(mode!=='match') assert.ok(c.shareIdentityText(result).includes(/^(ja|zh)$/.test(locale)?NICK_COPY[locale].replace(' ',''):NICK_COPY[locale]));
  }
  // Unsupported and planned-but-unserved locales are rejected before any billing or provider call.
  for(const locale of ['xx','ko-KR','zh-CN','zh-TW','ru-RU','pt-BR','ar-SA','fr-FR','de-DE','it-IT','ja-JP']){

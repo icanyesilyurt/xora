@@ -912,7 +912,8 @@ function shareCardLayout(model, ctx) {
   var boxW = card.w - 112;
   var fixedH = titleH + descH + barsH;
   var budget = bodyBottom - bodyTop - fixedH - 4 * minGap;
-  var insight = compact ? shareFitFullInsight(ctx, model.analysis, boxW - 68, budget) : shareFitInsight(ctx, model.analysis, boxW - 68, budget);
+  // Match shows the whole chemistry report too, like the card on the page; only the size steps down.
+  var insight = shareFitFullInsight(ctx, model.analysis, boxW - 68, budget);
   var boxH = insight ? shareInsightBoxH(insight.lines.length, insight.size) : 0;
   var groups = [titleH + descH, barsH, boxH].filter(function (h) { return h > 0; });
   var gap = Math.max(minGap, (bodyBottom - bodyTop - groups.reduce(function (a, b) { return a + b; }, 0)) / (groups.length + 1));
@@ -1755,14 +1756,27 @@ function cardPresentationCopy(value, key) {
   }
   if (Array.isArray(value)) return value.map(function(v){return cardPresentationCopy(v);});
   if (value && typeof value === "object") {
-    var copy={}; Object.keys(value).forEach(function(k){copy[k]=cardPresentationCopy(value[k],k);}); return copy;
+    var copy={}; Object.keys(value).forEach(function(k){copy[k]=cardPresentationCopy(value[k],k);});
+    if (key === "nickname") copy = tightenCjkNickname(copy);
+    return copy;
   }
   return value;
+}
+// Nicknames are generated as two words, but Japanese and Chinese do not put a space between words:
+// "リンク 案内人" is shown as "リンク案内人". Spaces next to Latin, Korean or Thai text stay.
+var CJK_WORD = "[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]";
+var CJK_INNER_SPACE = new RegExp("(" + CJK_WORD + "[\u3005\u30fc\uff5e~]?)\\s+(?=" + CJK_WORD + ")", "g");
+function tightenCjkNickname(v) {
+  if (typeof v === "string") return v.replace(CJK_INNER_SPACE, "$1");
+  if (v && typeof v === "object" && !Array.isArray(v)) {
+    var out = {}; Object.keys(v).forEach(function (k) { out[k] = tightenCjkNickname(v[k]); }); return out;
+  }
+  return v;
 }
 // REAL AI copy is generated only in the request locale ({es: "..."}). Renderers read copy[activeLang],
 // so project the generated text onto the active language instead of rendering blanks.
 // UI chrome (buttons, labels, rarity) still follows the active language.
-var PLANNED_LOCALES = ["tr","en","es","pt","it","fr","de","ru","ja","ko","zh","ar"];
+var PLANNED_LOCALES = ["tr","en","es","pt","it","fr","de","ru","ja","ko","zh","ar","id","th"];
 function realLocaleView(value, lang, source) {
   if (Array.isArray(value)) return value.map(function(v){return realLocaleView(v,lang,source);});
   if (!value || typeof value !== "object") return value;
