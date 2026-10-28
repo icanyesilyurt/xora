@@ -20,6 +20,16 @@ function resultTier(res) {
   return res && res.meta && ["real","fun"].indexOf(res.meta.tier) >= 0 ? res.meta.tier : "legacy";
 }
 
+// A bar's label in the UI language, else the result's own language (REAL results carry one), never
+// a raw key unless there is no label at all.
+function barLabelText(b, lang) {
+  if (!b || !b.label) return b ? b.key : "";
+  if (b.label[lang]) return b.label[lang];
+  if (b.label.tr) return b.label.tr;
+  var keys = Object.keys(b.label);
+  return keys.length ? b.label[keys[0]] : b.key;
+}
+
 function rarityName(res) {
   if (typeof ensureRealRarity === "function") ensureRealRarity(res);
   return (res && res.rarity && res.rarity.name) || (res && res.meta && res.meta.rarity) || "common";
@@ -264,7 +274,7 @@ function buildIdentityCardV3(res) {
   var top = res.top_behaviors || [];
   for (var j = 0; j < top.length && j < 6; j++) {
     var b = top[j];
-    var label = b.label ? (b.label[lang] || b.label.tr) : b.key;
+    var label = barLabelText(b, lang);
     chips +=
       '<div class="score-chip">' +
         '<span class="score-name">' + esc(label) + "</span>" +
@@ -306,7 +316,7 @@ function buildIdentityCardV2(res) {
   var chips = "";
   for (var i = 0; i < c.top_behaviors.length; i++) {
     var b = c.top_behaviors[i];
-    var label = b.label ? (b.label[lang] || b.label.tr) : b.key;
+    var label = barLabelText(b, lang);
     chips +=
       '<div class="score-chip">' +
         '<span class="score-name">' + esc(label) + "</span>" +
@@ -1216,7 +1226,7 @@ function renderIdentityPNGV3(res) {
 
   var top = res.top_behaviors || [];
   for (var i = 0; i < top.length && i < 6; i++) {
-    var label = top[i].label ? (top[i].label[lang] || top[i].label.tr) : top[i].key;
+    var label = barLabelText(top[i], lang);
     var val = top[i].value;
     curY += 36;
     ctx.textAlign = "left";
@@ -1292,7 +1302,7 @@ function renderIdentityPNGV2(res) {
   var scoreY = 730;
   var top = c.top_behaviors;
   for (var i = 0; i < top.length && i < 6; i++) {
-    var label = top[i].label ? (top[i].label[lang] || top[i].label.tr) : top[i].key;
+    var label = barLabelText(top[i], lang);
     var val = top[i].value;
     var barX = 160;
     var barW = 520;

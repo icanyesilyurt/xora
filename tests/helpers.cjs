@@ -4,7 +4,7 @@ const ts=require('typescript');
 // The edge function and its local modules are bundled into one script: local ES imports are
 // dropped and the module bodies are prepended, so their exports share the function's scope.
 const EDGE_DIR='supabase/functions/analyze-real/';
-const EDGE_MODULES=['ontology.ts','real-analysis.ts','index.ts'];
+const EDGE_MODULES=['ontology.ts','labels.ts','real-analysis.ts','index.ts'];
 const stripImports=src=>src.replace(/^import\s[\s\S]*?\sfrom\s+"[^"]+";[ \t]*\r?\n/gm,'');
 function edgeSource() {
   return EDGE_MODULES.map(f=>stripImports(fs.readFileSync(EDGE_DIR+f,'utf8'))).join('\n');
@@ -56,7 +56,7 @@ const ANALYSIS_COPY={
  ru:'Аккаунт начинает свои мысли с вопросов. Ответы остаются короткими и ясными. Он участвует в разговоре своими словами.'
 };
 // A valid serious-analysis result for fixtures whose posts are own-voice originals (indexes 0-7).
-const seriousAI=(locale='en')=>({ontology_version:'real-1.0',
+const seriousAI=(locale='en')=>({ontology_version:'real-1.1',
  selected_traits:[{id:'questioning',score:82,confidence:.8,evidence:'Soru ile açılan paylaşımlar.',post_refs:[0,1,2]},{id:'curiosity',score:74,confidence:.75,evidence:'Merak eden sorular.',post_refs:[3,4]},{id:'brevity',score:66,confidence:.7,evidence:'Kısa cümleler.',post_refs:[5,6]},{id:'confidence',score:55,confidence:.6,evidence:'Kendinden emin sorular.',post_refs:[0,2]}],
  persistent_interests:[],character_analysis:ANALYSIS_COPY[locale],confidence:{overall:.7,data_sufficiency:'high',limitations:[]}});
 // Serious-analysis requests are recognised by their schema name (OpenAI) or ontology prompt (Anthropic).
