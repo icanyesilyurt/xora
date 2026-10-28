@@ -217,7 +217,7 @@ async function ensureUserRow(authUser, username) {
   setCurrentUser(profile);
   localStorage.setItem(LS.credits, String(profile.credit_balance));
   console.log("[XORA db] ensureUserRow done", profile);
-  await syncReferral();
+  await syncReferral(authUser);
   return profile;
 }
 
@@ -233,7 +233,9 @@ async function createLocalUser(username, email, password) {
     var signup = await sb.auth.signUp({
       email: cleanEmail,
       password: password,
-      options: { data: { username: cleanUsername } }
+      // The partner code also travels with the account, so it survives an e-mail confirmation link
+      // that opens in another browser or app (e.g. a link tapped inside X's in-app browser).
+      options: { data: getReferralCode() ? { username: cleanUsername, ref: getReferralCode() } : { username: cleanUsername } }
     });
     console.log("[XORA auth] signUp result", signup);
     if (signup.error) return { success: false, error: signup.error.message };
@@ -385,12 +387,14 @@ function getReferralCode() {
   return item.code;
 }
 
-async function syncReferral() {
+async function syncReferral(authUser) {
   var sb = getSupabaseClient();
   if (!sb || !getCurrentUser()) return;
   try { await (referralCapture || captureReferral()); } catch (e) {}
+  var meta = authUser && authUser.user_metadata;
+  var code = getReferralCode() || (meta && /^[a-z0-9_-]{2,64}$/.test(String(meta.ref || "")) ? String(meta.ref) : "");
   try {
-    var response = await sb.rpc("xora_capture_referral", {p_code:getReferralCode()});
+    var response = await sb.rpc("xora_capture_referral", {p_code:code});
     if (response.error) { console.warn("referral_sync_failed"); return; }
     if (response.data) saveClaimedReferral(response.data.referral_code, response.data.expires_at, response.data.handle);
     else localStorage.removeItem(LS.referral);
