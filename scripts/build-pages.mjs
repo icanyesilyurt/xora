@@ -3,7 +3,7 @@
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 
-const PAGES = ["index.html", "mirror.html", "stalk.html", "match.html", "credits.html", "profile.html", "auth.html"];
+const PAGES = ["index.html", "mirror.html", "stalk.html", "match.html", "credits.html", "profile.html", "auth.html", "partner.html"];
 const ASSETS = ["app.js", "xora.js", "card.js", "config.js", "style.css"];
 const OUT = "dist";
 
