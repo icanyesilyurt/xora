@@ -27,7 +27,7 @@ test('nickname rule: exactly two words, letters only',()=>{
 test('nickname input is the character profile only: never raw posts',()=>{
  const e=edge();const serious=seriousFor('tr');
  const input=JSON.parse(JSON.stringify(e.nicknameInput(serious,'alice')));
- assert.deepEqual(Object.keys(input),['handle','traits','character_analysis','persistent_interests']);
+ assert.deepEqual(Object.keys(input),['handle','traits','character_analysis','persistent_interests','supported_club']);
  assert.deepEqual(input.traits.map(t=>Object.keys(t)),input.traits.map(()=>['id','label','score']));
  assert.equal(input.character_analysis,ANALYSIS_COPY.tr);
  assert.doesNotMatch(JSON.stringify(input),/Soru\?|post_refs|evidence|"posts"/);
@@ -57,7 +57,7 @@ test('REAL result: ontology bars, serious analysis as the main text, locale-only
   const serious=seriousFor(locale);
   const r=e.buildRealResult('alice','mirror',{sample_size:8,question_ratio:1,own_posts:8},locale,serious,{text:NICK_COPY[locale],tagline:AI_COPY[locale].tagline,icon:'🦉',source:'ai',attempts:1});
   assert.equal(r.meta.tier,'real');assert.equal(r.meta.analysis_version,'real_analysis_v1');assert.ok(['common','rare','epic','legendary'].includes(r.rarity.name));
-  assert.deepEqual(JSON.parse(JSON.stringify(r.top_behaviors)),[{key:'questioning',label:{tr:'Soru Odaklı Üslup'},value:82},{key:'curiosity',label:{tr:'Merak'},value:74},{key:'brevity',label:{tr:'Özlü Anlatım'},value:66},{key:'confidence',label:{tr:'Özgüven'},value:55}]);
+  assert.deepEqual(JSON.parse(JSON.stringify(r.top_behaviors)),[{key:'questioning',label:{tr:'Soru Ustalığı'},value:82},{key:'curiosity',label:{tr:'Merak'},value:74},{key:'brevity',label:{tr:'Özlü Anlatım'},value:66},{key:'confidence',label:{tr:'Özgüven'},value:55}]);
   for(const field of [r.nickname,r.tagline,r.comment.mirror,r.comment.stalk,r.card.nickname,r.card.desc,r.archetype.comments]) assert.deepEqual(Object.keys(field),[locale]);
   assert.equal(r.nickname[locale],NICK_COPY[locale]);assert.equal(r.comment.mirror[locale],ANALYSIS_COPY[locale]);
   assert.deepEqual([r.card.emoji,r.profile_emoji,r.archetype.emoji],['🦉','🦉','🦉']);
@@ -127,7 +127,7 @@ test('AI input separates own voice from reposts, strips repost authors and count
  assert.equal(input.own_voice_evidence,'normal');
  assert.deepEqual([...input.own_voice].map(p=>p.type),['original','original','original','reply','reply','quote'],'own voice = originals, replies, quote commentary');
  assert.ok(input.own_voice.every(p=>!/Başkasının/.test(p.text)),'no repost wording in own voice');
- assert.equal(input.interest_sharing.length,10,'at most 10 reposts');
+ assert.equal(input.interest_sharing.length,15,'at most 15 reposts');
  for(const r of input.interest_sharing){assert.deepEqual(Object.keys(r),['text'],'reposts carry no engagement numbers or type');assert.doesNotMatch(r.text,/^RT @/,'author prefix stripped');assert.ok(r.text.length<=120);}
  const thin=e.aiPostInput([...mixedPosts().filter(p=>p.type==='repost'),{text:'tek',type:'original',metrics:{}},{text:'iki',type:'reply',metrics:{}}],false);
  assert.equal(thin.own_voice_evidence,'thin','fewer than 3 own-voice posts');assert.deepEqual(Object.keys(thin.own_voice[0]),['type','text']);
@@ -147,7 +147,7 @@ test('Mirror/Stalk/Match send the split input and the repost rule, and store the
   assert.equal(res.status,200,mode);const {result}=await res.json();
   if(mode==='match'){
    assert.ok(systems[0].includes(e.REPOST_RULE),'match system prompt carries the repost rule');
-   for(const s of [payloads[0].profile_a,payloads[0].profile_b]){assert.equal(s.posts,undefined,'no mixed post list');assert.equal(s.own_voice.length,6);assert.equal(s.interest_sharing.length,10);assert.equal(s.sample.repost,19);}
+   for(const s of [payloads[0].profile_a,payloads[0].profile_b]){assert.equal(s.posts,undefined,'no mixed post list');assert.equal(s.own_voice.length,6);assert.equal(s.interest_sharing.length,15);assert.equal(s.sample.repost,19);}
    assert.ok(payloads[0].rules.includes(e.REPOST_RULE),'match rules carry the repost rule');
    assert.ok(payloads[0].rules.some(r=>/own_voice_evidence is "thin"/.test(r)),'thin-evidence rule');
    for(const side of ['resA','resB'])assert.deepEqual({...result[side].sample},{analyzed:25,original:3,reply:2,quote:1,repost:19},side);
@@ -159,7 +159,7 @@ test('Mirror/Stalk/Match send the split input and the repost rule, and store the
    assert.deepEqual(sp.slice(0,6).map(p=>p.type),['original','original','original','reply','reply','quote']);
    assert.ok(sp.slice(6).every(p=>p.type==='repost'&&!/^RT @/.test(p.text)));
    // The nickname sees the character profile only.
-   assert.equal(nicknameInputs.length,1);assert.deepEqual(Object.keys(nicknameInputs[0]),['handle','traits','character_analysis','persistent_interests']);
+   assert.equal(nicknameInputs.length,1);assert.deepEqual(Object.keys(nicknameInputs[0]),['handle','traits','character_analysis','persistent_interests','supported_club']);
    assert.doesNotMatch(JSON.stringify(nicknameInputs[0]),/Kendi cümlem|yanıtım|Başkasının|Alıntı yorumum/);
    assert.equal(result.nickname.tr,'Soru Ustası');assert.equal(result.comment.mirror.tr,ANALYSIS_COPY.tr);
   }
@@ -175,4 +175,17 @@ test('card icons: unsafe icons are refused; Match icons fall back deterministica
   const m=edge({fetch:async()=>Response.json({content:[{type:'text',text:JSON.stringify({...matchAI('tr'),icon_a:a,icon_b:b})}]})});
   const res=await m.analyzeMatch(service,'alice','bob','tr');assert.deepEqual([res.resA.archetype.emoji,res.resB.archetype.emoji],want);
  }
+});
+test('rarity follows the top-3 trait scores and legendary stays rare',()=>{
+ const e=edge();const r=v=>e.rarityFromMetrics(v.map(value=>({value}))).name;
+ assert.equal(r([88,85,82,76,70]),'epic');   // clearly dominant profile
+ assert.equal(r([88,78,77,72,68]),'rare');
+ assert.equal(r([74,70,66,60]),'common');
+ assert.equal(r([90,86,84,70]),'epic');
+ assert.equal(r([95,93,90,80]),'legendary');
+});
+test('X timeline fetch reads 40 posts and excludes replies',()=>{
+ const src=require('node:fs').readFileSync(require('node:path').join(__dirname,'../supabase/functions/analyze-real/index.ts'),'utf8');
+ assert.match(src,/max_results=\$\{MAX_POSTS\}&exclude=replies/);
+ assert.equal(edge().POST_LIMIT??40,40);
 });

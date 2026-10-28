@@ -52,17 +52,17 @@ for(const provider of ['openai','anthropic']) {
    assert.match(ssys,/FIXED ONTOLOGY/);assert.match(ssys,/3-6 complete, meaningful sentences/);assert.match(ssys,/never read like a recap of recent posts/);assert.ok(!ssys.includes('UNTRUSTED_DATA_MARKER'));
    if(provider==='openai'){assert.equal(sb.store,false);assert.equal(sb.tool_choice,'none');assert.equal(sb.text.format.strict,true);assert.deepEqual(sb.text.format.schema,JSON.parse(JSON.stringify(f.e.analysisSchema())));}
    const nb=bodyOf(f.nicknameRequests[0]),nsys=systemOf(provider,nb),ninput=userOf(provider,nb);
-   assert.match(nsys,/EXACTLY TWO WORDS/);assert.deepEqual(Object.keys(ninput),['handle','traits','character_analysis','persistent_interests']);
+   assert.match(nsys,/EXACTLY TWO WORDS/);assert.deepEqual(Object.keys(ninput),['handle','traits','character_analysis','persistent_interests','supported_club']);
    assert.doesNotMatch(JSON.stringify(ninput),/How does this work|UNTRUSTED_DATA_MARKER|"posts"/,'no raw posts or profile text in the nickname call');
    if(provider==='openai'){assert.equal(nb.store,false);assert.equal(nb.tool_choice,'none');assert.equal(nb.text.format.name,'xora_real_nickname');assert.equal(nb.text.format.strict,true);}
    // Card bars are the serious traits with ontology labels; the analysis is the main text.
-   assert.deepEqual(result.top_behaviors.map(b=>[b.key,b.label.tr,b.value]),[['questioning','Soru Odaklı Üslup',82],['curiosity','Merak',74],['brevity','Özlü Anlatım',66],['confidence','Özgüven',55]]);
+   assert.deepEqual(result.top_behaviors.map(b=>[b.key,b.label.tr,b.value]),[['questioning','Soru Ustalığı',82],['curiosity','Merak',74],['brevity','Özlü Anlatım',66],['confidence','Özgüven',55]]);
    assert.deepEqual(JSON.parse(JSON.stringify(result.card.top_behaviors)),JSON.parse(JSON.stringify(result.top_behaviors)));
    assert.equal(result.comment.mirror.en,ANALYSIS_COPY.en);assert.equal(result.comment.stalk.en,ANALYSIS_COPY.en);
    assert.equal(result.nickname.en,NICK_COPY.en);assert.equal(result.nickname.en.split(' ').length,2);assert.equal(result.meta.alias_source,'ai');
    assert.equal(result.meta.analysis_version,'real_analysis_v1');assert.equal(result.analysis.ontology_version,'real-1.0');
    assert.ok(result.analysis.selected_traits.every(t=>t.evidence&&t.post_refs.length));assert.deepEqual(JSON.parse(JSON.stringify(result.analysis.persistent_interests)),[]);
-   assert.ok(html.includes(c.esc('Soru Odaklı Üslup'))&&html.includes(c.esc(ANALYSIS_COPY.en))&&html.includes(c.esc(NICK_COPY.en)));
+   assert.ok(html.includes(c.esc('Soru Ustalığı'))&&html.includes(c.esc(ANALYSIS_COPY.en))&&html.includes(c.esc(NICK_COPY.en)));
   }
  });
  test(`${provider}: malformed Match output and invalid serious analyses refund without retry`,async()=>{
@@ -149,7 +149,7 @@ test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, 
    // behavior_signals are still measured from the posts (8 originals, each 'How does this work?') but are not drawn.
    assert.deepEqual({...result.behavior_signals},{reply_ratio:0,original_ratio:1,repost_ratio:0,quote_ratio:0,question_ratio:1,emoji_per_post:0,avg_text_length:19});
    assert.match(html,/data-source="ai_metrics"/);assert.doesNotMatch(html,/data-metric="(reply|original|repost|question)_ratio"/);
-   assert.ok(html.includes('<span class="score-name">'+c.esc('Soru Odaklı Üslup')+'</span>'),'ontology labels are drawn as bars');assert.ok(!html.includes('<span class="score-name">'+c.esc(copy.label)+'</span>'),'AI-written metric labels are never drawn');}
+   assert.ok(html.includes('<span class="score-name">'+c.esc('Soru Ustalığı')+'</span>'),'ontology labels are drawn as bars');assert.ok(!html.includes('<span class="score-name">'+c.esc(copy.label)+'</span>'),'AI-written metric labels are never drawn');}
   assert.match(mode==='match'?c.shareMatchText(result):c.shareIdentityText(result),/XORA REAL/);
   if(mode!=='match') assert.ok(c.shareIdentityText(result).includes(NICK_COPY[locale]));
  }

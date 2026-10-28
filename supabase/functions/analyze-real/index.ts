@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.116.0";
-import { analysisSchema, analysisSystemPrompt, analysisUserInput, normalizeAnalysis, ANALYSIS_VERSION } from "./real-analysis.ts";
+import { analysisSchema, analysisSystemPrompt, analysisUserInput, normalizeAnalysis, ANALYSIS_VERSION, POST_LIMIT } from "./real-analysis.ts";
 
 type Mode = "mirror" | "stalk" | "match";
 // The DB contract already accepts every planned locale. The edge function serves a locale only
@@ -48,7 +48,9 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 const CACHE_DAYS = 14;
-const MAX_POSTS = 25;
+// Recent posts per account. Replies are excluded at the X API so the sample is the account's own
+// posts, quotes and reposts; fewer posts read means lower X API cost per analysis.
+const MAX_POSTS = POST_LIMIT;
 const COST: Record<Mode, number> = { mirror: 5, stalk: 5, match: 10 };
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
@@ -116,10 +118,10 @@ function aiPostInput(posts: Post[], withMetrics: boolean) {
   return {
     sample: sampleCounts(posts),
     own_voice_evidence: own.length >= 3 ? "normal" : "thin",
-    own_voice: own.slice(0, 20).map(p => withMetrics
+    own_voice: own.slice(0, MAX_POSTS).map(p => withMetrics
       ? { type: p.type, text: p.text.slice(0, 320), likes: p.metrics?.likes ?? 0, replies: p.metrics?.replies ?? 0, reposts: p.metrics?.reposts ?? 0 }
       : { type: p.type, text: p.text.slice(0, 320) }),
-    interest_sharing: posts.filter(p => p.type === "repost").slice(0, 10).map(p => ({ text: p.text.replace(/^RT @[A-Za-z0-9_]+:\s*/, "").slice(0, 120) })),
+    interest_sharing: posts.filter(p => p.type === "repost").slice(0, 15).map(p => ({ text: p.text.replace(/^RT @[A-Za-z0-9_]+:\s*/, "").slice(0, 120) })),
   };
 }
 const OWN_VOICE_RULES = [
@@ -147,7 +149,7 @@ async function getDataset(service: any, username: string): Promise<Dataset> {
   if (profile.protected) throw new Error("protected_account");
 
   const fields = "created_at,lang,public_metrics,referenced_tweets";
-  const tRes = await fetch(`https://api.x.com/2/users/${profile.id}/tweets?max_results=${MAX_POSTS}&tweet.fields=${encodeURIComponent(fields)}`, { headers, signal:AbortSignal.timeout(20000) });
+  const tRes = await fetch(`https://api.x.com/2/users/${profile.id}/tweets?max_results=${MAX_POSTS}&exclude=replies&tweet.fields=${encodeURIComponent(fields)}`, { headers, signal:AbortSignal.timeout(20000) });
   if (tRes.status === 429) throw new Error("rate_limited");
   if (!tRes.ok) { await reportXError(tRes,"tweets_fetch"); throw new Error("x_api_error"); }
   const tJson = await tRes.json();
@@ -334,15 +336,14 @@ function colorForRarity(rarity: string) {
   return "#2D3445";
 }
 function rarityFromMetrics(metrics: Array<{value:number}>) {
-  const vals = metrics.map(m => clamp(m.value, 15, 95));
+  const vals = metrics.map(m => clamp(m.value, 15, 99)).sort((a,b)=>b-a);
   if (!vals.length) return { name: "common", score: 45 };
-  // Rarity measures how distinctive the profile is, not whether a trait is "good".
-  // 50 = ordinary/neutral; strong evidence-backed extremes make a card rarer.
-  const extremes = vals.map(v => Math.abs(v - 50));
-  const avgExtreme = extremes.reduce((a,b)=>a+b,0) / extremes.length;
-  const peakExtreme = Math.max(...extremes);
-  const score = clamp(35 + avgExtreme * 1.25 + peakExtreme * 0.6, 20, 99);
-  return { name: score >= 90 ? "legendary" : score >= 76 ? "epic" : score >= 58 ? "rare" : "common", score };
+  // Rarity = how dominant the account's strongest traits are: the average of its top 3 scores.
+  // Trait scores mostly land at 65-85, so legendary needs an exceptional profile (~top few %),
+  // epic a clearly dominant one; most cards end up common or rare.
+  const top = vals.slice(0, 3);
+  const score = Math.round(top.reduce((a,b)=>a+b,0) / top.length);
+  return { name: score >= 91 ? "legendary" : score >= 85 ? "epic" : score >= 77 ? "rare" : "common", score };
 }
 const BEHAVIOR_SIGNAL_KEYS = ["reply_ratio","original_ratio","repost_ratio","quote_ratio","question_ratio","emoji_per_post","avg_text_length"] as const;
 function behaviorSignals(signals: any) {
@@ -357,7 +358,9 @@ function behaviorSignals(signals: any) {
 // Nickname: generated AFTER the serious analysis, from the character profile only (fixed traits,
 // scores, character analysis, persistent interests, handle). Raw posts never reach this call.
 // The final nickname is exactly two words; one regeneration, then a trait-based fallback.
-const NICKNAME_TONE_EXAMPLES = ["Sessiz Gözlemci","Kaos Elçisi","Platonik Aşık","Yürüyen Kartal","Beşiktaş Fedaisi","Gece Kuşu","Laf Cambazı","Gizli Romantik","Tatlı Bela","Gölge Yazar","Fırsat Avcısı"];
+const NICKNAME_TONE_EXAMPLES = ["Sessiz Gözlemci","Kaos Elçisi","Platonik Aşık","Gece Kuşu","Laf Cambazı","Gizli Romantik","Tatlı Bela","Gölge Yazar","Fırsat Avcısı","Kripto Avcısı","Borsa Boğası","Yalnız Kurt","Gece Şairi","X Filozofu","Koltuk Filozofu","Tribün Hocası","Kanepe Ekonomisti","Sahne Kraliçesi","Kod Keşişi"];
+// Tone examples for a profile built around one supported club (Turkish; never copied verbatim).
+const NICKNAME_CLUB_EXAMPLES = ["Beşiktaş Fedaisi","Çarşı Megafonu","Kartal Bekçisi","Aslan Yürekli","Kanarya Sesi","Fırtına Ruhu","Tribün Hocası"];
 // Safe two-word fallbacks, keyed by the category of the strongest character trait.
 const NICKNAME_FALLBACKS: Record<string, {icon:string; names:Record<Locale,string>}> = {
   temperament: {icon:"🦅", names:{tr:"Özgür Ruh", en:"Free Spirit", es:"Espíritu Libre", pt:"Espírito Livre", ar:"روح حرة", fr:"Esprit Libre", de:"Freier Geist", it:"Spirito Libero", ja:"自由な 魂", ko:"자유로운 영혼", zh:"自由 靈魂", ru:"Свободный дух"}},
@@ -389,6 +392,7 @@ function nicknameInput(serious: any, handle: string) {
     traits: serious.selected_traits.map((t:any)=>({id:t.id,label:t.label,score:t.score})),
     character_analysis: serious.character_analysis,
     persistent_interests: serious.persistent_interests.map((i:any)=>({id:i.id,label:i.label,confidence:i.confidence})),
+    supported_club: serious.supported_club || "",
   };
 }
 function nicknameSchema() {
@@ -401,6 +405,8 @@ function nicknameSystemPrompt(outputLanguage: string) {
     `nickname: the humorous nickname friends would naturally give this character, in ${outputLanguage}. It must be EXACTLY TWO WORDS separated by one space: no one-word or three-word names, no punctuation, digits, emoji or hashtags.`,
     "Name the character, not a topic: capture the personality, attitude and social role that the traits and analysis describe. A persistent interest may flavour the name when it is central to the character, but never build the name from a recent topic, event, place, date or post.",
     `Tone examples (Turkish; they only show the tone, never copy them): ${NICKNAME_TONE_EXAMPLES.join(", ")}.`,
+    `The name must be instantly understandable: a reader should picture the type of person within two seconds. Pattern: [field, scene or behaviour] + [a familiar archetype] (hunter, philosopher, poet, guardian, wolf, king, rebel...). No abstract or invented word pairs, no metaphors that need explaining, no place names or event words.`,
+    `SUPPORTED CLUB. When supported_club is not empty and the profile is built around sports (a sports/football trait or interest is among its strongest), the nickname MUST be a fan nickname for that club: use the club's name or its well-known fan symbol (e.g. Beşiktaş -> Kartal or Çarşı, Galatasaray -> Aslan, Fenerbahçe -> Kanarya, Trabzonspor -> Fırtına) plus a fan archetype that fits the character traits. Club examples (Turkish; these may be used as-is when they fit the character): ${NICKNAME_CLUB_EXAMPLES.join(", ")}. Affectionate fan pride only: never mock the club or its rivals, never violent words.`,
     "Playful and affectionate, never cruel. Never use politics, religion, ethnicity, nationality, health, sexuality or other sensitive attributes, diagnoses or insults.",
     `tagline: one short, light line in ${outputLanguage} (max ~70 characters) that explains the nickname through the character. No post counts or numbers of analysed posts.`,
     "emoji: one single emoji that pictures the nickname (an animal, object or symbol). Never a flag, skin-tone or combined emoji, or a religious, political or violent symbol.",
@@ -555,5 +561,5 @@ async function main(req: Request) {
   }
 }
 
-export {main,analyzeSerious,generateNickname,nicknameValid,nicknameFallback,nicknameInput,nicknameSystemPrompt,buildRealResult,NICKNAME_FALLBACKS,requestAI,analyzeMatch,analyzeOne,validateRequest,validateMetrics,fallbackAlias,behaviorSignals,normalizeMatchAI,computeSignals,validCopy,callAI,getAIConfig,aiResultSchema,parseProviderResult,xErrorDiagnostic,safeDiagnosticText,PLANNED_LOCALES,REAL_LOCALES,iconValid,aiPostInput,sampleCounts,REPOST_RULE};
+export {main,rarityFromMetrics,analyzeSerious,generateNickname,nicknameValid,nicknameFallback,nicknameInput,nicknameSystemPrompt,buildRealResult,NICKNAME_FALLBACKS,requestAI,analyzeMatch,analyzeOne,validateRequest,validateMetrics,fallbackAlias,behaviorSignals,normalizeMatchAI,computeSignals,validCopy,callAI,getAIConfig,aiResultSchema,parseProviderResult,xErrorDiagnostic,safeDiagnosticText,PLANNED_LOCALES,REAL_LOCALES,iconValid,aiPostInput,sampleCounts,REPOST_RULE};
 Deno.serve(main);
