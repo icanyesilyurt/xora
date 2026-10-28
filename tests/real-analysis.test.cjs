@@ -39,9 +39,9 @@ test('ontology v1 is frozen at 150 traits and 48 topics with unique ids and vali
  const unlockable=new Set(e.INTEREST_TOPICS.flatMap(t=>t.traits));
  for(const t of e.TRAITS.filter(t=>t.group==='interest')) assert.ok(unlockable.has(t.id),t.id);
  for(const [a,b] of [...e.CONTRADICTORY_PAIRS,...e.NEAR_DUPLICATE_PAIRS]) {assert.ok(e.TRAIT_BY_ID.has(a),a);assert.ok(e.TRAIT_BY_ID.has(b),b);}
- assert.equal(e.TRAIT_BY_ID.get('reply_danger').label,'Yanıt Sertliği');
- assert.equal(e.TRAIT_BY_ID.get('silent_observer').label,'Gözlem Ağırlığı');
- assert.equal(e.TRAIT_BY_ID.get('visibility_seeking').label,'Etkileşim Odaklılık');
+ assert.equal(e.TRAIT_BY_ID.get('reply_danger').label,'Reply Ateşi');
+ assert.equal(e.TRAIT_BY_ID.get('silent_observer').label,'Gözlemci Duruş');
+ assert.equal(e.TRAIT_BY_ID.get('visibility_seeking').label,'Etkileşim Avcılığı');
  for(const t of e.TRAITS) {assert.match(t.definition,/\S{3}/);assert.doesNotMatch(t.label,/Enerjisi|Tehlikesi|Sessiz|\//,t.label);}
 });
 
