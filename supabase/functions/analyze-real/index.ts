@@ -5,9 +5,9 @@ import { traitLabel } from "./labels.ts";
 type Mode = "mirror" | "stalk" | "match";
 // The DB contract already accepts every planned locale. The edge function serves a locale only
 // once it has an entry in REAL_LOCALES plus nickname quality rules and fallback aliases below.
-const PLANNED_LOCALES = ["tr","en","es","pt","it","fr","de","ru","ja","ko","zh","ar"] as const;
+const PLANNED_LOCALES = ["tr","en","es","pt","it","fr","de","ru","ja","ko","zh","ar","id","th"] as const;
 type PlannedLocale = typeof PLANNED_LOCALES[number];
-type Locale = Extract<PlannedLocale, "tr" | "en" | "es" | "pt" | "ar" | "fr" | "de" | "it" | "ja" | "ko" | "zh" | "ru">;
+type Locale = Extract<PlannedLocale, "tr" | "en" | "es" | "pt" | "ar" | "fr" | "de" | "it" | "ja" | "ko" | "zh" | "ru" | "id" | "th">;
 const REAL_LOCALES: Record<Locale, {language:string; bcp47:string; unspaced?:boolean; minChars?:number; maxChars?:number; minWords?:number; maxWords?:number}> = {
   tr: {language:"Turkish", bcp47:"tr-TR"},
   en: {language:"English", bcp47:"en-US"},
@@ -21,6 +21,8 @@ const REAL_LOCALES: Record<Locale, {language:string; bcp47:string; unspaced?:boo
   ko: {language:"natural, modern standard Korean for a general web audience (plain 해요/합니다 politeness, no heavy honorifics, no internet slang or K-pop and K-drama jargon, no unnecessary Latin-script words; nicknames are 1-4 short Korean words)", bcp47:"ko-KR", minChars:3, maxChars:20, minWords:1, maxWords:4},
   zh: {language:"written Traditional Chinese that reads naturally in Taiwan and Hong Kong (Traditional characters only, never Simplified; no heavy Taiwanese or Cantonese colloquialisms, no mainland internet slang, no unnecessary Latin-script words; nicknames are 3-12 characters with no spaces)", bcp47:"zh-TW", unspaced:true},
   ru: {language:"natural, modern standard Russian for a general web audience (no bureaucratic or Soviet-era phrasing, no literary archaisms, no internet slang or forced youth speech, no unnecessary Latin-script words)", bcp47:"ru-RU"},
+  id: {language:"natural, modern Indonesian as people write it on X in Indonesia (relaxed and friendly; light everyday slang is fine, no heavy Jakarta slang, no unnecessary English words)", bcp47:"id-ID"},
+  th: {language:"natural, modern Thai as people write it on X in Thailand (friendly and casual, no royal or overly formal register, no unnecessary English words; Thai has no spaces between words: end every sentence with a single space as Thai writing does, and write the nickname as two short Thai parts separated by exactly one space)", bcp47:"th-TH"},
 };
 function isRealLocale(v: unknown): v is Locale {
   return typeof v === "string" && Object.hasOwn(REAL_LOCALES, v);
@@ -284,18 +286,18 @@ async function requestAI(opts:{system:string;user:string;schema:unknown;name:str
 // and cite a deterministic behavioral signal that is actually active for this dataset.
 // This keeps names personal without allowing random word salad or sensitive-trait labels.
 const ALIASES: Array<{names:Record<Locale,string>; key:string; test:(s:any)=>boolean}> = [
-  {names:{tr:"Sohbeti Seven", en:"Always Up for Conversation", es:"Siempre de Charla", pt:"Bom de Conversa", ar:"يحب الحوار", fr:"Aime Échanger", de:"Immer im Gespräch", it:"Ama Chiacchierare", ja:"おしゃべり好き", ko:"대화를 즐기는 사람", zh:"很愛聊天", ru:"Любит поговорить"}, key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
-  {names:{tr:"Uzun Uzun Anlatan", en:"Detailed Storyteller", es:"Narrador Detallista", pt:"Conta Tudo em Detalhes", ar:"يروي بالتفاصيل", fr:"Raconte en Détail", de:"Erzählt gern ausführlich", it:"Racconta nei Dettagli", ja:"じっくり語る人", ko:"길게 쓰는 사람", zh:"話比較長", ru:"Рассказывает подробно"}, key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
-  {names:{tr:"Renkli Anlatıcı", en:"Expressive Soul", es:"Alma Expresiva", pt:"Cheio de Expressão", ar:"معبر بطبعه", fr:"Très Expressif", de:"Sehr ausdrucksstark", it:"Molto Espressivo", ja:"表現豊か", ko:"표현이 풍부한 사람", zh:"表情很豐富", ru:"Очень выразительный"}, key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
-  {names:{tr:"Meraklı Biri", en:"Curious Mind", es:"Mente Curiosa", pt:"Curioso por Natureza", ar:"كثير السؤال", fr:"Toujours une Question", de:"Fragt gern nach", it:"Fa Tante Domande", ja:"質問好き", ko:"질문이 많은 사람", zh:"問題很多", ru:"Много спрашивает"}, key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
-  {names:{tr:"Sözü Kuvvetli", en:"Way with Words", es:"Buena Pluma", pt:"Bom com as Palavras", ar:"يحسن التعبير", fr:"Le Mot Juste", de:"Hat das richtige Wort", it:"Lessico Ricco", ja:"言葉選び上手", ko:"단어 선택이 좋은 사람", zh:"很會用詞", ru:"Умеет подобрать слова"}, key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
-  {names:{tr:"Özgün Anlatıcı", en:"Original Voice", es:"Voz Propia", pt:"Estilo Próprio", ar:"له أسلوبه الخاص", fr:"Une Voix à Part", de:"Ganz eigener Stil", it:"Stile Tutto Suo", ja:"自分の言葉派", ko:"자기 말로 쓰는 사람", zh:"用自己的話", ru:"Своими словами"}, key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
-  {names:{tr:"Alıntı Seven", en:"Thoughtful Reader", es:"Lector Atento", pt:"Bom Leitor", ar:"قارئ متأمل", fr:"Lecteur Attentif", de:"Liest aufmerksam", it:"Legge con Attenzione", ja:"読み込み派", ko:"꼼꼼히 읽는 사람", zh:"讀得很仔細", ru:"Читает внимательно"}, key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
-  {names:{tr:"Paylaşmayı Seven", en:"Keen Sharer", es:"Le Encanta Compartir", pt:"Adora Compartilhar", ar:"يحب المشاركة", fr:"Aime Partager", de:"Teilt gern", it:"Ama Condividere", ja:"シェア好き", ko:"공유를 좋아하는 사람", zh:"很愛分享", ru:"Любит делиться"}, key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
-  {names:{tr:"Coşkulu Anlatıcı", en:"Full of Enthusiasm", es:"Puro Entusiasmo", pt:"Sempre Empolgado", ar:"مليء بالحماس", fr:"Plein d'Enthousiasme", de:"Voller Begeisterung", it:"Sempre Entusiasta", ja:"テンション高め", ko:"신나 있는 사람", zh:"很有熱情", ru:"Полон энтузиазма"}, key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
-  {names:{tr:"X Yazarı", en:"X Contributor", es:"Autor en X", pt:"Autor no X", ar:"كاتب نشيط", fr:"Plume Active", de:"Schreibt fleißig", it:"Scrive Spesso", ja:"よく書く人", ko:"자주 쓰는 사람", zh:"很常發文", ru:"Часто пишет"}, key:"own_posts", test:(s:any)=>s.own_posts >= 6}
+  {names:{tr:"Sohbeti Seven", en:"Always Up for Conversation", es:"Siempre de Charla", pt:"Bom de Conversa", ar:"يحب الحوار", fr:"Aime Échanger", de:"Immer im Gespräch", it:"Ama Chiacchierare", ja:"おしゃべり好き", ko:"대화를 즐기는 사람", zh:"很愛聊天", ru:"Любит поговорить", id:"Suka Ngobrol", th:"ชอบ คุยเล่น"}, key:"reply_ratio", test:(s:any)=>s.reply_ratio >= .25},
+  {names:{tr:"Uzun Uzun Anlatan", en:"Detailed Storyteller", es:"Narrador Detallista", pt:"Conta Tudo em Detalhes", ar:"يروي بالتفاصيل", fr:"Raconte en Détail", de:"Erzählt gern ausführlich", it:"Racconta nei Dettagli", ja:"じっくり語る人", ko:"길게 쓰는 사람", zh:"話比較長", ru:"Рассказывает подробно", id:"Tukang Cerita Panjang", th:"เล่า ยาวเหยียด"}, key:"avg_text_length", test:(s:any)=>s.avg_text_length >= 160},
+  {names:{tr:"Renkli Anlatıcı", en:"Expressive Soul", es:"Alma Expresiva", pt:"Cheio de Expressão", ar:"معبر بطبعه", fr:"Très Expressif", de:"Sehr ausdrucksstark", it:"Molto Espressivo", ja:"表現豊か", ko:"표현이 풍부한 사람", zh:"表情很豐富", ru:"Очень выразительный", id:"Jiwa Ekspresif", th:"สาย แสดงออก"}, key:"emoji_per_post", test:(s:any)=>s.emoji_per_post >= 1.2},
+  {names:{tr:"Meraklı Biri", en:"Curious Mind", es:"Mente Curiosa", pt:"Curioso por Natureza", ar:"كثير السؤال", fr:"Toujours une Question", de:"Fragt gern nach", it:"Fa Tante Domande", ja:"質問好き", ko:"질문이 많은 사람", zh:"問題很多", ru:"Много спрашивает", id:"Si Penasaran", th:"ขี้ สงสัย"}, key:"question_ratio", test:(s:any)=>s.question_ratio >= .20},
+  {names:{tr:"Sözü Kuvvetli", en:"Way with Words", es:"Buena Pluma", pt:"Bom com as Palavras", ar:"يحسن التعبير", fr:"Le Mot Juste", de:"Hat das richtige Wort", it:"Lessico Ricco", ja:"言葉選び上手", ko:"단어 선택이 좋은 사람", zh:"很會用詞", ru:"Умеет подобрать слова", id:"Pandai Merangkai Kata", th:"คำคม ตัวจริง"}, key:"vocabulary_diversity", test:(s:any)=>s.vocabulary_diversity >= .62},
+  {names:{tr:"Özgün Anlatıcı", en:"Original Voice", es:"Voz Propia", pt:"Estilo Próprio", ar:"له أسلوبه الخاص", fr:"Une Voix à Part", de:"Ganz eigener Stil", it:"Stile Tutto Suo", ja:"自分の言葉派", ko:"자기 말로 쓰는 사람", zh:"用自己的話", ru:"Своими словами", id:"Gaya Sendiri", th:"สไตล์ ตัวเอง"}, key:"original_ratio", test:(s:any)=>s.original_ratio >= .65},
+  {names:{tr:"Alıntı Seven", en:"Thoughtful Reader", es:"Lector Atento", pt:"Bom Leitor", ar:"قارئ متأمل", fr:"Lecteur Attentif", de:"Liest aufmerksam", it:"Legge con Attenzione", ja:"読み込み派", ko:"꼼꼼히 읽는 사람", zh:"讀得很仔細", ru:"Читает внимательно", id:"Pembaca Teliti", th:"นักอ่าน ละเอียด"}, key:"quote_ratio", test:(s:any)=>s.quote_ratio >= .12},
+  {names:{tr:"Paylaşmayı Seven", en:"Keen Sharer", es:"Le Encanta Compartir", pt:"Adora Compartilhar", ar:"يحب المشاركة", fr:"Aime Partager", de:"Teilt gern", it:"Ama Condividere", ja:"シェア好き", ko:"공유를 좋아하는 사람", zh:"很愛分享", ru:"Любит делиться", id:"Hobi Berbagi", th:"สาย แชร์"}, key:"repost_ratio", test:(s:any)=>s.repost_ratio >= .35},
+  {names:{tr:"Coşkulu Anlatıcı", en:"Full of Enthusiasm", es:"Puro Entusiasmo", pt:"Sempre Empolgado", ar:"مليء بالحماس", fr:"Plein d'Enthousiasme", de:"Voller Begeisterung", it:"Sempre Entusiasta", ja:"テンション高め", ko:"신나 있는 사람", zh:"很有熱情", ru:"Полон энтузиазма", id:"Penuh Semangat", th:"ไฟ แรง"}, key:"exclamation_ratio", test:(s:any)=>s.exclamation_ratio >= .20},
+  {names:{tr:"X Yazarı", en:"X Contributor", es:"Autor en X", pt:"Autor no X", ar:"كاتب نشيط", fr:"Plume Active", de:"Schreibt fleißig", it:"Scrive Spesso", ja:"よく書く人", ko:"자주 쓰는 사람", zh:"很常發文", ru:"Часто пишет", id:"Rajin Posting", th:"โพสต์ ขยัน"}, key:"own_posts", test:(s:any)=>s.own_posts >= 6}
 ];
-const DEFAULT_ALIAS: Record<Locale,string> = {tr:"Sade Gözlemci", en:"Quiet Observer", es:"Observador Sereno", pt:"Observador Tranquilo", ar:"مراقب هادئ", fr:"Observateur Discret", de:"Beobachtet in Ruhe", it:"Osserva in Silenzio", ja:"静かな観察者", ko:"조용한 관찰자", zh:"安靜的觀察者", ru:"Тихий наблюдатель"};
+const DEFAULT_ALIAS: Record<Locale,string> = {tr:"Sade Gözlemci", en:"Quiet Observer", es:"Observador Sereno", pt:"Observador Tranquilo", ar:"مراقب هادئ", fr:"Observateur Discret", de:"Beobachtet in Ruhe", it:"Osserva in Silenzio", ja:"静かな観察者", ko:"조용한 관찰자", zh:"安靜的觀察者", ru:"Тихий наблюдатель", id:"Pengamat Kalem", th:"ผู้สังเกต เงียบๆ"};
 function fallbackAlias(signals: any, locale: Locale) {
   const rule=ALIASES.find(a=>a.test(signals));
   return rule ? rule.names[locale] : DEFAULT_ALIAS[locale];
@@ -374,6 +376,8 @@ const NICKNAME_TONE_BY_LOCALE: Record<Locale, string[]> = {
   ko: ["조용한 관찰자","걸어다니는 혼돈","밤샘 철학자","숨은 로맨티스트","고독한 늑대","독설 시인","소파 평론가","인용 장인","밈 수집가","직관 철학자"],
   zh: ["安靜 觀察者","行走 混亂","夜貓 哲學家","隱藏 浪漫派","孤獨 一匹狼","毒舌 詩人","沙發 評論家","金句 製造機","迷因 收藏家","看台 詩人"],
   ru: ["Тихий наблюдатель","Ходячий хаос","Ночной философ","Тайный романтик","Одинокий волк","Диванный эксперт","Мастер цитат","Мемный архивариус","Трибунный поэт","Кухонный экономист"],
+  id: ["Pengamat Kalem","Biang Rusuh","Burung Hantu","Filsuf Rebahan","Pakar Warung","Bucin Garis Keras","Raja Utas","Penimbun Meme","Serigala Sunyi","Pujangga Tribun","Pejuang Cuan","Ahli Nyinyir"],
+  th: ["สายส่อง เงียบๆ","ตัวป่วน ประจำไทม์ไลน์","นกฮูก ราตรี","นักปรัชญา บนโซฟา","กูรู ข้างทาง","สายเปย์ หัวใจ","เจ้าพ่อ เธรด","นักสะสม มีม","หมาป่า เดียวดาย","กวี ขอบสนาม","นักล่า คริปโต","เซียน จิกกัด"],
 };
 // Well-known fan names and symbols per language, so a club can flavour a nickname the way local
 // fans would say it. Examples only; any club the analysis names may be used the same way.
@@ -390,18 +394,20 @@ const CLUB_SYMBOLS_BY_LOCALE: Record<Locale, string> = {
   ko: "기아 타이거즈: 호랑이 · 롯데 자이언츠: 갈매기 · 전북: 녹색 전사",
   zh: "中信兄弟: 象迷 · 樂天桃猿: 猿迷 · 統一獅: 獅迷",
   ru: "Спартак: Спартаковец · Зенит: Зенитовец · ЦСКА: Армеец",
+  id: "Persija: Jakmania · Persib: Bobotoh · Arema: Aremania · Persebaya: Bonek",
+  th: "บุรีรัมย์: ปราสาทสายฟ้า · การท่าเรือ: สิงห์ท่าเรือ · แมนยู: ปีศาจแดง · ลิเวอร์พูล: หงส์แดง",
 };
 // Safe two-word fallbacks, keyed by the category of the strongest character trait.
 const NICKNAME_FALLBACKS: Record<string, {icon:string; names:Record<Locale,string>}> = {
-  temperament: {icon:"🦅", names:{tr:"Özgür Ruh", en:"Free Spirit", es:"Espíritu Libre", pt:"Espírito Livre", ar:"روح حرة", fr:"Esprit Libre", de:"Freier Geist", it:"Spirito Libero", ja:"自由な 魂", ko:"자유로운 영혼", zh:"自由 靈魂", ru:"Свободный дух"}},
-  communication: {icon:"🎤", names:{tr:"Laf Cambazı", en:"Word Acrobat", es:"Acróbata Verbal", pt:"Acrobata Verbal", ar:"بهلوان الكلام", fr:"Acrobate Verbal", de:"Wortgewandter Redner", it:"Acrobata Verbale", ja:"言葉の 曲芸師", ko:"말의 곡예사", zh:"語言 高手", ru:"Мастер слова"}},
-  humor: {icon:"😈", names:{tr:"Tatlı Bela", en:"Sweet Trouble", es:"Dulce Problema", pt:"Doce Encrenca", ar:"مشاغب لطيف", fr:"Douce Peste", de:"Charmanter Unruhestifter", it:"Dolce Peste", ja:"愛すべき 問題児", ko:"귀여운 말썽꾼", zh:"可愛 麻煩精", ru:"Милый хулиган"}},
-  emotional: {icon:"🌙", names:{tr:"Gizli Romantik", en:"Secret Romantic", es:"Romántico Secreto", pt:"Romântico Secreto", ar:"رومانسي خفي", fr:"Romantique Secret", de:"Heimlicher Romantiker", it:"Romantico Segreto", ja:"隠れ ロマンチスト", ko:"숨은 로맨티스트", zh:"隱藏 浪漫派", ru:"Тайный романтик"}},
-  relational: {icon:"💌", names:{tr:"Platonik Aşık", en:"Platonic Lover", es:"Amante Platónico", pt:"Amante Platônico", ar:"عاشق أفلاطوني", fr:"Amoureux Platonique", de:"Platonischer Verehrer", it:"Amante Platonico", ja:"片想いの 達人", ko:"플라토닉 연인", zh:"柏拉圖式 戀人", ru:"Платонический влюблённый"}},
-  language: {icon:"🖋", names:{tr:"Gölge Yazar", en:"Shadow Writer", es:"Escritor Fantasma", pt:"Escritor Fantasma", ar:"كاتب الظل", fr:"Plume Fantôme", de:"Stiller Schreiber", it:"Scrittore Ombra", ja:"影の 書き手", ko:"그림자 작가", zh:"影子 作家", ru:"Теневой автор"}},
-  creativity: {icon:"💡", names:{tr:"Fikir Fabrikası", en:"Idea Factory", es:"Mente Creativa", pt:"Mente Criativa", ar:"عقل مبدع", fr:"Esprit Créatif", de:"Kreativer Kopf", it:"Mente Creativa", ja:"アイデア 職人", ko:"아이디어 장인", zh:"點子 工廠", ru:"Генератор идей"}},
-  intellect: {icon:"🔍", names:{tr:"Meraklı Kafa", en:"Curious Mind", es:"Mente Curiosa", pt:"Mente Curiosa", ar:"عقل فضولي", fr:"Esprit Curieux", de:"Neugieriger Kopf", it:"Mente Curiosa", ja:"好奇心の 探検家", ko:"호기심 탐험가", zh:"好奇 腦袋", ru:"Пытливый ум"}},
-  social: {icon:"👀", names:{tr:"Sessiz Gözlemci", en:"Quiet Observer", es:"Observador Sereno", pt:"Observador Tranquilo", ar:"مراقب هادئ", fr:"Observateur Discret", de:"Stiller Beobachter", it:"Osservatore Silenzioso", ja:"静かな 観察者", ko:"조용한 관찰자", zh:"安靜 觀察者", ru:"Тихий наблюдатель"}},
+  temperament: {icon:"🦅", names:{tr:"Özgür Ruh", en:"Free Spirit", es:"Espíritu Libre", pt:"Espírito Livre", ar:"روح حرة", fr:"Esprit Libre", de:"Freier Geist", it:"Spirito Libero", ja:"自由な 魂", ko:"자유로운 영혼", zh:"自由 靈魂", ru:"Свободный дух", id:"Jiwa Bebas", th:"จิตวิญญาณ อิสระ"}},
+  communication: {icon:"🎤", names:{tr:"Laf Cambazı", en:"Word Acrobat", es:"Acróbata Verbal", pt:"Acrobata Verbal", ar:"بهلوان الكلام", fr:"Acrobate Verbal", de:"Wortgewandter Redner", it:"Acrobata Verbale", ja:"言葉の 曲芸師", ko:"말의 곡예사", zh:"語言 高手", ru:"Мастер слова", id:"Jago Bicara", th:"เซียน คารม"}},
+  humor: {icon:"😈", names:{tr:"Tatlı Bela", en:"Sweet Trouble", es:"Dulce Problema", pt:"Doce Encrenca", ar:"مشاغب لطيف", fr:"Douce Peste", de:"Charmanter Unruhestifter", it:"Dolce Peste", ja:"愛すべき 問題児", ko:"귀여운 말썽꾼", zh:"可愛 麻煩精", ru:"Милый хулиган", id:"Biang Rusuh", th:"ตัวป่วน น่ารัก"}},
+  emotional: {icon:"🌙", names:{tr:"Gizli Romantik", en:"Secret Romantic", es:"Romántico Secreto", pt:"Romântico Secreto", ar:"رومانسي خفي", fr:"Romantique Secret", de:"Heimlicher Romantiker", it:"Romantico Segreto", ja:"隠れ ロマンチスト", ko:"숨은 로맨티스트", zh:"隱藏 浪漫派", ru:"Тайный романтик", id:"Romantis Diam-diam", th:"โรแมนติก ลับๆ"}},
+  relational: {icon:"💌", names:{tr:"Platonik Aşık", en:"Platonic Lover", es:"Amante Platónico", pt:"Amante Platônico", ar:"عاشق أفلاطوني", fr:"Amoureux Platonique", de:"Platonischer Verehrer", it:"Amante Platonico", ja:"片想いの 達人", ko:"플라토닉 연인", zh:"柏拉圖式 戀人", ru:"Платонический влюблённый", id:"Cinta Platonis", th:"รัก ข้างเดียว"}},
+  language: {icon:"🖋", names:{tr:"Gölge Yazar", en:"Shadow Writer", es:"Escritor Fantasma", pt:"Escritor Fantasma", ar:"كاتب الظل", fr:"Plume Fantôme", de:"Stiller Schreiber", it:"Scrittore Ombra", ja:"影の 書き手", ko:"그림자 작가", zh:"影子 作家", ru:"Теневой автор", id:"Penulis Bayangan", th:"นักเขียน เงา"}},
+  creativity: {icon:"💡", names:{tr:"Fikir Fabrikası", en:"Idea Factory", es:"Mente Creativa", pt:"Mente Criativa", ar:"عقل مبدع", fr:"Esprit Créatif", de:"Kreativer Kopf", it:"Mente Creativa", ja:"アイデア 職人", ko:"아이디어 장인", zh:"點子 工廠", ru:"Генератор идей", id:"Pabrik Ide", th:"โรงงาน ไอเดีย"}},
+  intellect: {icon:"🔍", names:{tr:"Meraklı Kafa", en:"Curious Mind", es:"Mente Curiosa", pt:"Mente Curiosa", ar:"عقل فضولي", fr:"Esprit Curieux", de:"Neugieriger Kopf", it:"Mente Curiosa", ja:"好奇心の 探検家", ko:"호기심 탐험가", zh:"好奇 腦袋", ru:"Пытливый ум", id:"Otak Penasaran", th:"สมอง ช่างสงสัย"}},
+  social: {icon:"👀", names:{tr:"Sessiz Gözlemci", en:"Quiet Observer", es:"Observador Sereno", pt:"Observador Tranquilo", ar:"مراقب هادئ", fr:"Observateur Discret", de:"Stiller Beobachter", it:"Osservatore Silenzioso", ja:"静かな 観察者", ko:"조용한 관찰자", zh:"安靜 觀察者", ru:"Тихий наблюдатель", id:"Pengamat Kalem", th:"ผู้สังเกต เงียบๆ"}},
 };
 // Exactly two words: letters (with marks, apostrophes, hyphens) separated by one space. No digits,
 // emoji, links or punctuation. Returns the normalized nickname or null.

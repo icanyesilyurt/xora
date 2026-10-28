@@ -7,15 +7,15 @@ test('every FUN persona has distinct localized character copy in generated, save
   const result=c.analyzeFunHandle('alice','mirror',nonce);seen.set(result.nickname.tr,result);
  }
  assert.equal(seen.size,c.FUN_CARD_POOL.length);
- for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']){
+ for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th']){
   c.getLang=()=>lang;
   const unique=new Set();
   for(const [name,result] of seen){
    const expected=result.comment.mirror[lang];unique.add(expected);
    assert.doesNotMatch(expected,forbidden,name);
    // Japanese sentences end with 。！？ and carry no trailing space.
-   const sentences=expected.match((lang==='ja'||lang==='zh')?/[^。！？]+[。！？]/g:/[^.!?]+[.!?]/g)||[];
-   assert.ok(sentences.length>=2 && sentences.length<=4,name);
+   const sentences=expected.match((lang==='ja'||lang==='zh')?/[^。！？]+[。！？]/g:lang==='th'?/[^ ]+(?: |$)/g:/[^.!?]+[.!?]/g)||[];
+   assert.ok(sentences.length>=2 && (lang==='th'||sentences.length<=4),name);
    assert.equal(result.archetype.comments[lang][0],expected);
    // Historical cards must resolve their persona rather than redisplay stored boilerplate.
    const saved=structuredClone(result);
@@ -170,15 +170,15 @@ test('ambiguous REAL failure retains request ID and successful retry uses server
 });
 test('every I18N locale exposes the complete key set with non-empty strings; missing keys fail',()=>{
  const c=browser();
- assert.deepEqual(Object.keys(c.I18N).sort(),['ar','de','en','es','fr','it','ja','ko','pt','ru','tr','zh']);
+ assert.deepEqual(Object.keys(c.I18N).sort(),['ar','de','en','es','fr','id','it','ja','ko','pt','ru','th','tr','zh']);
  const keys=Object.keys(c.I18N.tr).sort();
- for(const lang of ['en','es','pt','ar','fr','de','it','ja','ko','zh','ru']) assert.deepEqual(Object.keys(c.I18N[lang]).sort(),keys,lang+' must cover every tr key');
- for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'])for(const key of keys){
+ for(const lang of ['en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th']) assert.deepEqual(Object.keys(c.I18N[lang]).sort(),keys,lang+' must cover every tr key');
+ for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th'])for(const key of keys){
   const value=c.I18N[lang][key];
   assert.ok(typeof value==='string' && value.trim().length>0,lang+'.'+key+' must be a non-empty string');
  }
  // t() must never fall back to another language for a supported locale.
- for(const lang of ['es','pt','ar','fr','de','it','ja','ko','zh','ru']){
+ for(const lang of ['es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th']){
   c.localStorage.setItem(c.LS.lang,lang);
   for(const key of keys) assert.equal(c.t(key),c.I18N[lang][key]);
  }
@@ -241,7 +241,7 @@ test('every saved locale persists and localizes; unknown stored values fall thro
  // No saved choice and no browser language: English.
  assert.equal(c.getLang(),'en');
  assert.equal(typeof c.nextLang,'undefined','the sequential cycle helper is gone');
- assert.deepEqual([...c.LANGS],['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']);
+ assert.deepEqual([...c.LANGS],['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th']);
  assert.equal(c.LANG_NAMES.pt,'Português');assert.equal(c.LANG_NAMES.ar,'العربية');assert.equal(c.LANG_NAMES.fr,'Français');assert.equal(c.LANG_NAMES.de,'Deutsch');assert.equal(c.LANG_NAMES.it,'Italiano');assert.equal(c.LANG_NAMES.ja,'日本語');assert.equal(c.LANG_NAMES.ko,'한국어');assert.equal(c.LANG_NAMES.zh,'繁體中文');assert.equal(c.LANG_NAMES.ru,'Русский');
  c.localStorage.setItem(c.LS.lang,'es');assert.equal(c.getLang(),'es');
  assert.equal(c.t('nav_profile'),'Perfil');
@@ -270,7 +270,7 @@ test('every saved locale persists and localizes; unknown stored values fall thro
 });
 for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/COMPATIBILIDAD XORA FUN/,/compatibilidad/],['pt',/Meu cartão XORA FUN/,/COMPATIBILIDADE XORA FUN/,/compatibilidade/],['ar',/بطاقتي في XORA FUN/,/توافق XORA FUN/,/توافق/],['fr',/Ma carte XORA FUN/,/COMPATIBILITÉ XORA FUN/,/compatibilité/],['de',/Meine XORA FUN-Karte/,/XORA FUN ÜBEREINSTIMMUNG/,/Übereinstimmung/],['it',/La mia carta XORA FUN/,/AFFINITÀ XORA FUN/,/affinità/],['ja',/XORA FUNのカード/,/XORA FUN相性/,/相性/],['ko',/내 XORA FUN 카드/,/XORA FUN 궁합/,/궁합/],['zh',/我的 XORA FUN 卡片/,/XORA FUN 速配/,/速配/],['ru',/Моя карточка XORA FUN/,/СОВМЕСТИМОСТЬ XORA FUN/,/совместимость/]]) test(lang.toUpperCase()+' FUN cards, PNG, share and match render natively without fallback to other locales',()=>{
  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
- const others=['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'].filter(l=>l!==lang);
+ const others=['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th'].filter(l=>l!==lang);
  for(let nonce=0;nonce<24;nonce++){
   const r=c.analyzeFunHandle('alice','mirror',nonce);
   const persona=c.FUN_PERSONAS.find(p=>p.id===r.persona_id);
@@ -295,7 +295,7 @@ for(const [lang,shareFun,overall,shareMatch] of [['es',/Mi tarjeta XORA FUN/,/CO
  assert.match(c.matchComment({a:'alice',b:'bob',ci:0},lang),/@alice/);
  for(const mode of ['mirror','stalk','match']) assert.ok(c.THINKING[mode][lang].length===6);
 });
-for(const lang of ['pt','ar','fr','de','it','ja','ko','zh','ru']) test('every '+lang.toUpperCase()+' persona renders nickname, tagline and comment intact in HTML and PNG without overflow',()=>{
+for(const lang of ['pt','ar','fr','de','it','ja','ko','zh','ru','id','th']) test('every '+lang.toUpperCase()+' persona renders nickname, tagline and comment intact in HTML and PNG without overflow',()=>{
  const c=browser();c.localStorage.setItem(c.LS.lang,lang);
  const seen=new Map();
  for(let nonce=0;nonce<1000 && seen.size<12;nonce++){const r=c.analyzeFunHandle('alice','mirror',nonce);seen.set(r.persona_id,r);}
@@ -356,8 +356,8 @@ for(const [lang,funBtn,funNote] of [['es','Saca tu Tarjeta Gratis','Esta tarjeta
 });
 test('static FUN personas keep TR/EN/ES/PT/AR/FR/DE/IT/JA copy and are untouched by the single-locale REAL view',()=>{
  const c=browser();
- for(const p of c.FUN_PERSONAS) assert.deepEqual(Object.keys(p.locales).sort(),['ar','de','en','es','fr','it','ja','ko','pt','ru','tr','zh']);
- for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']){
+ for(const p of c.FUN_PERSONAS) assert.deepEqual(Object.keys(p.locales).sort(),['ar','de','en','es','fr','id','it','ja','ko','pt','ru','th','tr','zh']);
+ for(const lang of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th']){
   c.localStorage.setItem(c.LS.lang,lang);
   for(let nonce=0;nonce<12;nonce++){
    const fun=c.analyzeFunHandle('alice',nonce%2?'stalk':'mirror',nonce);
@@ -366,11 +366,11 @@ test('static FUN personas keep TR/EN/ES/PT/AR/FR/DE/IT/JA copy and are untouched
    const html=c.buildIdentityCard(fun);
    const stalk=fun.mode==='stalk';
    assert.ok(html.includes(c.esc(copy.nickname)) && html.includes(c.esc(stalk?copy.stalk_tagline:copy.tagline)) && html.includes(c.esc(stalk?copy.stalk_comment:copy.comment)),lang+' '+fun.mode+' '+fun.persona_id);
-   for(const other of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'].filter(l=>l!==lang)){const o=c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[other];assert.ok(!html.includes(c.esc(o.comment))&&!html.includes(c.esc(o.stalk_comment)));}
+   for(const other of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th'].filter(l=>l!==lang)){const o=c.FUN_PERSONAS.find(p=>p.id===fun.persona_id).locales[other];assert.ok(!html.includes(c.esc(o.comment))&&!html.includes(c.esc(o.stalk_comment)));}
   }
   const m=c.matchFunHandles('alice','bob',3);
   assert.equal(c.realCopyForActiveLang(m),m);
-  assert.deepEqual(Object.keys(m.fun_comment).sort(),['ar','de','en','es','fr','it','ja','ko','pt','ru','tr','zh']);
+  assert.deepEqual(Object.keys(m.fun_comment).sort(),['ar','de','en','es','fr','id','it','ja','ko','pt','ru','th','tr','zh']);
   assert.ok(c.buildMatchCard(m).includes(c.esc(m.fun_comment[lang])));
  }
 });
@@ -411,7 +411,7 @@ test('RTL applies only to Arabic: page direction, scoped CSS and LTR technical i
 test('Arabic mixed-direction content keeps handles, URL, percentages and brand names in LTR order',()=>{
  const c=browser();const LRI='\u2066',PDI='\u2069';
  const fun=c.analyzeFunHandle('alice','mirror',2),m=c.matchFunHandles('alice','bob',1);
- for(const lang of ['tr','en','es','pt','fr','de','it','ja','ko','zh','ru']){
+ for(const lang of ['tr','en','es','pt','fr','de','it','ja','ko','zh','ru','id','th']){
   c.localStorage.setItem(c.LS.lang,lang);
   for(const text of [c.shareIdentityText(fun),c.shareMatchText(m),c.matchComment({a:'alice',b:'bob',ci:0},lang)])assert.ok(!text.includes(LRI)&&!text.includes(PDI),lang+' output has no bidi controls');
  }
@@ -457,14 +457,14 @@ test('Match PNG score rows fit the card frame in every locale, including ES, FR,
  // Full-width Japanese and Korean glyphs are about one em wide at 24px.
  const width=row=>[...row].reduce((w,ch)=>w+(/[\u3000-\u30ff\u3400-\u9fff\uac00-\ud7af\uff00-\uffef]/.test(ch)?24:pxPerChar),0);
  const rows=L=>[L.match_flirt+' %99  •  '+L.match_vibe+' %99  •  '+L.match_humor+' %99',L.match_chaos+' %99  •  '+L.match_romance+' %99'];
- for(const lang of ['tr','en','es','pt','fr','de','it','ja','ko','zh','ru'])for(const row of rows(c.I18N[lang])) assert.ok(width(row)<=maxWidth,lang+' score row too wide ('+Math.round(width(row))+'px): '+row);
+ for(const lang of ['tr','en','es','pt','fr','de','it','ja','ko','zh','ru','id','th'])for(const row of rows(c.I18N[lang])) assert.ok(width(row)<=maxWidth,lang+' score row too wide ('+Math.round(width(row))+'px): '+row);
  // The previous ES/FR labels measured 901px and 917px in the browser and must stay out.
  assert.notEqual(c.I18N.es.match_vibe,'Conexión de Vibra');assert.notEqual(c.I18N.fr.match_vibe,"Même longueur d'onde");
  assert.equal(c.I18N.es.match_vibe,'Sintonía');assert.equal(c.I18N.fr.match_vibe,'Complicité');
  // Rendering path: the actual PNG draws exactly these rows.
  const text=[];const ctx=new Proxy({measureText:v=>({width:String(v).length*12}),fillText:(v,x,y)=>text.push({v:String(v),y}),createLinearGradient:()=>({addColorStop(){}})},{get:(o,k)=>k in o?o[k]:()=>{}});
  c.document.createElement=()=>({getContext:()=>ctx});
- for(const lang of ['es','fr','it','ja','ko','zh','ru']){
+ for(const lang of ['es','fr','it','ja','ko','zh','ru','id','th']){
   c.localStorage.setItem(c.LS.lang,lang);text.length=0;
   const m=c.matchFunHandles('alice','bob',1);Object.assign(m,{flirt:99,vibe:99,humor:99,chaos:99,romance:99});
   // REAL Match draws the AI-scored rows; the same object as FUN draws none of them.
@@ -589,7 +589,7 @@ test('a saved language always wins over browser detection, and detection is neve
  // Only the existing key is used; no parallel preference store appears.
  assert.equal(c.LS.lang,'xora_lang');
 });
-test('language selector lists all 12 languages, applies and persists the pick, closes, and flips RTL/LTR',()=>{
+test('language selector lists all 14 languages, applies and persists the pick, closes, and flips RTL/LTR',()=>{
  const c=browser();c.navigator={languages:['ar-SA']};
  c.CustomEvent=class{constructor(type){this.type=type;}};
  const registry=[];const docListeners={};
@@ -623,8 +623,8 @@ test('language selector lists all 12 languages, applies and persists the pick, c
  btn.fire('click');
  assert.equal(menu.hidden,false,'opens on click');assert.equal(btn.getAttribute('aria-expanded'),'true');
  const options=[...menu.innerHTML.matchAll(/data-lang="(\w+)" lang="\w+" dir="(\w+)" aria-selected="(\w+)">([^<]+)<\/button>/g)].map(m=>({code:m[1],dir:m[2],selected:m[3]==='true',label:m[4]}));
- assert.deepEqual(options.map(o=>o.code),['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']);
- assert.deepEqual(options.map(o=>o.label),['Türkçe','English','Español','Português','العربية','Français','Deutsch','Italiano','日本語','한국어','繁體中文','Русский']);
+ assert.deepEqual(options.map(o=>o.code),['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th']);
+ assert.deepEqual(options.map(o=>o.label),['Türkçe','English','Español','Português','العربية','Français','Deutsch','Italiano','日本語','한국어','繁體中文','Русский','Bahasa Indonesia','ไทย']);
  assert.deepEqual(options.filter(o=>o.selected).map(o=>o.code),['ar'],'current language is marked');
  assert.equal(options.find(o=>o.code==='ar').dir,'rtl');assert.ok(options.filter(o=>o.code!=='ar').every(o=>o.dir==='ltr'));
 
@@ -654,10 +654,10 @@ test('language selector lists all 12 languages, applies and persists the pick, c
  fireDoc('click',{target:makeEl()});assert.equal(menu.hidden,true,'outside click closes');
  btn.fire('click');fireDoc('keydown',{key:'Escape'});assert.equal(menu.hidden,true,'Escape closes');
  // An unsupported value never reaches storage.
- c.setLang('xx');assert.equal(c.localStorage.getItem(c.LS.lang),'ru');
+ c.setLang('xx');assert.equal(c.localStorage.getItem(c.LS.lang),'th');
 });
 
-const LOCALES12=['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'];
+const LOCALES12=['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th'];
 const recorder=(c)=>{
  const cjk=/[\u3000-\u30ff\u3400-\u9fff\uac00-\ud7af\uff00-\uffef]/;
  const text=[],rects=[];
@@ -824,7 +824,9 @@ const FUN_OFFLINE={
  ja:/コーヒー|カフェ|テーブル|部屋|目が合|顔|表情|声|口調|対面|会って|飲み会|集まり|会議/u,
  ko:/커피|카페|테이블|방에서|방 안|모임|만나서|직접 만나|눈을 마주|얼굴|표정|목소리|말투|회의|자리에 앉/u,
  zh:/咖啡|桌上|餐桌|桌子|一桌|坐在|聚會|見面|房間|對上眼|臉|聲音|語調|語氣|面對面|派對/u,
- ru:FUN_WORD('коф\\p{L}*|кафе|стол|стола|столом|столе|встреч\\p{L}*|комнат\\p{L}*|вечеринк\\p{L}*|лицо|лица|лицом|лице|взгляд\\p{L}*|в глаза|голос\\p{L}*|интонац\\p{L}*|вживую|тусовк\\p{L}*')
+ ru:FUN_WORD('коф\\p{L}*|кафе|стол|стола|столом|столе|встреч\\p{L}*|комнат\\p{L}*|вечеринк\\p{L}*|лицо|лица|лицом|лице|взгляд\\p{L}*|в глаза|голос\\p{L}*|интонац\\p{L}*|вживую|тусовк\\p{L}*'),
+ id:FUN_WORD('kopi|kafe|meja|ruang\\p{L}*|pesta|wajah|tatap\\p{L}*|suara\\p{L}*|nongkrong|kopdar|ketemuan'),
+ th:/กาแฟ|คาเฟ่|โต๊ะ|ห้องนั่งเล่น|ห้องประชุม|ปาร์ตี้|ใบหน้า|สบตา|น้ำเสียง|เจอตัว|นั่งคุย/u
 };
 const FUN_CLAIM={
  tr:/analiz ett|hesabına baktık|hesabını inceled|son tweet|son postların|verilerin|verilerine göre|ölçtük|hesapladık|postlarına baktık/iu,
@@ -838,7 +840,9 @@ const FUN_CLAIM={
  ja:/分析しました|分析した結果|あなたのデータ|最近のポストから|測定|計算しました/u,
  ko:/분석했|분석 결과|당신의 데이터|최근 게시물을 보니|측정했|계산했/u,
  zh:/我們分析|分析了你的|你的資料顯示|根據你的資料|最近的貼文看來|測量|計算了/u,
- ru:/мы проанализировали|проанализировали|твои данные показывают|по твоим данным|твои последние посты|мы измерили|мы посчитали/iu
+ ru:/мы проанализировали|проанализировали|твои данные показывают|по твоим данным|твои последние посты|мы измерили|мы посчитали/iu,
+ id:/kami menganalisis|kami sudah menganalisis|datamu menunjukkan|menurut datamu|postingan terakhirmu|kami mengukur|kami menghitung/iu,
+ th:/เราวิเคราะห์|ข้อมูลของคุณแสดง|จากข้อมูลของคุณ|โพสต์ล่าสุดของคุณ|เราวัด|เราคำนวณ/u
 };
 test('FUN persona copy is X-native in all 12 locales: no offline scenes and no claim that X data was analyzed',()=>{
  const c=browser();
@@ -893,9 +897,9 @@ test('FUN Match shows one big FUN percentage labelled as a XORA FUN score; REAL 
 
 // ---------------------------------------------------------------------------------------------
 // FUN Mirror speaks to the user; FUN Stalk describes someone else's account from the outside.
-const STALK_SECOND_PERSON={tr:new RegExp("(?<!\\p{L})(?:sen|sana|seni|senin|sende|senden|seninle|kendin)(?!\\p{L})|yorsun|(?:abil|ebil)irsin|(?<!\\p{L})(?!herkesin(?!\\p{L}))\\p{L}+(?:sın|sin|sun|sün)(?!\\p{L})","iu"),en:new RegExp("(?<!\\p{L})(?:you|your|yours|yourself)(?!\\p{L})","iu"),es:new RegExp("(?<!\\p{L})(?:tú|tu|tus|te|ti|contigo|vos)(?!\\p{L})","iu"),pt:new RegExp("(?<!\\p{L})(?:você|vocês|te|ti|contigo|teu|tua|teus|tuas)(?!\\p{L})","iu"),ar:new RegExp("(?<!\\p{L})(?:أنت|أنتِ|لك|عندك|معك|بك|منك|إليك|عليك|نفسك|خطك|يومك|حسابك|رصيدك|منشورك|منشوراتك|ردك|ردودك|جملك|جملتك|كلماتك|تفاعلك|بطاقتك|رسالتك|انتباهك|يزعجك|يهمك|يسعدك|يعجبك)(?!\\p{L})","u"),fr:new RegExp("(?<!\\p{L})(?:tu|te|toi|ton|ta|tes)(?!\\p{L})|(?<!\\p{L})t['’]","iu"),de:new RegExp("(?<!\\p{L})(?:du|dich|dir|dein|deine|deinen|deinem|deiner|deines)(?!\\p{L})","iu"),it:new RegExp("(?<!\\p{L})(?:tu|ti|te|tuo|tua|tuoi|tue)(?!\\p{L})","iu"),ja:new RegExp("あなた|君|きみ|お前","u"),ko:new RegExp("당신|(?<!\\p{L})너(?:는|의|를|랑|한테|에게)(?!\\p{L})|(?<!\\p{L})네가(?!\\p{L})","u"),zh:new RegExp("你|妳|您","u"),ru:new RegExp("(?<!\\p{L})(?:ты|тебя|тебе|тобой|твой|твоя|твоё|твое|твои|твоего|твоей|твоих|твоим|твоими|твою)(?!\\p{L})|(?<!\\p{L})(?!лишь(?!\\p{L}))\\p{L}+(?:ешь|ёшь|ишь)(?:ся)?(?!\\p{L})","iu")};
-const MIRROR_SECOND_PERSON={tr:new RegExp("(?<!\\p{L})(?:sen|sana|seni|senin|sende|senden|seninle|kendin)(?!\\p{L})|yorsun|(?:abil|ebil)irsin|(?<!\\p{L})(?!herkesin(?!\\p{L}))\\p{L}+(?:sın|sin|sun|sün)(?!\\p{L})","iu"),en:new RegExp("(?<!\\p{L})(?:you|your|yours|yourself)(?!\\p{L})","iu"),es:new RegExp("(?<!\\p{L})(?:tú|tu|tus|te|ti|contigo|vos)(?!\\p{L})|(?<!\\p{L})\\p{L}{2,}(?:as|es)(?!\\p{L})","iu"),pt:new RegExp("(?<!\\p{L})(?:você|vocês|te|ti|contigo|teu|tua|teus|tuas)(?!\\p{L})","iu"),ar:new RegExp("(?<!\\p{L})(?:أنت|أنتِ|لك|عندك|معك|بك|منك|إليك|عليك|نفسك|خطك|يومك|حسابك|رصيدك|منشورك|منشوراتك|ردك|ردودك|جملك|جملتك|كلماتك|تفاعلك|بطاقتك|رسالتك|انتباهك|يزعجك|يهمك|يسعدك|يعجبك)(?!\\p{L})|(?<!\\p{L})ت\\p{L}{2,}","u"),fr:new RegExp("(?<!\\p{L})(?:tu|te|toi|ton|ta|tes)(?!\\p{L})|(?<!\\p{L})t['’]","iu"),de:new RegExp("(?<!\\p{L})(?:du|dich|dir|dein|deine|deinen|deinem|deiner|deines)(?!\\p{L})","iu"),it:new RegExp("(?<!\\p{L})(?:tu|ti|te|tuo|tua|tuoi|tue)(?!\\p{L})|(?<!\\p{L})(?:sai|noti|scegli|aggiungi|cancelli|cambi|rimetti|conosci|pubblichi|lasci|scrivi|inizi|finisci|ritocchi|provi|lanci|trasformi|tieni|resisti|vuoi|senti|leggi|scorri|fai|spieghi)(?!\\p{L})","iu"),ja:new RegExp("あなた|君|きみ|お前","u"),ko:new RegExp("당신|(?<!\\p{L})너(?:는|의|를|랑|한테|에게)(?!\\p{L})|(?<!\\p{L})네가(?!\\p{L})","u"),zh:new RegExp("你|妳|您","u"),ru:new RegExp("(?<!\\p{L})(?:ты|тебя|тебе|тобой|твой|твоя|твоё|твое|твои|твоего|твоей|твоих|твоим|твоими|твою)(?!\\p{L})|(?<!\\p{L})(?!лишь(?!\\p{L}))\\p{L}+(?:ешь|ёшь|ишь)(?:ся)?(?!\\p{L})","iu")};
-const STALK_THIRD_PERSON={tr:new RegExp("\\p{L}yor(?!\\p{L})|(?<!\\p{L})(?:onun|ona|onda|onunla|o)(?!\\p{L})","iu"),en:new RegExp("(?<!\\p{L})(?:they|their|them|this account)(?!\\p{L})","iu"),es:new RegExp("(?<!\\p{L})(?:le|les|su|sus|suyo|suya|esta cuenta|la cuenta)(?!\\p{L})","iu"),pt:new RegExp("(?<!\\p{L})(?:essa conta|dessa conta|nessa conta|a conta|ela|dela)(?!\\p{L})","iu"),ar:new RegExp("هذا الحساب|(?<!\\p{L})ي\\p{L}{2,}","u"),fr:new RegExp("(?<!\\p{L})(?:il|lui|son|sa|ses|ce compte)(?!\\p{L})","iu"),de:new RegExp("(?<!\\p{L})(?:er|ihm|ihn|sein|seine|seinen|seinem|seiner|dieser account|diesem account|dieses profil)(?!\\p{L})","iu"),it:new RegExp("(?<!\\p{L})(?:questo account|l'account|gli|suo|sua|suoi|sue|lo)(?!\\p{L})","iu"),ja:new RegExp("このアカウント|この人|タイプだ|人だ","u"),ko:new RegExp("이 계정|이 사람|타입이에요|사람이에요","u"),zh:new RegExp("這個帳號|這個人","u"),ru:new RegExp("(?<!\\p{L})(?:он|его|ему|им|этот аккаунт|этого аккаунта|у этого аккаунта)(?!\\p{L})","iu")};
+const STALK_SECOND_PERSON={tr:new RegExp("(?<!\\p{L})(?:sen|sana|seni|senin|sende|senden|seninle|kendin)(?!\\p{L})|yorsun|(?:abil|ebil)irsin|(?<!\\p{L})(?!herkesin(?!\\p{L}))\\p{L}+(?:sın|sin|sun|sün)(?!\\p{L})","iu"),en:new RegExp("(?<!\\p{L})(?:you|your|yours|yourself)(?!\\p{L})","iu"),es:new RegExp("(?<!\\p{L})(?:tú|tu|tus|te|ti|contigo|vos)(?!\\p{L})","iu"),pt:new RegExp("(?<!\\p{L})(?:você|vocês|te|ti|contigo|teu|tua|teus|tuas)(?!\\p{L})","iu"),ar:new RegExp("(?<!\\p{L})(?:أنت|أنتِ|لك|عندك|معك|بك|منك|إليك|عليك|نفسك|خطك|يومك|حسابك|رصيدك|منشورك|منشوراتك|ردك|ردودك|جملك|جملتك|كلماتك|تفاعلك|بطاقتك|رسالتك|انتباهك|يزعجك|يهمك|يسعدك|يعجبك)(?!\\p{L})","u"),fr:new RegExp("(?<!\\p{L})(?:tu|te|toi|ton|ta|tes)(?!\\p{L})|(?<!\\p{L})t['’]","iu"),de:new RegExp("(?<!\\p{L})(?:du|dich|dir|dein|deine|deinen|deinem|deiner|deines)(?!\\p{L})","iu"),it:new RegExp("(?<!\\p{L})(?:tu|ti|te|tuo|tua|tuoi|tue)(?!\\p{L})","iu"),ja:new RegExp("あなた|君|きみ|お前","u"),ko:new RegExp("당신|(?<!\\p{L})너(?:는|의|를|랑|한테|에게)(?!\\p{L})|(?<!\\p{L})네가(?!\\p{L})","u"),zh:new RegExp("你|妳|您","u"),ru:new RegExp("(?<!\\p{L})(?:ты|тебя|тебе|тобой|твой|твоя|твоё|твое|твои|твоего|твоей|твоих|твоим|твоими|твою)(?!\\p{L})|(?<!\\p{L})(?!лишь(?!\\p{L}))\\p{L}+(?:ешь|ёшь|ишь)(?:ся)?(?!\\p{L})","iu"),id:new RegExp("(?<!\\p{L})(?:kamu|kau|anda|dirimu)(?!\\p{L})|\\p{L}{2,}-?mu(?!\\p{L})","iu"),th:new RegExp("คุณ","u")};
+const MIRROR_SECOND_PERSON={tr:new RegExp("(?<!\\p{L})(?:sen|sana|seni|senin|sende|senden|seninle|kendin)(?!\\p{L})|yorsun|(?:abil|ebil)irsin|(?<!\\p{L})(?!herkesin(?!\\p{L}))\\p{L}+(?:sın|sin|sun|sün)(?!\\p{L})","iu"),en:new RegExp("(?<!\\p{L})(?:you|your|yours|yourself)(?!\\p{L})","iu"),es:new RegExp("(?<!\\p{L})(?:tú|tu|tus|te|ti|contigo|vos)(?!\\p{L})|(?<!\\p{L})\\p{L}{2,}(?:as|es)(?!\\p{L})","iu"),pt:new RegExp("(?<!\\p{L})(?:você|vocês|te|ti|contigo|teu|tua|teus|tuas)(?!\\p{L})","iu"),ar:new RegExp("(?<!\\p{L})(?:أنت|أنتِ|لك|عندك|معك|بك|منك|إليك|عليك|نفسك|خطك|يومك|حسابك|رصيدك|منشورك|منشوراتك|ردك|ردودك|جملك|جملتك|كلماتك|تفاعلك|بطاقتك|رسالتك|انتباهك|يزعجك|يهمك|يسعدك|يعجبك)(?!\\p{L})|(?<!\\p{L})ت\\p{L}{2,}","u"),fr:new RegExp("(?<!\\p{L})(?:tu|te|toi|ton|ta|tes)(?!\\p{L})|(?<!\\p{L})t['’]","iu"),de:new RegExp("(?<!\\p{L})(?:du|dich|dir|dein|deine|deinen|deinem|deiner|deines)(?!\\p{L})","iu"),it:new RegExp("(?<!\\p{L})(?:tu|ti|te|tuo|tua|tuoi|tue)(?!\\p{L})|(?<!\\p{L})(?:sai|noti|scegli|aggiungi|cancelli|cambi|rimetti|conosci|pubblichi|lasci|scrivi|inizi|finisci|ritocchi|provi|lanci|trasformi|tieni|resisti|vuoi|senti|leggi|scorri|fai|spieghi)(?!\\p{L})","iu"),ja:new RegExp("あなた|君|きみ|お前","u"),ko:new RegExp("당신|(?<!\\p{L})너(?:는|의|를|랑|한테|에게)(?!\\p{L})|(?<!\\p{L})네가(?!\\p{L})","u"),zh:new RegExp("你|妳|您","u"),ru:new RegExp("(?<!\\p{L})(?:ты|тебя|тебе|тобой|твой|твоя|твоё|твое|твои|твоего|твоей|твоих|твоим|твоими|твою)(?!\\p{L})|(?<!\\p{L})(?!лишь(?!\\p{L}))\\p{L}+(?:ешь|ёшь|ишь)(?:ся)?(?!\\p{L})","iu"),id:new RegExp("(?<!\\p{L})(?:kamu|kau|anda|dirimu)(?!\\p{L})|\\p{L}{2,}-?mu(?!\\p{L})","iu"),th:new RegExp("คุณ","u")};
+const STALK_THIRD_PERSON={tr:new RegExp("\\p{L}yor(?!\\p{L})|(?<!\\p{L})(?:onun|ona|onda|onunla|o)(?!\\p{L})","iu"),en:new RegExp("(?<!\\p{L})(?:they|their|them|this account)(?!\\p{L})","iu"),es:new RegExp("(?<!\\p{L})(?:le|les|su|sus|suyo|suya|esta cuenta|la cuenta)(?!\\p{L})","iu"),pt:new RegExp("(?<!\\p{L})(?:essa conta|dessa conta|nessa conta|a conta|ela|dela)(?!\\p{L})","iu"),ar:new RegExp("هذا الحساب|(?<!\\p{L})ي\\p{L}{2,}","u"),fr:new RegExp("(?<!\\p{L})(?:il|lui|son|sa|ses|ce compte)(?!\\p{L})","iu"),de:new RegExp("(?<!\\p{L})(?:er|ihm|ihn|sein|seine|seinen|seinem|seiner|dieser account|diesem account|dieses profil)(?!\\p{L})","iu"),it:new RegExp("(?<!\\p{L})(?:questo account|l'account|gli|suo|sua|suoi|sue|lo)(?!\\p{L})","iu"),ja:new RegExp("このアカウント|この人|タイプだ|人だ","u"),ko:new RegExp("이 계정|이 사람|타입이에요|사람이에요","u"),zh:new RegExp("這個帳號|這個人","u"),ru:new RegExp("(?<!\\p{L})(?:он|его|ему|им|этот аккаунт|этого аккаунта|у этого аккаунта)(?!\\p{L})","iu"),id:new RegExp("(?<!\\p{L})(?:dia|akun ini|baginya|dengannya)(?!\\p{L})|\\p{L}nya(?!\\p{L})","iu"),th:new RegExp("เขา|บัญชีนี้","u")};
 test('FUN Mirror copy is second person and FUN Stalk copy is third person in all 12 locales, both X-native',()=>{
  const c=browser();
  // The patterns are live: they separate the two viewpoints on real words.
@@ -916,7 +920,7 @@ test('FUN Mirror copy is second person and FUN Stalk copy is third person in all
    const off=text.match(FUN_OFFLINE[lang]);assert.equal(off,null,where+' offline context: '+(off&&off[0]));
    assert.doesNotMatch(text,FUN_CLAIM[lang],where+' claims an analysis');
   }
-  assert.ok((copy.stalk_comment.match(lang==='ja'||lang==='zh'?/[^。！？]+[。！？]/g:/[^.!?]+[.!?]/g)||[]).length>=2,where+' Stalk comment has 2-4 sentences');
+  assert.ok((copy.stalk_comment.match(lang==='ja'||lang==='zh'?/[^。！？]+[。！？]/g:lang==='th'?/[^ ]+(?: |$)/g:/[^.!?]+[.!?]/g)||[]).length>=2,where+' Stalk comment has 2-4 sentences');
  }
 });
 test('Stalk cards show the Stalk copy and Mirror cards the Mirror copy, in HTML and PNG',()=>{

@@ -124,7 +124,10 @@ function uniqueRefs(raw: unknown, postCount: number) {
 }
 // Latin/Cyrillic/Arabic sentences end in punctuation plus a space; CJK sentences end in a full-width
 // mark with no space after it.
+// Thai marks sentence ends with a space instead of punctuation, so Thai text is split on spaces.
+const THAI = /[\u0E00-\u0E7F]/u;
 export function sentenceCount(text: string) {
+  if (THAI.test(text) && !/[.!?]\s/.test(text)) return text.trim().split(/\s+/).filter(s => /\p{L}/u.test(s)).length;
   return text.trim().split(/(?<=[.!?…؟])\s+(?=\S)|(?<=[。！？])/u).filter(s => /\p{L}/u.test(s)).length;
 }
 // User-facing text never states sample sizes; also no markup and no links.
@@ -134,7 +137,8 @@ function validAnalysisText(v: unknown) {
   const text = v.replace(/\s+/g, " ").trim();
   if (!text || text.length > 1100 || /[<>]|https?:\/\//i.test(text) || COUNT_CLAIM.test(text)) throw new Error("ai_bad_analysis");
   const n = sentenceCount(text);
-  if (n < 3 || n > 6) throw new Error("ai_bad_analysis");
+  // Thai spaces also separate clauses, so a Thai analysis may show more space-separated parts.
+  if (n < 3 || n > (THAI.test(text) ? 14 : 6)) throw new Error("ai_bad_analysis");
   return text;
 }
 

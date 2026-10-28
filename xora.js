@@ -990,6 +990,20 @@ var FUN_PERSONAS = [
         "comment": "Когда в ответах все вроде бы согласны, ты оставляешь маленький вопрос и тихо уходишь. Пишешь так спокойно, что никто не понимает, всерьёз ты или шутишь. Самое приятное — увидеть, кто догадался первым.",
         "stalk_tagline": "Один невинный ответ этого аккаунта — и весь тред оживает.",
         "stalk_comment": "Когда в ответах все вроде бы согласны, этот аккаунт оставляет маленький вопрос и тихо уходит. Пишет так спокойно, что никто не понимает, всерьёз он или шутит. Самое приятное для него — увидеть, кто догадался первым."
+      },
+      "id": {
+        "nickname": "Usil Kalem",
+        "tagline": "Satu balasan yang kelihatan polos, dan seluruh thread langsung bangun.",
+        "comment": "Saat semua orang di balasan kelihatan sepakat, kamu menjatuhkan satu pertanyaan kecil lalu mundur. Kamu menulisnya begitu tenang sampai tidak ada yang tahu kamu bercanda atau serius. Bagian terbaiknya adalah melihat siapa yang paling dulu sadar.",
+        "stalk_tagline": "Satu balasan polos darinya, dan seluruh thread langsung bangun.",
+        "stalk_comment": "Saat semua orang di balasan kelihatan sepakat, akun ini menjatuhkan satu pertanyaan kecil lalu mundur. Ditulis begitu tenang sampai tidak ada yang tahu itu bercanda atau serius. Bagian favoritnya adalah melihat siapa yang paling dulu sadar."
+      },
+      "th": {
+        "nickname": "ตัวป่วนเงียบ",
+        "tagline": "รีพลายดูไร้เดียงสาแค่ครั้งเดียว ทั้งเธรดก็ตื่นทันที",
+        "comment": "ตอนที่ทุกคนในรีพลายดูจะเห็นด้วยกันหมด คุณจะโยนคำถามเล็ก ๆ ไว้หนึ่งข้อแล้วถอยออกมา คุณเขียนนิ่งมากจนไม่มีใครรู้ว่าล้อเล่นหรือจริงจัง ส่วนที่สนุกที่สุดคือการนั่งดูว่าใครจะจับได้ก่อน",
+        "stalk_tagline": "รีพลายดูไร้เดียงสาจากเขาแค่ครั้งเดียว ทั้งเธรดก็ตื่น",
+        "stalk_comment": "ตอนที่ทุกคนในรีพลายดูจะเห็นด้วยกันหมด บัญชีนี้จะโยนคำถามเล็ก ๆ ไว้หนึ่งข้อแล้วถอยออกมา เขียนนิ่งมากจนไม่มีใครรู้ว่าล้อเล่นหรือจริงจัง ส่วนที่เขาชอบที่สุดคือการดูว่าใครจะจับได้ก่อน"
       }
     }
   },
@@ -1087,6 +1101,20 @@ var FUN_PERSONAS = [
         "comment": "Слишком самоуверенный пост в ленте для тебя почти приглашение. Вместо длинного треда с возражениями ты выбираешь цитату в одну строку с лёгким подвохом. Шутку ты не объясняешь. Кто понял, тот поставит лайк.",
         "stalk_tagline": "Его фразы кажутся серьёзными до последнего слова.",
         "stalk_comment": "Слишком самоуверенный пост в ленте для него почти приглашение. Вместо длинного треда с возражениями он выбирает цитату в одну строку с лёгким подвохом. Шутку он не объясняет. Кто понял, тот поставит лайк."
+      },
+      "id": {
+        "nickname": "Sindiran Halus",
+        "tagline": "Hampir serius, tapi tidak pernah benar-benar serius.",
+        "comment": "Postingan yang terlalu percaya diri di timeline-mu itu pada dasarnya undangan. Bukannya bikin thread bantahan panjang, kamu pilih quote satu kalimat dengan pelintiran halus. Kamu tidak pernah menjelaskan leluconnya; orang yang tepat pasti like.",
+        "stalk_tagline": "Postingannya terdengar serius sampai kata terakhir.",
+        "stalk_comment": "Postingan yang terlalu percaya diri di timeline-nya itu pada dasarnya undangan. Bukannya bikin thread bantahan panjang, dia pilih quote satu kalimat dengan pelintiran halus. Dia tidak pernah menjelaskan leluconnya; orang yang tepat pasti like."
+      },
+      "th": {
+        "nickname": "สายจิกกัด",
+        "tagline": "เกือบจริงจัง แต่ไม่เคยจริงจังจริง ๆ",
+        "comment": "โพสต์ที่มั่นใจเกินเหตุบนไทม์ไลน์คุณก็เหมือนบัตรเชิญ แทนที่จะเขียนเธรดโต้แย้งยาวเหยียด คุณเลือกโควตประโยคเดียวพร้อมหักมุมเบา ๆ คุณไม่เคยอธิบายมุก เพราะคนที่ใช่จะกดไลก์เอง",
+        "stalk_tagline": "โพสต์ของเขาฟังดูจริงจังจนถึงคำสุดท้าย",
+        "stalk_comment": "โพสต์ที่มั่นใจเกินเหตุบนไทม์ไลน์ของเขาก็เหมือนบัตรเชิญ แทนที่จะเขียนเธรดโต้แย้งยาวเหยียด เขาเลือกโควตประโยคเดียวพร้อมหักมุมเบา ๆ เขาไม่เคยอธิบายมุก เพราะคนที่ใช่จะกดไลก์เอง"
       }
     }
   },
@@ -1184,6 +1212,20 @@ var FUN_PERSONAS = [
         "comment": "Если в ленте всплывает незнакомая тема, ты не пролистываешь, а задаёшь вопрос в ответах. Каждый интересный ответ открывает новую вкладку и новый вопрос. Быть экспертом тебе важно меньше, чем закончить день, узнав что-то новое.",
         "stalk_tagline": "Тред ещё не закончился, а у него уже новый вопрос.",
         "stalk_comment": "Если в ленте всплывает незнакомая тема, этот аккаунт не пролистывает, а задаёт вопрос в ответах. Каждый интересный ответ открывает новую вкладку и новый вопрос. Знать всё ему важно меньше, чем закончить день, узнав что-то новое."
+      },
+      "id": {
+        "nickname": "Kepo Abadi",
+        "tagline": "Selalu ada satu pertanyaan lagi untuk dilempar ke balasan.",
+        "comment": "Kalau topik yang sama sekali tidak kamu pahami muncul di timeline, kamu bertanya alih-alih menggulir lewat. Setiap jawaban bagus membuka tab baru dan pertanyaan baru. Jadi ahli itu tidak penting; yang penting hari ini kamu belajar sesuatu.",
+        "stalk_tagline": "Selalu ada satu pertanyaan lagi yang ingin dia lempar ke balasan.",
+        "stalk_comment": "Kalau topik yang sama sekali tidak dia pahami muncul di timeline, dia bertanya alih-alih menggulir lewat. Setiap jawaban bagus membuka tab baru dan pertanyaan baru. Baginya jadi ahli itu tidak penting; yang penting hari ini dia belajar sesuatu."
+      },
+      "th": {
+        "nickname": "ขี้สงสัยไม่สิ้นสุด",
+        "tagline": "มีอีกคำถามหนึ่งที่อยากถามในรีพลายเสมอ",
+        "comment": "พอมีเรื่องที่คุณไม่รู้อะไรเลยโผล่มาในไทม์ไลน์ คุณเลือกถามแทนที่จะเลื่อนผ่าน คำตอบดี ๆ แต่ละข้อเปิดแท็บใหม่และคำถามใหม่ การเป็นผู้เชี่ยวชาญไม่สำคัญเท่ากับได้เรียนรู้อะไรใหม่ก่อนจบวัน",
+        "stalk_tagline": "มีอีกคำถามหนึ่งที่เขาอยากถามในรีพลายเสมอ",
+        "stalk_comment": "พอมีเรื่องที่เขาไม่รู้อะไรเลยโผล่มาในไทม์ไลน์ เขาเลือกถามแทนที่จะเลื่อนผ่าน คำตอบดี ๆ แต่ละข้อเปิดแท็บใหม่และคำถามใหม่ สำหรับเขา การเป็นผู้เชี่ยวชาญไม่สำคัญเท่ากับได้เรียนรู้อะไรใหม่ก่อนจบวัน"
       }
     }
   },
@@ -1281,6 +1323,20 @@ var FUN_PERSONAS = [
         "comment": "Абсурдную мысль ты публикуешь тем же сухим стилем, что и официальное объявление. Ни эмодзи, ни пояснений, так что ответам приходится гадать, всерьёз ли это. Момент, когда кто-то наконец понимает шутку, — твоя любимая реакция.",
         "stalk_tagline": "Любую нелепость этот аккаунт постит как срочную новость.",
         "stalk_comment": "Абсурдную мысль он публикует тем же сухим стилем, что и официальное объявление. Ни эмодзи, ни пояснений, так что ответам приходится гадать, всерьёз ли это. Момент, когда кто-то наконец понимает шутку, — его любимая реакция."
+      },
+      "id": {
+        "nickname": "Lucu Muka Datar",
+        "tagline": "Kamu memposting hal absurd seolah-olah berita terkini.",
+        "comment": "Kamu membagikan pikiran konyol dengan gaya datar seperti pengumuman resmi. Tanpa emoji, tanpa penjelasan, jadi orang di balasan harus menebak kamu serius atau tidak. Momen saat seseorang akhirnya paham adalah jenis interaksi favoritmu.",
+        "stalk_tagline": "Akun ini memposting hal absurd seolah-olah berita terkini.",
+        "stalk_comment": "Dia membagikan pikiran konyol dengan gaya datar seperti pengumuman resmi. Tanpa emoji, tanpa penjelasan, jadi orang di balasan harus menebak dia serius atau tidak. Momen saat seseorang akhirnya paham adalah jenis interaksi favoritnya."
+      },
+      "th": {
+        "nickname": "มุกหน้านิ่ง",
+        "tagline": "คุณโพสต์เรื่องไร้สาระเหมือนเป็นข่าวด่วน",
+        "comment": "คุณแชร์ความคิดบ้า ๆ ด้วยสไตล์เรียบ ๆ เหมือนประกาศทางการ ไม่มีอีโมจิ ไม่มีคำอธิบาย คนในรีพลายต้องเดาเองว่าคุณพูดจริงไหม ช่วงเวลาที่มีคนเก็ตในที่สุดคือเอนเกจที่คุณชอบที่สุด",
+        "stalk_tagline": "บัญชีนี้โพสต์เรื่องไร้สาระเหมือนเป็นข่าวด่วน",
+        "stalk_comment": "เขาแชร์ความคิดบ้า ๆ ด้วยสไตล์เรียบ ๆ เหมือนประกาศทางการ ไม่มีอีโมจิ ไม่มีคำอธิบาย คนในรีพลายต้องเดาเองว่าเขาพูดจริงไหม ช่วงเวลาที่มีคนเก็ตในที่สุดคือเอนเกจที่เขาชอบที่สุด"
       }
     }
   },
@@ -1382,6 +1438,20 @@ var FUN_PERSONAS = [
         "comment": "Начинаешь с ответа на мимолётный вопрос, а заканчиваешь неожиданной теорией о жизни. Перед публикацией ты несколько раз правишь черновик. Хорошее возражение в ответах тебя не смущает, ведь настоящий спор начинается именно там.",
         "stalk_tagline": "У этого аккаунта случайный вопрос легко превращается в длинный тред.",
         "stalk_comment": "Начинает он с ответа на мимолётный вопрос, а заканчивает неожиданной теорией о жизни. Перед публикацией он несколько раз правит черновик. Хорошее возражение в ответах его не смущает, ведь настоящий спор начинается именно там."
+      },
+      "id": {
+        "nickname": "Filsuf Rebahan",
+        "tagline": "Pertanyaan iseng bisa berubah jadi thread yang sangat panjang.",
+        "comment": "Kamu mulai menjawab pertanyaan sambil lalu dan berakhir dengan teori hidup yang tak terduga. Drafnya kamu edit beberapa kali sebelum idenya tayang. Bantahan bagus di balasan tidak mengganggumu; justru di situ obrolan sebenarnya dimulai.",
+        "stalk_tagline": "Pertanyaan iseng bisa berubah jadi thread panjang di akun ini.",
+        "stalk_comment": "Dia mulai menjawab pertanyaan sambil lalu dan berakhir dengan teori hidup yang tak terduga. Drafnya dia edit beberapa kali sebelum idenya tayang. Bantahan bagus di balasan tidak mengganggunya; justru di situ obrolan sebenarnya dimulai."
+      },
+      "th": {
+        "nickname": "นักปรัชญาบนโซฟา",
+        "tagline": "คำถามเล่น ๆ กลายเป็นเธรดยาวเหยียดได้",
+        "comment": "คุณเริ่มตอบคำถามผ่าน ๆ แล้วจบด้วยทฤษฎีชีวิตที่ไม่มีใครคาดคิด คุณแก้ดราฟต์หลายรอบก่อนปล่อยไอเดียออกไป ข้อโต้แย้งดี ๆ ในรีพลายไม่ทำให้คุณหงุดหงิด เพราะนั่นแหละคือจุดเริ่มต้นของบทสนทนาจริง",
+        "stalk_tagline": "คำถามเล่น ๆ กลายเป็นเธรดยาวเหยียดได้ในบัญชีนี้",
+        "stalk_comment": "เขาเริ่มตอบคำถามผ่าน ๆ แล้วจบด้วยทฤษฎีชีวิตที่ไม่มีใครคาดคิด เขาแก้ดราฟต์หลายรอบก่อนปล่อยไอเดียออกไป ข้อโต้แย้งดี ๆ ในรีพลายไม่ทำให้เขาหงุดหงิด เพราะนั่นแหละคือจุดเริ่มต้นของบทสนทนาจริง"
       }
     }
   },
@@ -1480,6 +1550,20 @@ var FUN_PERSONAS = [
         "comment": "В оживлённом треде ты замечаешь не только самые залайканные ответы, но и аккаунты, которым никак не удаётся вставить слово. Иногда помогает вопрос, иногда удачная гифка успокаивает всех. Лента тебе нравится больше всего, когда каждый может спокойно постить.",
         "stalk_tagline": "Он знает, когда ответ поможет, а когда лучше подождать.",
         "stalk_comment": "В оживлённом треде он замечает не только самые залайканные ответы, но и аккаунты, которым никак не удаётся вставить слово. Иногда помогает вопрос, иногда удачная гифка успокаивает всех. Лента нравится ему больше всего, когда каждый может спокойно постить."
+      },
+      "id": {
+        "nickname": "Peka Timeline",
+        "tagline": "Kamu tahu kapan balasan membantu dan kapan lebih baik menunggu.",
+        "comment": "Di thread yang ramai, kamu memperhatikan bukan cuma balasan teratas tapi juga akun yang tidak kebagian bicara. Kadang satu pertanyaan membantu, kadang GIF yang pas menenangkan semuanya. Timeline paling seru buatmu saat semua orang nyaman memposting.",
+        "stalk_tagline": "Dia tahu kapan balasan membantu dan kapan lebih baik menunggu.",
+        "stalk_comment": "Di thread yang ramai, dia memperhatikan bukan cuma balasan teratas tapi juga akun yang tidak kebagian bicara. Kadang satu pertanyaan membantu, kadang GIF yang pas menenangkan semuanya. Timeline paling seru baginya saat semua orang nyaman memposting."
+      },
+      "th": {
+        "nickname": "อ่านบรรยากาศเก่ง",
+        "tagline": "คุณรู้ว่าเมื่อไหร่ควรรีพลาย และเมื่อไหร่ควรรอ",
+        "comment": "ในเธรดที่คึกคัก คุณไม่ได้สังเกตแค่รีพลายยอดนิยม แต่เห็นบัญชีที่แทรกไม่ได้ด้วย บางทีคำถามเดียวก็ช่วยได้ บางทีจีไอเอฟที่เลือกดี ๆ ก็ทำให้ทุกอย่างเย็นลง ไทม์ไลน์สนุกที่สุดสำหรับคุณเมื่อทุกคนกล้าโพสต์",
+        "stalk_tagline": "เขารู้ว่าเมื่อไหร่ควรรีพลาย และเมื่อไหร่ควรรอ",
+        "stalk_comment": "ในเธรดที่คึกคัก เขาไม่ได้สังเกตแค่รีพลายยอดนิยม แต่เห็นบัญชีที่แทรกไม่ได้ด้วย บางทีคำถามเดียวก็ช่วยได้ บางทีจีไอเอฟที่เลือกดี ๆ ก็ทำให้ทุกอย่างเย็นลง ไทม์ไลน์สนุกที่สุดสำหรับเขาเมื่อทุกคนกล้าโพสต์"
       }
     }
   },
@@ -1580,6 +1664,20 @@ var FUN_PERSONAS = [
         "comment": "Когда ответы превращаются в перепалку, ты сначала пытаешься понять, что на самом деле хочет сказать каждая сторона. Чтобы с кем-то согласиться, не нужна война скриншотов. Если тред заканчивается чуть более спокойными сообщениями, для тебя это победа.",
         "stalk_tagline": "Он может спорить в ответах, не переходя на личности.",
         "stalk_comment": "Когда ответы превращаются в перепалку, он сначала пытается понять, что на самом деле хочет сказать каждая сторона. Чтобы с кем-то согласиться, ему не нужна война скриншотов. Если тред заканчивается чуть более спокойными сообщениями, для него это победа."
+      },
+      "id": {
+        "nickname": "Penengah Bijak",
+        "tagline": "Kamu bisa beda pendapat di balasan tanpa bawa-bawa perasaan.",
+        "comment": "Saat balasan berubah jadi saling sahut, kamu mencoba memahami maksud sebenarnya dari tiap pihak. Kamu tidak butuh perang tangkapan layar untuk setuju dengan seseorang. Kalau thread berakhir dengan orang-orang menulis sedikit lebih tenang, itu sudah kemenangan.",
+        "stalk_tagline": "Dia bisa beda pendapat di balasan tanpa bawa-bawa perasaan.",
+        "stalk_comment": "Saat balasan berubah jadi saling sahut, dia mencoba memahami maksud sebenarnya dari tiap pihak. Dia tidak butuh perang tangkapan layar untuk setuju dengan seseorang. Kalau thread berakhir dengan orang-orang menulis sedikit lebih tenang, baginya itu sudah kemenangan."
+      },
+      "th": {
+        "nickname": "เสียงแห่งเหตุผล",
+        "tagline": "คุณเห็นต่างในรีพลายได้โดยไม่ทำให้เป็นเรื่องส่วนตัว",
+        "comment": "พอรีพลายกลายเป็นการตอบโต้ไปมา คุณพยายามทำความเข้าใจว่าแต่ละฝ่ายหมายความว่าอะไรจริง ๆ คุณไม่ต้องใช้สงครามแคปหน้าจอเพื่อเห็นด้วยกับใคร ถ้าเธรดจบลงด้วยทุกคนพิมพ์ใจเย็นขึ้นนิดหนึ่ง นั่นก็นับว่าชนะแล้ว",
+        "stalk_tagline": "เขาเห็นต่างในรีพลายได้โดยไม่ทำให้เป็นเรื่องส่วนตัว",
+        "stalk_comment": "พอรีพลายกลายเป็นการตอบโต้ไปมา เขาพยายามทำความเข้าใจว่าแต่ละฝ่ายหมายความว่าอะไรจริง ๆ เขาไม่ต้องใช้สงครามแคปหน้าจอเพื่อเห็นด้วยกับใคร ถ้าเธรดจบลงด้วยทุกคนพิมพ์ใจเย็นขึ้นนิดหนึ่ง สำหรับเขานั่นก็นับว่าชนะแล้ว"
       }
     }
   },
@@ -1677,6 +1775,20 @@ var FUN_PERSONAS = [
         "comment": "Даже в ответе из двух слов думаешь, не слишком ли холодно выглядит точка и не слишком ли бодро — восклицательный знак. Добавляешь эмодзи, удаляешь, меняешь слово и возвращаешь обратно. В итоге отправляешь первый вариант и смеёшься над собой.",
         "stalk_tagline": "Даже короткий ответ этот аккаунт перечитывает ещё раз.",
         "stalk_comment": "Даже в ответе из двух слов он думает, не слишком ли холодно выглядит точка и не слишком ли бодро — восклицательный знак. Добавляет эмодзи, удаляет, меняет слово и возвращает обратно. В итоге отправляет первый вариант и смеётся над собой."
+      },
+      "id": {
+        "nickname": "Raja Overthinking",
+        "tagline": "Balasan singkat pun layak dicek sekali lagi.",
+        "comment": "Balasan dua kata pun kamu cek dulu: titiknya terlalu dingin atau tanda serunya terlalu semangat. Kamu tambah emoji, hapus, ganti satu kata lalu kembalikan lagi. Akhirnya mengirim versi pertama setelah semua itu adalah kemenangan kecil yang sudah akrab.",
+        "stalk_tagline": "Balasan singkat darinya pun dicek sekali lagi dulu.",
+        "stalk_comment": "Balasan dua kata pun dia cek dulu: titiknya terlalu dingin atau tanda serunya terlalu semangat. Dia tambah emoji, hapus, ganti satu kata lalu kembalikan lagi. Akhirnya mengirim versi pertama setelah semua itu adalah kemenangan kecil yang akrab baginya."
+      },
+      "th": {
+        "nickname": "สายคิดเยอะ",
+        "tagline": "แม้แต่รีพลายสั้น ๆ ก็ต้องดูอีกรอบ",
+        "comment": "รีพลายสองคำก็ยังต้องเช็กว่าจุดฟูลสต็อปดูเย็นชาไปไหม หรือเครื่องหมายตกใจดูกระตือรือร้นเกิน คุณใส่อีโมจิ ลบออก เปลี่ยนคำแล้วเปลี่ยนกลับ สุดท้ายส่งเวอร์ชันแรกไป ซึ่งเป็นชัยชนะเล็ก ๆ ที่คุ้นเคย",
+        "stalk_tagline": "แม้แต่รีพลายสั้น ๆ ของเขาก็ต้องดูอีกรอบก่อน",
+        "stalk_comment": "รีพลายสองคำก็ยังต้องเช็กว่าจุดฟูลสต็อปดูเย็นชาไปไหม หรือเครื่องหมายตกใจดูกระตือรือร้นเกิน เขาใส่อีโมจิ ลบออก เปลี่ยนคำแล้วเปลี่ยนกลับ สุดท้ายส่งเวอร์ชันแรกไป ซึ่งเป็นชัยชนะเล็ก ๆ ที่เขาคุ้นเคย"
       }
     }
   },
@@ -1774,6 +1886,20 @@ var FUN_PERSONAS = [
         "comment": "Тебе не нужно заполнять каждую паузу в ленте; чаще всего ты просто читаешь и листаешь дальше. Когда ты постишь, это коротко и остаётся в памяти. Тебе тихо приятно, когда кто-то цитирует эту фразу через несколько дней.",
         "stalk_tagline": "Этот аккаунт постит редко, но его посты запоминаются.",
         "stalk_comment": "Ему не нужно заполнять каждую паузу в ленте; чаще всего он просто читает и листает дальше. Когда он постит, это коротко и остаётся в памяти. Ему тихо приятно, когда кто-то цитирует эту фразу через несколько дней."
+      },
+      "id": {
+        "nickname": "Pesona Kalem",
+        "tagline": "Jarang posting, tapi yang kamu posting selalu diingat.",
+        "comment": "Kamu tidak merasa harus mengisi setiap celah di timeline; kebanyakan hari kamu cuma membaca dan menggulir. Sekali posting, singkat dan langsung nempel. Diam-diam senang rasanya saat seseorang mengutip kalimat itu berhari-hari kemudian.",
+        "stalk_tagline": "Dia jarang posting, tapi yang dia posting selalu diingat.",
+        "stalk_comment": "Dia tidak merasa harus mengisi setiap celah di timeline; kebanyakan hari dia cuma membaca dan menggulir. Sekali posting, singkat dan langsung nempel. Diam-diam dia senang saat seseorang mengutip kalimat itu berhari-hari kemudian."
+      },
+      "th": {
+        "nickname": "เสน่ห์เงียบ ๆ",
+        "tagline": "โพสต์ไม่บ่อย แต่ทุกโพสต์มีคนจำได้",
+        "comment": "คุณไม่รู้สึกว่าต้องเติมทุกช่องว่างในไทม์ไลน์ ส่วนใหญ่แค่อ่านแล้วเลื่อน แต่พอโพสต์ทีก็สั้นและติดหู แอบดีใจเงียบ ๆ ทุกครั้งที่มีคนโควตประโยคนั้นหลายวันต่อมา",
+        "stalk_tagline": "เขาโพสต์ไม่บ่อย แต่ทุกโพสต์มีคนจำได้",
+        "stalk_comment": "เขาไม่รู้สึกว่าต้องเติมทุกช่องว่างในไทม์ไลน์ ส่วนใหญ่แค่อ่านแล้วเลื่อน แต่พอโพสต์ทีก็สั้นและติดหู เขาแอบดีใจเงียบ ๆ ทุกครั้งที่มีคนโควตประโยคนั้นหลายวันต่อมา"
       }
     }
   },
@@ -1875,6 +2001,20 @@ var FUN_PERSONAS = [
         "comment": "Когда ответы затихают, ты запускаешь вопрос или быстрый опрос, в котором может поучаствовать каждый. Тебе нравится втягивать людей в разговор, никого не отмечая, чтобы не ставить в неловкое положение. Тема может уйти совсем в другую сторону, лишь бы никому не было скучно.",
         "stalk_tagline": "Затихший тред первым оживляет именно этот аккаунт.",
         "stalk_comment": "Когда ответы затихают, он запускает вопрос или быстрый опрос, в котором может поучаствовать каждый. Ему нравится втягивать людей в разговор, никого не отмечая, чтобы не ставить в неловкое положение. Тема может уйти совсем в другую сторону, лишь бы никому не было скучно."
+      },
+      "id": {
+        "nickname": "Penghidup Thread",
+        "tagline": "Kamulah yang membangunkan thread yang sepi.",
+        "comment": "Saat balasan mulai sepi, kamu memulai pertanyaan atau polling singkat yang bisa diikuti semua orang. Kamu suka mengajak orang masuk obrolan tanpa langsung menandai siapa pun. Topiknya boleh melenceng ke mana saja, asal tidak ada yang bosan.",
+        "stalk_tagline": "Dialah yang membangunkan thread yang sepi.",
+        "stalk_comment": "Saat balasan mulai sepi, dia memulai pertanyaan atau polling singkat yang bisa diikuti semua orang. Dia suka mengajak orang masuk obrolan tanpa langsung menandai siapa pun. Topiknya boleh melenceng ke mana saja, asal tidak ada yang bosan."
+      },
+      "th": {
+        "nickname": "ตัวจุดไฟเธรด",
+        "tagline": "คุณคือคนที่ปลุกเธรดเงียบ ๆ ให้ตื่น",
+        "comment": "พอรีพลายเริ่มเงียบ คุณก็เปิดคำถามหรือโพลสั้น ๆ ที่ทุกคนร่วมได้ คุณชอบชวนคนเข้าวงโดยไม่ต้องแท็กใครแบบกะทันหัน หัวข้อจะไหลไปไหนก็ได้ ขอแค่ไม่มีใครเบื่อ",
+        "stalk_tagline": "เขาคือคนที่ปลุกเธรดเงียบ ๆ ให้ตื่น",
+        "stalk_comment": "พอรีพลายเริ่มเงียบ เขาก็เปิดคำถามหรือโพลสั้น ๆ ที่ทุกคนร่วมได้ เขาชอบชวนคนเข้าวงโดยไม่ต้องแท็กใครแบบกะทันหัน หัวข้อจะไหลไปไหนก็ได้ ขอแค่ไม่มีใครเบื่อ"
       }
     }
   },
@@ -1972,6 +2112,20 @@ var FUN_PERSONAS = [
         "comment": "Когда кто-то пишет пост о своём дне, ты не можешь не спросить, что было дальше. Маленькая деталь цепляет, и тебе хочется прочитать продолжение треда. Поэтому короткая переписка в личке с тобой обычно затягивается.",
         "stalk_tagline": "Один его хороший вопрос превращает ответ в настоящий разговор.",
         "stalk_comment": "Когда кто-то пишет пост о своём дне, этот аккаунт не может не спросить, что было дальше. Маленькая деталь цепляет, и ему хочется прочитать продолжение треда. Поэтому короткая переписка в личке с ним обычно затягивается."
+      },
+      "id": {
+        "nickname": "Pendengar Baik",
+        "tagline": "Satu pertanyaan bagus mengubah balasan jadi obrolan sungguhan.",
+        "comment": "Saat seseorang menyinggung harinya di postingan, kamu tidak tahan untuk bertanya lalu bagaimana. Detail kecil menarik perhatianmu dan kamu ingin lanjutan thread-nya. Itulah kenapa DM singkat denganmu biasanya jadi panjang.",
+        "stalk_tagline": "Satu pertanyaan bagus darinya mengubah balasan jadi obrolan sungguhan.",
+        "stalk_comment": "Saat seseorang memposting tentang harinya, akun ini yang pertama bertanya lalu bagaimana. Detail kecil menarik perhatiannya dan dia ingin lanjutan thread-nya. Itulah kenapa DM singkat dengannya biasanya jadi panjang."
+      },
+      "th": {
+        "nickname": "ผู้ฟังตัวจริง",
+        "tagline": "คำถามดี ๆ ข้อเดียวเปลี่ยนรีพลายให้เป็นบทสนทนาจริง",
+        "comment": "พอมีคนเล่าเรื่องวันของตัวเองในโพสต์ คุณอดไม่ได้ที่จะถามว่าแล้วยังไงต่อ รายละเอียดเล็ก ๆ ดึงความสนใจคุณ และคุณอยากรู้ส่วนที่เหลือของเธรด นั่นแหละเหตุผลที่ดีเอ็มสั้น ๆ กับคุณมักยาวกว่าที่คิด",
+        "stalk_tagline": "คำถามดี ๆ ข้อเดียวจากเขาเปลี่ยนรีพลายให้เป็นบทสนทนาจริง",
+        "stalk_comment": "พอมีคนโพสต์เรื่องวันของตัวเอง บัญชีนี้มักเป็นคนแรกที่ถามว่าแล้วยังไงต่อ รายละเอียดเล็ก ๆ ดึงความสนใจเขา และเขาอยากรู้ส่วนที่เหลือของเธรด นั่นแหละเหตุผลที่ดีเอ็มสั้น ๆ กับเขามักยาวกว่าที่คิด"
       }
     }
   },
@@ -2069,6 +2223,20 @@ var FUN_PERSONAS = [
         "comment": "Превращая мелкую неудачу в тред, ты приберегаешь самую смешную деталь для последнего поста. Та же история от кого-то другого лишилась бы твоих точных слов. Половина удовольствия — увидеть свою лучшую фразу процитированной в ответах.",
         "stalk_tagline": "Он точно знает, какая деталь делает тред смешным.",
         "stalk_comment": "Превращая мелкую неудачу в тред, он приберегает самую смешную деталь для последнего поста. Та же история от кого-то другого лишилась бы его точных слов. Половина удовольствия — увидеть свою лучшую фразу процитированной в ответах."
+      },
+      "id": {
+        "nickname": "Jago Merangkai Kata",
+        "tagline": "Kamu tahu detail mana yang bikin thread jadi hidup.",
+        "comment": "Saat mengubah kesialan kecil jadi thread, kamu simpan detail paling lucu untuk postingan terakhir. Cerita yang sama kalau diceritakan orang lain tidak akan punya kalimat persismu. Separuh keseruannya adalah melihat kalimat terbaikmu dikutip balik di balasan.",
+        "stalk_tagline": "Dia tahu detail mana yang bikin thread jadi hidup.",
+        "stalk_comment": "Saat mengubah kesialan kecil jadi thread, dia simpan detail paling lucu untuk postingan terakhir. Cerita yang sama kalau diceritakan orang lain tidak akan punya kalimat persisnya. Separuh keseruannya baginya adalah melihat kalimat terbaiknya dikutip balik di balasan."
+      },
+      "th": {
+        "nickname": "เจ้าแห่งถ้อยคำ",
+        "tagline": "คุณรู้ว่ารายละเอียดไหนทำให้เธรดปัง",
+        "comment": "เวลาคุณเปลี่ยนเรื่องซวยเล็ก ๆ ให้เป็นเธรด คุณเก็บรายละเอียดที่ฮาที่สุดไว้โพสต์สุดท้าย เรื่องเดียวกันถ้าคนอื่นเล่าก็จะขาดคำพูดแบบของคุณ ครึ่งหนึ่งของความสนุกคือได้เห็นประโยคเด็ดของคุณถูกโควตกลับมาในรีพลาย",
+        "stalk_tagline": "เขารู้ว่ารายละเอียดไหนทำให้เธรดปัง",
+        "stalk_comment": "เวลาเขาเปลี่ยนเรื่องซวยเล็ก ๆ ให้เป็นเธรด เขาเก็บรายละเอียดที่ฮาที่สุดไว้โพสต์สุดท้าย เรื่องเดียวกันถ้าคนอื่นเล่าก็จะขาดคำพูดแบบของเขา ครึ่งหนึ่งของความสนุกสำหรับเขาคือได้เห็นประโยคเด็ดถูกโควตกลับมาในรีพลาย"
       }
     }
   }
@@ -2123,8 +2291,8 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
   var card = FUN_CARD_POOL[seed % FUN_CARD_POOL.length];
   var desc = actualMode === "stalk" ? card.stalkDesc : card.desc;
   var comment = {
-    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de"), it: funModeComment(card, "mirror", "it"), ja: funModeComment(card, "mirror", "ja"), ko: funModeComment(card, "mirror", "ko"), zh: funModeComment(card, "mirror", "zh"), ru: funModeComment(card, "mirror", "ru") },
-    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de"), it: funModeComment(card, "stalk", "it"), ja: funModeComment(card, "stalk", "ja"), ko: funModeComment(card, "stalk", "ko"), zh: funModeComment(card, "stalk", "zh"), ru: funModeComment(card, "stalk", "ru") }
+    mirror: { tr: funModeComment(card, "mirror", "tr"), en: funModeComment(card, "mirror", "en"), es: funModeComment(card, "mirror", "es"), pt: funModeComment(card, "mirror", "pt"), ar: funModeComment(card, "mirror", "ar"), fr: funModeComment(card, "mirror", "fr"), de: funModeComment(card, "mirror", "de"), it: funModeComment(card, "mirror", "it"), ja: funModeComment(card, "mirror", "ja"), ko: funModeComment(card, "mirror", "ko"), zh: funModeComment(card, "mirror", "zh"), ru: funModeComment(card, "mirror", "ru"), id: funModeComment(card, "mirror", "id"), th: funModeComment(card, "mirror", "th") },
+    stalk: { tr: funModeComment(card, "stalk", "tr"), en: funModeComment(card, "stalk", "en"), es: funModeComment(card, "stalk", "es"), pt: funModeComment(card, "stalk", "pt"), ar: funModeComment(card, "stalk", "ar"), fr: funModeComment(card, "stalk", "fr"), de: funModeComment(card, "stalk", "de"), it: funModeComment(card, "stalk", "it"), ja: funModeComment(card, "stalk", "ja"), ko: funModeComment(card, "stalk", "ko"), zh: funModeComment(card, "stalk", "zh"), ru: funModeComment(card, "stalk", "ru"), id: funModeComment(card, "stalk", "id"), th: funModeComment(card, "stalk", "th") }
   };
   return {
     mode: actualMode,
@@ -2138,7 +2306,7 @@ function analyzeFunHandle(rawHandle, mode, rerollNonce) {
     profile_emoji: card.emoji,
     comment: comment,
     card: { persona_id: card.id, nickname: card.nickname, desc: desc, emoji: card.emoji, color: card.color, top_behaviors: [] },
-    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it], ja:[comment[actualMode].ja], ko:[comment[actualMode].ko], zh:[comment[actualMode].zh], ru:[comment[actualMode].ru] } },
+    archetype: { id: "fun", emoji: card.emoji, color: card.color, name: card.nickname, desc: desc, comments: { tr:[comment[actualMode].tr], en:[comment[actualMode].en], es:[comment[actualMode].es], pt:[comment[actualMode].pt], ar:[comment[actualMode].ar], fr:[comment[actualMode].fr], de:[comment[actualMode].de], it:[comment[actualMode].it], ja:[comment[actualMode].ja], ko:[comment[actualMode].ko], zh:[comment[actualMode].zh], ru:[comment[actualMode].ru], id:[comment[actualMode].id], th:[comment[actualMode].th] } },
     ci: 0,
     meta: { version:"xora_fun_v2", source:"fun", tier:"fun", reroll:nonce, ts:new Date().toISOString() }
   };
@@ -2240,6 +2408,22 @@ var FUN_MATCH_COMMENTS = {
     "В одном треде эти двое либо станут легендарным дуэтом, либо кто-то отключит уведомления.",
     "XORA верит в это сочетание. Откуда у неё такая уверенность, не знает никто.",
     "Наука вернула дело без рассмотрения. Процент мы всё равно посчитали."
+  ],
+  id: [
+    "Laboratorium XORA yang sama sekali tidak ilmiah menilai pasangan ini mencurigakan serunya.",
+    "Persentase ini tidak membuktikan apa pun. Tapi tetap bisa memicu debat di grup chat.",
+    "Kartu ini cuma buat seru-seruan. Persentasenya saja yang kelihatan terlalu resmi.",
+    "Di thread yang sama mereka bisa jadi ikonik, atau ada yang langsung bisukan percakapan.",
+    "XORA percaya pada pasangan ini. Tidak ada yang tahu kenapa XORA seyakin itu.",
+    "Sains menolak kasus ini. Kami tetap kasih persentase."
+  ],
+  th: [
+    "ห้องแล็บไม่มีหลักวิทยาศาสตร์ของ XORA พบว่าคู่นี้สนุกจนน่าสงสัย",
+    "เปอร์เซ็นต์นี้ไม่ได้พิสูจน์อะไรเลย แต่ก็พอจะเปิดศึกในกลุ่มแชตได้",
+    "การ์ดนี้เพื่อความสนุก แค่เปอร์เซ็นต์ดูทางการเกินไปหน่อย",
+    "อยู่เธรดเดียวกันเมื่อไหร่ ถ้าไม่ไอคอนิกก็มีคนกดปิดเสียงบทสนทนา",
+    "XORA เชื่อในคู่นี้ ไม่มีใครรู้ว่าทำไม XORA มั่นใจขนาดนี้",
+    "วิทยาศาสตร์ปฏิเสธเคสนี้ แต่เราก็ให้เปอร์เซ็นต์อยู่ดี"
   ]
 };
 
@@ -2263,7 +2447,7 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
     overall: overall,
     ci: commentIndex,
     source: "fun",
-    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex], de:FUN_MATCH_COMMENTS.de[commentIndex], it:FUN_MATCH_COMMENTS.it[commentIndex], ja:FUN_MATCH_COMMENTS.ja[commentIndex], ko:FUN_MATCH_COMMENTS.ko[commentIndex], zh:FUN_MATCH_COMMENTS.zh[commentIndex], ru:FUN_MATCH_COMMENTS.ru[commentIndex] },
+    fun_comment: { tr:FUN_MATCH_COMMENTS.tr[commentIndex], en:FUN_MATCH_COMMENTS.en[commentIndex], es:FUN_MATCH_COMMENTS.es[commentIndex], pt:FUN_MATCH_COMMENTS.pt[commentIndex], ar:FUN_MATCH_COMMENTS.ar[commentIndex], fr:FUN_MATCH_COMMENTS.fr[commentIndex], de:FUN_MATCH_COMMENTS.de[commentIndex], it:FUN_MATCH_COMMENTS.it[commentIndex], ja:FUN_MATCH_COMMENTS.ja[commentIndex], ko:FUN_MATCH_COMMENTS.ko[commentIndex], zh:FUN_MATCH_COMMENTS.zh[commentIndex], ru:FUN_MATCH_COMMENTS.ru[commentIndex], id:FUN_MATCH_COMMENTS.id[commentIndex], th:FUN_MATCH_COMMENTS.th[commentIndex] },
     meta: { tier:"fun", source:"fun", reroll:nonce, version:"match_fun_v1", ts:new Date().toISOString() }
   };
 }
@@ -2271,9 +2455,9 @@ function matchFunHandles(rawA, rawB, rerollNonce) {
 function archetypeById(id) {
   return {
     id: id, emoji: "🔍", color: "#0FAFAF",
-    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA", de: "XORA-Profil", it: "Profilo XORA", ja: "XORAプロフィール", ko: "XORA 프로필", zh: "XORA 檔案", ru: "Профиль XORA" },
-    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée.", de: "Analyse abgeschlossen.", it: "Analisi completata.", ja: "分析が完了しました。", ko: "분석이 끝났습니다.", zh: "分析完成了。", ru: "Разбор завершён." },
-    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""], de: [""], it: [""], ja: [""], ko: [""], zh: [""], ru: [""] }
+    name: { tr: "XORA Profil", en: "XORA Profile", es: "Perfil XORA", pt: "Perfil XORA", ar: "ملف XORA", fr: "Profil XORA", de: "XORA-Profil", it: "Profilo XORA", ja: "XORAプロフィール", ko: "XORA 프로필", zh: "XORA 檔案", ru: "Профиль XORA", id: "Profil XORA", th: "โปรไฟล์ XORA" },
+    desc: { tr: "Analiz tamamlandı.", en: "Analysis complete.", es: "Análisis completado.", pt: "Análise concluída.", ar: "اكتمل التحليل.", fr: "Analyse terminée.", de: "Analyse abgeschlossen.", it: "Analisi completata.", ja: "分析が完了しました。", ko: "분석이 끝났습니다.", zh: "分析完成了。", ru: "Разбор завершён.", id: "Analisis selesai.", th: "วิเคราะห์เสร็จแล้ว" },
+    comments: { tr: [""], en: [""], es: [""], pt: [""], ar: [""], fr: [""], de: [""], it: [""], ja: [""], ko: [""], zh: [""], ru: [""], id: [""], th: [""] }
   };
 }
 
@@ -2383,6 +2567,22 @@ var MATCH_COMMENTS = {
     "{a} и {b} следят за лентами друг друга, но не подписаны. Это не смелость и не робость, а чистый хаос.",
     "{a} шлёт сердечки, {b} шлёт огонь. Оба не знают, чего хотят, но совпадение налицо.",
     "{a} строит планы, {b} их переворачивает. Из этих двоих получилась бы готовая романтическая комедия."
+  ],
+  id: [
+    "{a} kirim pesan, {b} cuma baca. Tapi dua profil ini saling stalking jam 3 pagi. Klasik.",
+    "Gombalan dua akun ini dimulai dari like dan berakhir dengan drama. XORA sudah siap popcorn.",
+    "{a} menulis dengan perasaan, {b} membalas dengan ironi. Ketegangan dua profil ini akan jadi cinta atau blokir.",
+    "{a} dan {b} saling stalking tapi tidak saling follow. Pasangan ini tidak berani, tidak juga takut: murni kacau.",
+    "{a} kirim hati, {b} kirim api. Dua akun ini tidak tahu maunya apa, tapi chemistry-nya tidak bisa dibantah.",
+    "{a} bikin rencana, {b} membatalkannya. Mereka berdua naskah komedi romantis yang sempurna."
+  ],
+  th: [
+    "{a} ส่งข้อความ {b} อ่านไม่ตอบ แต่สองโปรไฟล์นี้แอบส่องกันตอนตีสาม คลาสสิก",
+    "การจีบกันของสองบัญชีนี้เริ่มจากไลก์และจบที่ดราม่า XORA เตรียมป๊อปคอร์นไว้แล้ว",
+    "{a} เขียนด้วยอารมณ์ {b} ตอบด้วยการประชด ความตึงของสองโปรไฟล์นี้จะกลายเป็นรักหรือบล็อก",
+    "{a} กับ {b} แอบส่องกันแต่ไม่ยอมฟอล คู่นี้ไม่กล้าแต่ก็ไม่กลัว วุ่นวายล้วน ๆ",
+    "{a} ส่งหัวใจ {b} ส่งไฟ สองบัญชีนี้ไม่รู้ว่าต้องการอะไร แต่เคมีปฏิเสธไม่ได้",
+    "{a} วางแผน {b} ทำพัง สองคนนี้คือบทหนังรอมคอมที่สมบูรณ์แบบ"
   ]
 };
 
@@ -2529,6 +2729,22 @@ var THINKING = {
       "Записываю твои противоречия…",
       "Разбираю сигналы, которые повторяются…",
       "XORA иногда слишком честна. Приготовься."
+    ],
+    id: [
+      "Membersihkan debu di timeline-mu...",
+      "Mencoba pura-pura tidak lihat postingan jam 3 pagimu... gagal.",
+      "Memindai pola perilaku...",
+      "Mencatat kontradiksimu...",
+      "Menganalisis sinyal yang berulang...",
+      "XORA kadang terlalu jujur. Siapkan mental."
+    ],
+    th: [
+      "กำลังปัดฝุ่นไทม์ไลน์ของคุณ...",
+      "พยายามทำเป็นไม่เห็นโพสต์ตีสามของคุณ... ไม่ไหว",
+      "กำลังสแกนรูปแบบพฤติกรรม...",
+      "กำลังจดความย้อนแย้งของคุณ...",
+      "กำลังวิเคราะห์สัญญาณที่เกิดซ้ำ...",
+      "XORA อาจจะพูดตรงไปหน่อย เตรียมใจไว้"
     ]
   },
   stalk: {
@@ -2627,6 +2843,22 @@ var THINKING = {
       "Только не говори, что это от меня…",
       "Посмотрела и на подписки. Многое становится понятно.",
       "Что нашла, расскажу только тебе."
+    ],
+    id: [
+      "Masuk ke profilnya diam-diam...",
+      "Tenang, tidak meninggalkan jejak.",
+      "Hmm. Riwayat like-nya menarik.",
+      "Kamu tidak dengar ini dariku ya...",
+      "Sudah cek juga siapa yang dia follow. Banyak cerita.",
+      "Yang kutemukan cuma kuceritakan padamu."
+    ],
+    th: [
+      "กำลังเข้าไปในโปรไฟล์อย่างเงียบ ๆ...",
+      "ไม่ทิ้งร่องรอย ไม่ต้องห่วง",
+      "อืม ประวัติการกดไลก์น่าสนใจ",
+      "ไม่ได้ยินจากฉันนะ...",
+      "เช็กด้วยว่าเขาฟอลใครบ้าง บอกอะไรได้เยอะ",
+      "สิ่งที่เจอ จะบอกแค่คุณคนเดียว"
     ]
   },
   match: {
@@ -2725,6 +2957,22 @@ var THINKING = {
       "В переписке замечено напряжение.",
       "Считаю совместимость. Халат уже надет.",
       "Результат может расстроить кого-то из вас. Объявляю."
+    ],
+    id: [
+      "Menjajarkan dua timeline...",
+      "Memindai like yang sama... menarik.",
+      "Satu orang pagi, satu orang malam. Dicatat.",
+      "Ketegangan terdeteksi di riwayat balasan.",
+      "Menghitung chemistry. Jas lab sudah dipakai.",
+      "Hasilnya mungkin bikin salah satu dari kalian kesal. Membuka sekarang."
+    ],
+    th: [
+      "กำลังวางสองไทม์ไลน์เทียบกัน...",
+      "กำลังสแกนไลก์ที่ตรงกัน... น่าสนใจ",
+      "คนหนึ่งสายเช้า อีกคนสายดึก จดไว้แล้ว",
+      "ตรวจพบความตึงเครียดในประวัติรีพลาย",
+      "กำลังคำนวณเคมี ใส่เสื้อกาวน์แล้ว",
+      "ผลอาจทำให้ใครคนหนึ่งไม่พอใจ กำลังเปิดเผย"
     ]
   }
 };

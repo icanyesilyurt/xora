@@ -38,7 +38,9 @@ const AI_COPY={
  ja:{nickname:'質問好き',tagline:'質問しながら話を進めるタイプ。',summary:'オープンな質問をよくする。',comment:'質問から会話を始めるのが得意。',label:'コメント',observation:'よく質問している。',match:'どちらのアカウントもよく質問する。'},
  ko:{nickname:'질문이 많은 사람',tagline:'질문으로 대화를 이어가요.',summary:'열린 질문을 자주 합니다.',comment:'질문으로 대화를 여는 편이에요.',label:'코멘트',observation:'질문을 자주 합니다.',match:'두 계정 모두 질문이 많아요.'},
  zh:{nickname:'問題很多',tagline:'靠問題把話題帶下去。',summary:'常常問開放式的問題。',comment:'你習慣用問題打開一段對話。',label:'評語',observation:'很常提問。',match:'兩個帳號都很愛問問題。'},
- ru:{nickname:'Много спрашивает',tagline:'Идёт вперёд через вопросы.',summary:'Задаёт открытые вопросы.',comment:'Ты открываешь разговор вопросом.',label:'Комментарий',observation:'Часто задаёт вопросы.',match:'Оба аккаунта много спрашивают.'}
+ ru:{nickname:'Много спрашивает',tagline:'Идёт вперёд через вопросы.',summary:'Задаёт открытые вопросы.',comment:'Ты открываешь разговор вопросом.',label:'Комментарий',observation:'Часто задаёт вопросы.',match:'Оба аккаунта много спрашивают.'},
+ id:{nickname:'Si Penanya',tagline:'Maju lewat pertanyaan.',summary:'Mengajukan pertanyaan terbuka.',comment:'Kamu membuka obrolan dengan pertanyaan.',label:'Komentar',observation:'Sering bertanya.',match:'Kedua akun sama-sama suka bertanya.'},
+ th:{nickname:'นักถาม ตัวยง',tagline:'ไปข้างหน้าด้วยคำถาม',summary:'ตั้งคำถามปลายเปิด',comment:'คุณเปิดบทสนทนาด้วยคำถาม',label:'ความเห็น',observation:'ถามบ่อย',match:'ทั้งสองบัญชีชอบถามเหมือนกัน'}
 };
 // Serious-analysis copy: three sentences per locale, no sample counts.
 const ANALYSIS_COPY={
@@ -53,7 +55,9 @@ const ANALYSIS_COPY={
  ja:'このアカウントは質問から考えを始める。返信は短く明確だ。自分の言葉で会話に参加している。',
  ko:'이 계정은 질문으로 생각을 엽니다. 답글은 짧고 분명합니다. 자신의 말로 대화에 참여합니다.',
  zh:'這個帳號習慣用問題開啟想法。回覆簡短而清楚。會用自己的話參與討論。',
- ru:'Аккаунт начинает свои мысли с вопросов. Ответы остаются короткими и ясными. Он участвует в разговоре своими словами.'
+ ru:'Аккаунт начинает свои мысли с вопросов. Ответы остаются короткими и ясными. Он участвует в разговоре своими словами.',
+ id:'Akun ini memulai pikirannya dengan pertanyaan. Balasannya singkat dan jelas. Ia ikut dalam obrolan dengan kata-katanya sendiri.',
+ th:'บัญชีนี้เริ่มความคิดด้วยคำถาม คำตอบสั้นและชัด เข้าร่วมบทสนทนาด้วยคำพูดของตัวเอง'
 };
 // A valid serious-analysis result for fixtures whose posts are own-voice originals (indexes 0-7).
 const seriousAI=(locale='en')=>({ontology_version:'real-1.1',
@@ -68,7 +72,7 @@ function seriousLocale(body,e){
  return Object.keys(e.REAL_LOCALES).find(l=>m&&e.REAL_LOCALES[l].language===m[1])||'en';
 }
 // Nickname-call fixtures: exactly two words per locale, with the locale's tagline.
-const NICK_COPY={tr:'Soru Ustası',en:'Question Master',es:'Maestro Preguntón',pt:'Mestre Curioso',ar:'سيد الأسئلة',fr:'Maître Curieux',de:'Neugieriger Frager',it:'Maestro Curioso',ja:'質問の 達人',ko:'질문 달인',zh:'提問 達人',ru:'Главный почемучка'};
+const NICK_COPY={tr:'Soru Ustası',en:'Question Master',es:'Maestro Preguntón',pt:'Mestre Curioso',ar:'سيد الأسئلة',fr:'Maître Curieux',de:'Neugieriger Frager',it:'Maestro Curioso',ja:'質問の 達人',ko:'질문 달인',zh:'提問 達人',ru:'Главный почемучка',id:'Raja Bertanya',th:'นักถาม ตัวยง'};
 const nicknameAI=(locale='en')=>({nickname:NICK_COPY[locale],tagline:AI_COPY[locale].tagline,emoji:'🦉'});
 const isNicknameRequest=body=>body?.text?.format?.name==='xora_real_nickname'||String(body?.system||'').includes("XORA's nickname writer");
 function nicknameLocale(body,e){

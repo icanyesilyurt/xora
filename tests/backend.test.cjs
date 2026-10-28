@@ -3,7 +3,7 @@ const {edge,profileAI,matchAI,AI_COPY,seriousAI,isSeriousRequest,seriousLocale,n
 test('strict request validation before billing',()=>{
  const e=edge();const base={mode:'mirror',locale:'tr',handle:'@Alice',request_id:'request-123'};
  assert.equal(e.validateRequest(base).handles[0],'alice');
- for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru']) assert.equal(e.validateRequest({...base,locale}).locale,locale);
+ for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th']) assert.equal(e.validateRequest({...base,locale}).locale,locale);
  // Planned but not yet served locales are rejected before billing until they have REAL language rules.
  for(const patch of [{mode:'fun'},{mode:'oops'},{locale:'RU'},{locale:'ru-RU'},{locale:'ZH'},{locale:'zh-TW'},{locale:'KO'},{locale:'ko-KR'},{locale:'JA'},{locale:'ja-JP'},{locale:'IT'},{locale:'it-IT'},{locale:'FR'},{locale:'fr-FR'},{locale:'DE'},{locale:'de-DE'},{locale:'ES'},{locale:'es-ES'},{locale:'PT'},{locale:'pt-BR'},{locale:'AR'},{locale:'ar-SA'},{handle:'abc!'},{handle:'a b'},{handle:'a'.repeat(16)},{handle:32},{request_id:'../id'},{mode:'match',handles:['Alice','@alice']}]) assert.throws(()=>e.validateRequest({...base,...patch}),/bad_request/);
 });
