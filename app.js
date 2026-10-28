@@ -18,12 +18,11 @@ var COSTS = { mirror: 5, stalk: 5, match: 10 };
 
 // Launch pricing in TRY. `list` is the regular price shown struck through; `price` is charged.
 // Capacity is derived from COSTS so it can never drift from the real per-analysis prices.
-var LAUNCH_DISCOUNT = 0.4;
 var CREDIT_PACKAGES = [
-  { id: "starter", credits: 10, list: 249, price: 149, label: "pkg_starter" },
-  { id: "popular", credits: 20, list: 499, price: 299, label: "pkg_popular", featured: true },
-  { id: "value", credits: 50, list: 1249, price: 749, label: "pkg_value" },
-  { id: "professional", credits: 300, list: 7499, price: 4499, label: "pkg_pro", note: "pkg_pro_note" }
+  { id: "starter", credits: 10, price: 149, label: "pkg_starter" },
+  { id: "popular", credits: 20, price: 279, label: "pkg_popular", featured: true },
+  { id: "value", credits: 50, price: 599, label: "pkg_value" },
+  { id: "professional", credits: 300, price: 2999, label: "pkg_pro", note: "pkg_pro_note" }
 ];
 var FREE_CREDITS = 0;
 var xoraSupabase = null;
@@ -919,7 +918,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "Tek cümleyle bitirir",
     share_label_mirror: "XORA AYNA",
     share_label_match: "KİMYA RAPORU",
-    pricing_launch: "LANSMAN FIRSATI · {pct} İNDİRİM",
+    pricing_launch: "BÜYÜK PAKET · DAHA UCUZ KREDİ",
+    pkg_per_credit: "{price} / kredi",
+    pkg_save: "{pct} avantajlı",
     pkg_starter: "BAŞLANGIÇ",
     pkg_popular: "EN POPÜLER",
     pkg_value: "AVANTAJLI",
@@ -1111,7 +1112,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "One-liner closer",
     share_label_mirror: "XORA MIRROR",
     share_label_match: "CHEMISTRY REPORT",
-    pricing_launch: "LAUNCH OFFER · {pct} OFF",
+    pricing_launch: "BIGGER PACK · CHEAPER CREDITS",
+    pkg_per_credit: "{price} / credit",
+    pkg_save: "Save {pct}",
     pkg_starter: "STARTER",
     pkg_popular: "MOST POPULAR",
     pkg_value: "VALUE",
@@ -1310,7 +1313,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "Cierra con una frase",
     share_label_mirror: "XORA ESPEJO",
     share_label_match: "INFORME DE QUÍMICA",
-    pricing_launch: "OFERTA DE LANZAMIENTO · {pct} DE DESCUENTO",
+    pricing_launch: "PAQUETE MAYOR · CRÉDITOS MÁS BARATOS",
+    pkg_per_credit: "{price} / crédito",
+    pkg_save: "Ahorra {pct}",
     pkg_starter: "INICIAL",
     pkg_popular: "MÁS POPULAR",
     pkg_value: "AHORRO",
@@ -1510,7 +1515,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "Fecha com uma frase",
     share_label_mirror: "XORA ESPELHO",
     share_label_match: "RELATÓRIO DE QUÍMICA",
-    pricing_launch: "OFERTA DE LANÇAMENTO · {pct} OFF",
+    pricing_launch: "PACOTE MAIOR · CRÉDITOS MAIS BARATOS",
+    pkg_per_credit: "{price} / crédito",
+    pkg_save: "Economize {pct}",
     pkg_starter: "INICIAL",
     pkg_popular: "MAIS POPULAR",
     pkg_value: "CUSTO-BENEFÍCIO",
@@ -1702,7 +1709,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "يختم بجملة واحدة",
     share_label_mirror: "مرآة XORA",
     share_label_match: "تقرير الكيمياء",
-    pricing_launch: "عرض الإطلاق · خصم {pct}",
+    pricing_launch: "باقة أكبر · رصيد أرخص",
+    pkg_per_credit: "{price} / رصيد",
+    pkg_save: "وفّر {pct}",
     pkg_starter: "المبتدئ",
     pkg_popular: "الأكثر شيوعًا",
     pkg_value: "الأفضل قيمة",
@@ -1893,7 +1902,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "Conclut en une phrase",
     share_label_mirror: "MIROIR XORA",
     share_label_match: "RAPPORT DE CHIMIE",
-    pricing_launch: "OFFRE DE LANCEMENT · {pct} DE RÉDUCTION",
+    pricing_launch: "PLUS GRAND PACK · CRÉDITS MOINS CHERS",
+    pkg_per_credit: "{price} / crédit",
+    pkg_save: "Économisez {pct}",
     pkg_starter: "DÉCOUVERTE",
     pkg_popular: "LE PLUS POPULAIRE",
     pkg_value: "AVANTAGEUX",
@@ -2084,7 +2095,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "Beendet mit einem Satz",
     share_label_mirror: "XORA SPIEGEL",
     share_label_match: "CHEMIE-BERICHT",
-    pricing_launch: "LAUNCH-ANGEBOT · {pct} RABATT",
+    pricing_launch: "GRÖSSERES PAKET · GÜNSTIGERE CREDITS",
+    pkg_per_credit: "{price} / Credit",
+    pkg_save: "{pct} sparen",
     pkg_starter: "STARTER",
     pkg_popular: "AM BELIEBTESTEN",
     pkg_value: "SPARPAKET",
@@ -2275,7 +2288,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "Chiude con una battuta",
     share_label_mirror: "SPECCHIO XORA",
     share_label_match: "REPORT DI CHIMICA",
-    pricing_launch: "OFFERTA DI LANCIO · {pct} DI SCONTO",
+    pricing_launch: "PACCHETTO PIÙ GRANDE · CREDITI PIÙ ECONOMICI",
+    pkg_per_credit: "{price} / credito",
+    pkg_save: "Risparmi {pct}",
     pkg_starter: "BASE",
     pkg_popular: "IL PIÙ SCELTO",
     pkg_value: "CONVENIENZA",
@@ -2466,7 +2481,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "ひと言で締める",
     share_label_mirror: "XORAミラー",
     share_label_match: "相性レポート",
-    pricing_launch: "ローンチ特価 · {pct}オフ",
+    pricing_launch: "大きいパックほどお得",
+    pkg_per_credit: "1クレジット {price}",
+    pkg_save: "{pct}お得",
     pkg_starter: "スターター",
     pkg_popular: "いちばん人気",
     pkg_value: "お得",
@@ -2657,7 +2674,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "한마디로 끝낸다",
     share_label_mirror: "XORA 미러",
     share_label_match: "케미 리포트",
-    pricing_launch: "출시 기념 · {pct} 할인",
+    pricing_launch: "큰 패키지일수록 더 저렴",
+    pkg_per_credit: "크레딧당 {price}",
+    pkg_save: "{pct} 절약",
     pkg_starter: "스타터",
     pkg_popular: "가장 인기",
     pkg_value: "알뜰",
@@ -2848,7 +2867,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "一句話結束",
     share_label_mirror: "XORA 鏡子",
     share_label_match: "化學反應報告",
-    pricing_launch: "上線優惠 · 立省 {pct}",
+    pricing_launch: "方案越大 點數越便宜",
+    pkg_per_credit: "每點 {price}",
+    pkg_save: "省 {pct}",
     pkg_starter: "入門",
     pkg_popular: "最受歡迎",
     pkg_value: "超值",
@@ -3039,7 +3060,9 @@ var I18N = {
     trait_timeline_drops_one_liners: "Заканчивает одной фразой",
     share_label_mirror: "ЗЕРКАЛО XORA",
     share_label_match: "ОТЧЁТ О ХИМИИ",
-    pricing_launch: "СТАРТОВОЕ ПРЕДЛОЖЕНИЕ · СКИДКА {pct}",
+    pricing_launch: "БОЛЬШЕ ПАКЕТ · ДЕШЕВЛЕ КРЕДИТЫ",
+    pkg_per_credit: "{price} / кредит",
+    pkg_save: "Экономия {pct}",
     pkg_starter: "СТАРТ",
     pkg_popular: "САМЫЙ ПОПУЛЯРНЫЙ",
     pkg_value: "ВЫГОДНЫЙ",
@@ -3244,18 +3267,22 @@ function packageCapacity(pkg) {
 
 function renderCreditPackages(container, banner) {
   var lang = getLang();
-  if (banner) banner.textContent = fillTemplate(t("pricing_launch"), { pct: formatPercent(LAUNCH_DISCOUNT, lang) });
+  if (banner) banner.textContent = t("pricing_launch");
   if (!container) return;
   container.innerHTML = CREDIT_PACKAGES.map(function (pkg) {
     var cap = packageCapacity(pkg);
-    var list = formatPrice(pkg.list, lang);
+    // Savings are measured against the smallest pack's price per credit: a real, current price.
+    var base = CREDIT_PACKAGES[0].price / CREDIT_PACKAGES[0].credits;
+    var perCredit = pkg.price / pkg.credits;
+    var save = Math.round((1 - perCredit / base) * 100) / 100;
     return '<div class="pack pack-' + pkg.id + (pkg.featured ? ' hot' : '') + '" data-package="' + pkg.id + '">' +
       '<p class="pack-badge">' + esc(t(pkg.label)) + '</p>' +
       '<p class="pack-amount">' + pkg.credits + ' <small>⚡</small></p>' +
       '<p class="pack-name">' + esc(fillTemplate(t("pkg_capacity"), { ms: cap.mirrorStalk, mt: cap.match })) + '</p>' +
       (pkg.note ? '<p class="pack-note">' + esc(t(pkg.note)) + '</p>' : '') +
-      '<p class="pack-price"><s class="pack-old" aria-label="' + esc(t("pkg_regular") + ": " + list) + '">' + esc(list) + '</s> ' +
-        '<span class="pack-now">' + esc(formatPrice(pkg.price, lang)) + '</span></p>' +
+      '<p class="pack-price"><span class="pack-now">' + esc(formatPrice(pkg.price, lang)) + '</span></p>' +
+      '<p class="pack-per">' + esc(fillTemplate(t("pkg_per_credit"), { price: formatPrice(Math.round(perCredit * 10) / 10, lang) })) +
+        (save >= 0.05 ? ' · <b class="pack-save">' + esc(fillTemplate(t("pkg_save"), { pct: formatPercent(save, lang) })) + '</b>' : '') + '</p>' +
       '<button type="button" class="btn btn-sm' + (pkg.featured ? ' btn-orange' : '') + '" data-amount="' + pkg.credits + '" data-i18n="credits_buy">' + esc(t("credits_buy")) + '</button>' +
     '</div>';
   }).join("");

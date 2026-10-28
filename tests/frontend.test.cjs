@@ -762,23 +762,24 @@ test('REAL cards use the comment written for the active mode: Mirror, Stalk and 
   assert.match(c.shareCardModel(m).analysis,/^MATCH_VOICE/,lang+' match share');
  }
 });
-test('credit packages: 10/20/50/300 at launch prices with struck regular prices and correct capacity, in all 12 locales',()=>{
+test('credit packages: 10/20/50/300 with volume pricing, per-credit price, savings and correct capacity, in all 12 locales',()=>{
  const c=browser();
  assert.deepEqual({...c.COSTS},{mirror:5,stalk:5,match:10},'per-analysis prices unchanged');
- const pk=[...c.CREDIT_PACKAGES].map(p=>({id:p.id,credits:p.credits,list:p.list,price:p.price,featured:!!p.featured,label:p.label,note:p.note||null}));
+ const pk=[...c.CREDIT_PACKAGES].map(p=>({id:p.id,credits:p.credits,price:p.price,featured:!!p.featured,label:p.label,note:p.note||null}));
  assert.deepEqual(pk,[
-  {id:'starter',credits:10,list:249,price:149,featured:false,label:'pkg_starter',note:null},
-  {id:'popular',credits:20,list:499,price:299,featured:true,label:'pkg_popular',note:null},
-  {id:'value',credits:50,list:1249,price:749,featured:false,label:'pkg_value',note:null},
-  {id:'professional',credits:300,list:7499,price:4499,featured:false,label:'pkg_pro',note:'pkg_pro_note'}]);
+  {id:'starter',credits:10,price:149,featured:false,label:'pkg_starter',note:null},
+  {id:'popular',credits:20,price:279,featured:true,label:'pkg_popular',note:null},
+  {id:'value',credits:50,price:599,featured:false,label:'pkg_value',note:null},
+  {id:'professional',credits:300,price:2999,featured:false,label:'pkg_pro',note:'pkg_pro_note'}]);
  assert.deepEqual([...c.CREDIT_PACKAGES].map(p=>({...c.packageCapacity(p)})),[{mirrorStalk:2,match:1},{mirrorStalk:4,match:2},{mirrorStalk:10,match:5},{mirrorStalk:60,match:30}]);
- for(const p of c.CREDIT_PACKAGES) assert.ok(Math.abs(1-p.price/p.list-c.LAUNCH_DISCOUNT)<0.005,p.id+' is 40% off');
+ const per=c.CREDIT_PACKAGES.map(p=>p.price/p.credits);for(let i=1;i<per.length;i++) assert.ok(per[i]<per[i-1],'bigger packs cost less per credit');
+ assert.equal(c.LAUNCH_DISCOUNT,undefined,'no fake launch discount');
  for(const lang of LOCALES12){
   c.localStorage.setItem(c.LS.lang,lang);
   const box={innerHTML:''},banner={textContent:''};
   c.renderCreditPackages(box,banner);
-  assert.equal(banner.textContent,c.I18N[lang].pricing_launch.replace('{pct}',c.formatPercent(0.4,lang)),lang+' banner');
-  const packs=[...box.innerHTML.matchAll(/<div class="pack pack-(\w+)( hot)?" data-package="\w+"><p class="pack-badge">([^<]+)<\/p><p class="pack-amount">(\d+) <small>⚡<\/small><\/p><p class="pack-name">([^<]+)<\/p>(?:<p class="pack-note">([^<]+)<\/p>)?<p class="pack-price"><s class="pack-old" aria-label="[^"]+">([^<]+)<\/s> <span class="pack-now">([^<]+)<\/span><\/p><button type="button" class="btn btn-sm( btn-orange)?" data-amount="(\d+)"/g)];
+  assert.equal(banner.textContent,c.I18N[lang].pricing_launch,lang+' banner');assert.doesNotMatch(box.innerHTML,/<s /,'no struck prices');
+  const packs=[...box.innerHTML.matchAll(/<div class="pack pack-(\w+)( hot)?" data-package="\w+"><p class="pack-badge">([^<]+)<\/p><p class="pack-amount">(\d+) <small>⚡<\/small><\/p><p class="pack-name">([^<]+)<\/p>(?:<p class="pack-note">([^<]+)<\/p>)?<p class="pack-price"><span class="pack-now">([^<]+)<\/span><\/p><p class="pack-per">([^<]+)(?: · <b class="pack-save">[^<]+<\/b>)?<\/p><button type="button" class="btn btn-sm( btn-orange)?" data-amount="(\d+)"/g)];
   assert.equal(packs.length,4,lang+' four packages');
   const fill=(s,v)=>s.replace('{ms}',v.ms).replace('{mt}',v.mt);
   const caps=[[2,1],[4,2],[10,5],[60,30]];
@@ -789,13 +790,14 @@ test('credit packages: 10/20/50/300 at launch prices with struck regular prices 
    assert.equal(+m[4],p.credits);assert.equal(+m[10],p.credits,'buy button amount');
    assert.equal(m[5],c.esc(fill(c.I18N[lang].pkg_capacity,{ms:caps[i][0],mt:caps[i][1]})),lang+' capacity');
    assert.equal(m[6]||null,p.id==='professional'?c.esc(c.I18N[lang].pkg_pro_note):null,lang+' pro note');
-   assert.equal(m[7],c.esc(c.formatPrice(p.list,lang)),lang+' struck regular price');assert.equal(m[8],c.esc(c.formatPrice(p.price,lang)),lang+' launch price');
+   assert.equal(m[7],c.esc(c.formatPrice(p.price,lang)),lang+' price');assert.ok(m[8].length>0,lang+' per-credit price');
    assert.equal(!!m[9],p.id==='popular');
   });
   assert.doesNotMatch(box.innerHTML,/Real Analiz|Real Analysis|pkg[123]_n/,'no generic "N Real Analysis" labels');
  }
  c.localStorage.setItem(c.LS.lang,'en');const box={innerHTML:''};c.renderCreditPackages(box,null);
- for(const [old,now] of [['249 ₺','149 ₺'],['499 ₺','299 ₺'],['1,249 ₺','749 ₺'],['7,499 ₺','4,499 ₺']]) assert.ok(box.innerHTML.includes('>'+old+'</s> <span class="pack-now">'+now+'<'),old+' -> '+now);
+ for(const now of ['149 ₺','279 ₺','599 ₺','2,999 ₺']) assert.ok(box.innerHTML.includes('<span class="pack-now">'+now+'<'),now);
+ for(const s of ['15 ₺ / credit','14 ₺ / credit','12 ₺ / credit','10 ₺ / credit','Save 6%','Save 20%','Save 33%']) assert.ok(box.innerHTML.includes(s),s);
  assert.match(box.innerHTML,/pack-popular hot"[^]*?>MOST POPULAR</);assert.match(box.innerHTML,/pack-professional"[^]*?>PROFESSIONAL<[^]*?>Creators &amp; Agencies</);
  // The credits page renders from this config and starts checkout with the package id only.
  const page=fs.readFileSync('credits.html','utf8');
