@@ -721,6 +721,13 @@ body::before{
 .card-status{position:absolute;z-index:4;top:12px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
 .card-status span,.card-status b{display:inline-flex;align-items:center;min-height:27px;padding:4px 10px;border:2px solid var(--ink);border-radius:999px;background:var(--ink);color:#fff;font-size:10.5px;font-weight:900;letter-spacing:.8px}
 .real-status b{background:var(--orange);color:#fff}
+.rarity-badge i{font-style:normal;margin-inline-end:5px}
+.rarity-badge[data-rarity="common"]{background:linear-gradient(180deg,#E8A970,#A9662C);color:#fff}
+.rarity-badge[data-rarity="rare"]{background:linear-gradient(180deg,#F7F9FB,#AAB4C0);color:var(--ink)}
+.rarity-badge[data-rarity="epic"]{background:linear-gradient(180deg,#FFE28A,#D8960A);color:var(--ink)}
+.rarity-badge[data-rarity="legendary"]{background:linear-gradient(180deg,#FFF6C2,#FFC93C 55%,#C98500);color:var(--ink);box-shadow:0 0 14px rgba(255,190,40,.8);animation:xora-shine 2.4s ease-in-out infinite}
+@keyframes xora-shine{50%{box-shadow:0 0 22px rgba(255,200,60,1)}}
+@media (prefers-reduced-motion:reduce){.rarity-badge[data-rarity="legendary"]{animation:none}}
 .fun-status{justify-content:flex-start}
 .fun-status span{background:var(--teal);color:#fff}
 .funcard .idcard-body{padding-top:26px;padding-bottom:24px}
