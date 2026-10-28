@@ -24,6 +24,20 @@ var CREDIT_PACKAGES = [
   { id: "value", credits: 50, price: 599, label: "pkg_value" },
   { id: "professional", credits: 300, price: 2999, label: "pkg_pro", note: "pkg_pro_note" }
 ];
+// Outside Turkey credits are sold in US dollars (iyzico multi-currency). Same packs, own ids.
+var CREDIT_PACKAGES_USD = [
+  { id: "starter_usd", credits: 10, price: 3.99, label: "pkg_starter", currency: "USD" },
+  { id: "popular_usd", credits: 20, price: 7.49, label: "pkg_popular", featured: true, currency: "USD" },
+  { id: "value_usd", credits: 50, price: 14.99, label: "pkg_value", currency: "USD" },
+  { id: "professional_usd", credits: 300, price: 79.99, label: "pkg_pro", note: "pkg_pro_note", currency: "USD" }
+];
+// Turkish lira only for the Turkish site; every other language pays in dollars.
+function priceCurrency(lang) {
+  return (lang || (typeof getLang === "function" ? getLang() : "tr")) === "tr" ? "TRY" : "USD";
+}
+function activeCreditPackages(lang) {
+  return priceCurrency(lang) === "TRY" ? CREDIT_PACKAGES : CREDIT_PACKAGES_USD;
+}
 var FREE_CREDITS = 0;
 var xoraSupabase = null;
 
@@ -3251,10 +3265,12 @@ function formatPercent(ratio, lang) {
   return new Intl.NumberFormat(numberLocale(lang), { style: "percent", maximumFractionDigits: 0 }).format(ratio);
 }
 
-// Fixed TRY prices are rendered without decimals and with an explicit lira symbol in every locale.
-function formatPrice(tryAmount, lang) {
+// TRY prices are rendered without decimals with an explicit lira symbol; USD prices as dollars
+// with cents.
+function formatPrice(amount, lang, currency) {
   var l = lang || getLang();
-  return new Intl.NumberFormat(numberLocale(l), { maximumFractionDigits: 0 }).format(tryAmount) + " ₺";
+  if (currency === "USD") return new Intl.NumberFormat(numberLocale(l), { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+  return new Intl.NumberFormat(numberLocale(l), { maximumFractionDigits: 0 }).format(amount) + " ₺";
 }
 
 function fillTemplate(text, values) {
@@ -3269,19 +3285,20 @@ function renderCreditPackages(container, banner) {
   var lang = getLang();
   if (banner) banner.textContent = t("pricing_launch");
   if (!container) return;
-  container.innerHTML = CREDIT_PACKAGES.map(function (pkg) {
+  var packs = activeCreditPackages(lang);
+  container.innerHTML = packs.map(function (pkg) {
     var cap = packageCapacity(pkg);
     // Savings are measured against the smallest pack's price per credit: a real, current price.
-    var base = CREDIT_PACKAGES[0].price / CREDIT_PACKAGES[0].credits;
+    var base = packs[0].price / packs[0].credits;
     var perCredit = pkg.price / pkg.credits;
     var save = Math.round((1 - perCredit / base) * 100) / 100;
-    return '<div class="pack pack-' + pkg.id + (pkg.featured ? ' hot' : '') + '" data-package="' + pkg.id + '">' +
+    return '<div class="pack pack-' + pkg.id.replace(/_usd$/, "") + (pkg.featured ? ' hot' : '') + '" data-package="' + pkg.id + '">' +
       '<p class="pack-badge">' + esc(t(pkg.label)) + '</p>' +
       '<p class="pack-amount">' + pkg.credits + ' <small>⚡</small></p>' +
       '<p class="pack-name">' + esc(fillTemplate(t("pkg_capacity"), { ms: cap.mirrorStalk, mt: cap.match })) + '</p>' +
       (pkg.note ? '<p class="pack-note">' + esc(t(pkg.note)) + '</p>' : '') +
-      '<p class="pack-price"><span class="pack-now">' + esc(formatPrice(pkg.price, lang)) + '</span></p>' +
-      '<p class="pack-per">' + esc(fillTemplate(t("pkg_per_credit"), { price: formatPrice(Math.round(perCredit * 10) / 10, lang) })) +
+      '<p class="pack-price"><span class="pack-now">' + esc(formatPrice(pkg.price, lang, pkg.currency)) + '</span></p>' +
+      '<p class="pack-per">' + esc(fillTemplate(t("pkg_per_credit"), { price: pkg.currency === "USD" ? formatPrice(perCredit, lang, "USD") : formatPrice(Math.round(perCredit * 10) / 10, lang) })) +
         (save >= 0.05 ? ' · <b class="pack-save">' + esc(fillTemplate(t("pkg_save"), { pct: formatPercent(save, lang) })) + '</b>' : '') + '</p>' +
       '<button type="button" class="btn btn-sm' + (pkg.featured ? ' btn-orange' : '') + '" data-amount="' + pkg.credits + '" data-i18n="credits_buy">' + esc(t("credits_buy")) + '</button>' +
     '</div>';
@@ -3295,7 +3312,7 @@ var PAYMENT_FUNCTION = "iyzico-checkout";
 
 // Sends only the package id. Price, currency and credits are decided on the server.
 async function startCreditPurchase(packageId) {
-  if (!CREDIT_PACKAGES.some(function (p) { return p.id === packageId; })) return "unknown_package";
+  if (!activeCreditPackages().some(function (p) { return p.id === packageId; })) return "unknown_package";
   var sb = getSupabaseClient();
   var sessionRes = sb ? await sb.auth.getSession() : null;
   var session = sessionRes && sessionRes.data && sessionRes.data.session;

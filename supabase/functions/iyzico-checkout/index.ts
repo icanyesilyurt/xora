@@ -12,15 +12,20 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.116.0";
 // database re-checks the same fields and credits through its idempotent ledger, exactly once.
 // Card data never reaches Xora: the card form is iyzico's.
 
-type PackageId = "starter" | "popular" | "value" | "professional";
-type CatalogEntry = { credits: number; amount: number; currency: "TRY" };
+type PackageId = "starter" | "popular" | "value" | "professional" | "starter_usd" | "popular_usd" | "value_usd" | "professional_usd";
+type CatalogEntry = { credits: number; amount: number; currency: "TRY" | "USD" };
 type Purchase = { id: string; user_id: string; package_id: string; credits: number; amount: number | string; currency: string; provider_token: string | null; status: "pending" | "completed" | "failed" };
 
 const CATALOG: Record<PackageId, CatalogEntry> = {
   starter: { credits: 10, amount: 149, currency: "TRY" },
   popular: { credits: 20, amount: 279, currency: "TRY" },
   value: { credits: 50, amount: 599, currency: "TRY" },
-  professional: { credits: 300, amount: 2999, currency: "TRY" }
+  professional: { credits: 300, amount: 2999, currency: "TRY" },
+  // Outside Turkey: the same packs in US dollars (iyzico multi-currency).
+  starter_usd: { credits: 10, amount: 3.99, currency: "USD" },
+  popular_usd: { credits: 20, amount: 7.49, currency: "USD" },
+  value_usd: { credits: 50, amount: 14.99, currency: "USD" },
+  professional_usd: { credits: 300, amount: 79.99, currency: "USD" }
 };
 
 const IYZICO_SANDBOX_URL = "https://sandbox-api.iyzipay.com";
