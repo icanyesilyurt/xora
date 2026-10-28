@@ -952,7 +952,7 @@ test('Cloudflare Pages build publishes exactly the static site into dist/, and n
  const out=execFileSync(process.execPath,['scripts/build-pages.mjs'],{encoding:'utf8'});
  assert.match(out,/9 pages, 5 assets/);
  const files=fs.readdirSync('dist').sort();
- assert.deepEqual(files,['admin.html','app.js','auth.html','card.js','config.js','credits.html','index.html','match.html','mirror.html','partner.html','profile.html','stalk.html','style.css','xora.js']);
+ assert.deepEqual(files,['admin.html','app.js','auth.html','card.js','config.js','credits.html','index.html','match.html','mirror.html','partner.html','profile.html','robots.txt','stalk.html','style.css','xora.js']);
  // Assets are copied byte for byte; pages only differ in the content-hash version on each asset reference.
  const crypto=require('node:crypto');const assets=['app.js','xora.js','card.js','config.js','style.css'];
  const ver=Object.fromEntries(assets.map(a=>[a,crypto.createHash('sha256').update(fs.readFileSync(a)).digest('hex').slice(0,10)]));

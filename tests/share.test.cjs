@@ -32,17 +32,20 @@ test('share-card accepts one 1200x630 JPEG with short metadata and refuses anyth
 test('/k/<id> serves X preview tags for a stored card and sends people on to the site',async()=>{
  const src=fs.readFileSync('functions/k/[id].js','utf8').replace(/^export /gm,'');
  const fetched=[];
- const ctx={URL,Response,fetch:async u=>{fetched.push(u);return u.endsWith('Abc234Defg.json')?{ok:true,json:async()=>({nickname:'Tribün "Komedyeni"',lang:'tr',mode:'stalk'})}:{ok:false};}};
+ const ctx={URL,Response,fetch:async u=>{fetched.push(u);if(u.endsWith('Abc234Defg.jpg'))return {ok:true,body:'JPEGBYTES'};return u.endsWith('Abc234Defg.json')?{ok:true,json:async()=>({nickname:'Tribün "Komedyeni"',lang:'tr',mode:'stalk'})}:{ok:false};}};
  vm.createContext(ctx);vm.runInContext(src+';this.onRequestGet=onRequestGet;',ctx);
  const res=await ctx.onRequestGet({params:{id:'Abc234Defg'},request:{url:'https://xora.roviaqr.com/k/Abc234Defg?ref=Kartal'}});
  const html=await res.text();
  assert.match(res.headers.get('content-type'),/text\/html/);
  assert.match(html,/<meta name="twitter:card" content="summary_large_image">/);
- assert.match(html,/og:image" content="https:\/\/jafrxhkppvvchyjbkldd\.supabase\.co\/storage\/v1\/object\/public\/cards\/Abc234Defg\.jpg"/);
+ assert.match(html,/og:image" content="https:\/\/xora\.roviaqr\.com\/k\/Abc234Defg\.jpg"/,'image served from the site domain');
  assert.match(html,/og:title" content="&quot;Tribün &quot;Komedyeni&quot;&quot; · XORA kartım"/,'title escaped');
  assert.match(html,/url=https:\/\/xora\.roviaqr\.com\/stalk\?ref=kartal/,'onward link keeps the partner ref');
  const missing=await ctx.onRequestGet({params:{id:'Zzz234Defg'},request:{url:'https://xora.roviaqr.com/k/Zzz234Defg'}});
  assert.equal(missing.status,302);
  const bad=await ctx.onRequestGet({params:{id:'../../etc'},request:{url:'https://xora.roviaqr.com/k/x'}});
  assert.equal(bad.status,302);assert.equal(fetched.length,2,'bad ids never reach storage');
+ const img=await ctx.onRequestGet({params:{id:'Abc234Defg.jpg'},request:{url:'https://xora.roviaqr.com/k/Abc234Defg.jpg'}});
+ assert.equal(img.headers.get('content-type'),'image/jpeg');assert.equal(await img.text(),'JPEGBYTES');
+ assert.ok(fetched[2].endsWith('/cards/Abc234Defg.jpg'));
 });
