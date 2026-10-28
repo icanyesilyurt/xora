@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Partner Paneli — XORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.pp-link{display:flex;gap:8px;align-items:center;margin-top:10px}
+.pp-link input{flex:1;min-width:0;padding:12px 14px;border:2.5px solid var(--ink);border-radius:14px;font:800 14px Nunito,sans-serif;background:#fff;color:var(--ink)}
+.pp-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.pp-stat{border:2.5px solid var(--ink);border-radius:16px;padding:12px 14px;background:#fff}
+.pp-stat small{display:block;color:var(--mut);font-weight:800;font-size:12px;letter-spacing:.4px;text-transform:uppercase}
+.pp-stat b{display:block;font-size:22px;font-weight:900;margin-top:2px}
+.pp-stat.hl{background:#E6F7F6}
+.pp-cur{margin-top:18px;font-weight:900;font-size:13px;letter-spacing:.6px;color:var(--mut)}
+.pp-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px}
+.pp-table th{text-align:start;color:var(--mut);font-size:12px;font-weight:800;padding:6px 4px;border-bottom:2px solid var(--ink)}
+.pp-table td{padding:8px 4px;border-bottom:1px solid rgba(0,0,0,.08);font-weight:700}
+.pp-table td:last-child,.pp-table th:last-child{text-align:end}
+.pp-tips{margin:10px 0 0;padding-inline-start:18px;line-height:1.55;font-weight:700}
+.pp-empty{color:var(--mut);font-weight:700;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">XO<span>RA</span></a>
+</header>
+
+<main class="page" id="pp">
+  <span class="mode-emoji">🤝</span>
+  <h1 id="ppTitle">Partner Paneli</h1>
+  <p class="sub" id="ppSub"></p>
+  <div id="ppBody"></div>
+</main>
+
+<footer class="foot">XORA V2</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  // Partner panel: opened with the partner's secret link (?key=...). Shows the referral link and
+  // the partner's own sales and commission. Turkish for the Turkish site, English otherwise.
+  var L = {
+    tr: {
+      title: "Partner Paneli", sub: "Linkinden gelen satışlar ve kazancın.",
+      bad: "Bu panel linki geçersiz. Linki sana veren kişiyle iletişime geç.", loading: "Yükleniyor…", error: "Bilgiler alınamadı, biraz sonra tekrar dene.",
+      link: "Senin linkin", copy: "Kopyala", copied: "Kopyalandı", rate: "Komisyonun",
+      signups: "Linkinden gelen", buyers: "Satın alan", sales: "Satış", revenue: "Ciro", earned: "Kazancın", paid: "Ödenen", unpaid: "Bekleyen",
+      recent: "Son satışlar", date: "Tarih", pack: "Paket", amount: "Tutar", commission: "Komisyon", none: "Henüz satış yok. Linkini paylaştıkça burada görünecek.",
+      tips: "Nasıl paylaşılır", tip1: "Kendi XORA kartını çıkar ve görselini paylaş.", tip2: "Linki gönderinin ilk yanıtına koy; X linkli gönderilerin erişimini düşürüyor.",
+      tip3: "Linkinden gelen biri 30 gün içinde aldığı her pakette sana komisyon kazandırır.", credits: "kredi", paidMark: "ödendi", unpaidMark: "bekliyor"
+    },
+    en: {
+      title: "Partner Panel", sub: "Sales from your link and what you earned.",
+      bad: "This panel link is not valid. Contact the person who sent it to you.", loading: "Loading…", error: "Could not load your numbers, try again shortly.",
+      link: "Your link", copy: "Copy", copied: "Copied", rate: "Your commission",
+      signups: "Came via your link", buyers: "Buyers", sales: "Sales", revenue: "Revenue", earned: "You earned", paid: "Paid", unpaid: "Pending",
+      recent: "Recent sales", date: "Date", pack: "Pack", amount: "Amount", commission: "Commission", none: "No sales yet. They will show up here as you share your link.",
+      tips: "How to share", tip1: "Get your own XORA card and post the image.", tip2: "Put the link in the first reply; X lowers the reach of posts with links.",
+      tip3: "Anyone who arrives through your link earns you commission on every pack they buy within 30 days.", credits: "credits", paidMark: "paid", unpaidMark: "pending"
+    }
+  };
+  var lang = (typeof getLang === "function" && getLang() === "tr") ? "tr" : "en";
+  var s = L[lang];
+  document.documentElement.lang = lang;
+  document.title = s.title + " — XORA";
+  document.getElementById("ppTitle").textContent = s.title;
+  document.getElementById("ppSub").textContent = s.sub;
+  var body = document.getElementById("ppBody");
+
+  function money(v, cur) {
+    var n = Number(v || 0);
+    if (cur === "USD") return new Intl.NumberFormat(lang === "tr" ? "tr-TR" : "en-US", { style: "currency", currency: "USD" }).format(n);
+    return new Intl.NumberFormat(lang === "tr" ? "tr-TR" : "en-US", { maximumFractionDigits: 2 }).format(n) + " ₺";
+  }
+  function packName(id) {
+    var m = { starter: 10, popular: 20, value: 50, professional: 300 };
+    var n = m[String(id).replace(/_usd$/, "")];
+    return n ? n + " " + s.credits : String(id);
+  }
+  function stat(label, value, hl) {
+    return '<div class="pp-stat' + (hl ? ' hl' : '') + '"><small>' + esc(label) + '</small><b>' + esc(value) + '</b></div>';
+  }
+
+  var key = new URLSearchParams(location.search).get("key") || "";
+  // The secret key is not kept in the address bar after it is read.
+  try { history.replaceState(null, "", location.pathname); } catch (e) {}
+  if (!/^[0-9a-f]{20,64}$/i.test(key)) { body.innerHTML = '<p class="pp-empty">' + esc(s.bad) + '</p>'; return; }
+  body.innerHTML = '<p class="pp-empty">' + esc(s.loading) + '</p>';
+
+  var sb = typeof getSupabaseClient === "function" ? getSupabaseClient() : null;
+  if (!sb) { body.innerHTML = '<p class="pp-empty">' + esc(s.error) + '</p>'; return; }
+  sb.rpc("xora_partner_panel", { p_key: key }).then(function (res) {
+    if (res.error) { body.innerHTML = '<p class="pp-empty">' + esc(s.error) + '</p>'; return; }
+    var p = res.data;
+    if (!p) { body.innerHTML = '<p class="pp-empty">' + esc(s.bad) + '</p>'; return; }
+    if (p.display_name) document.getElementById("ppSub").textContent = p.display_name + " · " + s.sub;
+    var link = (typeof getPublicSiteUrl === "function" ? getPublicSiteUrl() : location.origin + "/") + "?ref=" + encodeURIComponent(p.code);
+    var html = '<div class="panel"><p style="font-weight:900">' + esc(s.link) + '</p>' +
+      '<div class="pp-link"><input id="ppLink" readonly value="' + esc(link) + '"><button type="button" class="btn btn-sm btn-orange" id="ppCopy">' + esc(s.copy) + '</button></div>' +
+      '<div class="pp-stats">' + stat(s.rate, "%" + Math.round(p.commission_bps / 100)) + stat(s.signups, p.signups) + stat(s.buyers, p.buyers) + '</div></div>';
+
+    (p.totals || []).forEach(function (t) {
+      html += '<div class="panel"><p class="pp-cur">' + esc(t.currency) + '</p><div class="pp-stats">' +
+        stat(s.sales, t.sales) + stat(s.revenue, money(t.revenue, t.currency)) +
+        stat(s.earned, money(t.commission, t.currency), true) + stat(s.unpaid, money(t.unpaid, t.currency)) +
+        stat(s.paid, money(t.paid, t.currency)) + '</div></div>';
+    });
+
+    html += '<div class="panel"><p style="font-weight:900">' + esc(s.recent) + '</p>';
+    if (!p.recent || !p.recent.length) html += '<p class="pp-empty">' + esc(s.none) + '</p>';
+    else {
+      html += '<table class="pp-table"><thead><tr><th>' + esc(s.date) + '</th><th>' + esc(s.pack) + '</th><th>' + esc(s.amount) + '</th><th>' + esc(s.commission) + '</th></tr></thead><tbody>';
+      p.recent.forEach(function (r) {
+        var d = new Date(r.created_at).toLocaleDateString(lang === "tr" ? "tr-TR" : "en-US", { day: "numeric", month: "short" });
+        html += '<tr><td>' + esc(d) + '</td><td>' + esc(packName(r.package_id)) + '</td><td>' + esc(money(r.amount, r.currency)) + '</td><td>' +
+          esc(money(r.commission_amount, r.currency)) + '<br><small style="color:var(--mut)">' + esc(r.paid ? s.paidMark : s.unpaidMark) + '</small></td></tr>';
+      });
+      html += '</tbody></table>';
+    }
+    html += '</div><div class="panel"><p style="font-weight:900">' + esc(s.tips) + '</p><ol class="pp-tips"><li>' + esc(s.tip1) + '</li><li>' + esc(s.tip2) + '</li><li>' + esc(s.tip3) + '</li></ol></div>';
+    body.innerHTML = html;
+
+    document.getElementById("ppCopy").addEventListener("click", function () {
+      var input = document.getElementById("ppLink"), btn = this;
+      var done = function () { btn.textContent = s.copied; setTimeout(function () { btn.textContent = s.copy; }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(input.value).then(done, function () { input.select(); });
+      else { input.select(); try { document.execCommand("copy"); done(); } catch (e) {} }
+    });
+  }, function () { body.innerHTML = '<p class="pp-empty">' + esc(s.error) + '</p>'; });
+})();
+</script>
+</body>
+</html>
