@@ -16,7 +16,7 @@ do $$
 begin
   if exists (select 1 from information_schema.columns where table_schema = 'auth' and table_name = 'users' and column_name = 'email') then
     execute $q$insert into public.xora_admins(user_id)
-      select id from auth.users where lower(email) = 'ican.yslyrt@gmail.com'
+      select id from auth.users where lower(email) = 'yesilyurtizzetcan@gmail.com'
       on conflict do nothing$q$;
   end if;
 end $$;
