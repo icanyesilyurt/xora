@@ -8,7 +8,7 @@ const SIMPLIFIED_ONLY=/[这个们说见会时现样觉认为么过还来对开�
 test('canonical FUN personas cover every supported locale with reviewed independent copy',()=>{
  const c=browser();
  const locales=Object.keys(c.I18N).sort();
- assert.deepEqual(locales,['ar','de','en','es','fr','it','ja','ko','pt','ru','tr','zh']);
+ assert.deepEqual(locales,['ar','de','en','es','fr','id','it','ja','ko','pt','ru','th','tr','zh']);
  assert.equal(c.FUN_PERSONAS.length,12);
  assert.equal(new Set(c.FUN_PERSONAS.map(p=>p.id)).size,12);
  for(const p of c.FUN_PERSONAS){

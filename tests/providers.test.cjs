@@ -112,9 +112,9 @@ test('missing/unsupported provider and missing key/model fail before debit, X or
   }
  }
 });
-const QUESTIONING={tr:'Soru Ustalığı',en:'Question Master',es:'Maestro de Preguntas',pt:'Mestre das Perguntas',ar:'فن السؤال',fr:'Art de la Question',de:'Fragenmeister',it:'Maestro delle Domande',ja:'質問力',ko:'질문 장인',zh:'提問高手',ru:'Мастер вопросов'};
+const QUESTIONING={tr:'Soru Ustalığı',en:'Question Master',es:'Maestro de Preguntas',pt:'Mestre das Perguntas',ar:'فن السؤال',fr:'Art de la Question',de:'Fragenmeister',it:'Maestro delle Domande',ja:'質問力',ko:'질문 장인',zh:'提問高手',ru:'Мастер вопросов',id:'Jago Bertanya',th:'เจ้าแห่งคำถาม'};
 test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, fr, de, it, ja, ko, zh, ru) through both providers',async()=>{
- for(const provider of ['openai','anthropic'])for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'])for(const mode of ['mirror','stalk','match']){
+ for(const provider of ['openai','anthropic'])for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th'])for(const mode of ['mirror','stalk','match']){
   const f=fixture(provider);const response=await f.e.main(req(mode,locale));
   assert.equal(response.status,200,provider+' '+locale+' '+mode);
   const {result}=await response.json();

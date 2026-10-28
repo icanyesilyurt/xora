@@ -268,7 +268,7 @@ function buildIdentityCardV3(res) {
   var mode = res.mode || "mirror";
   var quoteLabel = mode === "stalk"
     ? "XORA Stalk"
-    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "Miroir XORA" : lang === "de" ? "XORA Spiegel" : lang === "it" ? "Specchio XORA" : lang === "ja" ? "XORAミラー" : lang === "ko" ? "XORA 미러" : lang === "zh" ? "XORA 鏡子" : lang === "ru" ? "Зеркало XORA" : "XORA Mirror");
+    : (lang === "tr" ? "XORA Ayna" : lang === "es" ? "XORA Espejo" : lang === "pt" ? "XORA Espelho" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "Miroir XORA" : lang === "de" ? "XORA Spiegel" : lang === "it" ? "Specchio XORA" : lang === "ja" ? "XORAミラー" : lang === "ko" ? "XORA 미러" : lang === "zh" ? "XORA 鏡子" : lang === "ru" ? "Зеркало XORA" : lang === "id" ? "XORA Cermin" : lang === "th" ? "กระจก XORA" : "XORA Mirror");
 
   var chips = "";
   var top = res.top_behaviors || [];
@@ -1193,7 +1193,7 @@ function renderIdentityPNGV3(res) {
   var emoji = res.profile_emoji || "🪞";
   var tagline = res.tagline ? (res.tagline[lang] || res.tagline.tr) : "";
   var mode = res.mode || "mirror";
-  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "MIROIR XORA" : lang === "de" ? "XORA SPIEGEL" : lang === "it" ? "SPECCHIO XORA" : lang === "ja" ? "XORAミラー" : lang === "ko" ? "XORA 미러" : lang === "zh" ? "XORA 鏡子" : lang === "ru" ? "ЗЕРКАЛО XORA" : "XORA MIRROR");
+  var quoteLabel = mode === "stalk" ? "XORA STALK" : (lang === "tr" ? "XORA AYNA" : lang === "es" ? "XORA ESPEJO" : lang === "pt" ? "XORA ESPELHO" : lang === "ar" ? "مرآة XORA" : lang === "fr" ? "MIROIR XORA" : lang === "de" ? "XORA SPIEGEL" : lang === "it" ? "SPECCHIO XORA" : lang === "ja" ? "XORAミラー" : lang === "ko" ? "XORA 미러" : lang === "zh" ? "XORA 鏡子" : lang === "ru" ? "ЗЕРКАЛО XORA" : lang === "id" ? "XORA CERMIN" : lang === "th" ? "กระจก XORA" : "XORA MIRROR");
   var b = baseCanvas();
   var ctx = b.ctx;
 
@@ -1524,6 +1524,8 @@ function shareIdentityText(res) {
     if (lang === "ko") return 'XORA REAL이 읽어낸 나: ‘' + name + '’ · ' + rarity + ' 👀 당신은 어떻게 나올까요? → ' + getPublicSiteUrl();
     if (lang === "zh") return 'XORA REAL 讀出來的我：「' + name + '」 · ' + rarity + ' 👀 你會是什麼樣子？ → ' + getPublicSiteUrl();
     if (lang === "ru") return 'XORA REAL прочитала меня: «' + name + '» · ' + rarity + ' 👀 А что скажет о тебе? → ' + getPublicSiteUrl();
+    if (lang === "id") return 'XORA REAL membaca aku: "' + name + '" · ' + rarity + ' 👀 Kalau kamu bakal jadi apa? → ' + getPublicSiteUrl();
+    if (lang === "th") return 'XORA REAL อ่านฉันออกว่า: "' + name + '" · ' + rarity + ' 👀 แล้วคุณจะได้อะไร? → ' + getPublicSiteUrl();
     return 'XORA REAL read me: "' + name + '" · ' + rarity + ' 👀 What would yours say? → ' + getPublicSiteUrl();
   }
   if (lang === "tr") return 'XORA FUN kartım: "' + name + '" 😅 Seninkini çek → ' + getPublicSiteUrl();
@@ -1537,6 +1539,8 @@ function shareIdentityText(res) {
   if (lang === "ko") return '내 XORA FUN 카드: ‘' + name + '’ 😅 당신도 뽑아 보세요 → ' + getPublicSiteUrl();
   if (lang === "zh") return '我的 XORA FUN 卡片：「' + name + '」😅 你也來抽一張 → ' + getPublicSiteUrl();
   if (lang === "ru") return 'Моя карточка XORA FUN: «' + name + '» 😅 Вытяни свою → ' + getPublicSiteUrl();
+  if (lang === "id") return 'Kartu XORA FUN-ku: "' + name + '" 😅 Ambil punyamu → ' + getPublicSiteUrl();
+  if (lang === "th") return 'การ์ด XORA FUN ของฉัน: "' + name + '" 😅 จั่วของคุณบ้าง → ' + getPublicSiteUrl();
   return 'My XORA FUN card: "' + name + '" 😅 Draw yours → ' + getPublicSiteUrl();
 }
 
@@ -1555,6 +1559,8 @@ function shareMatchText(m) {
     if (lang === "ko") return "XORA REAL: @" + m.a + " × @" + m.b + " 궁합 " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "zh") return "XORA REAL：@" + m.a + " × @" + m.b + " 速配 " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     if (lang === "ru") return "XORA REAL: @" + m.a + " × @" + m.b + " совместимость " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
+    if (lang === "id") return "XORA REAL: @" + m.a + " × @" + m.b + " kecocokan " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
+    if (lang === "th") return "XORA REAL: @" + m.a + " × @" + m.b + " เข้ากัน " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
     return "XORA REAL: @" + m.a + " × @" + m.b + " match " + m.overall + "% · " + rarity + " 🔥 → " + getPublicSiteUrl();
   }
   if (lang === "tr") return "XORA FUN: @" + m.a + " × @" + m.b + " uyumu %" + m.overall + " 😅 Siz kaç çıkarsınız? → " + getPublicSiteUrl();
@@ -1568,6 +1574,8 @@ function shareMatchText(m) {
   if (lang === "ko") return "XORA FUN: @" + m.a + " × @" + m.b + " 궁합 " + m.overall + "% 😅 두 분은 몇 %일까요? → " + getPublicSiteUrl();
   if (lang === "zh") return "XORA FUN：@" + m.a + " × @" + m.b + " 速配 " + m.overall + "% 😅 你們呢？ → " + getPublicSiteUrl();
   if (lang === "ru") return "XORA FUN: @" + m.a + " × @" + m.b + " совместимость " + m.overall + "% 😅 А сколько у вас? → " + getPublicSiteUrl();
+  if (lang === "id") return "XORA FUN: @" + m.a + " × @" + m.b + " kecocokan " + m.overall + "% 😅 Kalian berapa? → " + getPublicSiteUrl();
+  if (lang === "th") return "XORA FUN: @" + m.a + " × @" + m.b + " เข้ากัน " + m.overall + "% 😅 แล้วคู่คุณล่ะกี่%? → " + getPublicSiteUrl();
   return "XORA FUN: @" + m.a + " × @" + m.b + " match " + m.overall + "% 😅 Try yours → " + getPublicSiteUrl();
 }
 

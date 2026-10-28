@@ -83,8 +83,8 @@ test('Task 04C exact Mirror ledger and strict rarity across all modes',async()=>
  }finally{await db.close();}
 });
 
-test('planned locale DB contract accepts all 12 locales once and still rejects anything else',async()=>{
- const planned=['tr','en','es','pt','it','fr','de','ru','ja','ko','zh','ar'];
+test('planned locale DB contract accepts all 14 locales once and still rejects anything else',async()=>{
+ const planned=['tr','en','es','pt','it','fr','de','ru','ja','ko','zh','ar','id','th'];
  const db=await setup();try{
   const constraint=(await q(db,`select pg_get_constraintdef(oid) as def from pg_constraint where conname='real_requests_locale_check'`))[0].def;
   for(const locale of planned) assert.match(constraint,new RegExp(`'${locale}'`),locale+' in table constraint');
