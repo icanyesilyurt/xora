@@ -7,3 +7,7 @@ verify_jwt = true
 # iyzico posts the payment result from the buyer's browser without a Supabase JWT; the
 # function authenticates create/verify itself and never trusts the callback without iyzico.
 verify_jwt = false
+
+[functions.share-card]
+# Fun cards are shared without signing in; the function only accepts one 1200x630 JPEG.
+verify_jwt = false
