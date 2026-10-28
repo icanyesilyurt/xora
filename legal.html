@@ -59,7 +59,7 @@
     var date = new Date(LEGAL_UPDATED + "T12:00:00Z").toLocaleDateString(lang === "th" ? "th-TH-u-ca-gregory" : lang, { year: "numeric", month: "long", day: "numeric" });
     var html = '<h1>' + esc(D.title) + '</h1><p class="legal-date">' + esc(L.updated) + ': ' + esc(date) + '</p>';
     D.sections.forEach(function (s) { html += '<h2>' + esc(s[0]) + '</h2><p>' + esc(s[1]) + '</p>'; });
-    var seller = [LEGAL_SELLER.name, LEGAL_SELLER.address, LEGAL_SELLER.taxId].filter(Boolean);
+    var seller = [LEGAL_SELLER.name, LEGAL_SELLER.address, LEGAL_SELLER.taxId, LEGAL_SELLER.phone].filter(Boolean);
     html += '<div class="legal-seller"><h2>' + esc(L.seller) + '</h2>' +
       (seller.length ? '<p>' + seller.map(esc).join('<br>') + '</p>' : '') +
       '<p>' + esc(L.contact) + ': ' + (LEGAL_SELLER.email ? '<a href="mailto:' + esc(LEGAL_SELLER.email) + '">' + esc(LEGAL_SELLER.email) + '</a>' : 'xora.roviaqr.com') + '</p></div>';

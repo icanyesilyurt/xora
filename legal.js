@@ -2,7 +2,13 @@
 // LEGAL_SELLER is the operator block shown under every document; fill it in before relying on
 // the texts commercially.
 var LEGAL_UPDATED = "2026-10-28";
-var LEGAL_SELLER = { name: "", address: "", email: "", taxId: "" };
+var LEGAL_SELLER = {
+  name: "İzzet Can Yeşilyurt (Şahıs İşletmesi) · ROVIA / XORA",
+  address: "Barbaros Hayrettin Paşa Mah. 1102. Sk. No: 40 İç Kapı No: 2, Gaziosmanpaşa / İstanbul, Türkiye",
+  taxId: "Küçükköy V.D.",
+  phone: "+90 536 282 45 06",
+  email: "hello@roviaqr.com"
+};
 var LEGAL_DOCS = ["terms", "privacy", "sales"];
 var LEGAL = {
  "tr": {
