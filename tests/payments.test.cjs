@@ -16,6 +16,7 @@ const ENV={IYZICO_API_KEY:API_KEY,IYZICO_SECRET_KEY:SECRET,IYZICO_BASE_URL:'http
 const INIT='/payment/iyzipos/checkoutform/initialize/auth/ecom';
 const DETAIL='/payment/iyzipos/checkoutform/auth/ecom/detail';
 const CATALOG={starter:[10,'149.00'],popular:[20,'279.00'],value:[50,'599.00'],professional:[300,'2999.00']};
+const CATALOG_USD={starter_usd:[10,'3.99'],popular_usd:[20,'7.49'],value_usd:[50,'14.99'],professional_usd:[300,'79.99']};
 
 // Supabase client backed by PGlite. The service key acts as service_role; the anon client only
 // resolves the user named in its bearer token ("Bearer user:<uuid>").
@@ -114,10 +115,16 @@ test('credit package catalog is identical in the database, the edge function and
    assert.deepEqual({credits:Number(row.credits),amount:Number(row.amount).toFixed(2),currency:row.currency},{credits,amount,currency:'TRY'},id);
    assert.deepEqual({...fn.CATALOG[id]},{credits,amount:Number(amount),currency:'TRY'},id+' edge');
   }
+  for(const [id,[credits,amount]] of Object.entries(CATALOG_USD)){
+   const row=(await q(db,`select * from public.xora_credit_package($1)`,[id]))[0];
+   assert.deepEqual({credits:Number(row.credits),amount:Number(row.amount).toFixed(2),currency:row.currency},{credits,amount,currency:'USD'},id);
+   assert.deepEqual({...fn.CATALOG[id]},{credits,amount:Number(amount),currency:'USD'},id+' edge');
+  }
   assert.equal((await q(db,`select * from public.xora_credit_package('pro')`)).length,0,'unknown ids are not packages');
   await db.exec('reset role');
   const c=browser();
   assert.deepEqual([...c.CREDIT_PACKAGES].map(p=>[p.id,p.credits,p.price.toFixed(2)]),Object.entries(CATALOG).map(([id,[cr,am]])=>[id,cr,am]),'UI shows the same packages');
+  assert.deepEqual([...c.CREDIT_PACKAGES_USD].map(p=>[p.id,p.credits,p.price.toFixed(2)]),Object.entries(CATALOG_USD).map(([id,[cr,am]])=>[id,cr,am]),'UI shows the same dollar packages');
  });
 });
 
@@ -322,6 +329,7 @@ test('credits page sends only a package id and shows the result the server confi
  const toasts=[];c.toast=m=>toasts.push(m);
  c.document.body={appendChild(){}};c.document.getElementById=()=>null;c.document.createElement=()=>({});
  answer=()=>({status:'ok',purchase_id:'00000000-0000-4000-8000-00000000c0de',checkout_form_content:null,payment_page_url:'https://sandbox-cpp.iyzipay.com?token=abc',sandbox:true});
+ c.localStorage.setItem(c.LS.lang,'tr');
  c.location.href='https://example.test/xora/credits.html';const assigned=[];c.location.assign=u=>{assigned.push(u);c.location.href=u;};
  await c.startCreditPurchase('popular');
  assert.equal(sent[0].name,'iyzico-checkout');
@@ -346,6 +354,11 @@ test('credits page sends only a package id and shows the result the server confi
   assert.match(c.I18N[lang].pay_success,/\{n\}/,lang+' success message names the credits');
   assert.doesNotMatch(c.I18N[lang].credits_note,/pasif|disabled|desactivad|désactiv|deaktiviert|disattivat|無効|꺼져|還沒開放|не работает|معطلة|desativad/i,lang+' note no longer says buying is disabled');
  }
+ // Outside the Turkish site only the dollar packs can be bought.
+ c.localStorage.setItem(c.LS.lang,'en');answer=()=>({status:'ok',purchase_id:'00000000-0000-4000-8000-00000000c0de',checkout_form_content:null,payment_page_url:'https://sandbox-cpp.iyzipay.com?token=abc',sandbox:true});
+ assert.equal(await c.startCreditPurchase('popular'),'unknown_package','no lira pack outside the Turkish site');
+ await c.startCreditPurchase('popular_usd');assert.equal(sent[sent.length-1].body.package_id,'popular_usd');
+ c.localStorage.setItem(c.LS.lang,'tr');
  // Signed-out users are sent to sign in and nothing is requested.
  const before=sent.length;sb.auth.getSession=async()=>({data:{session:null}});
  assert.equal(await c.startCreditPurchase('popular'),'unauthorized');assert.equal(sent.length,before);
@@ -358,6 +371,7 @@ test('mobile-safe checkout: iyzico opens in the same tab after the awaited reque
  c.getSupabaseClient=()=>sb;const toasts=[];c.toast=m=>toasts.push(m);
  const appended=[],assigned=[],popups=[];
  c.document.body={appendChild:el=>appended.push(el)};c.document.head={appendChild:el=>appended.push(el)};c.document.getElementById=()=>null;c.document.createElement=tag=>({tag});
+ c.localStorage.setItem(c.LS.lang,'tr');
  c.location.href='https://xora.test/credits.html';c.location.assign=u=>assigned.push(u);
  c.window.open=(...a)=>{popups.push(a);return null;};
  const form='<script type="text/javascript">var iyziInit={};/* https://static.iyzipay.com/checkoutform/v2/bundle.js */</script>';

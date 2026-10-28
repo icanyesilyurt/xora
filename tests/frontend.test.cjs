@@ -784,20 +784,24 @@ test('credit packages: 10/20/50/300 with volume pricing, per-credit price, savin
   const fill=(s,v)=>s.replace('{ms}',v.ms).replace('{mt}',v.mt);
   const caps=[[2,1],[4,2],[10,5],[60,30]];
   packs.forEach((m,i)=>{
-   const p=c.CREDIT_PACKAGES[i];
-   assert.equal(m[1],p.id);assert.equal(!!m[2],p.id==='popular',lang+' only 20 is highlighted');
+   const p=c.activeCreditPackages(lang)[i];
+   assert.equal(lang==='tr'?'TRY':'USD',c.priceCurrency(lang),lang+' currency');
+   assert.equal(m[1],p.id.replace(/_usd$/,''));assert.equal(!!m[2],p.credits===20,lang+' only 20 is highlighted');
    assert.equal(m[3],c.esc(c.I18N[lang][p.label]),lang+' '+p.id+' badge');
    assert.equal(+m[4],p.credits);assert.equal(+m[10],p.credits,'buy button amount');
    assert.equal(m[5],c.esc(fill(c.I18N[lang].pkg_capacity,{ms:caps[i][0],mt:caps[i][1]})),lang+' capacity');
-   assert.equal(m[6]||null,p.id==='professional'?c.esc(c.I18N[lang].pkg_pro_note):null,lang+' pro note');
-   assert.equal(m[7],c.esc(c.formatPrice(p.price,lang)),lang+' price');assert.ok(m[8].length>0,lang+' per-credit price');
-   assert.equal(!!m[9],p.id==='popular');
+   assert.equal(m[6]||null,p.credits===300?c.esc(c.I18N[lang].pkg_pro_note):null,lang+' pro note');
+   assert.equal(m[7],c.esc(c.formatPrice(p.price,lang,p.currency)),lang+' price');if(lang!=='tr') assert.doesNotMatch(box.innerHTML,/₺/,lang+' no lira outside Turkish');assert.ok(m[8].length>0,lang+' per-credit price');
+   assert.equal(!!m[9],p.credits===20);
   });
   assert.doesNotMatch(box.innerHTML,/Real Analiz|Real Analysis|pkg[123]_n/,'no generic "N Real Analysis" labels');
  }
+ c.localStorage.setItem(c.LS.lang,'tr');const trBox={innerHTML:''};c.renderCreditPackages(trBox,null);
+ for(const now of ['149 ₺','279 ₺','599 ₺','2.999 ₺']) assert.ok(trBox.innerHTML.includes('<span class="pack-now">'+now+'<'),now);
+ for(const s of ['15 ₺ / kredi','14 ₺ / kredi','12 ₺ / kredi','10 ₺ / kredi','%6 avantajlı','%20 avantajlı','%33 avantajlı']) assert.ok(trBox.innerHTML.includes(s),s);
  c.localStorage.setItem(c.LS.lang,'en');const box={innerHTML:''};c.renderCreditPackages(box,null);
- for(const now of ['149 ₺','279 ₺','599 ₺','2,999 ₺']) assert.ok(box.innerHTML.includes('<span class="pack-now">'+now+'<'),now);
- for(const s of ['15 ₺ / credit','14 ₺ / credit','12 ₺ / credit','10 ₺ / credit','Save 6%','Save 20%','Save 33%']) assert.ok(box.innerHTML.includes(s),s);
+ for(const now of ['$3.99','$7.49','$14.99','$79.99']) assert.ok(box.innerHTML.includes('<span class="pack-now">'+now+'<'),now);
+ for(const s of ['$0.40 / credit','$0.37 / credit','$0.30 / credit','$0.27 / credit','Save 6%','Save 25%','Save 33%']) assert.ok(box.innerHTML.includes(s),s);
  assert.match(box.innerHTML,/pack-popular hot"[^]*?>MOST POPULAR</);assert.match(box.innerHTML,/pack-professional"[^]*?>PROFESSIONAL<[^]*?>Creators &amp; Agencies</);
  // The credits page renders from this config and starts checkout with the package id only.
  const page=fs.readFileSync('credits.html','utf8');
