@@ -156,6 +156,27 @@
       }
     } catch (e) { inner.innerHTML = "<p>" + esc(t("card_load_failed")) + "</p>"; }
 
+    // Past cards can be shared and downloaded the same way as a fresh result.
+    if (item.rawResult) {
+      var isMatch = item.type === "match";
+      var actions = document.createElement("div");
+      actions.style.cssText = "display:flex;gap:.6rem;margin-top:1rem";
+      var shareBtn = document.createElement("button");
+      shareBtn.type = "button"; shareBtn.className = "btn"; shareBtn.style.flex = "1";
+      shareBtn.textContent = t("btn_share");
+      shareBtn.onclick = function () { shareResultOnX(item.rawResult, isMatch ? "match" : "identity"); };
+      var dlBtn = document.createElement("button");
+      dlBtn.type = "button"; dlBtn.className = "btn btn-ghost"; dlBtn.style.flex = "1";
+      dlBtn.textContent = t("btn_download");
+      dlBtn.onclick = function () {
+        var r = item.rawResult;
+        if (isMatch) downloadCanvas(renderMatchPNG(r), "xora-match-" + r.a + "-" + r.b + ".png");
+        else downloadCanvas(renderIdentityPNG(r), "xora-" + (r.mode || "mirror") + "-" + r.handle + ".png");
+      };
+      actions.appendChild(shareBtn); actions.appendChild(dlBtn);
+      inner.appendChild(actions);
+    }
+
     var closeBtn = document.createElement("button");
     closeBtn.textContent = t("close");
     closeBtn.className = "btn btn-ghost";
