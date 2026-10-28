@@ -542,6 +542,17 @@ function getPublicSiteUrl() {
   } catch (e) { return XORA_PUBLIC_ORIGIN + "/"; }
 }
 
+// The bare canonical site root, never carrying the visitor's own ref. Admin and partner pages build
+// partner links on top of it, so a ref remembered in this browser can never leak into them.
+function getSiteRoot() {
+  var cfg = window.XORA_CONFIG || {};
+  try {
+    var url = new URL(cfg.PUBLIC_URL ? String(cfg.PUBLIC_URL) : XORA_PUBLIC_ORIGIN + "/");
+    url.search = ""; url.hash = "";
+    return url.href;
+  } catch (e) { return XORA_PUBLIC_ORIGIN + "/"; }
+}
+
 // Creator link: https://xora.roviaqr.com/?ref=<code>
 function creatorReferralUrl(code) {
   var url = new URL(XORA_PUBLIC_ORIGIN + "/");
