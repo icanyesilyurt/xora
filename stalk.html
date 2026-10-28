@@ -114,6 +114,7 @@
 
     if (tier === "fun") {
       lastResult = markAnalysisTier(analyzeFunHandle(handle, "stalk", reroll), "fun", "stalk");
+      if (resultTier(lastResult) !== "real") trackSiteEvent("fun_card", "stalk");
       if (isLoggedIn()) saveAnalysisRecord("stalk", [handle], lastResult);
       setState("think");
       playThinking(document.getElementById("thinkMsg"), "stalk", showResult);

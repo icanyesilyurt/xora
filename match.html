@@ -120,6 +120,7 @@
     if (tier === "fun") {
       lastMatch = matchFunHandles(a, b, reroll);
       markAnalysisTier(lastMatch, "fun", "match");
+      if (resultTier(lastMatch) !== "real") trackSiteEvent("fun_card", "match");
       if (isLoggedIn()) saveAnalysisRecord("match", [a, b], lastMatch);
       setState("think");
       playThinking(document.getElementById("thinkMsg"), "match", showResult);

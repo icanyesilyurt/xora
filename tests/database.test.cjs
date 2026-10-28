@@ -64,3 +64,28 @@ for(const schema of ['legacy','compact/no-lang']) test(`PostgreSQL migration and
  });
  } finally {await db.close();}
 });
+
+test('owner dashboard: anonymous visit counter and admin-only stats',async()=>{
+ const {setup,q,role,A}=require('./db-setup.cjs');
+ const db=await setup();
+ await role(db,'anon');
+ const v='abcdefghijkl0123';
+ await q(db,"select public.xora_track($1,'visit','home','tr',null)",[v]);
+ await q(db,"select public.xora_track($1,'visit','home','tr',null)",[v]);
+ await q(db,"select public.xora_track($1,'visit','mirror','tr','deneme2')",[v]);
+ await q(db,"select public.xora_track($1,'fun_card','mirror','tr',null)",[v]);
+ await q(db,"select public.xora_track('bad id','visit','home',null,null)");
+ await q(db,"select public.xora_track($1,'visit','admin',null,null)",[v]);
+ await assert.rejects(q(db,'select * from public.xora_site_events'),'events are not readable by visitors');
+ await assert.rejects(q(db,'select public.xora_admin_stats(30)'),'stats are admin-only');
+ await role(db,'authenticated',A);
+ await assert.rejects(q(db,'select public.xora_admin_stats(30)'),/not_admin/);
+ await db.exec('reset role');
+ await q(db,'insert into public.xora_admins(user_id) values($1)',[A]);
+ await role(db,'authenticated',A);
+ const [{xora_admin_stats:s}]=await q(db,'select public.xora_admin_stats(30)');
+ assert.equal(s.visitors,1);assert.equal(s.page_views,2,'one visit per page per day');assert.equal(s.ref_visitors,1);assert.equal(s.fun_cards,1);
+ assert.equal(s.users_total,2);assert.equal(s.sales,0);assert.equal(s.credits_outstanding,200);assert.equal(s.daily.length,14);assert.equal(s.shared_cards,null);
+ const [{xora_admin_stats:all}]=await q(db,'select public.xora_admin_stats(0)');assert.equal(all.days,0);assert.equal(all.visitors,1);
+ await db.exec('reset role');
+});

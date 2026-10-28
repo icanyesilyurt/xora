@@ -3954,6 +3954,39 @@ function initAuthGuards() {
   }
 }
 
+/* ---------------- ziyaret sayacı ---------------- */
+
+// Anonymous counters for the owner dashboard: one random id per browser (no account, no personal
+// data), one "visit" per page per day and one "fun_card" per free card. Admin and partner pages are
+// never counted. Failures are ignored; counting must never get in the way of the site.
+var TRACK_PAGES = ["home", "mirror", "stalk", "match", "credits", "profile", "auth", "legal"];
+function trackPageName() {
+  var p = String(location.pathname || "/").replace(/\.html$/, "").replace(/^\/+|\/+$/g, "");
+  return p === "" || p === "index" ? "home" : p;
+}
+function trackVisitorId() {
+  try {
+    var id = localStorage.getItem("xora_vid");
+    if (!/^[a-z0-9]{12,40}$/.test(id || "")) {
+      var abc = "abcdefghijklmnopqrstuvwxyz0123456789", buf = new Uint32Array(20);
+      crypto.getRandomValues(buf);
+      id = Array.prototype.map.call(buf, function (n) { return abc[n % abc.length]; }).join("");
+      localStorage.setItem("xora_vid", id);
+    }
+    return id;
+  } catch (e) { return ""; }
+}
+function trackSiteEvent(kind, path) {
+  try {
+    var page = path || trackPageName();
+    if (TRACK_PAGES.indexOf(page) < 0 || location.protocol === "file:") return;
+    var sb = getSupabaseClient(), visitor = trackVisitorId();
+    if (!sb || !visitor) return;
+    sb.rpc("xora_track", { p_visitor: visitor, p_kind: kind, p_path: page, p_lang: getLang(), p_ref: referralParam() || getReferralCode() || null })
+      .then(function () {}, function () {});
+  } catch (e) {}
+}
+
 /* ---------------- sayfa açılışı ---------------- */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -3963,4 +3996,5 @@ document.addEventListener("DOMContentLoaded", function () {
   initAuthGuards();
   applyI18n();
   initSession();
+  trackSiteEvent("visit");
 });
