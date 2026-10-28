@@ -91,3 +91,23 @@ test('admin page RPCs: only admins manage partners; panel keys can be replaced',
   await assert.rejects(db.exec(`select public.xora_admin_mark_commissions_paid('kartal','TRY')`),/not_admin/);
  }finally{await db.close();}
 });
+
+test('referral links are confirmed before sign-in and then attribute the signed-in buyer',async()=>{
+ const db=await setup();
+ try{
+  await role(db,'service_role');
+  await db.exec(`select public.xora_admin_upsert_affiliate('kartal','Kartal',2500)`);
+  await db.exec(`select public.xora_admin_upsert_affiliate('durgun','Durgun',2500)`);
+  await db.exec(`update public.affiliates set is_active=false where code='durgun'`);
+  await role(db,'anon');
+  assert.deepEqual((await q(db,`select public.xora_referral_preview('Kartal') as r`))[0].r,{code:'kartal',handle:'kartal'});
+  assert.equal((await q(db,`select public.xora_referral_preview('durgun') as r`))[0].r,null,'paused partner');
+  assert.equal((await q(db,`select public.xora_referral_preview('yok') as r`))[0].r,null,'unknown code');
+  // The browser then claims it for the signed-in user.
+  await role(db,'authenticated',B);
+  const claimed=(await q(db,`select public.xora_capture_referral('kartal') as r`))[0].r;
+  assert.equal(claimed.referral_code,'kartal');
+  await db.exec('reset role');
+  assert.equal((await q(db,`select count(*)::int as n from public.affiliate_attributions where referral_code='kartal'`))[0].n,1);
+ }finally{await db.close();}
+});
