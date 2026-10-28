@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Yönetim — XORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.ad-form{display:grid;gap:10px;margin-top:10px}
+.ad-form label{font-weight:800;font-size:13px;color:var(--mut)}
+.ad-form input{width:100%;padding:12px 14px;border:2.5px solid var(--ink);border-radius:14px;font:800 15px Nunito,sans-serif;background:#fff;color:var(--ink);box-sizing:border-box}
+.ad-row{display:grid;grid-template-columns:1fr 110px;gap:10px}
+.ad-p{border:2.5px solid var(--ink);border-radius:18px;padding:14px;background:#fff;margin-top:12px}
+.ad-p.off{opacity:.55}
+.ad-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ad-head b{font-size:18px;font-weight:900}
+.ad-head span{color:var(--mut);font-weight:800;font-size:13px}
+.ad-nums{display:flex;flex-wrap:wrap;gap:6px 14px;margin:8px 0;font-weight:800;font-size:14px}
+.ad-nums em{font-style:normal;color:var(--mut);font-weight:700}
+.ad-link{display:flex;gap:6px;align-items:center;margin-top:8px}
+.ad-link small{width:62px;flex:none;color:var(--mut);font-weight:800;font-size:12px}
+.ad-link input{flex:1;min-width:0;padding:8px 10px;border:2px solid var(--ink);border-radius:10px;font:700 12px Nunito,sans-serif;background:#FFF8EF;color:var(--ink)}
+.ad-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ad-acts .btn{font-size:12px;padding:7px 12px}
+.ad-msg{color:var(--mut);font-weight:700;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">XO<span>RA</span></a>
+</header>
+
+<main class="page">
+  <span class="mode-emoji">🛠️</span>
+  <h1>Yönetim</h1>
+  <p class="sub">Partnerler ve kazançları.</p>
+  <div id="adBody"><p class="ad-msg">Yükleniyor…</p></div>
+</main>
+
+<footer class="foot">XORA V2</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+(function () {
+  // Owner-only page. The server refuses every call from accounts that are not in xora_admins.
+  var body = document.getElementById("adBody");
+  var sb = typeof getSupabaseClient === "function" ? getSupabaseClient() : null;
+  var siteUrl = typeof getPublicSiteUrl === "function" ? getPublicSiteUrl() : location.origin + "/";
+  var panelBase = siteUrl.replace(/\/+$/, "") + "/partner?key=";
+
+  function msg(text) { body.innerHTML = '<p class="ad-msg">' + esc(text) + '</p>'; }
+  function money(v, cur) {
+    var n = Number(v || 0);
+    return cur === "USD" ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n)
+      : new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 2 }).format(n) + " ₺";
+  }
+  // "Kartal Hesabı" -> "kartal-hesabi"
+  function slug(name) {
+    var map = { "ç": "c", "ğ": "g", "ı": "i", "İ": "i", "ö": "o", "ş": "s", "ü": "u", "Ç": "c", "Ğ": "g", "Ö": "o", "Ş": "s", "Ü": "u" };
+    return String(name || "").replace(/[çğıİöşüÇĞÖŞÜ]/g, function (c) { return map[c]; }).toLowerCase()
+      .replace(/^@+/, "").replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+  }
+  function copyField(btn) {
+    var input = btn.parentNode.querySelector("input");
+    var done = function () { var t = btn.textContent; btn.textContent = "Kopyalandı"; setTimeout(function () { btn.textContent = t; }, 1400); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(input.value).then(done, function () { input.select(); });
+    else { input.select(); try { document.execCommand("copy"); done(); } catch (e) {} }
+  }
+  async function call(fn, args) {
+    var res = await sb.rpc(fn, args || {});
+    if (res.error) throw new Error(/not_admin/.test(res.error.message) ? "not_admin" : res.error.message);
+    return res.data;
+  }
+
+  function partnerHtml(p) {
+    var nums = '<span><em>Gelen</em> ' + esc(p.signups) + '</span><span><em>Satış</em> ' + esc(p.sales) + '</span><span><em>Oran</em> %' + esc(Math.round(p.commission_bps / 100)) + '</span>';
+    var pays = "";
+    (p.totals || []).forEach(function (t) {
+      nums += '<span><em>Ciro ' + esc(t.currency) + '</em> ' + esc(money(t.revenue, t.currency)) + '</span><span><em>Bekleyen ' + esc(t.currency) + '</em> ' + esc(money(t.unpaid, t.currency)) + '</span>';
+      if (Number(t.unpaid) > 0) pays += '<button type="button" class="btn btn-sm btn-orange" data-act="paid" data-cur="' + esc(t.currency) + '">Ödendi işaretle · ' + esc(money(t.unpaid, t.currency)) + '</button>';
+    });
+    return '<div class="ad-p' + (p.is_active ? '' : ' off') + '" data-code="' + esc(p.code) + '" data-name="' + esc(p.display_name || "") + '" data-bps="' + esc(p.commission_bps) + '">' +
+      '<div class="ad-head"><b>' + esc(p.display_name || p.code) + '</b><span>' + esc(p.code) + (p.is_active ? '' : ' · durduruldu') + '</span></div>' +
+      '<div class="ad-nums">' + nums + '</div>' +
+      '<div class="ad-link"><small>Paylaşım</small><input readonly value="' + esc(siteUrl + "?ref=" + encodeURIComponent(p.code)) + '"><button type="button" class="btn btn-sm" data-act="copy">Kopyala</button></div>' +
+      '<div class="ad-link"><small>Panel (gizli)</small><input readonly value="' + esc(panelBase + p.panel_key) + '"><button type="button" class="btn btn-sm" data-act="copy">Kopyala</button></div>' +
+      '<div class="ad-acts">' + pays +
+        '<button type="button" class="btn btn-sm" data-act="rate">Oranı değiştir</button>' +
+        '<button type="button" class="btn btn-sm" data-act="toggle">' + (p.is_active ? 'Durdur' : 'Yeniden başlat') + '</button>' +
+        '<button type="button" class="btn btn-sm" data-act="rotate">Panel linkini yenile</button>' +
+      '</div></div>';
+  }
+
+  async function render() {
+    var list = await call("xora_admin_partners");
+    body.innerHTML =
+      '<div class="panel"><p style="font-weight:900">Yeni partner</p><form class="ad-form" id="adNew">' +
+        '<div><label for="adName">Partner adı (ör. X hesabının adı)</label><input id="adName" required maxlength="80" placeholder="Kartal Hesabı"></div>' +
+        '<div class="ad-row"><div><label for="adCode">Link kodu</label><input id="adCode" required maxlength="40" placeholder="kartal-hesabi"></div>' +
+        '<div><label for="adRate">Komisyon %</label><input id="adRate" required type="number" min="0" max="100" step="1" value="25"></div></div>' +
+        '<button type="submit" class="btn btn-orange">Partner oluştur</button><p class="ad-msg" id="adNewMsg"></p></form></div>' +
+      '<div id="adList">' + (list.length ? list.map(partnerHtml).join("") : '<p class="ad-msg">Henüz partner yok.</p>') + '</div>';
+
+    var name = document.getElementById("adName"), code = document.getElementById("adCode"), touched = false;
+    code.addEventListener("input", function () { touched = true; });
+    name.addEventListener("input", function () { if (!touched) code.value = slug(name.value); });
+    document.getElementById("adNew").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var out = document.getElementById("adNewMsg");
+      var c = slug(code.value), rate = Math.round(Number(document.getElementById("adRate").value));
+      if (!/^[a-z0-9_-]{2,40}$/.test(c)) { out.textContent = "Link kodu en az 2 karakter olmalı (harf, rakam, - ve _)."; return; }
+      if (list.some(function (p) { return p.code === c; })) { out.textContent = "Bu link kodu zaten kullanılıyor."; return; }
+      if (!(rate >= 0 && rate <= 100)) { out.textContent = "Komisyon 0 ile 100 arasında olmalı."; return; }
+      out.textContent = "Oluşturuluyor…";
+      try { await call("xora_admin_save_partner", { p_code: c, p_display_name: name.value.trim(), p_commission_bps: rate * 100, p_is_active: true }); await render(); }
+      catch (err) { out.textContent = "Oluşturulamadı: " + err.message; }
+    });
+
+    document.getElementById("adList").addEventListener("click", async function (e) {
+      var btn = e.target.closest("[data-act]"); if (!btn) return;
+      var card = btn.closest(".ad-p"), c = card.getAttribute("data-code"), act = btn.getAttribute("data-act");
+      if (act === "copy") { copyField(btn); return; }
+      try {
+        if (act === "paid") {
+          if (!window.confirm(c + " için bekleyen " + btn.getAttribute("data-cur") + " komisyonu ödendi olarak işaretlensin mi?")) return;
+          await call("xora_admin_mark_commissions_paid", { p_code: c, p_currency: btn.getAttribute("data-cur") });
+        } else if (act === "rate") {
+          var v = window.prompt("Yeni komisyon oranı (%)", String(Number(card.getAttribute("data-bps")) / 100));
+          if (v === null) return;
+          var r = Math.round(Number(v)); if (!(r >= 0 && r <= 100)) { window.alert("0 ile 100 arasında bir sayı gir."); return; }
+          await call("xora_admin_save_partner", { p_code: c, p_display_name: card.getAttribute("data-name"), p_commission_bps: r * 100, p_is_active: !card.classList.contains("off") });
+        } else if (act === "toggle") {
+          await call("xora_admin_save_partner", { p_code: c, p_display_name: card.getAttribute("data-name"), p_commission_bps: Number(card.getAttribute("data-bps")), p_is_active: card.classList.contains("off") });
+        } else if (act === "rotate") {
+          if (!window.confirm("Eski panel linki çalışmayı bırakacak. Yenisini partnere tekrar göndermen gerekir. Devam edilsin mi?")) return;
+          await call("xora_admin_rotate_panel_key", { p_code: c });
+        }
+        await render();
+      } catch (err) { window.alert("İşlem yapılamadı: " + err.message); }
+    });
+  }
+
+  (async function start() {
+    if (!sb) { msg("Bağlantı kurulamadı."); return; }
+    var s = await sb.auth.getSession();
+    if (!s || !s.data || !s.data.session) { body.innerHTML = '<p class="ad-msg">Önce XORA hesabınla giriş yap.</p><a class="btn btn-orange" href="auth.html">Giriş yap</a>'; return; }
+    try {
+      if (!(await call("xora_is_admin"))) { msg("Bu sayfa sadece site sahibi içindir."); return; }
+      await render();
+    } catch (err) { msg(err.message === "not_admin" ? "Bu sayfa sadece site sahibi içindir." : "Bilgiler alınamadı: " + err.message); }
+  })();
+})();
+</script>
+</body>
+</html>

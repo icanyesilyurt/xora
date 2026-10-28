@@ -54,3 +54,40 @@ test('attributed purchases earn the partner commission once; others earn nothing
   const t2=after.totals.find(t=>t.currency==='TRY');assert.equal(Number(t2.paid),69.75);assert.equal(t2.unpaid,null);
  }finally{await db.close();}
 });
+
+test('admin page RPCs: only admins manage partners; panel keys can be replaced',async()=>{
+ const db=await setup();
+ try{
+  // Non-admin signed-in users and anon are refused.
+  await role(db,'authenticated',B);
+  assert.equal((await q(db,`select public.xora_is_admin() as r`))[0].r,false);
+  await assert.rejects(db.exec(`select public.xora_admin_partners()`),/not_admin/);
+  await assert.rejects(db.exec(`select public.xora_admin_save_partner('x1','X',2500,true)`),/not_admin/);
+  await role(db,'anon');
+  await assert.rejects(db.exec(`select public.xora_admin_partners()`),/permission denied/);
+  // A is made admin (in production: the owner's account, by the migration).
+  await db.exec('reset role');await db.exec(`insert into public.xora_admins(user_id) values('${A}')`);
+  await role(db,'authenticated',A);
+  assert.equal((await q(db,`select public.xora_is_admin() as r`))[0].r,true);
+  await assert.rejects(db.exec(`select public.xora_admin_save_partner('Bad Code!','X',2500,true)`),/bad_code/);
+  await assert.rejects(db.exec(`select public.xora_admin_save_partner('ok','X',20000,true)`),/bad_commission/);
+  const p=(await q(db,`select public.xora_admin_save_partner('Kartal','Kartal Hesabı',3000,true) as r`))[0].r;
+  assert.equal(p.code,'kartal');assert.equal(p.commission_bps,3000);assert.match(p.panel_key,/^[0-9a-f]{32}$/);
+  const list=(await q(db,`select public.xora_admin_partners() as r`))[0].r;
+  assert.equal(list.length,1);assert.equal(list[0].code,'kartal');assert.equal(Number(list[0].signups),0);assert.deepEqual(list[0].totals,[]);
+  // Rotating the key kills the old panel link.
+  const rot=(await q(db,`select public.xora_admin_rotate_panel_key('kartal') as r`))[0].r;
+  assert.notEqual(rot.panel_key,p.panel_key);
+  await role(db,'anon');
+  assert.equal((await q(db,`select public.xora_partner_panel($1) as r`,[p.panel_key]))[0].r,null,'old link dead');
+  assert.equal((await q(db,`select public.xora_partner_panel($1) as r`,[rot.panel_key]))[0].r.code,'kartal');
+  // Pausing a partner closes its panel.
+  await role(db,'authenticated',A);
+  await db.exec(`select public.xora_admin_save_partner('kartal','Kartal Hesabı',3000,false)`);
+  await role(db,'anon');
+  assert.equal((await q(db,`select public.xora_partner_panel($1) as r`,[rot.panel_key]))[0].r,null,'paused partner has no panel');
+  // Admin can mark paid; a non-admin cannot.
+  await role(db,'authenticated',B);
+  await assert.rejects(db.exec(`select public.xora_admin_mark_commissions_paid('kartal','TRY')`),/not_admin/);
+ }finally{await db.close();}
+});
