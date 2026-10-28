@@ -364,7 +364,7 @@ function behaviorSignals(signals: any) {
 // Tone examples per output language, from that language's own X culture: what people there
 // would actually call each other. They show the tone only and are never copied.
 const NICKNAME_TONE_BY_LOCALE: Record<Locale, string[]> = {
-  tr: ["Sessiz Gözlemci","Kaos Elçisi","Gece Kuşu","Laf Cambazı","Koltuk Filozofu","Kanepe Ekonomisti","Gizli Romantik","Tatlı Bela","Kripto Avcısı","Yalnız Kurt","Çarşı Şairi","Kod Keşişi"],
+  tr: ["Sessiz Gözlemci","Kaos Elçisi","Gece Kuşu","Laf Cambazı","Koltuk Filozofu","Kanepe Ekonomisti","Gizli Romantik","Tatlı Bela","Kripto Avcısı","Yalnız Kurt","Tribün Komedyeni","Kod Keşişi"],
   en: ["Quiet Lurker","Chaos Agent","Night Owl","Reply Gremlin","Couch Philosopher","Armchair Economist","Secret Romantic","Thread Wizard","Meme Archivist","Lone Wolf","Terrace Poet","Code Monk"],
   es: ["Observador Silencioso","Caos Andante","Búho Nocturno","Filósofo Nocturno","Economista Casero","Romántico Secreto","Lobo Solitario","Troll Elegante","Poeta Tuitero","Tertuliano Digital","Culé Filósofo","Analista Madrugador"],
   pt: ["Observador Silencioso","Caos Ambulante","Coruja Noturna","Filósofo Noturno","Romântico Secreto","Lobo Solitário","Poeta Tuiteiro","Zoeiro Profissional","Comentarista Raiz","Economista Caseiro","Rubro-Negro Poeta","Analista Madrugador"],
@@ -422,9 +422,28 @@ function nicknameFallback(serious: any, locale: Locale) {
   const entry = NICKNAME_FALLBACKS[top?.category] || NICKNAME_FALLBACKS.social;
   return { text: entry.names[locale], icon: entry.icon };
 }
+// Archetype words fitting each character category. The nickname's archetype comes from the
+// strongest character trait, so nicknames vary with the person instead of repeating one favourite.
+const ARCHETYPES_BY_CATEGORY: Record<string, string> = {
+  temperament: "rebel, lone wolf, storm, boss, maverick, wildcard, firecracker",
+  communication: "commentator, referee, debater, lawyer, announcer, preacher, negotiator",
+  humor: "comedian, jester, troll, prankster, stand-up, joker, meme lord",
+  emotional: "romantic, dreamer, softie, drama queen or king, sweetheart, empath",
+  relational: "romantic, matchmaker, love guru, heartbreaker, loyal friend, wingman",
+  language: "wordsmith, poet, scribe, storyteller, quote machine",
+  creativity: "inventor, artist, idea factory, visionary, tinkerer",
+  intellect: "professor, detective, analyst, philosopher, strategist, know-it-all",
+  social: "host, cheerleader, lurker, connector, gossip, ringleader, curator",
+};
+function archetypeHints(serious: any) {
+  return serious.selected_traits.filter((t:any)=>t.group === "character")
+    .sort((a:any,b:any)=>b.score-a.score).slice(0, 2)
+    .map((t:any)=>({trait:t.id, archetypes:ARCHETYPES_BY_CATEGORY[t.category] || ""}));
+}
 function nicknameInput(serious: any, handle: string) {
   return {
     handle,
+    archetype_hints: archetypeHints(serious),
     traits: serious.selected_traits.map((t:any)=>({id:t.id,label:t.label,score:t.score})),
     character_analysis: serious.character_analysis,
     persistent_interests: serious.persistent_interests.map((i:any)=>({id:i.id,label:i.label,confidence:i.confidence})),
@@ -442,9 +461,10 @@ function nicknameSystemPrompt(outputLanguage: string, locale: Locale = "tr") {
     "Name the character, not a topic: capture the personality, attitude and social role that the traits and analysis describe. A persistent interest may flavour the name when it is central to the character, but never build the name from a recent topic, event, place, date or post.",
     `Tone examples in ${outputLanguage}, from that language's own X culture (they only show the tone, never copy them): ${(NICKNAME_TONE_BY_LOCALE[locale] || NICKNAME_TONE_BY_LOCALE.en).join(", ")}.`,
     `Write it the way people on X in that language really nickname each other: native idiom and humour, never a translation of a Turkish or English name.`,
-    `The name must be instantly understandable: a reader should picture the type of person within two seconds. Pattern: [field, scene or behaviour] + [a familiar archetype] (hunter, philosopher, poet, guardian, wolf, king, rebel...). No abstract or invented word pairs, no metaphors that need explaining, no place names or event words.`,
+    `The name must be instantly understandable: a reader should picture the type of person within two seconds. Pattern: [field, scene or behaviour] + [a familiar archetype]. No abstract or invented word pairs, no metaphors that need explaining, no place names or event words.`,
+    `ARCHETYPE. Take the archetype from archetype_hints: the first entry is the strongest character trait, so its archetypes describe this person best (use the second entry only when it fits much better). Say it the way that language's X users would. "Poet" or "philosopher" are allowed ONLY when poetic_language, literary_language or philosophical_tendency is among the traits; never use them as a default. Do not reuse the archetype word of the tone examples.`,
     `PERSONALITY FIRST. The nickname is a humorous read of this person's X persona: how they write, joke, argue and behave. An interest may flavour it, never replace it: the card must never read like a fan card or a topic label.`,
-    `SUPPORTED CLUB. Only when supported_club is not empty AND sport is among the strongest traits or interests, the club may flavour the name: pair the club's well-known fan name or symbol with a personality archetype taken from the character traits (a witty fan -> a fan symbol + "poet" or "philosopher", like "Çarşı Şairi"). Never a pure fan title that says nothing about the person (not "Beşiktaş Fedaisi" alone). Local fan names: ${CLUB_SYMBOLS_BY_LOCALE[locale] || ""}. Affectionate only: never mock the club or its rivals, never violent words.`,
+    `SUPPORTED CLUB. Only when supported_club is not empty AND sport is among the strongest traits or interests, the club may flavour the name: pair the club's well-known fan name or symbol with the archetype from archetype_hints (a funny fan becomes a fan symbol + comedian, a debater a fan symbol + referee). Never a pure fan title that says nothing about the person (not "Beşiktaş Fedaisi" alone). Local fan names: ${CLUB_SYMBOLS_BY_LOCALE[locale] || ""}. Affectionate only: never mock the club or its rivals, never violent words.`,
     "Playful and affectionate, never cruel. Never use politics, religion, ethnicity, nationality, health, sexuality or other sensitive attributes, diagnoses or insults.",
     `tagline: one short, light line in ${outputLanguage} (max ~70 characters) that explains the nickname through the character. No post counts or numbers of analysed posts.`,
     "emoji: one single emoji that pictures the nickname (an animal, object or symbol). Never a flag, skin-tone or combined emoji, or a religious, political or violent symbol.",

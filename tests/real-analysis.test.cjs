@@ -153,3 +153,16 @@ test('v1.1: every trait has a short label in all 14 card languages, and nickname
  assert.match(ja,/PERSONALITY FIRST/);assert.match(ja,/never a pure fan title/i);
  assert.match(e.nicknameSystemPrompt('Spanish','es'),/Culé/);
 });
+
+test('nickname archetype comes from the strongest character trait; poet is not a default',()=>{
+ const e=edge();
+ const serious={selected_traits:[
+  {id:'colloquial_register',category:'language',group:'character',score:78,label:'x'},
+  {id:'humor',category:'humor',group:'character',score:82,label:'x'},
+  {id:'brevity',category:'communication',group:'character',score:76,label:'x'},
+  {id:'music_interest',category:'music',group:'interest',score:51,label:'x'}],character_analysis:'a',persistent_interests:[],supported_club:''};
+ const hints=e.nicknameInput(serious,'h').archetype_hints;
+ assert.equal(hints.length,2);assert.equal(hints[0].trait,'humor');assert.match(hints[0].archetypes,/comedian/);
+ const sys=e.nicknameSystemPrompt('Turkish','tr');
+ assert.match(sys,/ONLY when poetic_language/);assert.doesNotMatch(sys,/Çarşı Şairi/);
+});
