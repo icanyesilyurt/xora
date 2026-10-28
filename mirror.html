@@ -149,7 +149,7 @@
     if (lastResult) downloadCanvas(renderIdentityPNG(lastResult), "xora-" + tier + "-mirror-" + lastResult.handle + ".png");
   });
   document.getElementById("shareBtn").addEventListener("click", function () {
-    if (lastResult) shareOnX(shareIdentityText(lastResult));
+    if (lastResult) shareResultOnX(lastResult, "identity");
   });
   document.addEventListener("xora:lang", function () {
     renderTierUi();

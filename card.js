@@ -1500,6 +1500,125 @@ function shareOnX(text) {
   window.open(url, "_blank", "noopener");
 }
 
+/* ---------------- kart linkiyle paylaşım (X önizlemesi) ---------------- */
+
+var SHARE_PREVIEW_W = 1200, SHARE_PREVIEW_H = 630;
+
+// X shows link previews at about 1.91:1, so the 4:5 card is placed on a wide canvas next to its
+// nickname instead of being cropped.
+function renderSharePreview(cardCanvas, title, subtitle) {
+  var cv = document.createElement("canvas");
+  cv.width = SHARE_PREVIEW_W; cv.height = SHARE_PREVIEW_H;
+  var ctx = cv.getContext("2d");
+  ctx.fillStyle = "#FFF6EC"; ctx.fillRect(0, 0, cv.width, cv.height);
+  var h = 570, w = Math.round(cardCanvas.width * h / cardCanvas.height);
+  var x = cv.width - w - 50, y = Math.round((cv.height - h) / 2);
+  ctx.drawImage(cardCanvas, x, y, w, h);
+  var left = 64, maxW = x - left - 40;
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = "#1B1B1B";
+  ctx.font = "900 44px Nunito, Arial, sans-serif"; ctx.fillText("XORA", left, 120);
+  var size = 76, lines;
+  do {
+    ctx.font = "900 " + size + "px Nunito, Arial, sans-serif";
+    lines = previewLines(ctx, String(title || ""), maxW);
+    size -= 6;
+  } while ((lines.length > 3 || lines.some(function (l) { return ctx.measureText(l).width > maxW; })) && size > 34);
+  var lineH = Math.round((size + 6) * 1.15), top = 250 - Math.round((lines.length - 1) * lineH / 2);
+  lines.forEach(function (l, i) { ctx.fillText(l, left, top + i * lineH); });
+  ctx.fillStyle = "#E0663A"; ctx.font = "800 30px Nunito, Arial, sans-serif";
+  ctx.fillText(String(subtitle || ""), left, top + lines.length * lineH + 24);
+  ctx.fillStyle = "#6B6B6B"; ctx.font = "800 28px Nunito, Arial, sans-serif";
+  ctx.fillText(publicHost(), left, cv.height - 70);
+  return cv;
+}
+
+function previewLines(ctx, text, maxW) {
+  var words = text.split(/\s+/).filter(Boolean), lines = [], line = "";
+  if (!words.length) return [text];
+  if (words.length === 1 || /[\u3040-\u30ff\u4e00-\u9fff\u0e00-\u0e7f]/.test(text) && ctx.measureText(text).width <= maxW) return [text];
+  words.forEach(function (w) {
+    var next = line ? line + " " + w : w;
+    if (line && ctx.measureText(next).width > maxW) { lines.push(line); line = w; } else line = next;
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+function publicHost() {
+  try { return new URL(getPublicSiteUrl()).host; } catch (e) { return "xora.roviaqr.com"; }
+}
+
+function isPhone() {
+  return /Android|iPhone|iPad|iPod/i.test((window.navigator && navigator.userAgent) || "");
+}
+
+// Shares a card on X. On phones the card image itself goes to the share sheet (X app). Elsewhere
+// the wide preview is stored once and the tweet carries the card's own link, which X shows with
+// the card image. Any failure falls back to the plain text share.
+async function shareResultOnX(res, kind) {
+  var isMatch = kind === "match";
+  var text = isMatch ? shareMatchText(res) : shareIdentityText(res);
+  var cardCanvas = isMatch ? renderMatchPNG(res) : renderIdentityPNG(res);
+  if (isPhone() && navigator.canShare && cardCanvas.toBlob) {
+    try {
+      var blob = await new Promise(function (ok) { cardCanvas.toBlob(ok, "image/png"); });
+      var file = blob && new File([blob], "xora-card.png", { type: "image/png" });
+      if (file && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text: text });
+        return "shared";
+      }
+    } catch (e) {
+      if (e && e.name === "AbortError") return "cancelled";
+    }
+  }
+  // Opened before the upload so the browser does not treat it as an unrequested popup.
+  var win = window.open("", "_blank");
+  var go = function (t) {
+    var url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(t);
+    if (win) { try { win.opener = null; } catch (e) {} win.location.href = url; } else window.location.href = url;
+  };
+  try {
+    var lang = (typeof getLang === "function") ? getLang() : "tr";
+    var view = (typeof cardPresentationCopy === "function" && typeof realCopyForActiveLang === "function") ? cardPresentationCopy(realCopyForActiveLang(res)) : res;
+    var title = isMatch ? "@" + res.a + " × @" + res.b + " · " + res.overall + "%" : shareTitle(view, lang);
+    var sub = resultTier(res) === "real" ? t("real_label") + " · " + rarityText(res) : t("fun_label");
+    var preview = renderSharePreview(cardCanvas, title, sub);
+    var image = preview.toDataURL("image/jpeg", 0.86);
+    if (image.length > 900000) image = preview.toDataURL("image/jpeg", 0.72);
+    var sb = typeof getSupabaseClient === "function" ? getSupabaseClient() : null;
+    if (!sb) throw new Error("no_client");
+    var out = await sb.functions.invoke("share-card", { body: {
+      image: image, nickname: isMatch ? "" : title, handle: isMatch ? res.a + " × " + res.b : res.handle,
+      tier: resultTier(res), mode: isMatch ? "match" : (res.mode || "mirror"), lang: lang
+    } });
+    if (out.error || !out.data || !out.data.id) throw new Error("share_failed");
+    var link = publicSiteOrigin() + "/k/" + out.data.id;
+    go(text.split(getPublicSiteUrl()).join(link));
+    return "linked";
+  } catch (e) {
+    console.warn("share_card_fallback", e && e.message);
+    go(text);
+    return "text";
+  }
+}
+
+function publicSiteOrigin() {
+  try { return new URL(getPublicSiteUrl()).origin; } catch (e) { return "https://xora.roviaqr.com"; }
+}
+
+// The nickname a share shows, the same one shareIdentityText uses.
+function shareTitle(res, lang) {
+  var name = "";
+  if (isV3Result(res)) name = localized(res.nickname, lang);
+  else if (isV2Result(res)) name = localized(res.card && res.card.nickname, lang);
+  else name = localized(res.archetype && res.archetype.name, lang);
+  if (resultTier(res) === "fun") {
+    var persona = funIdentityPersona(res);
+    if (persona) name = localized(persona.nickname, lang);
+  }
+  return name;
+}
+
 function shareIdentityText(res) {
   var lang = (typeof getLang === "function") ? getLang() : "tr";
   var name = "";

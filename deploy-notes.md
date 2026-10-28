@@ -37,3 +37,12 @@ Supabase Auth (at cutover): Site URL `https://xora.roviaqr.com`, redirect allow 
 Fun/Real deployment and secret setup are documented in `XORA_V2_SETUP.md`.
 
 `XORA Real` must not be advertised as live until the V2 migration is applied, `analyze-real` is deployed, and a real X+AI smoke test succeeds. There is intentionally no fake/demo fallback on the paid Real path.
+
+## Card share links (`/k/<id>`)
+
+- `functions/k/[id].js` is a Cloudflare Pages Function (Pages picks up `functions/` from the repo
+  root automatically). It serves the Open Graph / X card tags for a shared card and forwards
+  visitors to the site.
+- The `share-card` edge function stores each preview (1200x630 JPEG + small JSON) in the public
+  `cards` storage bucket (migration `20261029100000_xora_card_share_bucket.sql`).
+- Deploy: run the migration SQL, then `supabase functions deploy share-card --use-api`.

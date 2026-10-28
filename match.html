@@ -145,7 +145,7 @@
     if (lastMatch) downloadCanvas(renderMatchPNG(lastMatch), "xora-" + tier + "-match-" + lastMatch.a + "-" + lastMatch.b + ".png");
   });
   document.getElementById("shareBtn").addEventListener("click", function () {
-    if (lastMatch) shareOnX(shareMatchText(lastMatch));
+    if (lastMatch) shareResultOnX(lastMatch, "match");
   });
   document.addEventListener("xora:lang", function () { renderTierUi(); if (lastMatch && !stepResult.hidden) showResult(); });
 
