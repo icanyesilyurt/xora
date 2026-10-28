@@ -5,11 +5,12 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } fr
 
 const PAGES = ["index.html", "mirror.html", "stalk.html", "match.html", "credits.html", "profile.html", "auth.html", "partner.html", "admin.html"];
 const ASSETS = ["app.js", "xora.js", "card.js", "config.js", "style.css"];
+const STATIC = ["robots.txt"];
 const OUT = "dist";
 
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT);
-for (const file of [...PAGES, ...ASSETS]) {
+for (const file of [...PAGES, ...ASSETS, ...STATIC]) {
   if (!existsSync(file)) throw new Error("missing public file: " + file);
   cpSync(file, `${OUT}/${file}`);
 }

@@ -25,8 +25,15 @@ function esc(s) {
 }
 
 export async function onRequestGet({ params, request }) {
-  const id = String(params.id || "");
+  let id = String(params.id || "");
   const site = new URL(request.url).origin + "/";
+  // The preview image is served from this domain too, so link-preview bots only ever talk to
+  // xora.roviaqr.com.
+  if (/^[A-Za-z0-9]{10}\.jpg$/.test(id)) {
+    const img = await fetch(STORAGE + id, { cf: { cacheTtl: 31536000, cacheEverything: true } });
+    if (!img.ok) return new Response("Not found", { status: 404 });
+    return new Response(img.body, { headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable" } });
+  }
   if (!/^[A-Za-z0-9]{10}$/.test(id)) return Response.redirect(site, 302);
   let meta = null;
   try {
@@ -38,7 +45,7 @@ export async function onRequestGet({ params, request }) {
   const lang = COPY[meta.lang] ? meta.lang : "en";
   const [heading, desc] = COPY[lang];
   const title = meta.nickname ? `"${meta.nickname}" · ${heading}` : heading;
-  const image = STORAGE + id + ".jpg";
+  const image = site + "k/" + id + ".jpg";
   const ref = new URL(request.url).searchParams.get("ref");
   const target = site + (meta.mode === "match" ? "match" : meta.mode === "stalk" ? "stalk" : "mirror") +
     (ref && /^[a-z0-9_-]{2,64}$/i.test(ref) ? "?ref=" + encodeURIComponent(ref.toLowerCase()) : "");
