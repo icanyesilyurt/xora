@@ -57,11 +57,12 @@ test('REAL result: ontology bars, serious analysis as the main text, locale-only
   const serious=seriousFor(locale);
   const r=e.buildRealResult('alice','mirror',{sample_size:8,question_ratio:1,own_posts:8},locale,serious,{text:NICK_COPY[locale],tagline:AI_COPY[locale].tagline,icon:'🦉',source:'ai',attempts:1});
   assert.equal(r.meta.tier,'real');assert.equal(r.meta.analysis_version,'real_analysis_v1');assert.ok(['common','rare','epic','legendary'].includes(r.rarity.name));
-  assert.deepEqual(JSON.parse(JSON.stringify(r.top_behaviors)),[{key:'questioning',label:{tr:'Soru Ustalığı'},value:82},{key:'curiosity',label:{tr:'Merak'},value:74},{key:'brevity',label:{tr:'Özlü Anlatım'},value:66},{key:'confidence',label:{tr:'Özgüven'},value:55}]);
+  const L={tr:['Soru Ustalığı','Merak','Özlü Anlatım','Özgüven'],en:['Question Master','Curiosity','Short and Sharp','Confidence'],ja:['質問力','好奇心','簡潔さ','自信']}[locale];
+  assert.deepEqual(JSON.parse(JSON.stringify(r.top_behaviors)),[['questioning',82],['curiosity',74],['brevity',66],['confidence',55]].map(([key,value],i)=>({key,label:{[locale]:L[i]},value})),locale+' labels from the fixed table, in the result language');
   for(const field of [r.nickname,r.tagline,r.comment.mirror,r.comment.stalk,r.card.nickname,r.card.desc,r.archetype.comments]) assert.deepEqual(Object.keys(field),[locale]);
   assert.equal(r.nickname[locale],NICK_COPY[locale]);assert.equal(r.comment.mirror[locale],ANALYSIS_COPY[locale]);
   assert.deepEqual([r.card.emoji,r.profile_emoji,r.archetype.emoji],['🦉','🦉','🦉']);
-  assert.equal(r.analysis.ontology_version,'real-1.0');assert.ok(r.analysis.selected_traits.every(t=>t.evidence&&t.post_refs.length));
+  assert.equal(r.analysis.ontology_version,'real-1.1');assert.ok(r.analysis.selected_traits.every(t=>t.evidence&&t.post_refs.length));
  }
  const serious=seriousFor('en');serious.character_analysis='25 posts analyzed. Two. Three.';
  assert.throws(()=>e.buildRealResult('alice','mirror',{},'en',serious,{text:'A B',tagline:'',icon:'🦉'}),/ai_bad_copy/);

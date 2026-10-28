@@ -56,13 +56,13 @@ for(const provider of ['openai','anthropic']) {
    assert.doesNotMatch(JSON.stringify(ninput),/How does this work|UNTRUSTED_DATA_MARKER|"posts"/,'no raw posts or profile text in the nickname call');
    if(provider==='openai'){assert.equal(nb.store,false);assert.equal(nb.tool_choice,'none');assert.equal(nb.text.format.name,'xora_real_nickname');assert.equal(nb.text.format.strict,true);}
    // Card bars are the serious traits with ontology labels; the analysis is the main text.
-   assert.deepEqual(result.top_behaviors.map(b=>[b.key,b.label.tr,b.value]),[['questioning','Soru Ustalığı',82],['curiosity','Merak',74],['brevity','Özlü Anlatım',66],['confidence','Özgüven',55]]);
+   assert.deepEqual(result.top_behaviors.map(b=>[b.key,b.label.en,b.value]),[['questioning','Question Master',82],['curiosity','Curiosity',74],['brevity','Short and Sharp',66],['confidence','Confidence',55]]);
    assert.deepEqual(JSON.parse(JSON.stringify(result.card.top_behaviors)),JSON.parse(JSON.stringify(result.top_behaviors)));
    assert.equal(result.comment.mirror.en,ANALYSIS_COPY.en);assert.equal(result.comment.stalk.en,ANALYSIS_COPY.en);
    assert.equal(result.nickname.en,NICK_COPY.en);assert.equal(result.nickname.en.split(' ').length,2);assert.equal(result.meta.alias_source,'ai');
-   assert.equal(result.meta.analysis_version,'real_analysis_v1');assert.equal(result.analysis.ontology_version,'real-1.0');
+   assert.equal(result.meta.analysis_version,'real_analysis_v1');assert.equal(result.analysis.ontology_version,'real-1.1');
    assert.ok(result.analysis.selected_traits.every(t=>t.evidence&&t.post_refs.length));assert.deepEqual(JSON.parse(JSON.stringify(result.analysis.persistent_interests)),[]);
-   assert.ok(html.includes(c.esc('Soru Ustalığı'))&&html.includes(c.esc(ANALYSIS_COPY.en))&&html.includes(c.esc(NICK_COPY.en)));
+   assert.ok(html.includes(c.esc('Question Master'))&&html.includes(c.esc(ANALYSIS_COPY.en))&&html.includes(c.esc(NICK_COPY.en)));
   }
  });
  test(`${provider}: malformed Match output and invalid serious analyses refund without retry`,async()=>{
@@ -112,6 +112,7 @@ test('missing/unsupported provider and missing key/model fail before debit, X or
   }
  }
 });
+const QUESTIONING={tr:'Soru Ustalığı',en:'Question Master',es:'Maestro de Preguntas',pt:'Mestre das Perguntas',ar:'فن السؤال',fr:'Art de la Question',de:'Fragenmeister',it:'Maestro delle Domande',ja:'質問力',ko:'질문 장인',zh:'提問高手',ru:'Мастер вопросов'};
 test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, fr, de, it, ja, ko, zh, ru) through both providers',async()=>{
  for(const provider of ['openai','anthropic'])for(const locale of ['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru'])for(const mode of ['mirror','stalk','match']){
   const f=fixture(provider);const response=await f.e.main(req(mode,locale));
@@ -149,7 +150,7 @@ test('REAL requests produce copy only for their own locale (tr, en, es, pt, ar, 
    // behavior_signals are still measured from the posts (8 originals, each 'How does this work?') but are not drawn.
    assert.deepEqual({...result.behavior_signals},{reply_ratio:0,original_ratio:1,repost_ratio:0,quote_ratio:0,question_ratio:1,emoji_per_post:0,avg_text_length:19});
    assert.match(html,/data-source="ai_metrics"/);assert.doesNotMatch(html,/data-metric="(reply|original|repost|question)_ratio"/);
-   assert.ok(html.includes('<span class="score-name">'+c.esc('Soru Ustalığı')+'</span>'),'ontology labels are drawn as bars');assert.ok(!html.includes('<span class="score-name">'+c.esc(copy.label)+'</span>'),'AI-written metric labels are never drawn');}
+   assert.ok(html.includes('<span class="score-name">'+c.esc(c.I18N?QUESTIONING[locale]:'')+'</span>'),'ontology labels are drawn as bars, in the result language');assert.ok(!html.includes('<span class="score-name">'+c.esc(copy.label)+'</span>'),'AI-written metric labels are never drawn');}
   assert.match(mode==='match'?c.shareMatchText(result):c.shareIdentityText(result),/XORA REAL/);
   if(mode!=='match') assert.ok(c.shareIdentityText(result).includes(NICK_COPY[locale]));
  }

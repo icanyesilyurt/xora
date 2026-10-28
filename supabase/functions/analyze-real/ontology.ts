@@ -1,4 +1,5 @@
-// XORA REAL ontology v1 — FROZEN at 150 traits + 48 persistent-interest topics.
+// XORA REAL ontology v1.1 — 168 traits + 49 persistent-interest topics (v1.1 deepened philosophy,
+// relationships, literature, history, economy, science and the arts).
 // The AI may only return ids from these lists; visible labels come from here, never from the AI.
 // Labels are Turkish only for v1; localization follows after validation on saved real accounts.
 //
@@ -7,12 +8,12 @@
 //        B   = deterministic behaviour ratios, confirmed by own words
 // K in a definition = knowledge dimension: scored on demonstrated depth, not on how often the topic appears.
 
-export const ONTOLOGY_VERSION = "real-1.0";
+export const ONTOLOGY_VERSION = "real-1.1";
 
 export type TraitBasis = "V" | "V/S" | "B";
 export type TraitCategory =
   | "temperament" | "communication" | "humor" | "emotional" | "relational" | "language" | "creativity" | "intellect" | "social"
-  | "sports" | "economy" | "politics" | "history" | "science" | "technology" | "literature" | "screen" | "music" | "gaming" | "travel" | "food" | "lifestyle";
+  | "sports" | "economy" | "politics" | "history" | "philosophy" | "science" | "technology" | "literature" | "screen" | "music" | "gaming" | "travel" | "food" | "lifestyle";
 export type Trait = { id: string; category: TraitCategory; group: "character" | "interest"; basis: TraitBasis; label: string; definition: string };
 export type InterestTopic = { id: string; label: string; traits: string[] };
 
@@ -61,6 +62,7 @@ const ROWS: Record<TraitCategory, Row[]> = {
     ["wordplay","V","Kelime Oyunu","Puns, twisted idioms, language-based jokes."],
     ["meme_fluency","V/S","İnternet Mizahı","Fluent use of internet joke formats, templates and meme references."],
     ["observational_humor","V","Gözlem Mizahı","Finds humour in everyday situations and human behaviour."],
+    ["quick_wit","V","Hazırcevaplık","Fast, clever comebacks and one-liners, mostly in quote posts; scored on how sharp they are."],
   ],
   emotional: [
     ["emotionality","V","Duygusallık","Openly and frequently expresses feelings."],
@@ -82,6 +84,9 @@ const ROWS: Record<TraitCategory, Row[]> = {
     ["relationship_commentary","V","İlişki Yorumculuğu","General observations and advice about dating and relationship dynamics."],
     ["friendship_emphasis","V","Dostluk Vurgusu","Frequent references to friends, loyalty and close circles."],
     ["family_emphasis","V","Aile Vurgusu","Frequent references to family and home life (only what the account itself states)."],
+    ["love_philosophy","V","Aşk Felsefesi","Theorises about love, attraction and what relationships mean, beyond one's own story."],
+    ["dating_humor","V","Flört Mizahı","Jokes about dating, being single, crushes and modern relationship rituals."],
+    ["loyalty_emphasis","V","Vefa Vurgusu","Values loyalty and keeping one's word; calls out betrayal and fair-weather friends."],
   ],
   language: [
     ["poetic_language","V","Şiirsel Dil","Imagery, rhythm and metaphor-heavy phrasing."],
@@ -111,6 +116,7 @@ const ROWS: Record<TraitCategory, Row[]> = {
     ["observation","V","Gözlemcilik","Sharp, accurate observations about people and situations."],
     ["contrarianism","V","Aykırı Görüş","Tends to argue against the prevailing view."],
     ["intellectual_depth","V","Entelektüel Derinlik","Layered content with references that show accumulated knowledge."],
+    ["big_picture","V","Büyük Resim Bakışı","Connects single events to wider trends, systems and long-term consequences."],
     ["strategic_thinking","V","Stratejik Düşünce","Thinks in long-term consequences, plans and scenarios."],
     ["pragmatism","V","Pragmatizm","Focuses on concrete, workable solutions."],
     ["teaching","V","Öğreticilik","Explains, guides and shares tips so others learn."],
@@ -140,6 +146,8 @@ const ROWS: Record<TraitCategory, Row[]> = {
   ],
   economy: [
     ["economics_knowledge","V","Ekonomi Bilgisi","K: uses inflation, interest rates, FX and macro concepts correctly."],
+    ["economy_commentary","V","Ekonomi Yorumculuğu","Comments on prices, wages, cost of living and economic news from daily life."],
+    ["personal_finance","V/S","Kişisel Finans İlgisi","Budgeting, saving, spending habits and money tips."],
     ["finance_interest","V/S","Finans İlgisi","Follows stocks, investing, funds and markets."],
     ["crypto_interest","V/S","Kripto İlgisi","Recurring crypto and web3 content."],
     ["entrepreneurship","V/S","Girişimcilik","Business building, startups, product and sales."],
@@ -154,8 +162,15 @@ const ROWS: Record<TraitCategory, Row[]> = {
     ["media_criticism","V","Medya Eleştirisi","Comments on news framing, distortion and misinformation."],
   ],
   history: [
+    ["history_storytelling","V","Tarih Anlatıcılığı","Retells historical episodes and figures as engaging stories."],
+    ["historical_parallels","V","Tarihten Ders Çıkarma","Compares today's events with historical precedents to explain them."],
     ["history_interest","V/S","Tarih İlgisi","Shares historical content; curious about the past (depth not required)."],
     ["history_knowledge","V","Tarih Bilgisi","K: uses historical events, periods and figures accurately and in context."],
+  ],
+  philosophy: [
+    ["philosophy_interest","V/S","Felsefe İlgisi","Shares and discusses philosophers, schools of thought and the big questions."],
+    ["philosophy_knowledge","V","Felsefe Bilgisi","K: uses philosophers, concepts and arguments accurately and in context."],
+    ["ethics_debate","V","Ahlak Tartışmacılığı","Raises right and wrong, fairness and moral dilemmas in discussions."],
   ],
   science: [
     ["science_interest","V/S","Bilim İlgisi","Recurring science content."],
@@ -164,6 +179,8 @@ const ROWS: Record<TraitCategory, Row[]> = {
     ["health_medicine_interest","V/S","Sağlık ve Tıp İlgisi","Health and medicine as a topic; never the person's own health."],
     ["psychology_interest","V/S","Psikoloji İlgisi","Psychology concepts and discussions of behaviour."],
     ["nature_environment","V/S","Doğa ve Çevre İlgisi","Nature, climate, environment."],
+    ["science_communication","V","Bilim Anlatıcılığı","Explains scientific ideas simply and clearly for a general audience."],
+    ["fun_facts","V/S","İlginç Bilgi Avcılığı","Shares surprising facts, trivia and 'did you know' content."],
   ],
   technology: [
     ["tech_interest","V/S","Teknoloji İlgisi","Recurring technology content."],
@@ -178,6 +195,8 @@ const ROWS: Record<TraitCategory, Row[]> = {
     ["literary_knowledge","V","Edebiyat Bilgisi","K: knowledge of authors, movements and works."],
     ["reading_habit","V","Okurluk","Shares what they read: quotes, reading lists."],
     ["poetry_interest","V/S","Şiir İlgisi","Shares and discusses others' poetry (own poetic writing is poetic_language)."],
+    ["book_recommendations","V","Kitap Tavsiyeciliği","Recommends books and reviews what they read for others."],
+    ["quote_sharing","V/S","Alıntı Paylaşımı","Shares quotes from writers, thinkers and books."],
   ],
   screen: [
     ["cinema_culture","V","Sinema Kültürü","Film literacy: directors, genres, classics."],
@@ -209,6 +228,8 @@ const ROWS: Record<TraitCategory, Row[]> = {
     ["beauty_care","V/S","Güzellik ve Bakım İlgisi","Skincare, makeup, grooming."],
     ["visual_arts","V/S","Görsel Sanatlar İlgisi","Painting, museums, photography."],
     ["design_architecture","V/S","Tasarım ve Mimari İlgisi","Design, architecture, interiors."],
+    ["photography","V","Fotoğraf Tutkusu","Shares own photographs and talks about framing, light and cameras."],
+    ["performing_arts","V/S","Sahne Sanatları İlgisi","Theatre, opera, dance and stand-up on stage."],
     ["animal_love","V/S","Hayvan Sevgisi","Pets, strays, animals."],
     ["automotive","V/S","Otomobil İlgisi","Cars, motorcycles, driving."],
     ["astrology","V/S","Astroloji İlgisi","Zodiac signs and astrology references."],
@@ -231,7 +252,7 @@ export const INTEREST_TOPICS: readonly InterestTopic[] = ([
   ["combat_sports","Dövüş Sporları",["combat_sports_interest","sports_enthusiasm"]],
   ["other_sports","Diğer Sporlar",["other_sports_interest","sports_enthusiasm"]],
   ["fitness","Fitness",["fitness_interest"]],
-  ["economy","Ekonomi",["economics_knowledge"]],
+  ["economy","Ekonomi",["economics_knowledge","economy_commentary","personal_finance"]],
   ["markets_investing","Piyasalar ve Yatırım",["finance_interest"]],
   ["crypto","Kripto",["crypto_interest"]],
   ["business_startups","İş ve Girişim",["entrepreneurship"]],
@@ -240,8 +261,9 @@ export const INTEREST_TOPICS: readonly InterestTopic[] = ([
   ["geopolitics","Jeopolitik",["geopolitics"]],
   ["law_justice","Hukuk",["law_justice"]],
   ["news_media","Haber ve Medya",["current_affairs","media_criticism"]],
-  ["history","Tarih",["history_interest","history_knowledge"]],
-  ["science","Bilim",["science_interest","scientific_literacy"]],
+  ["history","Tarih",["history_interest","history_knowledge","history_storytelling","historical_parallels"]],
+  ["science","Bilim",["science_interest","scientific_literacy","science_communication","fun_facts"]],
+  ["philosophy","Felsefe",["philosophy_interest","philosophy_knowledge","ethics_debate"]],
   ["space","Uzay",["space_astronomy"]],
   ["health_medicine","Sağlık",["health_medicine_interest"]],
   ["psychology","Psikoloji",["psychology_interest"]],
@@ -251,7 +273,7 @@ export const INTEREST_TOPICS: readonly InterestTopic[] = ([
   ["artificial_intelligence","Yapay Zekâ",["ai_interest"]],
   ["gadgets","Cihazlar",["gadgets"]],
   ["internet_culture","İnternet Kültürü",["internet_culture"]],
-  ["literature","Edebiyat",["literature_interest","literary_knowledge","reading_habit"]],
+  ["literature","Edebiyat",["literature_interest","literary_knowledge","reading_habit","book_recommendations","quote_sharing"]],
   ["poetry","Şiir",["poetry_interest"]],
   ["cinema","Sinema",["cinema_culture"]],
   ["tv_series","Diziler",["tv_series_interest"]],
@@ -265,7 +287,7 @@ export const INTEREST_TOPICS: readonly InterestTopic[] = ([
   ["city_life","Şehir Hayatı",["city_culture"]],
   ["food_drink","Yeme-İçme",["food_interest","cooking"]],
   ["fashion_beauty","Moda ve Güzellik",["fashion_style","beauty_care"]],
-  ["art_design","Sanat ve Tasarım",["visual_arts","design_architecture"]],
+  ["art_design","Sanat ve Tasarım",["visual_arts","design_architecture","photography","performing_arts"]],
   ["animals","Hayvanlar",["animal_love"]],
   ["automotive","Otomobil",["automotive"]],
   ["astrology","Astroloji",["astrology"]],
@@ -285,4 +307,6 @@ export const CONTRADICTORY_PAIRS: ReadonlyArray<[string, string]> = [
 export const NEAR_DUPLICATE_PAIRS: ReadonlyArray<[string, string]> = [
   ["humor","observational_humor"], ["irony","sarcasm"], ["poetic_language","literary_language"],
   ["curiosity","questioning"], ["sports_enthusiasm","football_fandom"], ["football_fandom","football_knowledge"],
+  ["humor","quick_wit"], ["love_philosophy","relationship_commentary"], ["reading_habit","quote_sharing"],
+  ["philosophical_tendency","philosophy_interest"], ["history_interest","history_storytelling"],
 ];

@@ -6,7 +6,7 @@ const TYPES=['original','original','original','original','reply','original','ori
 const posts=()=>TYPES.map((type,i)=>({id:String(i),type,text:type==='repost'?`RT @someone: shared song number ${i}`:`Kendi cümlemle yazdığım bir düşünce, sıra ${i}, maç ve ekonomi üzerine uzunca bir not.`,created_at:`2026-09-${String(20+i%5).padStart(2,'0')}T10:00:00Z`,lang:'tr',metrics:{likes:1,replies:0,reposts:0}}));
 const ANALYSIS='Hesap, gündeme duygusal tepkiden çok gerekçeli yorumla katılan analitik bir profil çiziyor. Futbol üzerine yazdıkları taktik ve veri odaklı; yanıtlarda karşı görüşe net biçimde itiraz ediyor. Mizahı kuru ve kısa, çoğunlukla ciddi bir tespitin sonuna eklenen tek satırlık bir iğneleme olarak ortaya çıkıyor. Seyrek gece paylaşımlarındaki melankolik ton, genel olarak mesafeli üslupla dikkat çekici bir kontrast oluşturuyor.';
 const raw=()=>({
- ontology_version:'real-1.0',
+ ontology_version:'real-1.1',
  selected_traits:[
   {id:'football_knowledge',score:84,confidence:.88,evidence:'Taktik ve xG ile yorum.',post_refs:[0,3,7,11]},
   {id:'dry_humor',score:78,confidence:.8,evidence:'Düz cümleyle soğuk espriler.',post_refs:[2,5,9,13]},
@@ -27,13 +27,13 @@ const plain=v=>JSON.parse(JSON.stringify(v));
 const ids=r=>plain(r.selected_traits.map(t=>t.id));
 const reasons=r=>Object.fromEntries(r.dropped.map(d=>[d.id,d.reason]));
 
-test('ontology v1 is frozen at 150 traits and 48 topics with unique ids and valid links',()=>{
+test('ontology v1.1 has 168 traits and 49 topics with unique ids and valid links',()=>{
  const e=edge();
- assert.equal(e.ONTOLOGY_VERSION,'real-1.0');
- assert.equal(e.TRAITS.length,150);assert.equal(new Set(e.TRAITS.map(t=>t.id)).size,150);
- assert.equal(e.INTEREST_TOPICS.length,48);assert.equal(new Set(e.INTEREST_TOPICS.map(t=>t.id)).size,48);
- assert.equal(new Set(e.TRAITS.map(t=>t.label)).size,150,'labels are unique');
- assert.equal(e.TRAITS.filter(t=>t.group==='character').length,89);
+ assert.equal(e.ONTOLOGY_VERSION,'real-1.1');
+ assert.equal(e.TRAITS.length,168);assert.equal(new Set(e.TRAITS.map(t=>t.id)).size,168);
+ assert.equal(e.INTEREST_TOPICS.length,49);assert.equal(new Set(e.INTEREST_TOPICS.map(t=>t.id)).size,49);
+ assert.equal(new Set(e.TRAITS.map(t=>t.label)).size,168,'labels are unique');
+ assert.equal(e.TRAITS.filter(t=>t.group==='character').length,94);
  for(const t of e.INTEREST_TOPICS) for(const id of t.traits) assert.equal(e.TRAIT_BY_ID.get(id)?.group,'interest',`${t.id} -> ${id}`);
  // Every interest trait can be unlocked by at least one topic.
  const unlockable=new Set(e.INTEREST_TOPICS.flatMap(t=>t.traits));
@@ -137,4 +137,19 @@ test('analyzeSerious performs one strict provider call and returns the normalize
  const openai=edge({Deno:{env:{get:k=>({AI_PROVIDER:'openai',OPENAI_API_KEY:'k',AI_MODEL:'m'})[k]}},fetch:async(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return Response.json({status:'completed',output:[{type:'message',role:'assistant',status:'completed',content:[{type:'output_text',text:JSON.stringify(raw())}]}]});}});
  await openai.analyzeSerious({username:'demo'},posts(),'tr');
  const body=calls.at(-1).body;assert.equal(body.text.format.name,'xora_real_analysis');assert.equal(body.text.format.strict,true);
+});
+
+test('v1.1: every trait has a short label in all 14 card languages, and nicknames use local examples',()=>{
+ const e=edge();
+ const langs=['tr','en','es','pt','ar','fr','de','it','ja','ko','zh','ru','id','th'];
+ for(const t of e.TRAITS){
+  const row=e.TRAIT_LABELS.get(t.id);assert.ok(row,t.id+' has labels');
+  for(const l of langs){assert.ok(row[l]&&row[l].trim(),t.id+' '+l);assert.ok(row[l].length<=32,t.id+' '+l+' fits a bar: '+row[l]);}
+  assert.equal(e.traitLabel(t.id,'xx'),row.en,'unknown language falls back to English');
+ }
+ for(const l of langs){const vals=e.TRAITS.map(t=>e.TRAIT_LABELS.get(t.id)[l]);assert.equal(new Set(vals).size,vals.length,l+' labels are unique');}
+ const ja=e.nicknameSystemPrompt('Japanese','ja');
+ assert.match(ja,/夜ふかし 哲学者/);assert.doesNotMatch(ja,/Koltuk Filozofu/,'no Turkish examples in a Japanese prompt');
+ assert.match(ja,/PERSONALITY FIRST/);assert.match(ja,/never a pure fan title/i);
+ assert.match(e.nicknameSystemPrompt('Spanish','es'),/Culé/);
 });
