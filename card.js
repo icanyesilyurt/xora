@@ -30,8 +30,24 @@ function rarityText(res) {
   return typeof t === "function" ? t("rarity_" + name) : name.toUpperCase();
 }
 
+// Rarity reads as a metal: common bronze, rare silver, epic gold, legendary bright gold that shines.
+var RARITY_METALS = {
+  common:    { metal: "bronze", stops: ["#E8A970", "#A9662C"], text: "#FFFFFF" },
+  rare:      { metal: "silver", stops: ["#F7F9FB", "#AAB4C0"], text: "#1B1B1B" },
+  epic:      { metal: "gold",   stops: ["#FFE28A", "#D8960A"], text: "#1B1B1B" },
+  legendary: { metal: "gold",   stops: ["#FFF6C2", "#FFC93C", "#C98500"], text: "#1B1B1B", shine: true }
+};
+var RARITY_MARKS = { common: "●", rare: "◆", epic: "★", legendary: "✦" };
+
+function rarityMetal(res) {
+  return RARITY_METALS[rarityName(res)] || RARITY_METALS.common;
+}
+
 function realRibbonHtml(res) {
-  return '<div class="card-status real-status"><span>' + esc(t("real_label")) + '</span><b>' + esc(rarityText(res)) + '</b></div>';
+  var name = rarityName(res);
+  return '<div class="card-status real-status"><span>' + esc(t("real_label")) + '</span>' +
+    '<b class="rarity-badge" data-rarity="' + esc(name) + '" data-metal="' + rarityMetal(res).metal + '">' +
+    '<i aria-hidden="true">' + (RARITY_MARKS[name] || "●") + '</i>' + esc(rarityText(res)) + '</b></div>';
 }
 
 function funRibbonHtml() {
@@ -635,7 +651,7 @@ var SHARE_INK = "#1E2330", SHARE_MUT = "#5C6270", SHARE_CREAM = "#FFF1E3";
 var SHARE_FONT = "Nunito, Arial, sans-serif";
 var SHARE_EMOJI_FONT = "'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif";
 var SHARE_MATCH_KEYS = ["vibe", "humor", "chaos", "flirt", "romance"];
-var SHARE_RARITY_MARK = { common: "●", rare: "◆", epic: "★", legendary: "✦" };
+var SHARE_RARITY_MARK = RARITY_MARKS;
 // Earlier REAL results stored a fixed mode icon; the card shows an archetype icon, so those fall back.
 var SHARE_MODE_ICONS = ["🪞", "👀"];
 var SHARE_DEFAULT_ICON = "✨";
@@ -662,6 +678,7 @@ function shareCardModel(res) {
     lang: lang,
     rtl: copyDirection(lang) === "rtl",
     rarityLabel: (SHARE_RARITY_MARK[rarity] ? SHARE_RARITY_MARK[rarity] + " " : "") + rarityText(res),
+    rarityMetal: rarityMetal(res),
     realLabel: t("real_label")
   };
   if (isMatch) {
@@ -849,11 +866,11 @@ function shareCardLayout(model, ctx) {
     { x: card.x + 30, y: pillMid - 23, w: realW, h: 46, fill: SHARE_INK, stroke: null },
     { x: card.x + 30 + realW + 10, y: pillMid - 21, w: modeW, h: 42, fill: "#FFFFFF", stroke: SHARE_INK },
     // On Match the right half of the header is already orange, so the rarity badge turns white.
-    { x: card.x + card.w - 30 - rarityW, y: pillMid - 25, w: rarityW, h: 50, fill: isMatch ? "#FFFFFF" : "#FF7A45", stroke: SHARE_INK }
+    { x: card.x + card.w - 30 - rarityW, y: pillMid - 25, w: rarityW, h: 50, fill: isMatch ? "#FFFFFF" : model.rarityMetal.stops[0], gradient: isMatch ? null : model.rarityMetal.stops, shine: !isMatch && !!model.rarityMetal.shine, stroke: SHARE_INK }
   ];
   text("header", model.realLabel, realFont, L.pills[0].x + realW / 2, pillMid + 8, "center", L.pills[0], "#FFFFFF");
   text("header", model.modeLabel, modeFont, L.pills[1].x + modeW / 2, pillMid + 7, "center", L.pills[1], SHARE_INK);
-  text("header", model.rarityLabel, rarityFont, L.pills[2].x + rarityW / 2, pillMid + 9, "center", L.pills[2], isMatch ? SHARE_INK : "#FFFFFF");
+  text("header", model.rarityLabel, rarityFont, L.pills[2].x + rarityW / 2, pillMid + 9, "center", L.pills[2], isMatch ? SHARE_INK : model.rarityMetal.text);
 
   // 3. @handle (Match: both handles), white in the header like the old card.
   var handle = shareFitLine(ctx, 800, 36, 22, model.handleLine, card.w - 120);
@@ -989,7 +1006,14 @@ function paintShareCard(ctx, L) {
   ctx.lineWidth = 4; ctx.strokeStyle = SHARE_INK; roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.stroke();
 
   L.pills.forEach(function (p) {
-    ctx.fillStyle = p.fill; roundRect(ctx, p.x, p.y, p.w, p.h, p.h / 2); ctx.fill();
+    var fill = p.fill;
+    if (p.gradient && p.gradient.length > 1) {
+      fill = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+      p.gradient.forEach(function (c, i) { fill.addColorStop(i / (p.gradient.length - 1), c); });
+    }
+    if (p.shine) { ctx.save(); ctx.shadowColor = "rgba(255,190,40,.85)"; ctx.shadowBlur = 22; }
+    ctx.fillStyle = fill; roundRect(ctx, p.x, p.y, p.w, p.h, p.h / 2); ctx.fill();
+    if (p.shine) ctx.restore();
     if (p.stroke) { ctx.lineWidth = 3; ctx.strokeStyle = p.stroke; roundRect(ctx, p.x, p.y, p.w, p.h, p.h / 2); ctx.stroke(); }
   });
 
