@@ -67,7 +67,7 @@ function funRibbonHtml() {
 function decorateRealCardHtml(html, res) {
   var idx = html.indexOf(">");
   if (idx < 0) return html;
-  html = html.slice(0, idx) + ' data-tier="real"' + html.slice(idx);
+  html = html.slice(0, idx) + ' data-tier="real" data-rarity="' + esc(rarityName(res)) + '"' + html.slice(idx);
   idx = html.indexOf(">");
   return html.slice(0, idx + 1) + realRibbonHtml(res) + html.slice(idx + 1);
 }
@@ -689,6 +689,7 @@ function shareCardModel(res) {
     rtl: copyDirection(lang) === "rtl",
     rarityLabel: (SHARE_RARITY_MARK[rarity] ? SHARE_RARITY_MARK[rarity] + " " : "") + rarityText(res),
     rarityMetal: rarityMetal(res),
+    rarity: rarity,
     realLabel: t("real_label")
   };
   if (isMatch) {
@@ -982,6 +983,49 @@ function shareCardLayout(model, ctx) {
 
 /* ---------- çizim ---------- */
 
+// The higher the rarity, the louder the frame: rare silver, epic purple-gold with a glow,
+// legendary a thick gold-holo frame, a gold sheen on the header and sparkles around the card.
+var RARITY_FRAMES = {
+  rare: { width: 10, glow: 0, stops: ["#FFFFFF", "#AEB8C4", "#E9EDF2", "#8E99A6"] },
+  epic: { width: 14, glow: 26, glowColor: "rgba(124,77,255,.55)", stops: ["#B98CFF", "#FFD66B", "#7C4DFF", "#FFE9A8", "#9E6BFF"] },
+  legendary: { width: 18, glow: 46, glowColor: "rgba(255,190,40,.85)", stops: ["#FFF3B0", "#FFC93C", "#FF8FD8", "#8FE3FF", "#FFC93C", "#C98500"], sheen: true, sparkles: true }
+};
+function drawRarityFrame(ctx, card, L, rarity) {
+  var f = RARITY_FRAMES[rarity];
+  if (!f) return;
+  var pad = f.width / 2 + 2;
+  var g = ctx.createLinearGradient(card.x, card.y, card.x + card.w, card.y + card.h);
+  f.stops.forEach(function (c, i) { g.addColorStop(i / (f.stops.length - 1), c); });
+  if (f.sheen) {
+    ctx.save();
+    roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.clip();
+    var sh = ctx.createLinearGradient(card.x, card.y, card.x + card.w, card.y + L.headerH);
+    sh.addColorStop(0, "rgba(255,255,255,0)"); sh.addColorStop(0.45, "rgba(255,255,255,.38)"); sh.addColorStop(0.55, "rgba(255,255,255,0)");
+    ctx.fillStyle = sh; ctx.fillRect(card.x, card.y, card.w, L.headerH - 2);
+    ctx.restore();
+  }
+  ctx.save();
+  if (f.glow) { ctx.shadowColor = f.glowColor; ctx.shadowBlur = f.glow; }
+  ctx.lineWidth = f.width; ctx.strokeStyle = g;
+  roundRect(ctx, card.x - pad, card.y - pad, card.w + pad * 2, card.h + pad * 2, 40 + pad); ctx.stroke();
+  ctx.restore();
+  ctx.lineWidth = 3; ctx.strokeStyle = SHARE_INK;
+  roundRect(ctx, card.x - pad * 2, card.y - pad * 2, card.w + pad * 4, card.h + pad * 4, 40 + pad * 2); ctx.stroke();
+  if (f.sparkles) {
+    [[card.x - 34, card.y + 120, 26], [card.x + card.w + 30, card.y + 260, 20], [card.x + card.w - 70, card.y - 30, 30],
+     [card.x + 60, card.y + card.h + 30, 22], [card.x + card.w + 26, card.y + card.h - 160, 28], [card.x - 28, card.y + card.h - 300, 18]]
+      .forEach(function (p) { drawSparkle(ctx, p[0], p[1], p[2]); });
+  }
+}
+function drawSparkle(ctx, x, y, r) {
+  ctx.save();
+  ctx.fillStyle = "#FFC93C"; ctx.shadowColor = "rgba(255,190,40,.9)"; ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.moveTo(x, y - r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.quadraticCurveTo(x, y, x, y + r);
+  ctx.quadraticCurveTo(x, y, x - r, y); ctx.quadraticCurveTo(x, y, x, y - r);
+  ctx.fill(); ctx.restore();
+}
+
 function paintShareCard(ctx, L) {
   var m = L.model, card = L.card;
   ctx.textBaseline = "alphabetic";
@@ -1014,6 +1058,7 @@ function paintShareCard(ctx, L) {
   ctx.fillRect(card.x, L.footTop, card.w, L.footH);
   ctx.restore();
   ctx.lineWidth = 4; ctx.strokeStyle = SHARE_INK; roundRect(ctx, card.x, card.y, card.w, card.h, 40); ctx.stroke();
+  drawRarityFrame(ctx, card, L, m.rarity);
 
   L.pills.forEach(function (p) {
     var fill = p.fill;
