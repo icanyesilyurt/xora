@@ -779,6 +779,15 @@ body::before{
 .realcard .idcard-foot{flex:0 0 auto;padding:1.6cqw 4cqw;font-size:2.6cqw}
 .realcard .barcode{font-size:2.6cqw}
 .realcard .idcard-host{font-size:2.3cqw}
+/* Real card rarity frames: rare silver, epic purple-gold glow, legendary moving gold-holo frame. */
+.idcard[data-tier="real"][data-rarity="rare"]{border:4px solid transparent;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,#FFFFFF,#AEB8C4,#E9EDF2,#8E99A6) border-box;box-shadow:10px 12px 0 rgba(30,35,48,.85),0 0 0 3px var(--ink)}
+.idcard[data-tier="real"][data-rarity="epic"]{border:5px solid transparent;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,#B98CFF,#FFD66B,#7C4DFF,#FFE9A8,#9E6BFF) border-box;box-shadow:10px 12px 0 rgba(30,35,48,.85),0 0 0 3px var(--ink),0 0 26px rgba(124,77,255,.55)}
+.idcard[data-tier="real"][data-rarity="legendary"]{position:relative;border:6px solid transparent;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(120deg,#FFF3B0,#FFC93C,#FF8FD8,#8FE3FF,#FFC93C,#C98500,#FFF3B0) border-box;background-size:100% 100%,300% 300%;animation:xora-holo 4s linear infinite;box-shadow:10px 12px 0 rgba(30,35,48,.85),0 0 0 3px var(--ink),0 0 34px rgba(255,190,40,.85)}
+.idcard[data-tier="real"][data-rarity="legendary"] .rc-head{background-image:linear-gradient(115deg,rgba(255,255,255,0) 35%,rgba(255,255,255,.45) 50%,rgba(255,255,255,0) 65%);background-size:250% 100%;animation:xora-sheen 3s ease-in-out infinite}
+@keyframes xora-holo{0%{background-position:0 0,0% 50%}100%{background-position:0 0,300% 50%}}
+@keyframes xora-sheen{0%,100%{background-position:150% 0}50%{background-position:-50% 0}}
+@media (prefers-reduced-motion:reduce){.idcard[data-tier="real"][data-rarity="legendary"],.idcard[data-tier="real"][data-rarity="legendary"] .rc-head{animation:none}}
+
 /* ============ RTL (Arapça) ============ */
 /* Arabic letters must stay joined: letter-spacing breaks cursive shaping. */
 [dir="rtl"] *{letter-spacing:0!important}
