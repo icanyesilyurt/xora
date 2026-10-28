@@ -27,7 +27,7 @@ test('nickname rule: exactly two words, letters only',()=>{
 test('nickname input is the character profile only: never raw posts',()=>{
  const e=edge();const serious=seriousFor('tr');
  const input=JSON.parse(JSON.stringify(e.nicknameInput(serious,'alice')));
- assert.deepEqual(Object.keys(input),['handle','traits','character_analysis','persistent_interests','supported_club']);
+ assert.deepEqual(Object.keys(input),['handle','archetype_hints','traits','character_analysis','persistent_interests','supported_club']);
  assert.deepEqual(input.traits.map(t=>Object.keys(t)),input.traits.map(()=>['id','label','score']));
  assert.equal(input.character_analysis,ANALYSIS_COPY.tr);
  assert.doesNotMatch(JSON.stringify(input),/Soru\?|post_refs|evidence|"posts"/);
@@ -160,7 +160,7 @@ test('Mirror/Stalk/Match send the split input and the repost rule, and store the
    assert.deepEqual(sp.slice(0,6).map(p=>p.type),['original','original','original','reply','reply','quote']);
    assert.ok(sp.slice(6).every(p=>p.type==='repost'&&!/^RT @/.test(p.text)));
    // The nickname sees the character profile only.
-   assert.equal(nicknameInputs.length,1);assert.deepEqual(Object.keys(nicknameInputs[0]),['handle','traits','character_analysis','persistent_interests','supported_club']);
+   assert.equal(nicknameInputs.length,1);assert.deepEqual(Object.keys(nicknameInputs[0]),['handle','archetype_hints','traits','character_analysis','persistent_interests','supported_club']);
    assert.doesNotMatch(JSON.stringify(nicknameInputs[0]),/Kendi cümlem|yanıtım|Başkasının|Alıntı yorumum/);
    assert.equal(result.nickname.tr,'Soru Ustası');assert.equal(result.comment.mirror.tr,ANALYSIS_COPY.tr);
   }

@@ -52,7 +52,7 @@ for(const provider of ['openai','anthropic']) {
    assert.match(ssys,/FIXED ONTOLOGY/);assert.match(ssys,/3-6 complete, meaningful sentences/);assert.match(ssys,/never read like a recap of recent posts/);assert.ok(!ssys.includes('UNTRUSTED_DATA_MARKER'));
    if(provider==='openai'){assert.equal(sb.store,false);assert.equal(sb.tool_choice,'none');assert.equal(sb.text.format.strict,true);assert.deepEqual(sb.text.format.schema,JSON.parse(JSON.stringify(f.e.analysisSchema())));}
    const nb=bodyOf(f.nicknameRequests[0]),nsys=systemOf(provider,nb),ninput=userOf(provider,nb);
-   assert.match(nsys,/EXACTLY TWO WORDS/);assert.deepEqual(Object.keys(ninput),['handle','traits','character_analysis','persistent_interests','supported_club']);
+   assert.match(nsys,/EXACTLY TWO WORDS/);assert.deepEqual(Object.keys(ninput),['handle','archetype_hints','traits','character_analysis','persistent_interests','supported_club']);
    assert.doesNotMatch(JSON.stringify(ninput),/How does this work|UNTRUSTED_DATA_MARKER|"posts"/,'no raw posts or profile text in the nickname call');
    if(provider==='openai'){assert.equal(nb.store,false);assert.equal(nb.tool_choice,'none');assert.equal(nb.text.format.name,'xora_real_nickname');assert.equal(nb.text.format.strict,true);}
    // Card bars are the serious traits with ontology labels; the analysis is the main text.
