@@ -90,8 +90,12 @@
     return '<div class="pp-stat' + (hl ? ' hl' : '') + '"><small>' + esc(label) + '</small><b>' + esc(value) + '</b></div>';
   }
 
+  // The secret key comes from the panel link once, is remembered on this device, and is then
+  // removed from the address bar, so a reload or a bookmark of /partner keeps working.
+  var KEY_STORE = "xora_partner_key";
   var key = new URLSearchParams(location.search).get("key") || "";
-  // The secret key is not kept in the address bar after it is read.
+  if (key) { try { localStorage.setItem(KEY_STORE, key); } catch (e) {} }
+  else { try { key = localStorage.getItem(KEY_STORE) || ""; } catch (e) { key = ""; } }
   try { history.replaceState(null, "", location.pathname); } catch (e) {}
   if (!/^[0-9a-f]{20,64}$/i.test(key)) { body.innerHTML = '<p class="pp-empty">' + esc(s.bad) + '</p>'; return; }
   body.innerHTML = '<p class="pp-empty">' + esc(s.loading) + '</p>';
@@ -101,7 +105,7 @@
   sb.rpc("xora_partner_panel", { p_key: key }).then(function (res) {
     if (res.error) { body.innerHTML = '<p class="pp-empty">' + esc(s.error) + '</p>'; return; }
     var p = res.data;
-    if (!p) { body.innerHTML = '<p class="pp-empty">' + esc(s.bad) + '</p>'; return; }
+    if (!p) { try { localStorage.removeItem(KEY_STORE); } catch (e) {} body.innerHTML = '<p class="pp-empty">' + esc(s.bad) + '</p>'; return; }
     if (p.display_name) document.getElementById("ppSub").textContent = p.display_name + " · " + s.sub;
     var link = (typeof getPublicSiteUrl === "function" ? getPublicSiteUrl() : location.origin + "/") + "?ref=" + encodeURIComponent(p.code);
     var html = '<div class="panel"><p style="font-weight:900">' + esc(s.link) + '</p>' +
