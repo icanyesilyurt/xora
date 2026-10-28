@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yasal — XORA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="canonical" href="https://xora.roviaqr.com/legal">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo">XO<span>RA</span></a>
+  <nav class="topnav">
+    <a href="credits.html" class="pill credits-pill">⚡ <b id="creditVal">10</b></a>
+    <a href="profile.html" class="pill" data-i18n="nav_profile">Profil</a>
+    <button type="button" class="pill lang-btn" id="langBtn">EN</button>
+  </nav>
+</header>
+
+<main class="page legal-page">
+  <nav class="legal-tabs" id="legalTabs">
+    <a href="legal.html?doc=terms" data-doc="terms" data-i18n="legal_terms">Kullanım Koşulları</a>
+    <a href="legal.html?doc=privacy" data-doc="privacy" data-i18n="legal_privacy">Gizlilik</a>
+    <a href="legal.html?doc=sales" data-doc="sales" data-i18n="legal_sales">Satış ve İade</a>
+  </nav>
+  <article class="panel legal-doc" id="legalDoc"></article>
+</main>
+
+<footer class="foot">
+  <span>XORA</span>
+  <span class="foot-dot">·</span>
+  <a href="legal.html?doc=terms" data-i18n="legal_terms">Kullanım Koşulları</a>
+  <span class="foot-dot">·</span>
+  <a href="legal.html?doc=privacy" data-i18n="legal_privacy">Gizlilik</a>
+  <span class="foot-dot">·</span>
+  <a href="legal.html?doc=sales" data-i18n="legal_sales">Satış ve İade</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="legal.js"></script>
+<script>
+(function () {
+  var docEl = document.getElementById("legalDoc");
+  function currentDoc() {
+    var d = new URLSearchParams(location.search).get("doc");
+    return LEGAL_DOCS.indexOf(d) >= 0 ? d : "terms";
+  }
+  function render() {
+    var lang = LEGAL[getLang()] ? getLang() : "en";
+    var L = LEGAL[lang], doc = currentDoc(), D = L[doc];
+    document.title = D.title + " — XORA";
+    var tabs = document.querySelectorAll("#legalTabs a");
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle("on", tabs[i].getAttribute("data-doc") === doc);
+    var date = new Date(LEGAL_UPDATED + "T12:00:00Z").toLocaleDateString(lang === "th" ? "th-TH-u-ca-gregory" : lang, { year: "numeric", month: "long", day: "numeric" });
+    var html = '<h1>' + esc(D.title) + '</h1><p class="legal-date">' + esc(L.updated) + ': ' + esc(date) + '</p>';
+    D.sections.forEach(function (s) { html += '<h2>' + esc(s[0]) + '</h2><p>' + esc(s[1]) + '</p>'; });
+    var seller = [LEGAL_SELLER.name, LEGAL_SELLER.address, LEGAL_SELLER.taxId].filter(Boolean);
+    html += '<div class="legal-seller"><h2>' + esc(L.seller) + '</h2>' +
+      (seller.length ? '<p>' + seller.map(esc).join('<br>') + '</p>' : '') +
+      '<p>' + esc(L.contact) + ': ' + (LEGAL_SELLER.email ? '<a href="mailto:' + esc(LEGAL_SELLER.email) + '">' + esc(LEGAL_SELLER.email) + '</a>' : 'xora.roviaqr.com') + '</p></div>';
+    docEl.innerHTML = html;
+  }
+  document.getElementById("legalTabs").addEventListener("click", function (e) {
+    var a = e.target.closest ? e.target.closest("a[data-doc]") : null;
+    if (!a) return;
+    e.preventDefault();
+    history.replaceState(null, "", "legal.html?doc=" + a.getAttribute("data-doc"));
+    render();
+    window.scrollTo(0, 0);
+  });
+  document.addEventListener("xora:lang", render);
+  render();
+})();
+</script>
+
+</body>
+</html>

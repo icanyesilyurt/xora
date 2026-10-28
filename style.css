@@ -788,6 +788,23 @@ body::before{
 @keyframes xora-sheen{0%,100%{background-position:150% 0}50%{background-position:-50% 0}}
 @media (prefers-reduced-motion:reduce){.idcard[data-tier="real"][data-rarity="legendary"],.idcard[data-tier="real"][data-rarity="legendary"] .rc-head{animation:none}}
 
+/* ============ Legal pages and purchase consent ============ */
+.legal-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+.legal-tabs a{padding:8px 14px;border:2.5px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);font-weight:900;font-size:13.5px;text-decoration:none}
+.legal-tabs a.on{background:var(--ink);color:#fff}
+.legal-doc{text-align:start;line-height:1.6}
+.legal-doc h1{font-size:26px;margin:0 0 4px}
+.legal-doc h2{font-size:16px;font-weight:900;margin:18px 0 4px;color:var(--ink)}
+.legal-doc p{margin:0;font-weight:600}
+.legal-doc .legal-date{color:var(--mut);font-size:13px;font-weight:800}
+.legal-seller{margin-top:22px;padding-top:12px;border-top:2px dashed rgba(0,0,0,.15)}
+.legal-seller a{color:var(--ink);font-weight:800}
+.buy-consent{display:flex;gap:10px;align-items:flex-start;margin:14px 0 4px;padding:12px 14px;border:2.5px solid var(--ink);border-radius:16px;background:#fff;font-weight:700;font-size:13.5px;line-height:1.45;text-align:start;cursor:pointer}
+.buy-consent input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--ink)}
+.buy-consent a{color:var(--ink);font-weight:900}
+.buy-consent.need{border-color:#E5484D;background:#FFF0F0}
+.buy-consent-need{color:#C62828;font-weight:800;font-size:13px;margin:4px 2px 0}
+
 /* ============ RTL (Arapça) ============ */
 /* Arabic letters must stay joined: letter-spacing breaks cursive shaping. */
 [dir="rtl"] *{letter-spacing:0!important}

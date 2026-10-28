@@ -950,17 +950,17 @@ test('Stalk cards show the Stalk copy and Mirror cards the Mirror copy, in HTML 
 test('Cloudflare Pages build publishes exactly the static site into dist/, and nothing else',()=>{
  const {execFileSync}=require('node:child_process');
  const out=execFileSync(process.execPath,['scripts/build-pages.mjs'],{encoding:'utf8'});
- assert.match(out,/9 pages, 5 assets/);
+ assert.match(out,/10 pages, 6 assets/);
  const files=fs.readdirSync('dist').sort();
- assert.deepEqual(files,['admin.html','app.js','auth.html','card.js','config.js','credits.html','index.html','match.html','mirror.html','partner.html','profile.html','robots.txt','stalk.html','style.css','xora.js']);
+ assert.deepEqual(files,['admin.html','app.js','auth.html','card.js','config.js','credits.html','index.html','legal.html','legal.js','match.html','mirror.html','partner.html','profile.html','robots.txt','stalk.html','style.css','xora.js']);
  // Assets are copied byte for byte; pages only differ in the content-hash version on each asset reference.
- const crypto=require('node:crypto');const assets=['app.js','xora.js','card.js','config.js','style.css'];
+ const crypto=require('node:crypto');const assets=['app.js','xora.js','card.js','config.js','style.css','legal.js'];
  const ver=Object.fromEntries(assets.map(a=>[a,crypto.createHash('sha256').update(fs.readFileSync(a)).digest('hex').slice(0,10)]));
- const strip=h=>h.replace(/\b((?:href|src)="(?:app|xora|card|config)\.js|(?:href|src)="style\.css)\?[^"]*"/g,'$1"');
+ const strip=h=>h.replace(/\b((?:href|src)="(?:app|xora|card|config|legal)\.js|(?:href|src)="style\.css)\?[^"]*"/g,'$1"');
  for(const f of files){
   const src=fs.readFileSync(f,'utf8'),out=fs.readFileSync('dist/'+f,'utf8');
   if(!f.endsWith('.html')){assert.equal(out,src,f+' copied byte for byte');continue;}
-  const refs=[...out.matchAll(/\b(?:href|src)="(app\.js|xora\.js|card\.js|config\.js|style\.css)([^"]*)"/g)];
+  const refs=[...out.matchAll(/\b(?:href|src)="(app\.js|xora\.js|card\.js|config\.js|style\.css|legal\.js)([^"]*)"/g)];
   assert.ok(refs.length>0,f+' has asset refs');
   for(const [,a,q] of refs) assert.equal(q,'?v='+ver[a],f+' '+a+' carries its content hash');
   assert.equal(strip(out),strip(src),f+' otherwise unchanged');
@@ -1007,8 +1007,9 @@ function assertLayoutFits(c,L,where){
  const z=L.zones,lowestIcon=Math.max(...L.icons.map(i=>i.y+i.r));
  assert.ok(lowestIcon<z.title.top&&z.title.bottom<=z.bars.top&&z.bars.bottom<=z.analysis.top&&z.analysis.bottom<=L.footTop-14,where+' icon, title, bars, analysis, footer in order '+JSON.stringify(z));
  assert.ok(L.bars.length<=6,where+' at most six bars');
- if(L.insight&&L.model.kind==='match') assert.ok(L.insight.lines.length>=1&&L.insight.lines.length<=4,where+' match analysis 1-4 lines');
- if(L.insight&&L.model.kind!=='match') assert.ok(L.insight.lines.length>=1,where+' analysis drawn');
+ // Match and REAL both show the whole analysis; only the font size steps down to fit.
+ if(L.insight) assert.ok(L.insight.lines.length>=1,where+' analysis drawn');
+ if(L.insight&&L.model.kind==='match'&&!/long$/.test(where)) assert.ok(!L.insight.truncated&&L.insight.sentences===L.insight.total,where+' whole chemistry report on the card');
 }
 test('REAL share card follows the Sessiz Gözlemci structure with REAL data, rarity and the archetype icon',()=>{
  for(const lang of LOCALES12){
@@ -1062,6 +1063,12 @@ test('share card text never overflows its box at 1080x1350, in all 12 locales wi
   assertLayoutFits(c,layoutFor(c,shareMatch(lang)),lang+' match');
   assertLayoutFits(c,layoutFor(c,shareMatch(lang,{a:'abcdefghijklmno',b:'ponmlkjihgfedcb',overall:100,vibe:0,humor:100,chaos:100,flirt:99,romance:15,ai_comment:{[lang]:comment}})),lang+' match long');
  }
+ // A real three-sentence chemistry report reaches the shared image whole, not just its first sentence.
+ const c=browser();c.localStorage.setItem(c.LS.lang,'tr');
+ const report='Ekrem, maç anında uzun analizlerle gol coşkusunu ve sert itirazları aynı akışta veren yüksek tempolu bir Beşiktaş sesi. Alper\u2019in kendi paylaşımları sahiplenici bir Beşiktaş vurgusu taşırken, sık sık takım gündemi paylaşması ortak futbol eksenini belirginleştiriyor.';
+ const L=layoutFor(c,shareMatch('tr',{a:'ekremalpay8',b:'alperbah',ai_comment:{tr:report}}));
+ assertLayoutFits(c,L,'tr match report');
+ assert.equal(L.insight.sentences,2);
 });
 test('XORA analysis targets three lines, four only as a fallback, dropping whole sentences first',()=>{
  const c=browser();c.localStorage.setItem(c.LS.lang,'en');
