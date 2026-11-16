@@ -237,7 +237,14 @@ async function createCheckout(req: Request, body: any) {
   }
   const service = serviceClient();
 
-  const begun = await service.rpc("xora_begin_credit_purchase", { p_user_id: user.id, p_package_id: body.package_id });
+  // The partner is settled here, server-side, and stamped on the purchase row: the partner code the
+  // browser still remembers, else the one saved with the account at sign-up. The database keeps the
+  // account's first partner and ignores both if one is already set. The iyzico callback is a
+  // cross-site POST without our cookies or storage, so it never decides the partner.
+  const referralCode = [body?.referral_code, user.user_metadata?.ref]
+    .map((v) => String(v || "").trim().toLowerCase())
+    .find((v) => /^[a-z0-9_-]{2,64}$/.test(v)) || null;
+  const begun = await service.rpc("xora_begin_credit_purchase", { p_user_id: user.id, p_package_id: body.package_id, p_referral_code: referralCode });
   if (begun.error) {
     const code = /too_many_pending/.test(begun.error.message) ? "too_many_pending" : /unknown_package/.test(begun.error.message) ? "unknown_package" : "purchase_failed";
     return json({ status: "error", code }, code === "purchase_failed" ? 500 : 400);

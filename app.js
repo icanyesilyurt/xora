@@ -3793,7 +3793,7 @@ async function startCreditPurchase(packageId) {
     return "unauthorized";
   }
   toast(t("pay_opening"));
-  var res = await sb.functions.invoke(PAYMENT_FUNCTION, { body: { action: "create", package_id: packageId, locale: getLang() } });
+  var res = await sb.functions.invoke(PAYMENT_FUNCTION, { body: { action: "create", package_id: packageId, locale: getLang(), referral_code: getReferralCode() || null } });
   var data = res && !res.error ? res.data : null;
   if (!data && res && res.error && res.error.context && typeof res.error.context.clone === "function") {
     try { data = await res.error.context.clone().json(); } catch (e) {}
