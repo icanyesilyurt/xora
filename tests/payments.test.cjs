@@ -333,7 +333,8 @@ test('credits page sends only a package id and shows the result the server confi
  c.location.href='https://example.test/xora/credits.html';const assigned=[];c.location.assign=u=>{assigned.push(u);c.location.href=u;};
  await c.startCreditPurchase('popular');
  assert.equal(sent[0].name,'iyzico-checkout');
- assert.deepEqual(Object.keys(sent[0].body).sort(),['action','locale','package_id'],'no amount, price or credits leave the page');
+ assert.deepEqual(Object.keys(sent[0].body).sort(),['action','locale','package_id','referral_code'],'no amount, price or credits leave the page');
+ assert.equal(sent[0].body.referral_code,null,'no partner remembered in this browser');
  assert.equal(sent[0].body.package_id,'popular');
  assert.deepEqual(assigned,['https://sandbox-cpp.iyzipay.com?token=abc'],'hosted checkout in the same tab');
  assert.equal(await c.startCreditPurchase('unlimited'),'unknown_package');assert.equal(sent.length,1);

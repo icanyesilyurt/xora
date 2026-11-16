@@ -154,7 +154,7 @@
       if (Number(t.unpaid) > 0) pays += '<button type="button" class="btn btn-sm btn-orange" data-act="paid" data-cur="' + esc(t.currency) + '">Ödendi işaretle · ' + esc(money(t.unpaid, t.currency)) + '</button>';
     });
     return '<div class="ad-p' + (p.is_active ? '' : ' off') + '" data-code="' + esc(p.code) + '" data-name="' + esc(p.display_name || "") + '" data-bps="' + esc(p.commission_bps) + '">' +
-      '<div class="ad-head"><b>' + esc(p.display_name || p.code) + '</b><span>' + esc(p.code) + (p.is_active ? '' : ' · durduruldu') + '</span></div>' +
+      '<div class="ad-head"><b>' + esc(p.display_name || p.code) + '</b><span>' + esc(p.code) + (p.has_owner ? ' · hesabı bağlı' : '') + (p.is_active ? '' : ' · durduruldu') + '</span></div>' +
       '<div class="ad-nums">' + nums + '</div>' +
       '<div class="ad-link"><small>Paylaşım</small><input readonly value="' + esc(siteUrl + "?ref=" + encodeURIComponent(p.code)) + '"><button type="button" class="btn btn-sm" data-act="copy">Kopyala</button></div>' +
       '<div class="ad-link"><small>Panel (gizli)</small><input readonly value="' + esc(panelBase + p.panel_key) + '"><button type="button" class="btn btn-sm" data-act="copy">Kopyala</button></div>' +
@@ -172,6 +172,7 @@
         '<div><label for="adName">Partner adı (ör. X hesabının adı)</label><input id="adName" required maxlength="80" placeholder="Kartal Hesabı"></div>' +
         '<div class="ad-row"><div><label for="adCode">Link kodu</label><input id="adCode" required maxlength="40" placeholder="kartal-hesabi"></div>' +
         '<div><label for="adRate">Komisyon %</label><input id="adRate" required type="number" min="0" max="100" step="1" value="25"></div></div>' +
+        '<div><label for="adOwner">Partnerin XORA hesabı e-postası (isteğe bağlı · kendi alımları sayılmaz)</label><input id="adOwner" type="email" maxlength="120" placeholder="partner@ornek.com"></div>' +
         '<button type="submit" class="btn btn-orange">Partner oluştur</button><p class="ad-msg" id="adNewMsg"></p></form></div>' +
       '<div id="adList">' + (list.length ? list.map(partnerHtml).join("") : '<p class="ad-msg">Henüz partner yok.</p>') + '</div>';
 
@@ -194,8 +195,9 @@
       if (list.some(function (p) { return p.code === c; })) { out.textContent = "Bu link kodu zaten kullanılıyor."; return; }
       if (!(rate >= 0 && rate <= 100)) { out.textContent = "Komisyon 0 ile 100 arasında olmalı."; return; }
       out.textContent = "Oluşturuluyor…";
-      try { await call("xora_admin_save_partner", { p_code: c, p_display_name: name.value.trim(), p_commission_bps: rate * 100, p_is_active: true }); await render(); }
-      catch (err) { out.textContent = "Oluşturulamadı: " + err.message; }
+      var owner = document.getElementById("adOwner").value.trim();
+      try { await call("xora_admin_save_partner", { p_code: c, p_display_name: name.value.trim(), p_commission_bps: rate * 100, p_is_active: true, p_owner_email: owner || null }); await render(); }
+      catch (err) { out.textContent = /owner_not_found/.test(err.message) ? "Bu e-postayla bir XORA hesabı yok." : "Oluşturulamadı: " + err.message; }
     });
 
     document.getElementById("adList").addEventListener("click", async function (e) {
